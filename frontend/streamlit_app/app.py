@@ -4,10 +4,18 @@ import pandas as pd
 from datetime import datetime, timedelta
 import plotly.express as px
 import plotly.graph_objects as go
+import sys
+import os
+
+# Add the app directory to Python path for imports
+sys.path.append(os.path.dirname(__file__))
+
+# Import our i18n framework
+from i18n import get_i18n, create_language_switcher, create_bilingual_header, create_footer, format_date_localized, t
 
 # Configure Streamlit page
 st.set_page_config(
-    page_title="AI Africa Funding Tracker",
+    page_title="TAIFA-FIALA | AI Funding Tracker",
     page_icon="🌍",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -17,31 +25,55 @@ st.set_page_config(
 API_BASE_URL = "http://backend:8000/api/v1"
 
 def main():
-    """Main application"""
-    st.title("🌍 AI Africa Funding Tracker")
-    st.markdown("*Comprehensive platform tracking AI funding opportunities across Africa*")
+    """Main TAIFA-FIALA application"""
+    # Initialize i18n
+    i18n = get_i18n()
     
-    # Sidebar
-    st.sidebar.title("Navigation")
+    # Detect language from URL or default
+    query_params = st.query_params
+    if 'lang' in query_params:
+        i18n.set_language(query_params['lang'])
+    
+    # Create bilingual header
+    create_bilingual_header(i18n)
+    
+    # Language switcher in sidebar
+    create_language_switcher(i18n)
+    
+    # Navigation
+    st.sidebar.title(t("nav.dashboard"))
     page = st.sidebar.selectbox(
-        "Choose a page",
-        ["Dashboard", "Funding Opportunities", "Organizations", "Analytics", "Search"]
+        "📍 " + t("nav.dashboard"),
+        [
+            t("nav.dashboard"),
+            t("nav.opportunities"), 
+            t("nav.organizations"),
+            t("nav.analytics"),
+            t("nav.submit")
+        ]
     )
     
-    if page == "Dashboard":
+    # Page routing
+    if page == t("nav.dashboard"):
         show_dashboard()
-    elif page == "Funding Opportunities":
+    elif page == t("nav.opportunities"):
         show_funding_opportunities()
-    elif page == "Organizations":
+    elif page == t("nav.organizations"):
         show_organizations()
-    elif page == "Analytics":
+    elif page == t("nav.analytics"):
         show_analytics()
-    elif page == "Search":
-        show_search()
+    elif page == t("nav.submit"):
+        show_submit_opportunity()
+    
+    # Footer
+    create_footer(i18n)
 
 def show_dashboard():
-    """Dashboard page"""
-    st.header("📊 Dashboard")
+    """Bilingual dashboard page"""
+    st.header("📊 " + t("dashboard.title"))
+    
+    # Welcome message
+    st.info(t("dashboard.welcome"))
     
     # Metrics row
     col1, col2, col3, col4 = st.columns(4)

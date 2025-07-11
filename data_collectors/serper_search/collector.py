@@ -18,8 +18,9 @@ class SerperSearchCollector:
         self.base_url = "https://google.serper.dev/search"
         self.session = None
         
-        # Search queries for different types of funding
+        # Comprehensive search queries for maximum funding discovery
         self.search_queries = [
+            # === CORE AI FUNDING SEARCHES ===
             {
                 "name": "AI Africa Research Funding",
                 "query": "(funding OR grants OR scholarships) AND (AI OR \"artificial intelligence\" OR \"machine learning\") AND Africa AND (research OR academic)",
@@ -33,22 +34,114 @@ class SerperSearchCollector:
             {
                 "name": "African AI Development Programs",
                 "query": "Africa AND (\"AI development\" OR \"AI4D\" OR \"artificial intelligence development\") AND (funding OR grants OR program)",
-                "priority": "medium"
+                "priority": "high"
             },
+            
+            # === SECTOR-SPECIFIC AI FUNDING ===
             {
                 "name": "Africa Health AI Funding",
                 "query": "(health OR healthcare OR medical) AND AI AND Africa AND (funding OR grants OR innovation)",
-                "priority": "medium"
+                "priority": "high"
             },
             {
                 "name": "Africa Agriculture AI Funding",
                 "query": "(agriculture OR farming OR food security) AND AI AND Africa AND (funding OR grants)",
+                "priority": "high"
+            },
+            {
+                "name": "Africa Education AI Funding",
+                "query": "(education OR learning OR training) AND AI AND Africa AND (funding OR grants OR program)",
                 "priority": "medium"
             },
             {
-                "name": "African Startup AI Funding",
-                "query": "(startup OR entrepreneur) AND AI AND Africa AND (funding OR investment OR accelerator OR incubator)",
+                "name": "Africa Fintech AI Funding",
+                "query": "(fintech OR financial OR banking) AND AI AND Africa AND (funding OR grants OR investment)",
+                "priority": "medium"
+            },
+            
+            # === ORGANIZATION-SPECIFIC SEARCHES ===
+            {
+                "name": "Gates Foundation AI Africa",
+                "query": "\"Gates Foundation\" AND AI AND Africa AND (funding OR grants OR program OR initiative)",
+                "priority": "high"
+            },
+            {
+                "name": "World Bank AI Africa",
+                "query": "\"World Bank\" AND AI AND Africa AND (funding OR grants OR program OR digital)",
+                "priority": "high"
+            },
+            {
+                "name": "USAID AI Africa",
+                "query": "USAID AND AI AND Africa AND (funding OR grants OR program OR digital)",
+                "priority": "medium"
+            },
+            {
+                "name": "Google AI Africa",
+                "query": "Google AND (\"AI for Good\" OR \"AI for Everyone\") AND Africa AND (funding OR grants OR program)",
+                "priority": "medium"
+            },
+            {
+                "name": "Microsoft AI Africa",
+                "query": "Microsoft AND \"AI for Good\" AND Africa AND (funding OR grants OR program)",
+                "priority": "medium"
+            },
+            
+            # === COUNTRY-SPECIFIC SEARCHES ===
+            {
+                "name": "Nigeria AI Funding",
+                "query": "Nigeria AND AI AND (funding OR grants OR investment OR accelerator OR startup)",
+                "priority": "medium"
+            },
+            {
+                "name": "Kenya AI Funding", 
+                "query": "Kenya AND AI AND (funding OR grants OR investment OR accelerator OR startup)",
+                "priority": "medium"
+            },
+            {
+                "name": "South Africa AI Funding",
+                "query": "\"South Africa\" AND AI AND (funding OR grants OR investment OR accelerator)",
+                "priority": "medium"
+            },
+            {
+                "name": "Ghana AI Funding",
+                "query": "Ghana AND AI AND (funding OR grants OR investment OR accelerator OR startup)",
                 "priority": "low"
+            },
+            
+            # === STARTUP & INNOVATION FUNDING ===
+            {
+                "name": "African AI Startup Funding",
+                "query": "(startup OR entrepreneur) AND AI AND Africa AND (funding OR investment OR accelerator OR incubator)",
+                "priority": "medium"
+            },
+            {
+                "name": "African AI Innovation Prizes",
+                "query": "Africa AND AI AND (prize OR competition OR challenge OR award) AND (innovation OR technology)",
+                "priority": "medium"
+            },
+            
+            # === RECENT ANNOUNCEMENTS ===
+            {
+                "name": "Recent AI Africa Funding 2025",
+                "query": "AI AND Africa AND funding AND (2025 OR \"this year\" OR recent OR announced)",
+                "priority": "high"
+            },
+            {
+                "name": "New AI Africa Programs",
+                "query": "Africa AND AI AND (\"new program\" OR \"announces\" OR \"launches\" OR \"opens\") AND funding",
+                "priority": "high"
+            },
+            
+            # === ACADEMIC & RESEARCH FUNDING ===
+            {
+                "name": "Africa AI PhD Scholarships",
+                "query": "Africa AND AI AND (PhD OR doctorate OR scholarship OR fellowship OR research)",
+                "priority": "low"
+            },
+            {
+                "name": "Africa AI Research Grants",
+                "query": "Africa AND \"artificial intelligence\" AND (\"research grant\" OR \"research funding\" OR \"R&D funding\")",
+                "priority": "medium"
             }
         ]
     
