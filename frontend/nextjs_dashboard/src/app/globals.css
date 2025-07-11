@@ -1,0 +1,64 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  --primary: #4f46e5; /* Indigo 600 */
+  --primary-dark: #4338ca; /* Indigo 700 */
+  --secondary: #10b981; /* Emerald 500 */
+  --accent: #f97316; /* Orange 500 */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #1a1a1a;
+    --foreground: #e0e0e0;
+    --primary: #6366f1; /* Indigo 500 */
+    --primary-dark: #4f46e5; /* Indigo 600 */
+    --secondary: #059669; /* Emerald 600 */
+    --accent: #ea580c; /* Orange 600 */
+  }
+}
+
+body {
+  font-family: 'Inter', sans-serif; /* Using a common modern font */
+  background-color: var(--background);
+  color: var(--foreground);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Inter', sans-serif;
+  color: var(--foreground);
+}
+
+a {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Custom utility classes or component styles */
+.btn-primary {
+  @apply bg-primary text-white py-2 px-4 rounded-md hover:bg-primary-dark transition-colors duration-300;
+}
+
+.card {
+  @apply bg-white rounded-xl shadow-lg p-6 border border-gray-200;
+}
+
+/* Swiper custom styles to ensure visibility */
+.swiper-button-next, .swiper-button-prev {
+  color: var(--primary) !important;
+}
+
+.swiper-pagination-bullet-active {
+  background: var(--primary) !important;
+}
