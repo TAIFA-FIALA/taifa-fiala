@@ -58,3 +58,30 @@ async def get_funding_opportunity(
         raise HTTPException(status_code=404, detail="Funding opportunity not found")
     
     return opportunity
+
+@router.post("/", response_model=FundingOpportunityResponse)
+async def create_funding_opportunity(
+    opportunity: FundingOpportunityCreate,
+    db: Session = Depends(get_db)
+):
+    """Create a new funding opportunity"""
+    db_opportunity = FundingOpportunity(**opportunity.dict())
+    db.add(db_opportunity)
+    db.commit()
+    db.refresh(db_opportunity)
+    return db_opportunity
+
+@router.get("/search/", response_model=List[FundingOpportunityResponse])
+async def search_funding_opportunities(
+    q: str = Query(..., description="Search query"),
+    limit: int = Query(10, ge=1, le=100),
+    db: Session = Depends(get_db)
+):
+    """Search funding opportunities by title or description"""
+    search_filter = f"%{q}%"
+    opportunities = db.query(FundingOpportunity).filter(
+        (FundingOpportunity.title.ilike(search_filter)) |
+        (FundingOpportunity.description.ilike(search_filter))
+    ).limit(limit).all()
+    
+    return opportunities
