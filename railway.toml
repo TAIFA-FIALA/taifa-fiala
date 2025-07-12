@@ -1,0 +1,62 @@
+[build]
+builder = "nixpacks"
+
+[deploy]
+healthcheckPath = "/"
+healthcheckTimeout = 300
+restartPolicyType = "always"
+
+# PostgreSQL Database Service
+[[services]]
+name = "taifa-database"
+source = "postgresql"
+
+[services.variables]
+POSTGRES_DB = "taifa_production"
+POSTGRES_USER = "taifa_admin"
+
+# FastAPI Backend Service  
+[[services]]
+name = "taifa-backend"
+source = "backend"
+
+[services.variables]
+PORT = "8000"
+ENVIRONMENT = "production"
+DEBUG = "false"
+
+[services.build]
+buildCommand = "pip install -r requirements.txt"
+startCommand = "uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+
+# Next.js Frontend Service
+[[services]]
+name = "taifa-frontend"
+source = "frontend/nextjs_dashboard"
+
+[services.variables]
+NODE_ENV = "production"
+PORT = "3000"
+
+[services.build]
+buildCommand = "npm install && npm run build"
+startCommand = "npm start"
+
+# Data Collection Service
+[[services]]
+name = "taifa-collector"
+source = "data_collectors"
+
+[services.variables]
+PORT = "8080"
+COLLECTION_SCHEDULE = "0 6 * * *"
+
+[services.build]
+buildCommand = "pip install -r requirements.txt"
+startCommand = "python scheduler.py"
+
+# Domain Configuration
+[environments.production.domains]
+"taifa-africa.com" = "taifa-frontend"
+"fiala-afrique.com" = "taifa-frontend"  
+"api.taifa-fiala.net" = "taifa-backend"
