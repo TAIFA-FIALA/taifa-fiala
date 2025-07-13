@@ -2,7 +2,6 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import NullPool
-import asyncio
 import re
 
 from app.core.config import settings
@@ -37,6 +36,9 @@ async def get_db():
     """Dependency to get async database session"""
     async with SessionLocal() as session:
         yield session
+
+# Alias for backward compatibility
+get_database = get_db
 
 async def create_tables():
     """Create all tables"""
