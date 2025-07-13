@@ -1,0 +1,108 @@
+# TAIFA CrewAI Enhanced ETL Pipeline Requirements
+# Core CrewAI and AI framework dependencies
+
+# CrewAI Framework
+crewai[tools]==0.32.0
+crewai-tools==0.0.32
+
+# LangChain ecosystem
+langchain==0.1.20
+langchain-community==0.0.35
+langchain-openai==0.1.8
+langchain-core==0.1.52
+
+# Large Language Model providers
+openai==1.35.0
+anthropic==0.25.0
+
+# Microsoft Azure Cognitive Services
+azure-cognitiveservices-language-translatortext==3.0.0
+azure-common==1.1.28
+
+# Web scraping and automation
+playwright==1.44.0
+selenium==4.21.0
+beautifulsoup4==4.12.3
+requests==2.31.0
+aiohttp==3.9.5
+
+# Data processing and analysis
+pandas==2.0.3
+numpy==1.24.4
+scikit-learn==1.3.2
+nltk==3.8.1
+
+# Database and ORM
+SQLAlchemy==2.0.20
+psycopg2-binary==2.9.7
+alembic==1.11.1
+
+# API integrations
+apify-client==1.6.4
+google-cloud-translate==3.15.3
+
+# Translation services
+deep-translator==1.11.4
+
+# Task scheduling and async
+celery==5.3.1
+redis==4.6.0
+schedule==1.2.0
+asyncio-throttle==1.0.2
+
+# Email and notifications
+jinja2==3.1.2
+smtplib-ssl==1.0.0
+
+# Configuration and environment
+python-dotenv==1.0.0
+pydantic==2.1.1
+pydantic-settings==2.0.2
+
+# Monitoring and logging
+prometheus-client==0.17.1
+structlog==23.1.0
+
+# Utilities
+python-dateutil==2.8.2
+pytz==2023.3
+hashlib-compat==1.0.1
+uuid==1.30
+
+# Data validation and parsing
+marshmallow==3.20.1
+validators==0.20.0
+
+# File processing
+python-magic==0.4.27
+chardet==5.1.0
+
+# Similarity and NLP
+sentence-transformers==2.2.2
+spacy==3.6.1
+fuzzywuzzy==0.18.0
+python-Levenshtein==0.21.1
+
+# Testing
+pytest==7.4.0
+pytest-asyncio==0.21.1
+pytest-mock==3.11.1
+factory-boy==3.3.0
+
+# Development tools
+black==23.7.0
+flake8==6.0.0
+mypy==1.5.1
+pre-commit==3.3.3
+
+# FastAPI (if using API endpoints)
+fastapi==0.101.1
+uvicorn==0.23.2
+
+# Additional CrewAI tools (if needed)
+crewai-tools[search]==0.0.32
+crewai-tools[browser]==0.0.32
+crewai-tools[file]==0.0.32
+
+# Note: Some packages may need to be installed separately or from specific sources
+# Check the latest versions and compatibility with your Python version

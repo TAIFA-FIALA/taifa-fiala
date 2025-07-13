@@ -16,6 +16,7 @@ from api_client import (
     fetch_opportunities_sync, search_opportunities_sync, 
     show_api_status, handle_api_error, demo_add_serper_opportunity
 )
+from admin import render_admin_page
 
 # Configure Streamlit page
 st.set_page_config(
@@ -54,7 +55,8 @@ def main():
             t("nav.organizations"),
             t("nav.analytics"),
             "🇷🇼 Rwanda Demo",  # Add demo page
-            t("nav.submit")
+            t("nav.submit"),
+            "🛠️ Admin Portal"  # Add admin portal
         ]
     )
     
@@ -71,6 +73,8 @@ def main():
         show_rwanda_demo()
     elif page == t("nav.submit"):
         show_submit_opportunity()
+    elif page == "🛠️ Admin Portal":
+        show_admin_portal()
     
     # Footer
     create_footer(i18n)
@@ -979,3 +983,11 @@ def show_search():
                 st.info("💡 Try broader terms like 'AI', 'health', 'Africa', or 'grants'")
         else:
             st.warning("Please enter a search query.")
+
+
+def show_admin_portal():
+    """Show the admin portal interface"""
+    render_admin_page()
+
+if __name__ == "__main__":
+    main()

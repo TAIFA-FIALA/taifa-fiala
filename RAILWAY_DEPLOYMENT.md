@@ -12,7 +12,7 @@
 - [ ] SERPER_DEV_API_KEY (for funding discovery)
 - [ ] OPENAI_API_KEY (for translations)
 - [ ] Custom domains DNS configuration
-- [ ] N8N_WEBHOOK_URL (for Notion integration)
+- [ ] N8N_WEBHOOK_URL (for Notion and other integrations)
 - [ ] SMTP credentials (for notifications)
 
 ### 3. **Domain Configuration**

@@ -6,6 +6,10 @@ const nextConfig: NextConfig = {
     optimizePackageImports: ['date-fns'],
   },
   
+  // Turbopack configuration - empty for now as we're running without turbopack
+  // We'll use standard webpack only to avoid configuration mismatches
+
+  
   // Output configuration for Railway
   output: 'standalone',
   
@@ -104,21 +108,8 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: false,
   },
   
-  // Internationalization setup for bilingual support
-  i18n: {
-    locales: ['en', 'fr'],
-    defaultLocale: 'en',
-    domains: [
-      {
-        domain: 'taifa-africa.com',
-        defaultLocale: 'en',
-      },
-      {
-        domain: 'fiala-afrique.com', 
-        defaultLocale: 'fr',
-      },
-    ],
-  },
+  // NOTE: i18n configuration has been moved to middleware.ts for App Router compatibility
+  // See: https://nextjs.org/docs/app/building-your-application/routing/internationalization
 };
 
 export default nextConfig;

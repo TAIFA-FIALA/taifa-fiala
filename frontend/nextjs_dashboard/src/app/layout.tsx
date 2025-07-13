@@ -95,7 +95,7 @@ export default function RootLayout({
                 <ul className="space-y-2 text-sm">
                   <li><Link href="/funding" className="hover:text-white">Search Funding</Link></li>
                   <li><Link href="/organizations" className="hover:text-white">Organizations</Link></li>
-                  <li><Link href="/submit-rfp" className="hover:text-white">Submit Opportunity</Link></li>
+                  <li><Link href="/submit-opportunity" className="hover:text-white">Submit Opportunity</Link></li>
                 </ul>
               </div>
               <div>

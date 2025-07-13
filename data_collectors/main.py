@@ -3,10 +3,6 @@ import logging
 from datetime import datetime
 import sys
 import os
-from dotenv import load_dotenv
-
-# Load environment variables
-load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env'))
 
 # Add the backend app to Python path so we can import models and config
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'backend'))
@@ -19,7 +15,7 @@ from database.connector import DatabaseConnector
 
 # Configure logging
 logging.basicConfig(
-    level=getattr(logging, settings.LOG_LEVEL),
+    level=getattr(logging, settings.LOG_LEVEL, logging.INFO),
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 

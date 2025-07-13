@@ -92,7 +92,7 @@ export default function FundingPage() {
       params.append('limit', String(itemsPerPage));
 
       const queryString = params.toString();
-      router.push(`/funding?${queryString}`, { shallow: true });
+      router.push(`/funding?${queryString}`);
 
       try {
         const res = await fetch(`http://localhost:8000/api/v1/rfps/?${queryString}`);
@@ -125,7 +125,7 @@ export default function FundingPage() {
     setSelectedCountry('');
     setCurrentPage(1);
     setItemsPerPage(10);
-    router.push('/funding', { shallow: true });
+    router.push('/funding');
   };
 
   const totalPages = Math.ceil(totalCount / itemsPerPage);
