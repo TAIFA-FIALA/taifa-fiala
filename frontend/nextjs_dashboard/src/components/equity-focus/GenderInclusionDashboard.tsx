@@ -166,7 +166,7 @@ export default function GenderInclusionDashboard({ className = '' }: GenderInclu
     datasets: [
       {
         data: genderData.map(item => item.funding_percentage),
-        backgroundColor: ['#3b82f6', '#ec4899', '#8b5cf6'],
+        backgroundColor: ['#1F2A44', '#4B9CD3', '#F0E68C'],
         borderWidth: 0,
       },
     ],
@@ -179,24 +179,24 @@ export default function GenderInclusionDashboard({ className = '' }: GenderInclu
       {
         label: 'Female-led Projects',
         data: trendData.map(item => item.female_led_percentage),
-        borderColor: '#ec4899',
-        backgroundColor: 'rgba(236, 72, 153, 0.1)',
+        borderColor: '#4B9CD3',
+        backgroundColor: 'rgba(75, 156, 211, 0.1)',
         fill: true,
         tension: 0.4
       },
       {
         label: 'Youth-led Projects',
         data: trendData.map(item => item.youth_led_percentage),
-        borderColor: '#3b82f6',
-        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+        borderColor: '#F0E68C',
+        backgroundColor: 'rgba(240, 230, 140, 0.1)',
         fill: true,
         tension: 0.4
       },
       {
         label: 'Rural Projects',
         data: trendData.map(item => item.rural_percentage),
-        borderColor: '#8b5cf6',
-        backgroundColor: 'rgba(139, 92, 246, 0.1)',
+        borderColor: '#1F2A44',
+        backgroundColor: 'rgba(31, 42, 68, 0.1)',
         fill: true,
         tension: 0.4
       }
@@ -240,12 +240,12 @@ export default function GenderInclusionDashboard({ className = '' }: GenderInclu
   };
 
   if (loading) {
-    return <div className="flex justify-center items-center h-64 bg-gray-50 rounded-lg">Loading inclusion data...</div>;
+    return <div className="flex justify-center items-center h-64 bg-[#F0E68C] bg-opacity-10 rounded-lg text-[#1F2A44]">Loading inclusion data...</div>;
   }
 
   if (error) {
     return (
-      <div className="flex justify-center items-center h-64 bg-red-50 rounded-lg text-red-500">
+      <div className="flex justify-center items-center h-64 bg-[#1F2A44] bg-opacity-10 rounded-lg text-[#1F2A44]">
         {error} Please try again later.
       </div>
     );
