@@ -8,11 +8,14 @@ from sqlalchemy import pool
 from alembic import context
 
 # Add the app directory to Python path
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+current_dir = os.path.dirname(os.path.abspath(__file__))
+backend_dir = os.path.dirname(current_dir)
+sys.path.insert(0, backend_dir)
 
 from app.core.config import settings
 from app.core.database import Base
-from app.models import FundingOpportunity, Organization, AIDomain, FundingCategory, DataSource, RFP
+# Import all models to ensure they're registered
+from app.models import *
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

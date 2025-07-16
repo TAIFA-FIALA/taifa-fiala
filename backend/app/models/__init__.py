@@ -15,6 +15,10 @@ from app.models.equity import (
     FeaturedFounder, FundingStageMetric, StageProgression,
     CollaborationSuggestion, SuggestedOpportunity
 )
+from app.models.validation import (
+    ValidationResult, DuplicateDetection, ProcessingJob, 
+    ModuleHealth, ContentFingerprint, SourceQuality
+)
 
 # Export all models for easy importing
 __all__ = [
@@ -44,6 +48,14 @@ __all__ = [
     "StageProgression",
     "CollaborationSuggestion",
     "SuggestedOpportunity",
+    
+    # ETL Pipeline models
+    "ValidationResult",
+    "DuplicateDetection",
+    "ProcessingJob",
+    "ModuleHealth",
+    "ContentFingerprint",
+    "SourceQuality",
 ]
 
 # Model relationships summary for reference:

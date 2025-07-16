@@ -101,6 +101,31 @@ class FundingOpportunity(Base):
     parsed_with_ai = Column(Boolean, default=False)
     active = Column(Boolean, default=True)
     
+    # ETL Pipeline Fields
+    # Enhanced duplicate detection
+    title_hash = Column(String(64), index=True)
+    semantic_hash = Column(String(64), index=True)
+    url_hash = Column(String(64), index=True)
+    
+    # Content classification
+    content_type = Column(String(50), default='funding_opportunity', index=True)
+    content_classification_confidence = Column(Float)
+    classification_method = Column(String(50))
+    
+    # Validation tracking
+    validation_status = Column(String(20), default='pending', index=True)
+    validation_confidence_score = Column(Float)
+    validation_flags = Column(JSONB)
+    validation_notes = Column(Text)
+    validated_at = Column(DateTime(timezone=True))
+    validated_by = Column(String(50))
+    requires_human_review = Column(Boolean, default=True)
+    
+    # Module tracking
+    ingestion_module = Column(String(50), index=True)
+    processing_id = Column(String(50), index=True)
+    processing_metadata = Column(JSONB)
+    
     # Multilingual support
     detected_language = Column(String(5), default='en')
     translation_status = Column(JSONB)
@@ -122,6 +147,10 @@ class FundingOpportunity(Base):
     geographic_scopes = relationship("GeographicScope",
                                    secondary=funding_opportunity_geographic_scopes, 
                                    back_populates="opportunities")
+    
+    # ETL Pipeline relationships
+    validation_results = relationship("ValidationResult", back_populates="opportunity")
+    content_fingerprint = relationship("ContentFingerprint", back_populates="opportunity", uselist=False)
     
     # Type-specific properties and methods
     @property

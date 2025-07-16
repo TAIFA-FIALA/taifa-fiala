@@ -6,7 +6,7 @@ from typing import List, Optional, Dict, Any
 from app.core.database import get_db
 from app.models import Organization, FundingOpportunity
 from app.schemas.organization import OrganizationResponse, OrganizationWithFundingResponse
-from app.schemas.funding import FundingOpportunityResponse
+from app.schemas.funding import FundingOpportunityResponse # todo: not implemented
 
 router = APIRouter()
 
