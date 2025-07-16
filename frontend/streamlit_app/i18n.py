@@ -242,7 +242,7 @@ class TaifaI18n:
         """Get all supported languages"""
         return self.supported_languages
 
-def create_language_switcher(i18n: TaifaI18n):
+def create_language_switcher(i18n: TaifaI18n, key: str = "language_selector"):
     """Create a language switcher component"""
     current_lang = i18n.get_current_language()
     languages = i18n.get_supported_languages()
@@ -271,14 +271,12 @@ def create_language_switcher(i18n: TaifaI18n):
             range(len(lang_options)),
             index=current_index,
             format_func=lambda x: lang_options[x],
-            key="language_selector"
+            key=key
         )
         
-        # Update language if changed
+        # Return selected language
         selected_lang = lang_codes[selected_index]
-        if selected_lang != current_lang:
-            i18n.set_language(selected_lang)
-            st.rerun()
+        return selected_lang
 
 def create_bilingual_header(i18n: TaifaI18n):
     """Create bilingual header with TAIFA-FIALA branding"""

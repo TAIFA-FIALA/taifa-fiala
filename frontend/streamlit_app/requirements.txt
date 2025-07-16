@@ -3,3 +3,4 @@ requests==2.31.0
 pandas==2.1.4
 plotly==5.17.0
 numpy==1.26.2
+aiohttp==3.9.1

@@ -227,16 +227,22 @@ class UnifiedScraperModule:
                     Extract funding opportunity information from this webpage.
                     Look for:
                     - Funding program titles and names
-                    - Organization offering the funding
+                    - Organization offering the funding (name and website URL)
                     - Grant amounts and currencies
                     - Application deadlines
                     - Eligibility criteria
                     - Contact information
                     - Application processes
+                    - Organization website/homepage URL (different from the current page)
                     
                     Return structured data as JSON with fields:
-                    title, organization_name, description, amount, currency, deadline, 
-                    eligibility_criteria, contact_info, application_process
+                    title, organization_name, organization_website, description, amount, currency, deadline, 
+                    eligibility_criteria, contact_info, application_process, application_url
+                    
+                    IMPORTANT: 
+                    - organization_website should be the main organization website (e.g., https://gatesfoundation.org)
+                    - application_url should be the direct link to apply (if different from current page)
+                    - If organization website is not found, set it to null
                     """
                 )
             )
@@ -413,13 +419,17 @@ class UnifiedScraperModule:
                     "amount": opp.get("amount"),
                     "currency": opp.get("currency", "USD"),
                     "deadline": opp.get("deadline"),
-                    "source_url": source_url,
+                    "source_url": source_url,  # URL where we found this info
+                    "application_url": opp.get("application_url") or opp.get("organization_website") or source_url,  # URL to apply or org website
                     "source_name": f"Admin Portal - {source_type}",
                     "source_type": "admin_scraping",
+                    "status": "under_review",  # Set new opportunities for review
                     "processing_metadata": {
                         "input_source": "admin_portal",
                         "extracted_at": datetime.utcnow().isoformat(),
-                        "extraction_method": "crawl4ai"
+                        "extraction_method": "crawl4ai",
+                        "organization_website": opp.get("organization_website"),
+                        "scraped_from_url": source_url
                     }
                 }
                 standardized_opportunities.append(standardized_opp)

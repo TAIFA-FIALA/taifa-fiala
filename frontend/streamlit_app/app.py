@@ -32,18 +32,24 @@ API_BASE_URL = "http://backend:8000/api/v1"
 def main():
     """Main TAIFA-FIALA application"""
     # Initialize i18n
-    i18n = get_i18n()
-    
-    # Detect language from URL or default
-    query_params = st.query_params
-    if 'lang' in query_params:
-        i18n.set_language(query_params['lang'])
+i18n = get_i18n()
+
+# Detect language from URL or default
+query_params = st.experimental_get_query_params()
+if 'lang' in query_params:
+    i18n.set_language(query_params['lang'])
+
+# Language switcher in sidebar (created once)
+selected_lang = create_language_switcher(i18n, key="main_language_switcher")
+if selected_lang != i18n.get_current_language():
+    i18n.set_language(selected_lang)
+    st.rerun()
+
+def main():
+    """Main TAIFA-FIALA application"""
     
     # Create bilingual header
     create_bilingual_header(i18n)
-    
-    # Language switcher in sidebar
-    create_language_switcher(i18n)
     
     # Navigation
     st.sidebar.title(t("nav.dashboard"))
@@ -90,9 +96,9 @@ def show_dashboard():
     api_connected = show_api_status()
     
     if api_connected:
-        # Fetch real data from API
+        # Fetch real data from API (only published opportunities)
         with st.spinner("Loading opportunities..."):
-            opportunities = handle_api_error(fetch_opportunities_sync, limit=1000)
+            opportunities = handle_api_error(fetch_opportunities_sync, limit=1000, status='published')
         
         if opportunities:
             # Calculate real metrics
@@ -322,7 +328,7 @@ def show_funding_opportunities():
             st.subheader("🕒 Recent Opportunities")
             
             with st.spinner("Loading recent opportunities..."):
-                recent_opps = handle_api_error(fetch_opportunities_sync, skip=0, limit=10)
+                recent_opps = handle_api_error(fetch_opportunities_sync, skip=0, limit=10, status='published')
             
             if recent_opps:
                 st.info(f"Showing {len(recent_opps)} most recent opportunities. Use search to find specific funding.")
@@ -635,7 +641,7 @@ def run_rwanda_demo_pipeline(search_query: str):
         st.markdown("**User's search results for 'Rwanda':**")
         for i, result in enumerate(search_results[:3], 1):
             st.markdown(f"{i}. **{result.get('title', 'Untitled')}**")
-            st.markdown(f"   💰 Amount: {f'${result[\"amount\"]:,.0f}' if result.get('amount') else 'Not specified'}")
+            st.markdown(f"   💰 Amount: {'${:,.0f}'.format(result['amount']) if result.get('amount') else 'Not specified'}")
             st.markdown(f"   📅 Added: {result.get('created_at', 'Unknown')[:10]}")
     else:
         st.info("Search results will appear once API is connected and data is added.")
