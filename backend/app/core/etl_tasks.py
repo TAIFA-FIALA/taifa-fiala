@@ -164,7 +164,7 @@ async def process_rss_feed_task(task: ETLTask) -> IngestionResult:
         
         processing_time = (datetime.now() - start_time).total_seconds()
         
-        return IngestionResult(
+        result = IngestionResult(
             success=True,
             data={
                 'opportunities': opportunities,
@@ -177,6 +177,20 @@ async def process_rss_feed_task(task: ETLTask) -> IngestionResult:
             processing_time=processing_time,
             requires_human_review=any(opp['requires_review'] for opp in opportunities)
         )
+        
+        # Automatically index in vector database if opportunities were found
+        if opportunities and len(opportunities) > 0:
+            try:
+                # Dynamically import to avoid circular imports
+                from .vector_indexing import index_rss_feed_results
+                
+                # Schedule vector indexing asynchronously
+                asyncio.create_task(index_rss_feed_results(result.data))
+                logger.info(f"Scheduled vector indexing for {len(opportunities)} opportunities from RSS feed: {feed_url}")
+            except Exception as e:
+                logger.warning(f"Failed to schedule vector indexing for RSS feed: {e}")
+        
+        return result
         
     except Exception as e:
         logger.error(f"RSS processing failed: {e}")
