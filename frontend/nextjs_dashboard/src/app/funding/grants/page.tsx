@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { format } from 'date-fns';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -33,7 +33,7 @@ interface Organization {
 const grantCategories = ['Research', 'Education', 'Health', 'Agriculture', 'Technology', 'Social Impact'];
 const statuses = ['open', 'closed', 'awarded'];
 
-export default function GrantsPage() {
+function GrantContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -442,5 +442,15 @@ export default function GrantsPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function GrantsPage() {
+  return (
+    <Suspense fallback={<div className="flex justify-center items-center h-64">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+    </div>}>
+      <GrantContent />
+    </Suspense>
   );
 }

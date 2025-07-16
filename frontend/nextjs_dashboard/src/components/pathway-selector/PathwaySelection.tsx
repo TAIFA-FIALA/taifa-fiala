@@ -1,7 +1,6 @@
 // components/pathway-selector/PathwaySelector.tsx
 import { useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 
 // Define the pathways available to users with inverted color themes
 const pathways = [

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { format } from 'date-fns';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -36,7 +36,7 @@ const investmentCategories = ['Seed', 'Series A', 'Series B', 'Growth', 'Fintech
 const statuses = ['open', 'closed', 'awarded'];
 const fundingStages = ['Pre-seed', 'Seed', 'Series A', 'Series B', 'Series C', 'Growth', 'Bridge'];
 
-export default function InvestmentsPage() {
+function InvestmentContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -454,5 +454,15 @@ export default function InvestmentsPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function InvestmentsPage() {
+  return (
+    <Suspense fallback={<div className="flex justify-center items-center h-64">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+    </div>}>
+      <InvestmentContent />
+    </Suspense>
   );
 }

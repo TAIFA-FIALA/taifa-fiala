@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { Search, Filter, ToggleLeft, ToggleRight, Database, Clock, Globe, Users, Brain, TrendingUp } from 'lucide-react';
+import { Search, Filter, Database, Clock, Globe, Users, Brain, TrendingUp } from 'lucide-react';
 
 interface SearchMode {
   mode: 'discover' | 'explore';

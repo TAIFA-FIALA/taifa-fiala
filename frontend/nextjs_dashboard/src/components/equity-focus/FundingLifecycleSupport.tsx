@@ -275,7 +275,7 @@ export default function FundingLifecycleSupport({ className = '' }: FundingLifec
         {/* Left Column: Chart and Stage selector */}
         <div className="lg:col-span-1">
           <div className="bg-gray-50 p-4 rounded-lg border border-gray-100 h-64 mb-4">
-            <Chart type="bar" data={chartData} options={chartOptions} />
+            <Chart data={chartData} options={chartOptions} />
           </div>
           
           <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">

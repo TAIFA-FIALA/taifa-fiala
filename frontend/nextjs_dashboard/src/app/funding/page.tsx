@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+"use client";
+
+import React, { useState, useEffect, Suspense } from 'react';
 import { format } from 'date-fns';
 import { useRouter, useSearchParams } from 'next/navigation';
 
@@ -64,7 +66,7 @@ export default function FundingPage() {
 
         setOrganizations(orgsData);
         setCountries(countriesData);
-      } catch (err: any) {
+      } catch (err: Error | unknown) {
         console.error("Failed to fetch initial data:", err);
         setError("Failed to load initial data (organizations, countries).");
       }
@@ -102,7 +104,7 @@ export default function FundingPage() {
         const data = await res.json();
         setOpportunities(data.rfps); // Access rfps array
         setTotalCount(data.total_count); // Access total_count
-      } catch (err: any) {
+      } catch (err: Error | unknown) {
         console.error("Failed to fetch funding opportunities:", err);
         setError("Failed to load funding opportunities.");
       } finally {

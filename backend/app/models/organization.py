@@ -75,6 +75,42 @@ class Organization(Base):
     # Community features
     community_rating = Column(Numeric(2,1))  # 1.0-5.0 rating from community
     
+    # Enrichment tracking
+    enrichment_status = Column(String(20), default='pending', index=True)  # pending, in_progress, completed, failed
+    enrichment_completeness = Column(Integer, default=0)  # 0-100: percentage of fields populated
+    last_enrichment_attempt = Column(DateTime(timezone=True))
+    enrichment_sources = Column(Text)  # JSON array of data sources used
+    
+    # Cultural and heritage context
+    founding_story = Column(Text)  # Organization's founding narrative
+    cultural_significance = Column(Text)  # Cultural importance and context
+    local_partnerships = Column(Text)  # JSON array of local partnerships
+    community_impact = Column(Text)  # Description of community impact
+    
+    # Extended profile data
+    logo_url = Column(String(500))
+    mission_statement = Column(Text)
+    vision_statement = Column(Text)
+    leadership_team = Column(Text)  # JSON array of key leaders
+    notable_achievements = Column(Text)  # JSON array of achievements
+    awards_recognition = Column(Text)  # JSON array of awards
+    
+    # Social media and online presence
+    linkedin_url = Column(String(500))
+    twitter_handle = Column(String(100))
+    facebook_url = Column(String(500))
+    instagram_url = Column(String(500))
+    
+    # Financial and operational context
+    annual_budget_range = Column(String(50))  # e.g., "1M-5M USD"
+    staff_size_range = Column(String(50))  # e.g., "10-50 employees"
+    languages_supported = Column(Text)  # JSON array of languages
+    
+    # Impact metrics
+    total_funding_distributed = Column(Numeric(15,2))  # Total funding amount distributed
+    beneficiaries_count = Column(Integer)  # Number of beneficiaries served
+    success_stories = Column(Text)  # JSON array of success stories
+    
     # Status and timestamps
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
@@ -214,6 +250,41 @@ class Organization(Base):
         if self.funding_opportunities:
             return max(opp.discovered_date for opp in self.funding_opportunities)
         return None
+    
+    @property
+    def enrichment_status_display(self):
+        """Get user-friendly enrichment status"""
+        status_map = {
+            'pending': '⏳ Pending',
+            'in_progress': '🔄 In Progress',
+            'completed': '✅ Completed',
+            'failed': '❌ Failed'
+        }
+        return status_map.get(self.enrichment_status, self.enrichment_status)
+    
+    @property
+    def enrichment_completeness_grade(self):
+        """Get enrichment completeness letter grade"""
+        if self.enrichment_completeness >= 90:
+            return 'A'
+        elif self.enrichment_completeness >= 80:
+            return 'B'
+        elif self.enrichment_completeness >= 70:
+            return 'C'
+        elif self.enrichment_completeness >= 60:
+            return 'D'
+        else:
+            return 'F'
+    
+    @property
+    def needs_enrichment(self):
+        """Check if organization needs enrichment"""
+        return (
+            self.enrichment_status in ['pending', 'failed'] or
+            self.enrichment_completeness < 70 or
+            (self.last_enrichment_attempt and 
+             (func.now() - self.last_enrichment_attempt).days > 30)
+        )
     
     def update_performance_metrics(self, discovered: int = 0, unique_added: int = 0, 
                                  duplicates: int = 0, data_quality: int = None):

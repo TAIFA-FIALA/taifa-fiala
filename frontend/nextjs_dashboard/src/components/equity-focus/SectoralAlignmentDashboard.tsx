@@ -291,7 +291,7 @@ export default function SectoralAlignmentDashboard({ className = '' }: SectoralA
 
       {/* Chart */}
       <div className="h-80 mt-4">
-        <Chart type="bar" data={chartData} options={chartOptions} />
+        <Chart data={chartData} options={chartOptions} />
       </div>
 
       {/* Critical Gap Alert */}

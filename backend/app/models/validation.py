@@ -95,8 +95,8 @@ class ProcessingJob(Base):
     __tablename__ = "processing_jobs"
     
     id = Column(String(50), primary_key=True, index=True)  # UUID
-    job_type = Column(String(30), index=True)  # ingestion, validation, enhancement, etc.
-    module_type = Column(String(30), index=True)  # rss_feed, serper_search, user_submission, crawl4ai
+    job_type = Column(String(30), index=True)  # ingestion, validation, enhancement, organization_enrichment, etc.
+    module_type = Column(String(30), index=True)  # rss_feed, serper_search, user_submission, crawl4ai, enrichment_pipeline
     
     # Job status
     status = Column(String(20), default='queued', index=True)  # queued, processing, completed, failed
@@ -105,6 +105,7 @@ class ProcessingJob(Base):
     # Processing metadata
     source_data = Column(JSONB)  # Input data
     result_data = Column(JSONB)  # Output data
+    metadata = Column(JSONB)  # Additional job metadata (organization_id, enrichment_type, etc.)
     error_message = Column(Text)
     retry_count = Column(Integer, default=0)
     max_retries = Column(Integer, default=3)

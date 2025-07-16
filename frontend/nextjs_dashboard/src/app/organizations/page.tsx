@@ -1,4 +1,6 @@
-import React from 'react';
+"use client";
+
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Scrollbar, A11y } from 'swiper/modules';
@@ -23,26 +25,38 @@ interface Organization {
   logo_url?: string;
 }
 
-async function getOrganizations(): Promise<Organization[]> {
-  try {
-    const res = await fetch('http://localhost:8000/api/v1/organizations/');
-    if (!res.ok) {
-      throw new Error(`HTTP error! status: ${res.status}`);
-    }
-    return res.json();
-  } catch (error) {
-    console.error("Failed to fetch organizations:", error);
-    return [];
-  }
-}
+export default function OrganizationsPage() {
+  const [organizations, setOrganizations] = useState<Organization[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
-export default async function OrganizationsPage() {
-  const organizations = await getOrganizations();
+  useEffect(() => {
+    async function getOrganizations() {
+      try {
+        setLoading(true);
+        const res = await fetch('http://localhost:8000/api/v1/organizations/');
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        const data = await res.json();
+        setOrganizations(data);
+      } catch (error) {
+        console.error("Failed to fetch organizations:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    getOrganizations();
+  }, []);
 
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-extrabold text-gray-900 mb-6 text-center">Our Valued Partners</h1>
-      {organizations.length === 0 ? (
+      {loading ? (
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+        </div>
+      ) : organizations.length === 0 ? (
         <p className="text-center text-gray-600">No organizations found.</p>
       ) : (
         <Swiper

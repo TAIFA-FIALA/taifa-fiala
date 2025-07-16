@@ -6,34 +6,7 @@ import {
   SortAsc, SortDesc, Filter, Download, Share2 
 } from 'lucide-react';
 import OpportunityCard from './OpportunityCard';
-
-interface FundingOpportunity {
-  id: number;
-  title: string;
-  description: string;
-  amount_min?: number;
-  amount_max?: number;
-  amount_exact?: number;
-  currency: string;
-  deadline?: string;
-  status: string;
-  provider_organization?: {
-    name: string;
-    type: string;
-    country?: string;
-  };
-  funding_type?: {
-    name: string;
-    category: string;
-  };
-  equity_score?: number;
-  underserved_focus?: boolean;
-  women_focus?: boolean;
-  youth_focus?: boolean;
-  rural_focus?: boolean;
-  created_at?: string;
-  last_checked?: string;
-}
+import { FundingOpportunity } from '@/types/funding';
 
 interface SearchResultsProps {
   searchMode: 'discover' | 'explore';
@@ -90,13 +63,19 @@ export default function SearchResults({ searchMode, filters, loading, onLoadMore
       deadline: "2024-09-15",
       status: "active",
       provider_organization: {
+        id: 101,
         name: "Bill & Melinda Gates Foundation",
         type: "Private Foundation",
-        country: "USA"
+        country: "USA",
+        is_granting_agency: true,
+        is_venture_capital: false,
       },
       funding_type: {
+        id: 201,
         name: "Development Grant",
-        category: "grant"
+        category: "grant",
+        requires_equity: false,
+        requires_repayment: false,
       },
       equity_score: 85,
       underserved_focus: true,
@@ -116,13 +95,19 @@ export default function SearchResults({ searchMode, filters, loading, onLoadMore
       deadline: "2024-08-30",
       status: "active",
       provider_organization: {
+        id: 102,
         name: "Acumen Fund",
         type: "Impact Investor",
-        country: "Kenya"
+        country: "Kenya",
+        is_granting_agency: false,
+        is_venture_capital: true,
       },
       funding_type: {
+        id: 202,
         name: "Seed Investment",
-        category: "investment"
+        category: "investment",
+        requires_equity: true,
+        requires_repayment: true,
       },
       equity_score: 72,
       underserved_focus: true,
@@ -141,13 +126,19 @@ export default function SearchResults({ searchMode, filters, loading, onLoadMore
       deadline: "2024-10-01",
       status: "active",
       provider_organization: {
+        id: 103,
         name: "Google AI",
         type: "Corporate",
-        country: "USA"
+        country: "USA",
+        is_granting_agency: true,
+        is_venture_capital: false,
       },
       funding_type: {
+        id: 203,
         name: "Research Fellowship",
-        category: "fellowship"
+        category: "fellowship",
+        requires_equity: false,
+        requires_repayment: false,
       },
       equity_score: 90,
       underserved_focus: false,

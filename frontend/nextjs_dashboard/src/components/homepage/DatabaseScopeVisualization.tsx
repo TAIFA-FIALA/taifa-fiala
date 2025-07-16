@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, LineChart, Line, AreaChart, Area,
-  Treemap, ScatterChart, Scatter
+  PieChart, Pie, Cell, LineChart, Line,
 } from 'recharts';
 import { Database, Globe, Building, Calendar, TrendingUp, Users, MapPin } from 'lucide-react';
 
