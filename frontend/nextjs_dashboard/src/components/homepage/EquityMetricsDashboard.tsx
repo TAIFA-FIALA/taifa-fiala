@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
+import { BarChart3, Globe, Building2, Users, TrendingUp, CheckCircle, Target, Search, UserCheck, GraduationCap, Home } from 'lucide-react';
 
 interface EquityMetrics {
   geographic: {
@@ -150,10 +151,10 @@ export default function EquityMetricsDashboard() {
         <div className="mt-6 border-b border-gray-200">
           <div className="flex space-x-8">
             {[
-              { id: 'overview', label: 'Overview', icon: '📊' },
-              { id: 'geographic', label: 'Geographic', icon: '🌍' },
-              { id: 'sectoral', label: 'Sectoral', icon: '🏥' },
-              { id: 'inclusion', label: 'Inclusion', icon: '👥' },
+              { id: 'overview', label: 'Overview', icon: BarChart3 },
+              { id: 'geographic', label: 'Geographic', icon: Globe },
+              { id: 'sectoral', label: 'Sectoral', icon: Building2 },
+              { id: 'inclusion', label: 'Inclusion', icon: Users },
             ].map(tab => (
               <button
                 key={tab.id}
@@ -164,7 +165,7 @@ export default function EquityMetricsDashboard() {
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
-                <span>{tab.icon}</span>
+                <tab.icon className="w-4 h-4" />
                 <span>{tab.label}</span>
               </button>
             ))}
@@ -184,8 +185,12 @@ export default function EquityMetricsDashboard() {
                   <span className="text-2xl font-bold text-blue-600">
                     {(metrics.overall_equity_score * 100).toFixed(0)}%
                   </span>
-                  <div className="text-sm text-gray-500">
-                    {metrics.overall_equity_score < 0.7 ? '📈 Improving' : '✅ Good'}
+                  <div className="text-sm text-gray-500 flex items-center space-x-1">
+                    {metrics.overall_equity_score < 0.7 ? (
+                      <><TrendingUp className="w-4 h-4" /><span>Improving</span></>
+                    ) : (
+                      <><CheckCircle className="w-4 h-4" /><span>Good</span></>
+                    )}
                   </div>
                 </div>
               </div>
@@ -322,7 +327,10 @@ export default function EquityMetricsDashboard() {
                 </div>
                 
                 <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-                  <h5 className="font-medium text-blue-900 mb-2">🎯 Equity Action</h5>
+                  <h5 className="font-medium text-blue-900 mb-2 flex items-center space-x-2">
+                    <Target className="w-4 h-4" />
+                    <span>Equity Action</span>
+                  </h5>
                   <p className="text-sm text-blue-700">
                     Our AI system automatically boosts opportunities from underserved regions and reduces over-concentration in major hubs.
                   </p>
@@ -375,7 +383,10 @@ export default function EquityMetricsDashboard() {
                 </div>
                 
                 <div className="mt-6 p-4 bg-yellow-50 rounded-lg">
-                  <h5 className="font-medium text-yellow-900 mb-2">🔍 Smart Detection</h5>
+                  <h5 className="font-medium text-yellow-900 mb-2 flex items-center space-x-2">
+                    <Search className="w-4 h-4" />
+                    <span>Smart Detection</span>
+                  </h5>
                   <p className="text-sm text-yellow-700">
                     Our multilingual AI identifies priority sectors across 6 African languages, ensuring comprehensive coverage.
                   </p>
@@ -427,7 +438,7 @@ export default function EquityMetricsDashboard() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="bg-pink-50 border border-pink-200 rounded-lg p-4">
                 <div className="flex items-center space-x-2 mb-2">
-                  <span className="text-2xl">👩‍💻</span>
+                  <UserCheck className="w-6 h-6 text-pink-600" />
                   <span className="font-medium text-pink-800">Women-Led</span>
                 </div>
                 <div className="text-2xl font-bold text-pink-600">{metrics.inclusion.women_focused_percentage}%</div>
@@ -436,7 +447,7 @@ export default function EquityMetricsDashboard() {
               
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <div className="flex items-center space-x-2 mb-2">
-                  <span className="text-2xl">🎓</span>
+                  <GraduationCap className="w-6 h-6 text-blue-600" />
                   <span className="font-medium text-blue-800">Youth-Focused</span>
                 </div>
                 <div className="text-2xl font-bold text-blue-600">{metrics.inclusion.youth_focused_percentage}%</div>
@@ -445,7 +456,7 @@ export default function EquityMetricsDashboard() {
               
               <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                 <div className="flex items-center space-x-2 mb-2">
-                  <span className="text-2xl">🏘️</span>
+                  <Home className="w-6 h-6 text-green-600" />
                   <span className="font-medium text-green-800">Rural-Focused</span>
                 </div>
                 <div className="text-2xl font-bold text-green-600">{metrics.inclusion.rural_focused_percentage}%</div>

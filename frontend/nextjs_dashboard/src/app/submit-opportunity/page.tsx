@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { Party, Rocket, BarChart3, Plus, Search, CheckCircle, ClipboardList } from 'lucide-react'
 
 interface SubmissionFormData {
   title: string
@@ -149,7 +150,8 @@ export default function SubmitOpportunity() {
                   </svg>
                 </div>
                 <h1 className="text-2xl font-bold text-gray-800 mb-2">
-                  🎉 Submission Successful!
+                  <Party className="w-6 h-6 inline mr-2" />
+                Submission Successful!
                 </h1>
                 <p className="text-gray-600">
                   Thank you for contributing to the TAIFA-FIALA community
@@ -215,21 +217,24 @@ export default function SubmitOpportunity() {
                   onClick={() => router.push(`/submissions/track?id=${submitResult.submission_id}`)}
                   className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
                 >
-                  📊 Track Submission
+                  <BarChart3 className="w-5 h-5 inline mr-2" />
+                  Track Submission
                 </button>
                 
                 <button
                   onClick={() => setSubmitSuccess(false)}
                   className="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors"
                 >
-                  ➕ Submit Another
+                  <Plus className="w-5 h-5 inline mr-2" />
+                  Submit Another
                 </button>
                 
                 <button
                   onClick={() => router.push('/funding')}
                   className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors"
                 >
-                  🔍 Browse Opportunities
+                  <Search className="w-5 h-5 inline mr-2" />
+                  Browse Opportunities
                 </button>
               </div>
             </div>
@@ -246,7 +251,8 @@ export default function SubmitOpportunity() {
           {/* Header */}
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-gray-800 mb-3">
-              🚀 Submit Funding Opportunity
+              <Rocket className="w-6 h-6 inline mr-2" />
+            Submit Funding Opportunity
             </h1>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               Help the African AI community by sharing funding opportunities you've discovered. 
@@ -256,10 +262,16 @@ export default function SubmitOpportunity() {
           
           {/* Guidelines */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
-            <h2 className="text-lg font-semibold text-blue-800 mb-3">📋 Submission Guidelines</h2>
+            <h2 className="text-lg font-semibold text-blue-800 mb-3 flex items-center space-x-2">
+              <ClipboardList className="w-5 h-5" />
+              <span>Submission Guidelines</span>
+            </h2>
             <div className="grid md:grid-cols-2 gap-4 text-sm text-blue-700">
               <div>
-                <h3 className="font-medium mb-2">✅ Good submissions include:</h3>
+                <h3 className="font-medium mb-2 flex items-center space-x-2">
+                  <CheckCircle className="w-4 h-4" />
+                  <span>Good submissions include:</span>
+                </h3>
                 <ul className="space-y-1">
                   <li>• Clear, descriptive titles</li>
                   <li>• AI or technology-related funding</li>
@@ -453,7 +465,7 @@ export default function SubmitOpportunity() {
                       Processing Submission...
                     </span>
                   ) : (
-                    '🚀 Submit Funding Opportunity'
+                    <><Rocket className="w-5 h-5 inline mr-2" />Submit Funding Opportunity</>
                   )}
                 </button>
               </div>

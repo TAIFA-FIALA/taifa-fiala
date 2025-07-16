@@ -5,7 +5,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, LineChart, Line,
 } from 'recharts';
-import { Database, Globe, Building, Calendar, TrendingUp, Users, MapPin } from 'lucide-react';
+import { Database, Globe, Building, Calendar, TrendingUp, Users, MapPin, BarChart3, Building2, Link } from 'lucide-react';
 
 interface DatabaseMetrics {
   totalOpportunities: number;
@@ -177,11 +177,11 @@ export default function DatabaseScopeVisualization() {
         <div className="mt-6 border-b border-gray-200">
           <div className="flex space-x-8">
             {[
-              { id: 'overview', label: 'Overview', icon: '📊' },
-              { id: 'geographic', label: 'Geographic', icon: '🌍' },
-              { id: 'sectors', label: 'Sectors', icon: '🏢' },
-              { id: 'growth', label: 'Growth', icon: '📈' },
-              { id: 'sources', label: 'Sources', icon: '🔗' }
+              { id: 'overview', label: 'Overview', icon: BarChart3 },
+              { id: 'geographic', label: 'Geographic', icon: Globe },
+              { id: 'sectors', label: 'Sectors', icon: Building2 },
+              { id: 'growth', label: 'Growth', icon: TrendingUp },
+              { id: 'sources', label: 'Sources', icon: Link }
             ].map(tab => (
               <button
                 key={tab.id}
@@ -192,7 +192,7 @@ export default function DatabaseScopeVisualization() {
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
-                <span>{tab.icon}</span>
+                <tab.icon className="w-4 h-4" />
                 <span>{tab.label}</span>
               </button>
             ))}
@@ -249,7 +249,10 @@ export default function DatabaseScopeVisualization() {
 
             {/* Database Coverage */}
             <div className="bg-gray-50 rounded-lg p-6">
-              <h4 className="text-lg font-semibold text-gray-900 mb-4">🌍 Continental Coverage</h4>
+              <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center space-x-2">
+                <Globe className="w-5 h-5" />
+                <span>Continental Coverage</span>
+              </h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <h5 className="font-medium text-gray-800 mb-3">Regional Distribution</h5>

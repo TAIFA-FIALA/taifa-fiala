@@ -4,6 +4,17 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { format } from 'date-fns';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { 
+  DollarSign, 
+  Clock, 
+  BarChart3, 
+  TrendingUp, 
+  Gem, 
+  Target, 
+  Building2, 
+  Handshake, 
+  CreditCard 
+} from 'lucide-react';
 
 interface InvestmentOpportunity {
   id: number;
@@ -352,53 +363,63 @@ function InvestmentContent() {
                 <div className="space-y-3 text-sm">
                   {opportunity.amount_usd && (
                     <p className="text-green-600 font-semibold">
-                      💰 Investment: ${opportunity.amount_usd.toLocaleString()} {opportunity.currency}
+                      <DollarSign className="w-4 h-4 inline mr-1" />
+                      Investment: ${opportunity.amount_usd.toLocaleString()} {opportunity.currency}
                     </p>
                   )}
                   <p className="text-orange-600">
-                    ⏰ Deadline: {format(new Date(opportunity.deadline), 'PPP')}
+                    <Clock className="w-4 h-4 inline mr-1" />
+                    Deadline: {format(new Date(opportunity.deadline), 'PPP')}
                   </p>
                   <p className="text-emerald-600">
-                    📊 Status: <span className="capitalize">{opportunity.status}</span>
+                    <BarChart3 className="w-4 h-4 inline mr-1" />
+                    Status: <span className="capitalize">{opportunity.status}</span>
                   </p>
                   
                   {/* Investment-specific information */}
                   {opportunity.equity_percentage && (
                     <p className="text-red-600">
-                      📈 Equity: {opportunity.equity_percentage}%
+                      <TrendingUp className="w-4 h-4 inline mr-1" />
+                      Equity: {opportunity.equity_percentage}%
                     </p>
                   )}
                   {opportunity.valuation_cap && (
                     <p className="text-blue-600">
-                      💎 Valuation Cap: ${opportunity.valuation_cap.toLocaleString()}
+                      <Gem className="w-4 h-4 inline mr-1" />
+                      Valuation Cap: ${opportunity.valuation_cap.toLocaleString()}
                     </p>
                   )}
                   {opportunity.expected_roi && (
                     <p className="text-purple-600">
-                      🎯 Expected ROI: {opportunity.expected_roi}%
+                      <Target className="w-4 h-4 inline mr-1" />
+                      Expected ROI: {opportunity.expected_roi}%
                     </p>
                   )}
                   {opportunity.interest_rate && (
                     <p className="text-indigo-600">
-                      📊 Interest Rate: {opportunity.interest_rate}%
+                      <BarChart3 className="w-4 h-4 inline mr-1" />
+                      Interest Rate: {opportunity.interest_rate}%
                     </p>
                   )}
                   
                   {opportunity.organization_id && (
                     <p className="text-gray-600">
-                      🏢 Investor: {organizations.find(org => org.id === opportunity.organization_id)?.name || 'N/A'}
+                      <Building2 className="w-4 h-4 inline mr-1" />
+                      Investor: {organizations.find(org => org.id === opportunity.organization_id)?.name || 'N/A'}
                     </p>
                   )}
                   
                   {opportunity.post_investment_support && (
                     <p className="text-cyan-600 text-xs">
-                      🤝 Support: {opportunity.post_investment_support}
+                      <Handshake className="w-4 h-4 inline mr-1" />
+                      Support: {opportunity.post_investment_support}
                     </p>
                   )}
                   
                   {opportunity.repayment_terms && (
                     <p className="text-gray-500 text-xs">
-                      💳 Terms: {opportunity.repayment_terms}
+                      <CreditCard className="w-4 h-4 inline mr-1" />
+                      Terms: {opportunity.repayment_terms}
                     </p>
                   )}
                 </div>

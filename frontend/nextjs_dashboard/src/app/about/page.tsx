@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { Globe, Scale, Search } from 'lucide-react';
 
 // About Us page component
 export default function AboutPage() {
@@ -89,7 +90,9 @@ export default function AboutPage() {
           <h2 className="text-3xl font-bold mb-12 text-center">Our Vision</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             <div className="bg-white rounded-lg shadow-md p-6">
-              <div className="text-blue-800 text-4xl mb-4">🌍</div>
+              <div className="text-blue-800 mb-4">
+                <Globe className="w-12 h-12" />
+              </div>
               <h3 className="text-xl font-semibold mb-2">Geographic Equity</h3>
               <p className="text-gray-600">
                 Ensuring AI funding reaches all African regions, not just the top four countries 
@@ -98,7 +101,9 @@ export default function AboutPage() {
             </div>
 
             <div className="bg-white rounded-lg shadow-md p-6">
-              <div className="text-blue-800 text-4xl mb-4">⚖️</div>
+              <div className="text-blue-800 mb-4">
+                <Scale className="w-12 h-12" />
+              </div>
               <h3 className="text-xl font-semibold mb-2">Inclusive Access</h3>
               <p className="text-gray-600">
                 Creating pathways for underrepresented groups, particularly women who currently 
@@ -107,7 +112,9 @@ export default function AboutPage() {
             </div>
 
             <div className="bg-white rounded-lg shadow-md p-6">
-              <div className="text-blue-800 text-4xl mb-4">🔍</div>
+              <div className="text-blue-800 mb-4">
+                <Search className="w-12 h-12" />
+              </div>
               <h3 className="text-xl font-semibold mb-2">Transparency</h3>
               <p className="text-gray-600">
                 Bringing clarity to funding processes through comprehensive data collection, 

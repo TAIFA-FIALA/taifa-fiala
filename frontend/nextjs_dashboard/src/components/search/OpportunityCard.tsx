@@ -4,7 +4,7 @@ import { useState } from 'react';
 import {
   Calendar, DollarSign, MapPin, Building, ExternalLink, Clock,
   Users, TrendingUp, Award, ChevronDown, ChevronUp,
-  Globe, Brain, Shield, AlertCircle
+  Globe, Brain, Shield, AlertCircle, UserCheck, GraduationCap, Home
 } from 'lucide-react';
 import { FundingOpportunity } from '@/types/funding';
 
@@ -47,15 +47,15 @@ export default function OpportunityCard({ opportunity, searchMode, onViewDetails
     switch (status?.toLowerCase()) {
       case 'active':
       case 'open':
-        return 'bg-green-100 text-green-800';
+        return 'bg-[#F0E68C] bg-opacity-30 text-[#1F2A44]';
       case 'closed':
-        return 'bg-red-100 text-red-800';
+        return 'bg-[#A0A0A0] bg-opacity-30 text-[#1F2A44]';
       case 'awarded':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-[#4B9CD3] bg-opacity-30 text-[#1F2A44]';
       case 'cancelled':
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-[#A0A0A0] bg-opacity-30 text-[#1F2A44]';
       default:
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-[#F0E68C] bg-opacity-20 text-[#1F2A44]';
     }
   };
 
@@ -63,21 +63,21 @@ export default function OpportunityCard({ opportunity, searchMode, onViewDetails
     if (!opportunity.equity_score) return null;
     
     const score = opportunity.equity_score;
-    let color = 'text-gray-600';
-    let bgColor = 'bg-gray-100';
+    let color = 'text-[#1F2A44]';
+    let bgColor = 'bg-[#A0A0A0] bg-opacity-20';
     
     if (score >= 80) {
-      color = 'text-green-600';
-      bgColor = 'bg-green-100';
+      color = 'text-[#1F2A44]';
+      bgColor = 'bg-[#4B9CD3] bg-opacity-30';
     } else if (score >= 60) {
-      color = 'text-blue-600';
-      bgColor = 'bg-blue-100';
+      color = 'text-[#1F2A44]';
+      bgColor = 'bg-[#4B9CD3] bg-opacity-20';
     } else if (score >= 40) {
-      color = 'text-yellow-600';
-      bgColor = 'bg-yellow-100';
+      color = 'text-[#1F2A44]';
+      bgColor = 'bg-[#F0E68C] bg-opacity-30';
     } else {
-      color = 'text-red-600';
-      bgColor = 'bg-red-100';
+      color = 'text-[#1F2A44]';
+      bgColor = 'bg-[#A0A0A0] bg-opacity-30';
     }
     
     return { score, color, bgColor };
@@ -107,12 +107,12 @@ export default function OpportunityCard({ opportunity, searchMode, onViewDetails
   const equityScore = getEquityScore();
 
   return (
-    <div className="bg-white rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-shadow duration-300 overflow-hidden">
+    <div className="bg-white rounded-xl shadow-lg border border-[#A0A0A0] border-opacity-20 hover:shadow-xl transition-shadow duration-300 overflow-hidden">
       {/* Header */}
       <div className="p-6 pb-4">
         <div className="flex items-start justify-between mb-3">
           <div className="flex-1">
-            <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2">
+            <h3 className="text-xl font-bold text-[#1F2A44] mb-2 line-clamp-2">
               {opportunity.title}
             </h3>
             
@@ -124,7 +124,7 @@ export default function OpportunityCard({ opportunity, searchMode, onViewDetails
               
               {/* Funding Type */}
               {opportunity.funding_type && (
-                <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
+                <span className="px-3 py-1 bg-[#4B9CD3] bg-opacity-20 text-[#1F2A44] rounded-full text-xs font-medium">
                   {opportunity.funding_type.name}
                 </span>
               )}
@@ -141,7 +141,7 @@ export default function OpportunityCard({ opportunity, searchMode, onViewDetails
           {/* Deadline Alert */}
           {daysUntilDeadline && daysUntilDeadline <= 30 && (
             <div className={`ml-4 px-3 py-1 rounded-full text-xs font-medium ${
-              daysUntilDeadline <= 7 ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'
+              daysUntilDeadline <= 7 ? 'bg-[#A0A0A0] bg-opacity-40 text-[#1F2A44]' : 'bg-[#F0E68C] bg-opacity-30 text-[#1F2A44]'
             }`}>
               {daysUntilDeadline <= 0 ? 'Deadline passed' : `${daysUntilDeadline} days left`}
             </div>
@@ -236,16 +236,28 @@ export default function OpportunityCard({ opportunity, searchMode, onViewDetails
             <Shield className="w-4 h-4 text-blue-600" />
             <div className="flex space-x-2">
               {opportunity.underserved_focus && (
-                <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">🌍 Underserved Focus</span>
+                <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded flex items-center space-x-1">
+                  <Globe className="w-3 h-3" />
+                  <span>Underserved Focus</span>
+                </span>
               )}
               {opportunity.women_focus && (
-                <span className="text-xs bg-pink-100 text-pink-800 px-2 py-1 rounded">👩‍💼 Women-Led</span>
+                <span className="text-xs bg-pink-100 text-pink-800 px-2 py-1 rounded flex items-center space-x-1">
+                  <UserCheck className="w-3 h-3" />
+                  <span>Women-Led</span>
+                </span>
               )}
               {opportunity.youth_focus && (
-                <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">🎓 Youth-Focused</span>
+                <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded flex items-center space-x-1">
+                  <GraduationCap className="w-3 h-3" />
+                  <span>Youth-Focused</span>
+                </span>
               )}
               {opportunity.rural_focus && (
-                <span className="text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded">🏘️ Rural</span>
+                <span className="text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded flex items-center space-x-1">
+                  <Home className="w-3 h-3" />
+                  <span>Rural</span>
+                </span>
               )}
             </div>
           </div>

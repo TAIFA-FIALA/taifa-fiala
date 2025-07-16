@@ -4,6 +4,17 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { format } from 'date-fns';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { 
+  DollarSign, 
+  Clock, 
+  ClipboardList, 
+  Calendar, 
+  RotateCcw, 
+  Target, 
+  Sparkles, 
+  Building2, 
+  BarChart3 
+} from 'lucide-react';
 
 interface GrantOpportunity {
   id: number;
@@ -346,47 +357,56 @@ function GrantContent() {
                 <div className="space-y-3 text-sm">
                   {opportunity.amount_usd && (
                     <p className="text-blue-400 font-semibold">
-                      💰 Grant Amount: ${opportunity.amount_usd.toLocaleString()} {opportunity.currency}
+                      <DollarSign className="w-4 h-4 inline mr-1" />
+                      Grant Amount: ${opportunity.amount_usd.toLocaleString()} {opportunity.currency}
                     </p>
                   )}
                   <p className="text-yellow-400">
-                    ⏰ Deadline: {format(new Date(opportunity.deadline), 'PPP')}
+                    <Clock className="w-4 h-4 inline mr-1" />
+                    Deadline: {format(new Date(opportunity.deadline), 'PPP')}
                   </p>
                   <p className="text-green-400">
-                    📋 Status: <span className="capitalize">{opportunity.status}</span>
+                    <ClipboardList className="w-4 h-4 inline mr-1" />
+                    Status: <span className="capitalize">{opportunity.status}</span>
                   </p>
                   
                   {/* Grant-specific information */}
                   {opportunity.grant_duration_months && (
                     <p className="text-purple-400">
-                      📅 Duration: {opportunity.grant_duration_months} months
+                      <Calendar className="w-4 h-4 inline mr-1" />
+                      Duration: {opportunity.grant_duration_months} months
                     </p>
                   )}
                   {opportunity.renewable && (
                     <p className="text-emerald-400">
-                      🔄 Renewable grant
+                      <RotateCcw className="w-4 h-4 inline mr-1" />
+                      Renewable grant
                     </p>
                   )}
                   {opportunity.project_based && (
                     <p className="text-cyan-400">
-                      🎯 Project-based funding
+                      <Target className="w-4 h-4 inline mr-1" />
+                      Project-based funding
                     </p>
                   )}
                   {opportunity.no_strings_attached && (
                     <p className="text-indigo-400">
-                      ✨ No strings attached
+                      <Sparkles className="w-4 h-4 inline mr-1" />
+                      No strings attached
                     </p>
                   )}
                   
                   {opportunity.organization_id && (
                     <p className="text-gray-400">
-                      🏢 Organization: {organizations.find(org => org.id === opportunity.organization_id)?.name || 'N/A'}
+                      <Building2 className="w-4 h-4 inline mr-1" />
+                      Organization: {organizations.find(org => org.id === opportunity.organization_id)?.name || 'N/A'}
                     </p>
                   )}
                   
                   {opportunity.reporting_requirements && (
                     <p className="text-orange-400 text-xs">
-                      📊 Reporting: {opportunity.reporting_requirements}
+                      <BarChart3 className="w-4 h-4 inline mr-1" />
+                      Reporting: {opportunity.reporting_requirements}
                     </p>
                   )}
                 </div>

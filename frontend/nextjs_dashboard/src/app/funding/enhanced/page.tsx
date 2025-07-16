@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import DualModeSearch from '@/components/search/DualModeSearch';
 import SearchResults from '@/components/search/SearchResults';
-import { AlertCircle, TrendingUp, Globe, Users, Database, Clock } from 'lucide-react';
+import { AlertCircle, TrendingUp, Globe, Users, Database, Clock, Target } from 'lucide-react';
 
 interface SearchFilters {
   query: string;
@@ -27,7 +27,7 @@ interface SearchFilters {
   equity_score_min: number;
 }
 
-export default function EnhancedFundingPage() {
+function EnhancedFundingContent() {
   const searchParams = useSearchParams();
   const [searchMode, setSearchMode] = useState<'discover' | 'explore'>('discover');
   const [loading, setLoading] = useState(false);
@@ -160,7 +160,10 @@ export default function EnhancedFundingPage() {
             </div>
             
             <div className="bg-blue-50 rounded-lg p-4 mb-6">
-              <h4 className="font-semibold text-blue-900 mb-2">🎯 Equity-Aware Features</h4>
+              <h4 className="font-semibold text-blue-900 mb-2 flex items-center">
+                <Target className="w-4 h-4 mr-2" />
+                Equity-Aware Features
+              </h4>
               <ul className="text-sm text-blue-800 space-y-1">
                 <li>• Filter for underserved regions and inclusion-focused opportunities</li>
                 <li>• Real-time bias monitoring and equity scoring</li>
@@ -331,5 +334,15 @@ export default function EnhancedFundingPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function EnhancedFundingPage() {
+  return (
+    <Suspense fallback={<div className="flex justify-center items-center h-64">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+    </div>}>
+      <EnhancedFundingContent />
+    </Suspense>
   );
 }

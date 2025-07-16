@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
+import { FileText, Target, Users } from 'lucide-react';
 
 // Dynamically import Chart.js to avoid SSR issues
 const PieChart = dynamic(() => import('react-chartjs-2').then((mod) => mod.Pie), {
@@ -348,13 +349,16 @@ export default function GenderInclusionDashboard({ className = '' }: GenderInclu
               <h4 className="text-sm font-medium text-gray-700 mb-2">Inclusion Resources</h4>
               <div className="space-y-2">
                 <Link href="/resources/gender-equity" className="text-xs bg-white text-purple-600 px-3 py-1.5 rounded block hover:bg-purple-50 transition-colors">
-                  📝 Template: Gender-responsive Grant Applications
+                  <FileText className="w-4 h-4 inline mr-1" />
+                  Template: Gender-responsive Grant Applications
                 </Link>
                 <Link href="/resources/youth-funding" className="text-xs bg-white text-purple-600 px-3 py-1.5 rounded block hover:bg-purple-50 transition-colors">
-                  🎯 Guide: Youth-led Project Development
+                  <Target className="w-4 h-4 inline mr-1" />
+                  Guide: Youth-led Project Development
                 </Link>
                 <Link href="/mentorship" className="text-xs bg-white text-purple-600 px-3 py-1.5 rounded block hover:bg-purple-50 transition-colors">
-                  👥 Connect with Female Founder Mentors
+                  <Users className="w-4 h-4 inline mr-1" />
+                  Connect with Female Founder Mentors
                 </Link>
               </div>
             </div>

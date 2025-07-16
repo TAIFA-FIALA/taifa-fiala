@@ -2,6 +2,8 @@ import Link from 'next/link';
 import EquityMetricsDashboard from '@/components/homepage/EquityMetricsDashboard';
 import SemanticSearchShowcase from '@/components/homepage/SemanticSearchShowcase';
 import DatabaseScopeVisualization from '@/components/homepage/DatabaseScopeVisualization';
+import { Globe, RefreshCw, Users2, Languages, Search, Building2, Target, Brain, MapPin, TrendingUp, Award } from 'lucide-react';
+import Image from 'next/image';
 
 interface AnalyticsSummary {
   total_opportunities?: number;
@@ -12,7 +14,7 @@ interface AnalyticsSummary {
 
 async function getAnalyticsSummary(): Promise<AnalyticsSummary | null> {
   try {
-    const res = await fetch('http://localhost:8000/api/v1/analytics/summary', { 
+    const res = await fetch('http://localhost:8000/api/v1/equity-analyses/summary', { 
       cache: 'no-store',
       next: { revalidate: 300 } // Revalidate every 5 minutes
     });
@@ -38,54 +40,69 @@ export default async function HomePage() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-purple-800 via-purple-600 to-blue-600 py-20 px-4 sm:px-6 lg:px-8 text-white">
-        <div className="max-w-7xl mx-auto text-center">
+      <section className="bg-gradient-to-br from-[#1F2A44] via-[#1F2A44] to-[#4B9CD3] pt-4 pb-8 px-4 sm:px-6 lg:px-8 text-white relative overflow-hidden">
+        <div className="max-w-7xl mx-auto text-center relative z-10">
           {/* Pan-African Map Background */}
-          <div className="relative">
-            <div className="absolute inset-0 opacity-10 pointer-events-none">
-              {/* SVG outline of Africa - stylized backdrop */}
-              <svg className="w-full h-full" viewBox="0 0 800 800" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                <path d="M400,100 Q550,150 600,300 Q650,450 550,600 Q450,750 300,700 Q150,650 200,500 Q250,350 400,100" />
-              </svg>
+          <div className="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none">
+            <div className="relative w-96 h-96 md:w-[550px] md:h-[550px]">
+              <Image
+                src="/Africa-outline-grey.png"
+                alt="Africa outline"
+                fill
+                className="object-contain"
+                priority
+              />
             </div>
-            
-            {/* TAIFA-FIALA Branding */}
-            <div className="mb-8 relative z-10">
-              <h1 className="text-6xl sm:text-7xl lg:text-8xl font-extrabold leading-tight">
-                <span className="text-white">TAIFA</span>
-                <span className="text-accent mx-2">|</span>
-                <span className="text-white">FIALA</span>
-              </h1>
-              <div className="mt-4 space-y-1">
-                <p className="text-xl text-white font-medium">Tracking AI Funding for Africa</p>
-                <p className="text-lg text-accent">Financement pour l'Intelligence Artificielle en Afrique</p>
-              </div>
+          </div>
+          
+          {/* TAIFA-FIALA Branding */}
+          <div className="mb-8 relative z-10">
+            <h1 className="text-6xl sm:text-7xl lg:text-8xl font-extrabold leading-tight">
+              <span className="text-[#F0E68C]">TAIFA</span>
+              <span className="text-[#4b9cd3] mx-2">|</span>
+              <span className="text-[#F0E68C]">FIALA</span>
+            </h1>
+            <div className="mt-2 mb-1">
+              <p className="text-2xl text-white font-medium leading-tight">Tracking Artificial Intelligence Funding for Africa</p>
+              <p className="text-xl text-[#4b9cd3] leading-tight">Financement pour l'Intelligence Artificielle en Afrique</p>
             </div>
           </div>
 
           {/* Mission Statement */}
-          <div className="max-w-4xl mx-auto mb-12">
-            <p className="text-xl sm:text-2xl text-white leading-relaxed">
-              Democratizing access to AI funding across the African continent, supporting researchers, entrepreneurs, and innovators to build the future of African AI.
-            </p>
-            <div className="flex flex-wrap justify-center gap-4 mt-6">
-              <span className="bg-accent bg-opacity-20 text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center">
-                <span className="mr-2">🌍</span> Pan-African Focus
-              </span>
-              <span className="bg-accent bg-opacity-20 text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center">
-                <span className="mr-2">🔄</span> Daily Updates
-              </span>
-              <span className="bg-accent bg-opacity-20 text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center">
-                <span className="mr-2">🌐</span> 44+ Global Sources
-              </span>
-              <span className="bg-accent bg-opacity-20 text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center">
-                <span className="mr-2">🇬🇧🇫🇷</span> Bilingual Platform
-              </span>
+          <div className="max-w-3xl mx-auto mb-6 relative">
+            <div className="bg-navy bg-opacity-50 backdrop-blur-sm p-4 pt-8 pb-4 rounded-xl border border-[#4B9CD3] border-opacity-30 shadow-lg">
+              <div className="absolute top-0 left-0 right-0 flex justify-center transform -translate-y-1/2">
+                <div className="flex space-x-4 bg-gradient-to-r from-navy via-[#4B9CD3] to-navy p-2 px-4 rounded-full shadow-lg border border-[#F0E68C] border-opacity-20">
+                  <div className="bg-[#F0E68C] bg-opacity-30 p-1.5 rounded-full">
+                    <Globe className="h-4 w-4 text-[#F0E68C]" />
+                  </div>
+                  <div className="bg-[#F0E68C] bg-opacity-30 p-1.5 rounded-full">
+                    <RefreshCw className="h-4 w-4 text-[#F0E68C]" />
+                  </div>
+                  <div className="bg-[#F0E68C] bg-opacity-30 p-1.5 rounded-full">
+                    <Users2 className="h-4 w-4 text-[#F0E68C]" />
+                  </div>
+                  <div className="bg-[#F0E68C] bg-opacity-30 p-1.5 rounded-full">
+                    <Languages className="h-4 w-4 text-[#F0E68C]" />
+                  </div>
+                </div>
+              </div>
+              
+              <p className="text-base sm:text-lg text-white leading-snug text-center mb-4">
+                Democratizing access to AI funding opportunities with equity, transparency, and accountability for funders, investors, researchers, and entrepreneurs.
+              </p>
+              
+              <div className="flex flex-wrap justify-center gap-x-6 gap-y-1">
+                <span className="text-xs text-[#F0E68C] text-center font-medium">Pan-African Focus</span>
+                <span className="text-xs text-[#F0E68C] text-center font-medium">Daily Updates</span>
+                <span className="text-xs text-[#F0E68C] text-center font-medium">44+ Global Sources</span>
+                <span className="text-xs text-[#F0E68C] text-center font-medium">Bilingual Platform</span>
+              </div>
             </div>
           </div>
 
           {/* Quick Search Feature */}
-          <div className="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg shadow-lg p-6 mb-10 max-w-3xl mx-auto border border-white border-opacity-30">
+          <div className="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg shadow-lg p-4 mb-6 max-w-3xl mx-auto border border-white border-opacity-30">
             <form className="flex flex-col sm:flex-row gap-2" action="/funding" method="GET">
               <div className="flex-grow relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -100,7 +117,7 @@ export default async function HomePage() {
                   className="pl-10 w-full rounded-lg py-3 bg-white bg-opacity-90 border border-white border-opacity-50 focus:ring-2 focus:ring-accent focus:border-transparent text-gray-800"
                 />
               </div>
-              <button type="submit" className="bg-accent hover:bg-accent-dark text-white font-bold py-3 px-6 rounded-lg transition-colors shadow-lg flex-shrink-0">
+              <button type="submit" className="bg-[#F0E68C] hover:bg-[#E6D768] text-[#1F2A44] font-bold py-3 px-6 rounded-lg transition-colors shadow-lg flex-shrink-0">
                 Search Now
               </button>
             </form>
@@ -110,15 +127,17 @@ export default async function HomePage() {
           <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
             <Link 
               href="/funding" 
-              className="bg-primary hover:bg-blue border border-white border-opacity-30 text-white font-bold py-4 px-8 rounded-lg text-lg transition-colors shadow-lg"
+              className="bg-[#F0E68C] hover:bg-[#E6D768] text-[#1F2A44] font-bold py-3 px-7 rounded-md text-base transition-colors shadow-md flex items-center gap-2"
             >
-              🔍 Explore All Opportunities
+              <Search className="h-5 w-5" />
+              Explore All Opportunities
             </Link>
             <Link 
               href="/funders" 
-              className="bg-transparent hover:bg-white hover:bg-opacity-10 border-2 border-white text-white font-bold py-4 px-8 rounded-lg text-lg transition-colors shadow-lg"
+              className="bg-transparent hover:bg-navy hover:bg-opacity-10 border border-navy text-navy font-bold py-3 px-7 rounded-md text-base transition-colors shadow-md flex items-center gap-2"
             >
-              🏢 Funder Profiles
+              <Building2 className="h-5 w-5" />
+              View Funder Profiles
             </Link>
           </div>
         </div>
@@ -132,7 +151,7 @@ export default async function HomePage() {
               <h2 className="text-3xl font-bold text-gray-800 mb-4 md:mb-0">
                 Live Analytics Dashboard
               </h2>
-              <div className="flex items-center space-x-2 text-primary">
+              <div className="flex items-center space-x-2 text-[#4B9CD3]">
                 <svg className="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                 </svg>
@@ -144,9 +163,16 @@ export default async function HomePage() {
             <div className="relative">
               {/* Subtle Map of Africa in background */}
               <div className="absolute inset-0 opacity-5 pointer-events-none hidden md:block">
-                <svg className="w-full h-full" viewBox="0 0 1200 800" fill="#553C9A" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M600,100 Q800,200 850,400 Q900,600 700,700 Q500,800 300,700 Q100,600 200,400 Q300,200 600,100" />
-                </svg>
+                <div className="w-full h-full flex items-center justify-center">
+                  <div className="relative w-96 h-96">
+                    <Image
+                      src="/Africa-outline-grey.png"
+                      alt="Africa outline background"
+                      fill
+                      className="object-contain"
+                    />
+                  </div>
+                </div>
               </div>
               
               {/* KPI Grid */}
@@ -154,7 +180,7 @@ export default async function HomePage() {
                 {/* Total Opportunities */}
                 <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 hover:shadow-xl transition-shadow duration-300">
                   <div className="p-5 relative">
-                    <div className="absolute top-5 right-5 text-primary opacity-20">
+                    <div className="absolute top-5 right-5 text-[#4B9CD3] opacity-20">
                       <svg className="w-12 h-12" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M3.5 2a.5.5 0 01.5.5v14a.5.5 0 01-1 0v-14a.5.5 0 01.5-.5zm4 0a.5.5 0 01.5.5v14a.5.5 0 01-1 0v-14a.5.5 0 01.5-.5zm4 0a.5.5 0 01.5.5v14a.5.5 0 01-1 0v-14a.5.5 0 01.5-.5zm4 0a.5.5 0 01.5.5v14a.5.5 0 01-1 0v-14a.5.5 0 01.5-.5z" clipRule="evenodd" />
                       </svg>
@@ -173,8 +199,8 @@ export default async function HomePage() {
                     </div>
                     <div className="text-xs text-gray-500 mt-1">From across Africa and global sources</div>
                   </div>
-                  <div className="bg-purple-50 px-5 py-2">
-                    <div className="text-xs text-primary font-medium flex justify-between">
+                  <div className="bg-[#4B9CD3] bg-opacity-10 px-5 py-2">
+                    <div className="text-xs text-[#4B9CD3] font-medium flex justify-between">
                       <span>View all</span>
                       <span>→</span>
                     </div>
@@ -184,7 +210,7 @@ export default async function HomePage() {
                 {/* Active Opportunities */}
                 <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 hover:shadow-xl transition-shadow duration-300">
                   <div className="p-5 relative">
-                    <div className="absolute top-5 right-5 text-accent opacity-20">
+                    <div className="absolute top-5 right-5 text-[#F0E68C] opacity-30">
                       <svg className="w-12 h-12" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M5 2a1 1 0 011 1v1h8V3a1 1 0 112 0v1h1a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2h1V3a1 1 0 011-1zm11 14a1 1 0 001-1V6a1 1 0 00-1-1H5a1 1 0 00-1 1v10a1 1 0 001 1h11z" clipRule="evenodd" />
                       </svg>
@@ -194,14 +220,14 @@ export default async function HomePage() {
                       <div className="text-4xl font-extrabold text-gray-800">
                         {summary.active_opportunities?.toLocaleString() || '89'}
                       </div>
-                      <div className="ml-2 text-sm font-medium text-accent flex items-center">
+                      <div className="ml-2 text-sm font-medium text-[#F0E68C] flex items-center">
                         <span>→</span>
                       </div>
                     </div>
                     <div className="text-xs text-gray-500 mt-1">Current open application windows</div>
                   </div>
-                  <div className="bg-orange-50 px-5 py-2">
-                    <div className="text-xs text-accent font-medium flex justify-between">
+                  <div className="bg-[#F0E68C] bg-opacity-10 px-5 py-2">
+                    <div className="text-xs text-[#F0E68C] font-medium flex justify-between">
                       <span>Closing soon</span>
                       <span>12</span>
                     </div>
@@ -211,7 +237,7 @@ export default async function HomePage() {
                 {/* Total Funding Value */}
                 <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 hover:shadow-xl transition-shadow duration-300">
                   <div className="p-5 relative">
-                    <div className="absolute top-5 right-5 text-primary opacity-20">
+                    <div className="absolute top-5 right-5 text-[#4B9CD3] opacity-20">
                       <svg className="w-12 h-12" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" />
                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clipRule="evenodd" />
@@ -228,8 +254,8 @@ export default async function HomePage() {
                     </div>
                     <div className="text-xs text-gray-500 mt-1">Available for African AI initiatives (2019-2024), with $641M raised by AI startups (2022-2023)</div>
                   </div>
-                  <div className="bg-purple-50 px-5 py-2">
-                    <div className="text-xs text-primary font-medium flex justify-between">
+                  <div className="bg-[#4B9CD3] bg-opacity-10 px-5 py-2">
+                    <div className="text-xs text-[#4B9CD3] font-medium flex justify-between">
                       <span>By funding type</span>
                       <span>→</span>
                     </div>
@@ -239,7 +265,7 @@ export default async function HomePage() {
                 {/* Organizations */}
                 <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 hover:shadow-xl transition-shadow duration-300">
                   <div className="p-5 relative">
-                    <div className="absolute top-5 right-5 text-accent opacity-20">
+                    <div className="absolute top-5 right-5 text-[#F0E68C] opacity-30">
                       <svg className="w-12 h-12" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
                       </svg>
@@ -252,8 +278,8 @@ export default async function HomePage() {
                     </div>
                     <div className="text-xs text-gray-500 mt-1">Across 159 startups, with 5 countries dominating 90% of funding</div>
                   </div>
-                  <div className="bg-orange-50 px-5 py-2">
-                    <div className="text-xs text-accent font-medium flex justify-between">
+                  <div className="bg-[#F0E68C] bg-opacity-10 px-5 py-2">
+                    <div className="text-xs text-[#F0E68C] font-medium flex justify-between">
                       <span>View funder profiles</span>
                       <span>→</span>
                     </div>
@@ -264,16 +290,16 @@ export default async function HomePage() {
               {/* Filters and Data Freshness */}
               <div className="mt-6 flex flex-col md:flex-row justify-between items-center text-sm">
                 <div className="flex flex-wrap gap-2 mb-4 md:mb-0">
-                  <Link href="/funding?type=grants" className="bg-purple-50 text-primary px-3 py-1 rounded-full hover:bg-purple-100 transition-colors">
+                  <Link href="/funding?type=grants" className="bg-[#4B9CD3] bg-opacity-10 text-[#4B9CD3] px-3 py-1 rounded-full hover:bg-[#4B9CD3] hover:bg-opacity-20 transition-colors">
                     Grants
                   </Link>
-                  <Link href="/funding?type=accelerators" className="bg-purple-50 text-primary px-3 py-1 rounded-full hover:bg-purple-100 transition-colors">
+                  <Link href="/funding?type=accelerators" className="bg-[#4B9CD3] bg-opacity-10 text-[#4B9CD3] px-3 py-1 rounded-full hover:bg-[#4B9CD3] hover:bg-opacity-20 transition-colors">
                     Accelerators
                   </Link>
-                  <Link href="/funding?type=fellowships" className="bg-purple-50 text-primary px-3 py-1 rounded-full hover:bg-purple-100 transition-colors">
+                  <Link href="/funding?type=fellowships" className="bg-[#4B9CD3] bg-opacity-10 text-[#4B9CD3] px-3 py-1 rounded-full hover:bg-[#4B9CD3] hover:bg-opacity-20 transition-colors">
                     Fellowships
                   </Link>
-                  <Link href="/funding?type=competitions" className="bg-purple-50 text-primary px-3 py-1 rounded-full hover:bg-purple-100 transition-colors">
+                  <Link href="/funding?type=competitions" className="bg-[#4B9CD3] bg-opacity-10 text-[#4B9CD3] px-3 py-1 rounded-full hover:bg-[#4B9CD3] hover:bg-opacity-20 transition-colors">
                     Competitions
                   </Link>
                 </div>
@@ -289,11 +315,11 @@ export default async function HomePage() {
       )}
 
       {/* Equity Focus Features */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-blue-50">
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-[#4B9CD3] bg-opacity-5">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
             <div className="inline-block mb-4">
-              <span className="inline-block px-4 py-1 text-sm font-semibold rounded-full bg-blue-dark text-white">
+              <span className="inline-block px-4 py-1 text-sm font-semibold rounded-full bg-[#1F2A44] text-white">
                 NEW FEATURES
               </span>
             </div>
@@ -309,14 +335,14 @@ export default async function HomePage() {
               <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 border border-gray-100 h-full flex flex-col">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center">
-                    <div className="w-12 h-12 flex items-center justify-center rounded-full bg-blue-100 text-blue-600 mr-4">
+                    <div className="w-12 h-12 flex items-center justify-center rounded-full bg-[#4B9CD3] bg-opacity-20 text-[#4B9CD3] mr-4">
                       <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M12 1.586l-4 4v12.828l4-4V1.586zM3.707 3.293A1 1 0 002 4v10a1 1 0 00.293.707L6 18.414V5.586L3.707 3.293zM17.707 5.293L14 1.586v12.828l2.293 2.293A1 1 0 0018 16V6a1 1 0 00-.293-.707z" clipRule="evenodd" />
                       </svg>
                     </div>
                     <h3 className="text-xl font-bold text-gray-800">Geographic Equity</h3>
                   </div>
-                  <div className="text-blue-600 group-hover:translate-x-1 transition-transform duration-200">
+                  <div className="text-[#4B9CD3] group-hover:translate-x-1 transition-transform duration-200">
                     <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
                     </svg>
@@ -327,7 +353,7 @@ export default async function HomePage() {
                 </p>
                 <div className="mt-auto pt-4 border-t border-gray-100 flex justify-between items-center text-sm">
                   <span className="text-red-500 font-semibold">Central Africa critically underserved</span>
-                  <span className="text-blue-600 font-semibold">View details →</span>
+                  <span className="text-[#4B9CD3] font-semibold">View details →</span>
                 </div>
               </div>
             </Link>
@@ -337,7 +363,7 @@ export default async function HomePage() {
               <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 border border-gray-100 h-full flex flex-col">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center">
-                    <div className="w-12 h-12 flex items-center justify-center rounded-full bg-green-100 text-green-600 mr-4">
+                    <div className="w-12 h-12 flex items-center justify-center rounded-full bg-[#4B9CD3] bg-opacity-20 text-[#4B9CD3] mr-4">
                       <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z" />
                         <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z" />
@@ -345,7 +371,7 @@ export default async function HomePage() {
                     </div>
                     <h3 className="text-xl font-bold text-gray-800">Sectoral Alignment</h3>
                   </div>
-                  <div className="text-green-600 group-hover:translate-x-1 transition-transform duration-200">
+                  <div className="text-[#4B9CD3] group-hover:translate-x-1 transition-transform duration-200">
                     <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
                     </svg>
@@ -356,7 +382,7 @@ export default async function HomePage() {
                 </p>
                 <div className="mt-auto pt-4 border-t border-gray-100 flex justify-between items-center text-sm">
                   <span className="text-amber-500 font-semibold">3 critical funding gaps</span>
-                  <span className="text-green-600 font-semibold">View details →</span>
+                  <span className="text-[#4B9CD3] font-semibold">View details →</span>
                 </div>
               </div>
             </Link>
@@ -366,14 +392,14 @@ export default async function HomePage() {
               <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 border border-gray-100 h-full flex flex-col">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center">
-                    <div className="w-12 h-12 flex items-center justify-center rounded-full bg-pink-100 text-pink-600 mr-4">
+                    <div className="w-12 h-12 flex items-center justify-center rounded-full bg-[#F0E68C] bg-opacity-20 text-[#1F2A44] mr-4">
                       <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
                       </svg>
                     </div>
                     <h3 className="text-xl font-bold text-gray-800">Gender & Inclusion</h3>
                   </div>
-                  <div className="text-pink-600 group-hover:translate-x-1 transition-transform duration-200">
+                  <div className="text-[#1F2A44] group-hover:translate-x-1 transition-transform duration-200">
                     <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
                     </svg>
@@ -384,7 +410,7 @@ export default async function HomePage() {
                 </p>
                 <div className="mt-auto pt-4 border-t border-gray-100 flex justify-between items-center text-sm">
                   <span className="text-red-500 font-semibold">23% below global average</span>
-                  <span className="text-pink-600 font-semibold">View details →</span>
+                  <span className="text-[#1F2A44] font-semibold">View details →</span>
                 </div>
               </div>
             </Link>
@@ -394,14 +420,14 @@ export default async function HomePage() {
               <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 border border-gray-100 h-full flex flex-col">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center">
-                    <div className="w-12 h-12 flex items-center justify-center rounded-full bg-purple-100 text-purple-600 mr-4">
+                    <div className="w-12 h-12 flex items-center justify-center rounded-full bg-[#1F2A44] bg-opacity-20 text-[#1F2A44] mr-4">
                       <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
                       </svg>
                     </div>
                     <h3 className="text-xl font-bold text-gray-800">Funding Lifecycle</h3>
                   </div>
-                  <div className="text-purple-600 group-hover:translate-x-1 transition-transform duration-200">
+                  <div className="text-[#1F2A44] group-hover:translate-x-1 transition-transform duration-200">
                     <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
                     </svg>
@@ -412,7 +438,7 @@ export default async function HomePage() {
                 </p>
                 <div className="mt-auto pt-4 border-t border-gray-100 flex justify-between items-center text-sm">
                   <span className="text-amber-500 font-semibold">31% stage advancement rate</span>
-                  <span className="text-purple-600 font-semibold">View details →</span>
+                  <span className="text-[#1F2A44] font-semibold">View details →</span>
                 </div>
               </div>
             </Link>
@@ -421,7 +447,7 @@ export default async function HomePage() {
           <div className="flex justify-center mt-10">
             <Link 
               href="/analytics" 
-              className="bg-gray-800 hover:bg-blue border text-white font-bold py-3 px-8 rounded-lg text-base transition-colors shadow-md flex items-center gap-2"
+              className="bg-[#1F2A44] hover:bg-[#4B9CD3] border text-white font-bold py-3 px-8 rounded-lg text-base transition-colors shadow-md flex items-center gap-2"
             >
               <span>Explore All Analytics</span>
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -437,8 +463,9 @@ export default async function HomePage() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
             <div className="inline-block mb-4">
-              <span className="inline-block px-4 py-1 text-sm font-semibold rounded-full bg-blue-600 text-white">
-                🎯 Equity-Aware Intelligence
+              <span className="inline-block px-4 py-1 text-sm font-semibold rounded-full bg-[#4B9CD3] text-white flex items-center gap-2">
+                <Target className="h-4 w-4" />
+                Equity-Aware Intelligence
               </span>
             </div>
             <h2 className="text-3xl font-bold text-gray-800 mb-4">Live Equity Analytics</h2>
@@ -456,8 +483,9 @@ export default async function HomePage() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
             <div className="inline-block mb-4">
-              <span className="inline-block px-4 py-1 text-sm font-semibold rounded-full bg-purple-600 text-white">
-                🧠 Vector-Powered Search
+              <span className="inline-block px-4 py-1 text-sm font-semibold rounded-full bg-[#1F2A44] text-white flex items-center gap-2">
+                <Brain className="h-4 w-4" />
+                Vector-Powered Search
               </span>
             </div>
             <h2 className="text-3xl font-bold text-gray-800 mb-4">Semantic Search Intelligence</h2>
@@ -475,8 +503,9 @@ export default async function HomePage() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
             <div className="inline-block mb-4">
-              <span className="inline-block px-4 py-1 text-sm font-semibold rounded-full bg-green-600 text-white">
-                🌍 Continental Coverage
+              <span className="inline-block px-4 py-1 text-sm font-semibold rounded-full bg-[#4B9CD3] text-white flex items-center gap-2">
+                <MapPin className="h-4 w-4" />
+                Continental Coverage
               </span>
             </div>
             <h2 className="text-3xl font-bold text-gray-800 mb-4">Database Intelligence</h2>
@@ -494,7 +523,7 @@ export default async function HomePage() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
             <div className="inline-block mb-4">
-              <span className="inline-block px-4 py-1 text-sm font-semibold rounded-full bg-blue-dark text-white">
+              <span className="inline-block px-4 py-1 text-sm font-semibold rounded-full bg-[#1F2A44] text-white">
                 TAIFA | FIALA Differentiators
               </span>
             </div>
@@ -506,8 +535,8 @@ export default async function HomePage() {
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Pan-African Focus */}
-            <div className="bg-white p-8 rounded-xl shadow-lg border-t-4 border-primary hover:shadow-xl transition-shadow duration-300">
-              <div className="w-16 h-16 flex items-center justify-center rounded-full bg-blue-50 text-primary mb-5 mx-auto">
+            <div className="bg-white p-8 rounded-xl shadow-lg border-t-4 border-[#4B9CD3] hover:shadow-xl transition-shadow duration-300">
+              <div className="w-16 h-16 flex items-center justify-center rounded-full bg-[#4B9CD3] bg-opacity-10 text-[#4B9CD3] mb-5 mx-auto">
                 <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M3 6a3 3 0 013-3h10a1 1 0 01.8 1.6L14.25 8l2.55 3.4A1 1 0 0116 13H6a1 1 0 00-1 1v3a1 1 0 11-2 0V6z" clipRule="evenodd" />
                 </svg>
@@ -517,7 +546,7 @@ export default async function HomePage() {
                 Our database is curated specifically for African initiatives, prioritizing opportunities that are relevant to the continent's AI ecosystem.
               </p>
               <div className="mt-5 flex justify-center">
-                <div className="inline-flex space-x-1 items-center text-primary font-medium text-sm">
+                <div className="inline-flex space-x-1 items-center text-[#4B9CD3] font-medium text-sm">
                   <span>All 54 countries covered</span>
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -527,8 +556,8 @@ export default async function HomePage() {
             </div>
             
             {/* Bilingual Platform */}
-            <div className="bg-white p-8 rounded-xl shadow-lg border-t-4 border-gold hover:shadow-xl transition-shadow duration-300">
-              <div className="w-16 h-16 flex items-center justify-center rounded-full bg-yellow-50 text-gold mb-5 mx-auto">
+            <div className="bg-white p-8 rounded-xl shadow-lg border-t-4 border-[#F0E68C] hover:shadow-xl transition-shadow duration-300">
+              <div className="w-16 h-16 flex items-center justify-center rounded-full bg-yellow-50 text-[#F0E68C] mb-5 mx-auto">
                 <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z" />
                   <path d="M15 7v2a4 4 0 01-4 4H9.828l-1.766 1.767c.28.149.599.233.938.233h2l3 3v-3h2a2 2 0 002-2V9a2 2 0 00-2-2h-1z" />
@@ -540,15 +569,15 @@ export default async function HomePage() {
               </p>
               <div className="mt-5 flex justify-center">
                 <div className="inline-flex space-x-2 items-center">
-                  <span className="rounded-full bg-blue-50 text-primary px-3 py-1 text-xs font-medium">English</span>
-                  <span className="rounded-full bg-yellow-50 text-gold px-3 py-1 text-xs font-medium">Français</span>
+                  <span className="rounded-full bg-[#4B9CD3] bg-opacity-10 text-[#4B9CD3] px-3 py-1 text-xs font-medium">English</span>
+                  <span className="rounded-full bg-yellow-50 text-[#F0E68C] px-3 py-1 text-xs font-medium">Français</span>
                 </div>
               </div>
             </div>
             
             {/* Rich Data */}
-            <div className="bg-white p-8 rounded-xl shadow-lg border-t-4 border-primary hover:shadow-xl transition-shadow duration-300">
-              <div className="w-16 h-16 flex items-center justify-center rounded-full bg-blue-50 text-primary mb-5 mx-auto">
+            <div className="bg-white p-8 rounded-xl shadow-lg border-t-4 border-[#4B9CD3] hover:shadow-xl transition-shadow duration-300">
+              <div className="w-16 h-16 flex items-center justify-center rounded-full bg-[#4B9CD3] bg-opacity-10 text-[#4B9CD3] mb-5 mx-auto">
                 <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11 4a1 1 0 10-2 0v4a1 1 0 102 0V7zm-3 1a1 1 0 10-2 0v3a1 1 0 102 0V8zM8 9a1 1 0 00-2 0v2a1 1 0 102 0V9z" clipRule="evenodd" />
                 </svg>
@@ -558,7 +587,7 @@ export default async function HomePage() {
                 Detailed insights on funding trends, geographic distribution, and opportunity types to inform your funding strategy.
               </p>
               <div className="mt-5 flex justify-center">
-                <div className="inline-flex space-x-1 items-center text-primary font-medium text-sm">
+                <div className="inline-flex space-x-1 items-center text-[#4B9CD3] font-medium text-sm">
                   <span>View detailed analytics</span>
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -571,8 +600,8 @@ export default async function HomePage() {
           {/* Second row of features */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
             {/* Daily Updates */}
-            <div className="bg-white p-8 rounded-xl shadow-lg border-t-4 border-gold hover:shadow-xl transition-shadow duration-300">
-              <div className="w-16 h-16 flex items-center justify-center rounded-full bg-yellow-50 text-gold mb-5 mx-auto">
+            <div className="bg-white p-8 rounded-xl shadow-lg border-t-4 border-[#F0E68C] hover:shadow-xl transition-shadow duration-300">
+              <div className="w-16 h-16 flex items-center justify-center rounded-full bg-yellow-50 text-[#F0E68C] mb-5 mx-auto">
                 <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
                 </svg>
@@ -582,7 +611,7 @@ export default async function HomePage() {
                 Fresh opportunities added every day, with automated alerts for new funding sources that match your profile.
               </p>
               <div className="mt-5 flex justify-center">
-                <span className="inline-flex items-center text-green-600 text-sm font-medium">
+                <span className="inline-flex items-center text-[#4B9CD3] text-sm font-medium">
                   <div className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
                   <span>Last update: Today</span>
                 </span>
@@ -590,8 +619,8 @@ export default async function HomePage() {
             </div>
             
             {/* Advanced Search */}
-            <div className="bg-white p-8 rounded-xl shadow-lg border-t-4 border-primary hover:shadow-xl transition-shadow duration-300">
-              <div className="w-16 h-16 flex items-center justify-center rounded-full bg-blue-50 text-primary mb-5 mx-auto">
+            <div className="bg-white p-8 rounded-xl shadow-lg border-t-4 border-[#4B9CD3] hover:shadow-xl transition-shadow duration-300">
+              <div className="w-16 h-16 flex items-center justify-center rounded-full bg-[#4B9CD3] bg-opacity-10 text-[#4B9CD3] mb-5 mx-auto">
                 <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
                 </svg>
@@ -601,7 +630,7 @@ export default async function HomePage() {
                 Powerful filters by funding type, amount, eligibility, deadlines, and geographic focus to find your perfect opportunity.
               </p>
               <div className="mt-5 flex justify-center">
-                <Link href="/funding" className="text-primary font-medium text-sm flex items-center space-x-1">
+                <Link href="/funding" className="text-[#4B9CD3] font-medium text-sm flex items-center space-x-1">
                   <span>Try advanced search</span>
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -611,8 +640,8 @@ export default async function HomePage() {
             </div>
             
             {/* Funder Profiles */}
-            <div className="bg-white p-8 rounded-xl shadow-lg border-t-4 border-gold hover:shadow-xl transition-shadow duration-300">
-              <div className="w-16 h-16 flex items-center justify-center rounded-full bg-yellow-50 text-gold mb-5 mx-auto">
+            <div className="bg-white p-8 rounded-xl shadow-lg border-t-4 border-[#F0E68C] hover:shadow-xl transition-shadow duration-300">
+              <div className="w-16 h-16 flex items-center justify-center rounded-full bg-yellow-50 text-[#F0E68C] mb-5 mx-auto">
                 <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
                 </svg>
@@ -622,7 +651,7 @@ export default async function HomePage() {
                 Detailed profiles of major funding organizations, their priorities, past grants, and tips for successful applications.
               </p>
               <div className="mt-5 flex justify-center">
-                <Link href="/funders" className="text-gold font-medium text-sm flex items-center space-x-1">
+                <Link href="/funders" className="text-[#1F2A44] font-medium text-sm flex items-center space-x-1">
                   <span>Browse funder profiles</span>
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -635,7 +664,7 @@ export default async function HomePage() {
       </section>
 
       {/* Pan-African Impact Showcase */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-blue-dark via-primary to-gold-dark text-white">
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-[#1F2A44] via-[#4B9CD3] to-[#F0E68C] text-white">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
             <span className="inline-block px-4 py-1 text-sm font-semibold rounded-full bg-white bg-opacity-20 text-white mb-4">
@@ -654,7 +683,7 @@ export default async function HomePage() {
             {/* Case Study 1: Universities */}
             <div className="bg-white bg-opacity-10 backdrop-blur-sm rounded-xl p-8 hover:bg-opacity-15 transition-all duration-300 border border-white border-opacity-20">
               <div className="flex items-center justify-center w-16 h-16 bg-gold bg-opacity-20 rounded-full mb-6 mx-auto">
-                <span className="text-2xl">🎓</span>
+                <Award className="h-8 w-8 text-[#F0E68C]" />
               </div>
               <h3 className="text-xl font-bold mb-4 text-center">Research Institutions</h3>
               <p className="text-white text-opacity-90 text-center mb-6">
@@ -671,7 +700,7 @@ export default async function HomePage() {
             {/* Case Study 2: Government */}
             <div className="bg-white bg-opacity-10 backdrop-blur-sm rounded-xl p-8 hover:bg-opacity-15 transition-all duration-300 border border-white border-opacity-20">
               <div className="flex items-center justify-center w-16 h-16 bg-gold bg-opacity-20 rounded-full mb-6 mx-auto">
-                <span className="text-2xl">🏛️</span>
+                <Building2 className="h-8 w-8 text-[#F0E68C]" />
               </div>
               <h3 className="text-xl font-bold mb-4 text-center">Government Initiatives</h3>
               <p className="text-white text-opacity-90 text-center mb-6">
@@ -688,7 +717,7 @@ export default async function HomePage() {
             {/* Case Study 3: Startups */}
             <div className="bg-white bg-opacity-10 backdrop-blur-sm rounded-xl p-8 hover:bg-opacity-15 transition-all duration-300 border border-white border-opacity-20">
               <div className="flex items-center justify-center w-16 h-16 bg-gold bg-opacity-20 rounded-full mb-6 mx-auto">
-                <span className="text-2xl">🚀</span>
+                <TrendingUp className="h-8 w-8 text-[#F0E68C]" />
               </div>
               <h3 className="text-xl font-bold mb-4 text-center">Tech Startups</h3>
               <p className="text-white text-opacity-90 text-center mb-6">
@@ -703,43 +732,34 @@ export default async function HomePage() {
             </div>
           </div>
           
-          {/* Featured Success Story */}
+          {/* Pan-African Impact Summary */}
           <div className="mt-16 bg-white bg-opacity-10 backdrop-blur-sm rounded-xl p-8 border border-white border-opacity-20">
-            <div className="flex flex-col md:flex-row items-center">
-              <div className="md:w-2/3 md:pr-8 mb-6 md:mb-0">
-                <h3 className="text-2xl font-bold mb-4">Rwanda: A Success Story</h3>
-                <p className="mb-4 text-white text-opacity-90">
-                  Rwanda's AI ecosystem has leveraged our platform to secure over $2.5M in funding across academic, government, and private sector initiatives.
-                </p>
-                <div className="grid grid-cols-3 gap-4 mb-6">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-gold">12</div>
-                    <div className="text-xs text-white text-opacity-80">Projects Funded</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-gold">$2.5M+</div>
-                    <div className="text-xs text-white text-opacity-80">Total Funding</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-gold">4</div>
-                    <div className="text-xs text-white text-opacity-80">Sectors Impacted</div>
-                  </div>
+            <div className="text-center">
+              <h3 className="text-2xl font-bold mb-4">Supporting Innovation Across Africa</h3>
+              <p className="mb-6 text-white text-opacity-90 max-w-3xl mx-auto">
+                Our platform connects African innovators with global opportunities, fostering sustainable growth and equitable development across the continent.
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div className="text-center bg-[#1F2A44] bg-opacity-30 rounded-lg p-4 shadow-sm">
+                  <div className="text-3xl font-bold text-[#F0E68C]">54</div>
+                  <div className="text-sm text-white text-opacity-90 font-medium mt-1">Countries Covered</div>
                 </div>
-                <Link 
-                  href="/success-stories/rwanda" 
-                  className="inline-flex items-center bg-gold hover:bg-gold-dark text-blue-dark font-medium py-2 px-6 rounded-lg transition-colors"
-                >
-                  <span>Read the full case study</span>
-                  <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                  </svg>
-                </Link>
-              </div>
-              <div className="md:w-1/3 flex justify-center">
-                <div className="w-48 h-48 rounded-full bg-gradient-to-br from-blue-dark to-primary border-4 border-white border-opacity-20 flex items-center justify-center">
-                  <span className="text-6xl">🇷🇼</span>
+                <div className="text-center bg-[#1F2A44] bg-opacity-30 rounded-lg p-4 shadow-sm">
+                  <div className="text-3xl font-bold text-[#F0E68C]">$300M+</div>
+                  <div className="text-sm text-white text-opacity-90 font-medium mt-1">AI Funding Tracked</div>
+                </div>
+                <div className="text-center bg-[#1F2A44] bg-opacity-30 rounded-lg p-4 shadow-sm">
+                  <div className="text-3xl font-bold text-[#F0E68C]">100+</div>
+                  <div className="text-sm text-white text-opacity-90 font-medium mt-1">Active Organizations</div>
                 </div>
               </div>
+              <Link 
+                href="/analytics" 
+                className="inline-flex items-center bg-[#F0E68C] hover:bg-[#E6D768] text-[#1F2A44] font-bold py-3 px-7 rounded-md text-base transition-colors shadow-md"
+              >
+                <TrendingUp className="h-5 w-5 mr-2" />
+                View Impact Analytics
+              </Link>
             </div>
           </div>
         </div>

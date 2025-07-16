@@ -1,6 +1,7 @@
 // components/pathway-selector/PathwaySelector.tsx
 import { useState } from 'react';
 import Link from 'next/link';
+import { Microscope, Briefcase, DollarSign, Globe } from 'lucide-react';
 
 // Define the pathways available to users with inverted color themes
 const pathways = [
@@ -8,7 +9,7 @@ const pathways = [
     id: 'researcher',
     title: 'Researcher / Grantee',
     description: 'Find grants and funding opportunities for AI research projects',
-    icon: '🔬',
+    icon: Microscope,
     theme: 'grants',
     color: 'bg-slate-800',
     hoverColor: 'hover:bg-slate-700',
@@ -21,7 +22,7 @@ const pathways = [
     id: 'entrepreneur',
     title: 'Entrepreneur / Startup',
     description: 'Discover investment and accelerator opportunities for AI ventures',
-    icon: '💼',
+    icon: Briefcase,
     theme: 'investments',
     color: 'bg-white',
     hoverColor: 'hover:bg-gray-50',
@@ -34,7 +35,7 @@ const pathways = [
     id: 'funder',
     title: 'Funder / Provider',
     description: 'Explore the funding landscape and find potential partners or recipients',
-    icon: '💰',
+    icon: DollarSign,
     theme: 'neutral',
     color: 'bg-yellow-500',
     hoverColor: 'hover:bg-yellow-400',
@@ -47,7 +48,7 @@ const pathways = [
     id: 'explorer',
     title: 'Just Exploring',
     description: 'Browse the full database of AI funding in Africa',
-    icon: '🌍',
+    icon: Globe,
     theme: 'neutral',
     color: 'bg-purple-600',
     hoverColor: 'hover:bg-purple-500',
@@ -82,8 +83,8 @@ export default function PathwaySelector() {
               onClick={() => setSelected(pathway.id)}
             >
               <div className="p-6">
-                <div className={`w-14 h-14 ${pathway.accentColor} ${pathway.theme === 'grants' ? 'text-white' : 'text-white'} rounded-full flex items-center justify-center text-2xl mb-4 shadow-md`}>
-                  {pathway.icon}
+                <div className={`w-14 h-14 ${pathway.accentColor} ${pathway.theme === 'grants' ? 'text-white' : 'text-white'} rounded-full flex items-center justify-center mb-4 shadow-md`}>
+                  <pathway.icon className="w-8 h-8" />
                 </div>
                 
                 <h3 className={`text-xl font-bold mb-2 ${pathway.textColor}`}>{pathway.title}</h3>

@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import { 
   Grid, List, ChevronLeft, ChevronRight, RotateCcw, 
-  SortAsc, SortDesc, Filter, Download, Share2 
+  SortAsc, SortDesc, Filter, Download, Share2,
+  Calendar, DollarSign, Scale, Target, Clock, Building2
 } from 'lucide-react';
 import OpportunityCard from './OpportunityCard';
 import { FundingOpportunity } from '@/types/funding';
@@ -44,12 +45,12 @@ export default function SearchResults({ searchMode, filters, loading, onLoadMore
   const [isExporting, setIsExporting] = useState(false);
 
   const sortOptions = [
-    { value: 'deadline', label: 'Deadline', icon: '📅' },
-    { value: 'amount', label: 'Funding Amount', icon: '💰' },
-    { value: 'equity_score', label: 'Equity Score', icon: '⚖️' },
-    { value: 'relevance', label: 'Relevance', icon: '🎯' },
-    { value: 'created_at', label: 'Recently Added', icon: '🕐' },
-    { value: 'organization', label: 'Organization', icon: '🏢' }
+    { value: 'deadline', label: 'Deadline', icon: Calendar },
+    { value: 'amount', label: 'Funding Amount', icon: DollarSign },
+    { value: 'equity_score', label: 'Equity Score', icon: Scale },
+    { value: 'relevance', label: 'Relevance', icon: Target },
+    { value: 'created_at', label: 'Recently Added', icon: Clock },
+    { value: 'organization', label: 'Organization', icon: Building2 }
   ];
 
   // Mock data for demonstration
@@ -225,10 +226,10 @@ export default function SearchResults({ searchMode, filters, loading, onLoadMore
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">
+            <h2 className="text-xl font-semibold text-[#1F2A44]">
               {searchMode === 'discover' ? 'Active Opportunities' : 'All Opportunities'}
             </h2>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-[#A0A0A0]">
               {loading ? 'Loading...' : `${state.total} opportunities found`}
             </p>
           </div>
@@ -236,10 +237,10 @@ export default function SearchResults({ searchMode, filters, loading, onLoadMore
           {/* Active Filters */}
           {state.selectedFilters.length > 0 && (
             <div className="flex items-center space-x-2">
-              <span className="text-sm text-gray-500">Filters:</span>
+              <span className="text-sm text-[#A0A0A0]">Filters:</span>
               <div className="flex flex-wrap gap-2">
                 {state.selectedFilters.map((filter, index) => (
-                  <span key={index} className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
+                  <span key={index} className="px-2 py-1 bg-[#4B9CD3] bg-opacity-20 text-[#1F2A44] rounded-full text-xs font-medium">
                     {filter}
                   </span>
                 ))}
@@ -254,23 +255,23 @@ export default function SearchResults({ searchMode, filters, loading, onLoadMore
           <div className="relative">
             <button
               onClick={() => setShowSortOptions(!showSortOptions)}
-              className="flex items-center space-x-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="flex items-center space-x-2 px-3 py-2 border border-[#A0A0A0] border-opacity-30 rounded-lg hover:bg-[#F0E68C] hover:bg-opacity-10 transition-colors text-[#1F2A44]"
             >
               {state.sortOrder === 'asc' ? <SortAsc className="w-4 h-4" /> : <SortDesc className="w-4 h-4" />}
               <span className="text-sm">Sort by {sortOptions.find(o => o.value === state.sortBy)?.label}</span>
             </button>
             
             {showSortOptions && (
-              <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-lg shadow-lg z-10">
+              <div className="absolute right-0 mt-2 w-48 bg-white border border-[#A0A0A0] border-opacity-30 rounded-lg shadow-lg z-10">
                 {sortOptions.map((option) => (
                   <button
                     key={option.value}
                     onClick={() => handleSort(option.value)}
-                    className={`w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center space-x-2 ${
-                      state.sortBy === option.value ? 'bg-blue-50 text-blue-600' : 'text-gray-700'
+                    className={`w-full px-4 py-2 text-left hover:bg-[#F0E68C] hover:bg-opacity-10 flex items-center space-x-2 ${
+                      state.sortBy === option.value ? 'bg-[#4B9CD3] bg-opacity-10 text-[#1F2A44] font-medium' : 'text-[#1F2A44]'
                     }`}
                   >
-                    <span>{option.icon}</span>
+                    <option.icon className="w-4 h-4" />
                     <span className="text-sm">{option.label}</span>
                   </button>
                 ))}
@@ -279,35 +280,43 @@ export default function SearchResults({ searchMode, filters, loading, onLoadMore
           </div>
 
           {/* View Mode */}
-          <div className="flex items-center border border-gray-300 rounded-lg">
+          <div className="flex bg-[#F0E68C] bg-opacity-10 rounded-lg p-1">
             <button
               onClick={() => handleViewModeChange('grid')}
-              className={`p-2 ${state.viewMode === 'grid' ? 'bg-blue-100 text-blue-600' : 'text-gray-600 hover:bg-gray-50'}`}
+              className={`px-3 py-1 rounded ${state.viewMode === 'grid' 
+                ? 'bg-white text-[#1F2A44] shadow-sm' 
+                : 'text-[#1F2A44] hover:bg-[#F0E68C] hover:bg-opacity-20'}`}
             >
               <Grid className="w-4 h-4" />
             </button>
             <button
               onClick={() => handleViewModeChange('list')}
-              className={`p-2 ${state.viewMode === 'list' ? 'bg-blue-100 text-blue-600' : 'text-gray-600 hover:bg-gray-50'}`}
+              className={`px-3 py-1 rounded ${state.viewMode === 'list' 
+                ? 'bg-white text-[#1F2A44] shadow-sm' 
+                : 'text-[#1F2A44] hover:bg-[#F0E68C] hover:bg-opacity-20'}`}
             >
               <List className="w-4 h-4" />
             </button>
           </div>
 
-          {/* Export */}
-          <button
-            onClick={handleExport}
-            disabled={isExporting}
-            className="flex items-center space-x-2 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 transition-colors"
-          >
-            <Download className="w-4 h-4" />
-            <span className="text-sm">{isExporting ? 'Exporting...' : 'Export'}</span>
-          </button>
+          {/* Export & Share */}
+          <div className="flex items-center space-x-2">
+            <button 
+              onClick={handleExport}
+              className="p-2 border border-[#A0A0A0] border-opacity-30 rounded-lg text-[#1F2A44] hover:bg-[#F0E68C] hover:bg-opacity-10 transition-colors"
+              disabled={isExporting}
+            >
+              {isExporting ? <RotateCcw className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+            </button>
+            <button className="p-2 border border-[#A0A0A0] border-opacity-30 rounded-lg text-[#1F2A44] hover:bg-[#F0E68C] hover:bg-opacity-10 transition-colors">
+              <Share2 className="w-4 h-4" />
+            </button>
+          </div>
 
-          {/* Share */}
-          <button className="flex items-center space-x-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-            <Share2 className="w-4 h-4" />
-            <span className="text-sm">Share</span>
+          {/* Filter */}
+          <button className="flex items-center space-x-2 px-3 py-2 border border-[#A0A0A0] border-opacity-30 rounded-lg hover:bg-[#F0E68C] hover:bg-opacity-10 text-[#1F2A44] transition-colors">
+            <Filter className="w-4 h-4" />
+            <span className="text-sm">Filter</span>
           </button>
         </div>
       </div>
@@ -392,7 +401,7 @@ export default function SearchResults({ searchMode, filters, loading, onLoadMore
             <button
               onClick={() => handlePageChange(state.currentPage - 1)}
               disabled={state.currentPage === 1}
-              className="flex items-center space-x-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="flex items-center space-x-2 px-3 py-2 border border-[#A0A0A0] border-opacity-30 rounded-lg hover:bg-[#F0E68C] hover:bg-opacity-10 text-[#1F2A44] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               <ChevronLeft className="w-4 h-4" />
               <span>Previous</span>
@@ -408,8 +417,8 @@ export default function SearchResults({ searchMode, filters, loading, onLoadMore
                     onClick={() => handlePageChange(pageNum)}
                     className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                       state.currentPage === pageNum
-                        ? 'bg-blue-600 text-white'
-                        : 'text-gray-700 hover:bg-gray-100'
+                        ? 'bg-[#1F2A44] text-[#F0E68C]'
+                        : 'text-[#1F2A44] hover:bg-[#F0E68C] hover:bg-opacity-10'
                     }`}
                   >
                     {pageNum}
@@ -419,13 +428,13 @@ export default function SearchResults({ searchMode, filters, loading, onLoadMore
               
               {state.totalPages > 5 && (
                 <>
-                  <span className="px-2 text-gray-500">...</span>
+                  <span className="px-2 text-[#A0A0A0]">...</span>
                   <button
                     onClick={() => handlePageChange(state.totalPages)}
                     className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                       state.currentPage === state.totalPages
-                        ? 'bg-blue-600 text-white'
-                        : 'text-gray-700 hover:bg-gray-100'
+                        ? 'bg-[#1F2A44] text-[#F0E68C]'
+                        : 'text-[#1F2A44] hover:bg-[#F0E68C] hover:bg-opacity-10'
                     }`}
                   >
                     {state.totalPages}
@@ -437,7 +446,7 @@ export default function SearchResults({ searchMode, filters, loading, onLoadMore
             <button
               onClick={() => handlePageChange(state.currentPage + 1)}
               disabled={state.currentPage === state.totalPages}
-              className="flex items-center space-x-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="flex items-center space-x-2 px-3 py-2 border border-[#A0A0A0] border-opacity-30 rounded-lg hover:bg-[#F0E68C] hover:bg-opacity-10 text-[#1F2A44] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               <span>Next</span>
               <ChevronRight className="w-4 h-4" />

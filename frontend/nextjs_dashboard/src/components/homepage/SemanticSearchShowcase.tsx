@@ -1,12 +1,12 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { Search, Globe, Brain, Zap, Languages } from 'lucide-react';
+import { Search, Globe, Brain, Zap, Languages, Flag } from 'lucide-react';
 
 interface SearchExample {
   query: string;
   language: string;
-  flag: string;
+  flag: React.ElementType;
   results: number;
   highlights: string[];
 }
@@ -20,28 +20,28 @@ export default function SemanticSearchShowcase() {
     {
       query: "AI healthcare funding rural Central Africa",
       language: "English",
-      flag: "🇬🇧",
+      flag: Flag,
       results: 23,
       highlights: ["Mali telemedicine grants", "CAR digital health initiative", "Chad mobile health funding"]
     },
     {
       query: "financement agriculture intelligente Afrique francophone",
       language: "Français",
-      flag: "🇫🇷",
+      flag: Flag,
       results: 18,
       highlights: ["Sénégal agtech incubateur", "Côte d'Ivoire smart farming", "Burkina Faso precision agriculture"]
     },
     {
       query: "تمويل الذكاء الاصطناعي للشباب",
       language: "العربية",
-      flag: "🇸🇦",
+      flag: Flag,
       results: 12,
       highlights: ["Morocco youth AI program", "Tunisia startup accelerator", "Egypt tech entrepreneurship"]
     },
     {
       query: "financiamento IA mulheres empreendedoras",
       language: "Português",
-      flag: "🇵🇹",
+      flag: Flag,
       results: 15,
       highlights: ["Angola women in tech", "Mozambique female founders", "São Tomé digital innovation"]
     }
@@ -153,7 +153,8 @@ export default function SemanticSearchShowcase() {
                         : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                     }`}
                   >
-                    {example.flag} {example.language}
+                    <example.flag className="w-4 h-4 mr-1" />
+                    {example.language}
                   </button>
                 ))}
               </div>
@@ -209,7 +210,10 @@ export default function SemanticSearchShowcase() {
 
         {/* Technical Architecture */}
         <div className="bg-gray-50 rounded-lg p-6">
-          <h4 className="text-lg font-semibold text-gray-900 mb-4">🧠 How Vector Intelligence Works</h4>
+          <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center space-x-2">
+            <Brain className="w-5 h-5" />
+            <span>How Vector Intelligence Works</span>
+          </h4>
           <div className="space-y-4">
             <div className="flex items-start space-x-4">
               <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">

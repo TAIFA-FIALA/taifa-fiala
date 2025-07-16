@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { Search, Filter, Database, Clock, Globe, Users, Brain, TrendingUp } from 'lucide-react';
+import { Search, Filter, Database, Clock, Globe, Users, Brain, TrendingUp, UserCheck, GraduationCap, Home } from 'lucide-react';
 
 interface SearchMode {
   mode: 'discover' | 'explore';
@@ -499,8 +499,9 @@ export default function DualModeSearch() {
                     onChange={(e) => handleFilterChange('underserved_focus', e.target.checked)}
                     className="h-4 w-4 text-blue-600 rounded focus:ring-blue-500"
                   />
-                  <label htmlFor="underserved-focus" className="ml-2 text-sm text-gray-700">
-                    🌍 Underserved Regions Focus
+                  <label htmlFor="underserved-focus" className="ml-2 text-sm text-gray-700 flex items-center space-x-1">
+                    <Globe className="w-4 h-4" />
+                    <span>Underserved Regions Focus</span>
                   </label>
                 </div>
                 <div className="flex items-center">
@@ -511,8 +512,9 @@ export default function DualModeSearch() {
                     onChange={(e) => handleFilterChange('women_focus', e.target.checked)}
                     className="h-4 w-4 text-blue-600 rounded focus:ring-blue-500"
                   />
-                  <label htmlFor="women-focus" className="ml-2 text-sm text-gray-700">
-                    👩‍💼 Women-Led Initiatives
+                  <label htmlFor="women-focus" className="ml-2 text-sm text-gray-700 flex items-center space-x-1">
+                    <UserCheck className="w-4 h-4" />
+                    <span>Women-Led Initiatives</span>
                   </label>
                 </div>
                 <div className="flex items-center">
@@ -523,8 +525,9 @@ export default function DualModeSearch() {
                     onChange={(e) => handleFilterChange('youth_focus', e.target.checked)}
                     className="h-4 w-4 text-blue-600 rounded focus:ring-blue-500"
                   />
-                  <label htmlFor="youth-focus" className="ml-2 text-sm text-gray-700">
-                    🎓 Youth-Focused Programs
+                  <label htmlFor="youth-focus" className="ml-2 text-sm text-gray-700 flex items-center space-x-1">
+                    <GraduationCap className="w-4 h-4" />
+                    <span>Youth-Focused Programs</span>
                   </label>
                 </div>
                 <div className="flex items-center">
@@ -535,8 +538,9 @@ export default function DualModeSearch() {
                     onChange={(e) => handleFilterChange('rural_focus', e.target.checked)}
                     className="h-4 w-4 text-blue-600 rounded focus:ring-blue-500"
                   />
-                  <label htmlFor="rural-focus" className="ml-2 text-sm text-gray-700">
-                    🏘️ Rural Communities
+                  <label htmlFor="rural-focus" className="ml-2 text-sm text-gray-700 flex items-center space-x-1">
+                    <Home className="w-4 h-4" />
+                    <span>Rural Communities</span>
                   </label>
                 </div>
               </div>
