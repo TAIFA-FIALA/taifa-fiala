@@ -7,73 +7,73 @@
 │                        DATA INGESTION ARCHITECTURE                              │
 ├─────────────────────────────────────────────────────────────────────────────────┤
 │                                                                                 │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐          │
-│  │   MODULE 1  │  │   MODULE 2  │  │   MODULE 3  │  │   MODULE 4  │          │
-│  │  RSS Feed   │  │    Serper   │  │    User     │  │   Crawl4AI  │          │
-│  │   Ingestion │  │   Search    │  │ Submission  │  │  Extraction │          │
-│  └─────────────┘  └─────────────┘  └─────────────┘  └─────────────┘          │
-│         │                 │                 │                 │               │
-│         │                 │                 │                 │               │
-│         └─────────────────┼─────────────────┼─────────────────┘               │
-│                           │                 │                                 │
-│                           ▼                 ▼                                 │
-│                  ┌─────────────────────────────────────────┐                  │
-│                  │           INGESTION ROUTER              │                  │
-│                  │       (Redis Queue Manager)             │                  │
-│                  │     • Priority-based queuing            │                  │
-│                  │     • Circuit breaker control           │                  │
-│                  │     • Health monitoring                 │                  │
-│                  └─────────────────────────────────────────┘                  │
-│                                   │                                           │
-│                                   ▼                                           │
-│                  ┌─────────────────────────────────────────┐                  │
-│                  │        CONTENT CLASSIFIER               │                  │
-│                  │     • Opportunity vs Announcement       │                  │
-│                  │     • Pattern matching + AI            │                  │
-│                  │     • Source quality scoring           │                  │
-│                  └─────────────────────────────────────────┘                  │
-│                                   │                                           │
-│                                   ▼                                           │
-│                  ┌─────────────────────────────────────────┐                  │
-│                  │      ENHANCED DUPLICATE DETECTOR        │                  │
-│                  │     • 7 detection strategies           │                  │
-│                  │     • Announcement chain detection     │                  │
-│                  │     • Temporal clustering             │                  │
-│                  │     • Organization-funding matching   │                  │
-│                  └─────────────────────────────────────────┘                  │
-│                                   │                                           │
-│                                   ▼                                           │
-│                  ┌─────────────────────────────────────────┐                  │
-│                  │          AI VALIDATOR                   │                  │
-│                  │     • Crawl4AI integration             │                  │
-│                  │     • Quality scoring                  │                  │
-│                  │     • Legitimacy assessment            │                  │
-│                  └─────────────────────────────────────────┘                  │
-│                                   │                                           │
-│                          ┌────────┴────────┐                                  │
-│                          ▼                 ▼                                  │
-│                 ┌─────────────┐   ┌─────────────┐                             │
-│                 │AUTO-APPROVE │   │   REVIEW    │                             │
-│                 │   QUEUE     │   │   QUEUE     │                             │
-│                 │ (>85% conf) │   │ (65-85%)    │                             │
-│                 └─────────────┘   └─────────────┘                             │
-│                          │                 │                                  │
-│                          │                 ▼                                  │
-│                          │        ┌─────────────┐                             │
-│                          │        │  STREAMLIT  │                             │
-│                          │        │   ADMIN     │                             │
-│                          │        │ INTERFACE   │                             │
-│                          │        └─────────────┘                             │
-│                          │                 │                                  │
-│                          └─────────────────┼─────────────────┐                 │
-│                                           ▼                 ▼                 │
-│                                  ┌─────────────────────────────────────────┐   │
-│                                  │           DATABASE                       │   │
-│                                  │        (Published)                       │   │
-│                                  │   • Optimized indexes                   │   │
-│                                  │   • Connection pooling                  │   │
-│                                  │   • Caching layer                       │   │
-│                                  └─────────────────────────────────────────┘   │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐             │
+│  │   MODULE 1  │  │   MODULE 2  │  │   MODULE 3  │  │   MODULE 4  │             │
+│  │  RSS Feed   │  │    Serper   │  │    User     │  │   Crawl4AI  │             │
+│  │   Ingestion │  │   Search    │  │ Submission  │  │  Extraction │             │
+│  └─────────────┘  └─────────────┘  └─────────────┘  └─────────────┘             │
+│         │                 │                 │                 │                 │
+│         │                 │                 │                 │                 │
+│         └─────────────────┼─────────────────┼─────────────────┘                 │
+│                           │                 │                                   │
+│                           ▼                 ▼                                   │
+│                  ┌─────────────────────────────────────────┐                    │ 
+│                  │           INGESTION ROUTER              │                    │
+│                  │       (Redis Queue Manager)             │                    │
+│                  │     • Priority-based queuing            │                    │
+│                  │     • Circuit breaker control           │                    │
+│                  │     • Health monitoring                 │                    │
+│                  └─────────────────────────────────────────┘                    │
+│                                   │                                             │
+│                                   ▼                                             │
+│                  ┌─────────────────────────────────────────┐                    │
+│                  │        CONTENT CLASSIFIER               │                    │
+│                  │     • Opportunity vs Announcement       │                    │
+│                  │     • Pattern matching + AI             │                    │
+│                  │     • Source quality scoring            │                    │
+│                  └─────────────────────────────────────────┘                    │
+│                                   │                                             │
+│                                   ▼                                             │
+│                  ┌─────────────────────────────────────────┐                    │
+│                  │      ENHANCED DUPLICATE DETECTOR        │                    │
+│                  │     • 7 detection strategies            │                    │
+│                  │     • Announcement chain detection      │                    │
+│                  │     • Temporal clustering               │                    │
+│                  │     • Organization-funding matching     │                    │
+│                  └─────────────────────────────────────────┘                    │
+│                                   │                                             │
+│                                   ▼                                             │
+│                  ┌─────────────────────────────────────────┐                    │
+│                  │          AI VALIDATOR                   │                    │
+│                  │     • Crawl4AI integration              │                    │
+│                  │     • Quality scoring                   │                    │
+│                  │     • Legitimacy assessment             │                    │
+│                  └─────────────────────────────────────────┘                    │
+│                                   │                                             │
+│                          ┌────────┴────────┐                                    │
+│                          ▼                 ▼                                    │
+│                 ┌─────────────┐   ┌─────────────┐                               │
+│                 │AUTO-APPROVE │   │   REVIEW    │                               │
+│                 │   QUEUE     │   │   QUEUE     │                               │
+│                 │ (>85% conf) │   │ (65-85%)    │                               │
+│                 └─────────────┘   └─────────────┘                               │
+│                          │                 │                                    │
+│                          │                 ▼                                    │
+│                          │        ┌─────────────┐                               │
+│                          │        │  STREAMLIT  │                               │
+│                          │        │   ADMIN     │                               │
+│                          │        │ INTERFACE   │                               │
+│                          │        └─────────────┘                               │
+│                          │                 │                                    │
+│                          └─────────────────┼─────────────────┐                  │
+│                                           ▼                 ▼                   │
+│                                  ┌─────────────────────────────────────────┐    │
+│                                  │           DATABASE                      │    │
+│                                  │        (Published)                      │    │
+│                                  │   • Optimized indexes                   │    │
+│                                  │   • Connection pooling                  │    │
+│                                  │   • Caching layer                       │    │
+│                                  └─────────────────────────────────────────┘    │
 │                                                                                 │
 └─────────────────────────────────────────────────────────────────────────────────┘
 ```
