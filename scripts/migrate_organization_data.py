@@ -23,7 +23,7 @@ from backend.app.models.funding import FundingOpportunity
 from backend.app.models.organization import Organization
 
 # Database setup
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql+asyncpg://postgres:stocksight1484@100.75.201.24:5432/TAIFA_db")
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 engine = create_async_engine(DATABASE_URL, poolclass=NullPool, echo=False)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine, class_=AsyncSession)

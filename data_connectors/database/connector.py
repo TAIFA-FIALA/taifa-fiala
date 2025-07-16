@@ -6,17 +6,17 @@ import hashlib
 from datetime import datetime, timedelta
 from typing import List, Dict, Any, Optional
 import os
-from dotenv import load_dotenv
 import aiohttp
+from dotenv import load_dotenv
 
 logger = logging.getLogger(__name__)
 
 class DatabaseConnector:
     """Database connector with DeepSeek AI parsing fallback"""
     
-    def __init__(self):
+    def __init__(self, database_url: str):
         load_dotenv()
-        self.database_url = os.getenv("DATABASE_URL")
+        self.database_url = database_url
         self.deepseek_api_key = os.getenv("DEEPSEEK_API_KEY")
         self.pool = None
         self.deepseek_session = None

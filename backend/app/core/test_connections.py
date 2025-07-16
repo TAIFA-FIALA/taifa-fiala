@@ -87,7 +87,7 @@ async def main():
 
 if __name__ == "__main__":
     # Load environment variables
-    load_dotenv()
+    
     
     # Run the connection tests
     asyncio.run(main())

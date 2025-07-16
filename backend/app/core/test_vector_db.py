@@ -6,7 +6,7 @@ with Microsoft's multilingual-e5-large embedding model.
 import os
 import asyncio
 import logging
-from dotenv import load_dotenv
+
 from pinecone import Pinecone, ServerlessSpec
 
 # Configure logging
@@ -14,7 +14,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Load environment variables
-load_dotenv()
+
 api_key = os.getenv("PINECONE_API_KEY")
 index_name = os.getenv("PINECONE_INDEX_NAME", "taifa-fiala")
 

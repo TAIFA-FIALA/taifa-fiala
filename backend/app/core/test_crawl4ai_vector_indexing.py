@@ -14,7 +14,7 @@ import asyncio
 import logging
 from datetime import datetime
 from typing import Dict, List, Any
-from dotenv import load_dotenv
+
 
 from crawl4ai import AsyncWebCrawler
 from crawl4ai.extraction_strategy import LLMExtractionStrategy
@@ -32,7 +32,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Load environment variables
-load_dotenv()
+
 
 # Test URLs - funding opportunities for African AI initiatives
 TEST_URLS = [

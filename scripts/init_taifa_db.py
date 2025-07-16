@@ -8,7 +8,7 @@ from datetime import datetime
 import sys
 
 # Direct database configuration
-DATABASE_URL = "postgresql://postgres:stocksight1484@100.75.201.24:5432/TAIFA_db"
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 def create_tables():
     """Create all necessary tables"""

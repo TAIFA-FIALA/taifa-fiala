@@ -14,7 +14,7 @@ from typing import Dict, List, Any, Optional
 from datetime import datetime
 
 from pinecone import Pinecone, ServerlessSpec
-from dotenv import load_dotenv
+
 
 from .etl_architecture import ETLTask, PipelineStage, Priority, ProcessingResult
 from .vector_db_config import PineconeConfig, VectorIndexType, default_config

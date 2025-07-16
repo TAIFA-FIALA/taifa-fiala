@@ -21,7 +21,7 @@ from pinecone import Pinecone, ServerlessSpec
 logger = logging.getLogger(__name__)
 
 # Load environment variables
-load_dotenv()
+
 
 # Supabase Configuration
 class SupabaseConfig(BaseModel):

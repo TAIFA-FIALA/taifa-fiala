@@ -16,7 +16,7 @@ import asyncio
 import logging
 from datetime import datetime
 from typing import Dict, List, Any
-from dotenv import load_dotenv
+
 
 import feedparser
 
@@ -33,7 +33,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Load environment variables
-load_dotenv()
+
 
 # Test RSS Feeds - curated list of AI funding sources with African focus
 TEST_FEEDS = [

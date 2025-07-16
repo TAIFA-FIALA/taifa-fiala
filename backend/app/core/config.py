@@ -1,6 +1,3 @@
-from dotenv import load_dotenv
-load_dotenv()
-
 from pydantic_settings import BaseSettings
 from typing import List, Optional
 import os
@@ -10,7 +7,7 @@ class Settings(BaseSettings):
     """Application settings from environment variables"""
     
     # Database - Railway provides DATABASE_URL automatically
-    DATABASE_URL: Optional[str] = "postgresql+asyncpg://postgres:stocksight1484@100.75.201.24:5432/TAIFA_db"
+    DATABASE_URL: Optional[str] = None
     
     # Parse database URL for individual components (if needed)
     @property
@@ -113,6 +110,18 @@ class Settings(BaseSettings):
     GOOGLE_TRANSLATE_API_KEY: Optional[str] = None
     DEEPSEEK_API_KEY: Optional[str] = None
     GEMINI_API_KEY: Optional[str] = None
+
+    # Supabase Configuration
+    SUPABASE_URL: Optional[str] = None
+    SUPABASE_API_KEY: Optional[str] = None
+    SUPABASE_PUBLISHABLE_KEY: Optional[str] = None
+    SUPABASE_JWT_SECRET: Optional[str] = None
+    SUPABASE_PROJECT_ID: Optional[str] = None
+
+    # Pinecone Configuration
+    PINECONE_API_KEY: Optional[str] = None
+    PINECONE_INDEX_NAME: Optional[str] = None
+    PINECONE_HOST: Optional[str] = None
     
     # Webhook URLs
     N8N_WEBHOOK_URL: Optional[str] = None
@@ -167,6 +176,7 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         case_sensitive = True
+        extra = "ignore"
 
 # Create settings instance
 settings = Settings()

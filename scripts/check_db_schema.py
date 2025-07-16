@@ -14,7 +14,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import NullPool
 
 # Define database settings directly
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql+asyncpg://postgres:stocksight1484@100.75.201.24:5432/TAIFA_db")
+DATABASE_URL = os.getenv("DATABASE_URL")
 DEBUG = os.getenv("DEBUG", "true").lower() == "true"
 
 print(f"DEBUG: DATABASE_URL being used: {DATABASE_URL}")

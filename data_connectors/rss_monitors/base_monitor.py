@@ -177,8 +177,10 @@ class RSSMonitor:
     
     async def _save_opportunities(self, opportunities: List[Dict[str, Any]]):
         """Save opportunities to database"""
-        from data_collectors.database.connector import DatabaseConnector
-        db_connector = DatabaseConnector()
+        from database.connector import DatabaseConnector
+        import os
+        database_url = os.getenv("DATABASE_URL")
+        db_connector = DatabaseConnector(database_url)
         await db_connector.initialize()
         try:
             await db_connector.save_opportunities(opportunities, "rss")

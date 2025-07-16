@@ -13,7 +13,7 @@ load_dotenv()
 async def apply_migration_step_by_step():
     """Apply migration changes step by step with error handling"""
     
-    DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:stocksight1484@100.75.201.24:5432/TAIFA_db")
+    DATABASE_URL = os.getenv("DATABASE_URL")
     
     print("🔧 Step-by-Step Enhanced Schema Migration")
     print("=" * 60)

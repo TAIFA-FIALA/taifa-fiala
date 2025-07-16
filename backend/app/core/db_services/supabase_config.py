@@ -9,14 +9,7 @@ import os
 import logging
 from typing import Optional
 from pydantic import BaseModel, Field
-from dotenv import load_dotenv
 from supabase import create_client, Client
-
-# Configure logging
-logger = logging.getLogger(__name__)
-
-# Load environment variables
-load_dotenv()
 
 class SupabaseConfig(BaseModel):
     """Configuration for Supabase client"""

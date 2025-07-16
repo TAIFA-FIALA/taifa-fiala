@@ -7,7 +7,7 @@ import os
 from sqlalchemy import create_engine, text
 
 # Direct database configuration
-DATABASE_URL = "postgresql://postgres:stocksight1484@100.75.201.24:5432/TAIFA_db"
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 def test_connection():
     """Test connection to TAIFA_db"""

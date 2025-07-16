@@ -3,15 +3,28 @@ import logging
 from datetime import datetime
 import sys
 import os
+import json
+
+def load_env_vars(env_path=".env"):
+    if os.path.exists(env_path):
+        with open(env_path, 'r') as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith('#'):
+                    key, value = line.split('=', 1)
+                    os.environ[key] = value
+                    print(f"Loaded env var: {key}={value[:5]}...") # Print first 5 chars of value for security
 
 # Add the backend app to Python path so we can import models and config
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'backend'))
 
+load_env_vars()
+
 from app.core.config import settings
 from rss_monitors.base_monitor import RSSMonitor
-from serper_search.collector import SerperSearchCollector
-from web_scraper import WebScraper
 from database.connector import DatabaseConnector
+from serper_search.collector import SerperSearchCollector
+from scrapers.web_scraper import WebScraper
 
 # Configure logging
 logging.basicConfig(
@@ -36,7 +49,7 @@ class DataCollector:
         logger.info("Initializing AI Africa Funding Tracker data collectors...")
         
         # Initialize database connector
-        self.db_connector = DatabaseConnector()
+        self.db_connector = DatabaseConnector(settings.DATABASE_URL)
         await self.db_connector.initialize()
         
         # Initialize RSS monitors for known sources
@@ -57,136 +70,18 @@ class DataCollector:
     async def _setup_rss_monitors(self):
         """Setup RSS monitors for verified high-quality sources"""
         
-        # Verified RSS feeds with correct URLs and comprehensive coverage
-        rss_sources = [
-            # === MULTILATERAL ORGANIZATIONS ===
-            {
-                "name": "World Bank - Digital Development",
-                "url": "https://www.worldbank.org/en/rss",
-                "keywords": ["digital", "technology", "AI", "artificial intelligence", "innovation", "Africa"],
-                "check_interval": 120,
-                "priority": "high"
-            },
-            {
-                "name": "African Development Bank",
-                "url": "https://www.afdb.org/rss.xml", 
-                "keywords": ["AI", "artificial intelligence", "digital", "technology", "innovation", "Africa"],
-                "check_interval": 120,
-                "priority": "high"
-            },
-            {
-                "name": "UNDP Global",
-                "url": "https://www.undp.org/rss.xml",
-                "keywords": ["AI", "artificial intelligence", "digital", "technology", "innovation", "Africa"],
-                "check_interval": 180,
-                "priority": "high"
-            },
-            
-            # === RESEARCH & DEVELOPMENT ===
-            {
-                "name": "IDRC - Research & Innovation",
-                "url": "https://idrc-crdi.ca/rss.xml",
-                "keywords": ["AI", "AI4D", "artificial intelligence", "machine learning", "digital", "technology", "Africa"],
-                "check_interval": 120,
-                "priority": "high"
-            },
-            {
-                "name": "MIT Technology Review",
-                "url": "https://www.technologyreview.com/feed/",
-                "keywords": ["AI", "artificial intelligence", "Africa", "development", "funding", "grants"],
-                "check_interval": 240,
-                "priority": "medium"
-            },
-            
-            # === FOUNDATIONS & NONPROFITS ===
-            {
-                "name": "TechCrunch - Startups",
-                "url": "https://techcrunch.com/category/startups/feed/",
-                "keywords": ["AI", "artificial intelligence", "Africa", "funding", "investment", "startup"],
-                "check_interval": 180,
-                "priority": "medium"
-            },
-            {
-                "name": "Devex - Development News", 
-                "url": "https://www.devex.com/en/rss",
-                "keywords": ["AI", "artificial intelligence", "digital", "technology", "Africa", "funding"],
-                "check_interval": 120,
-                "priority": "high"
-            },
-            
-            # === GOVERNMENT SOURCES ===
-            {
-                "name": "USAID - Opportunities",
-                "url": "https://www.usaid.gov/rss/opportunities",
-                "keywords": ["digital", "technology", "AI", "artificial intelligence", "Africa"],
-                "check_interval": 240,
-                "priority": "medium"
-            },
-            
-            # === ACADEMIC & RESEARCH ===
-            {
-                "name": "Nature - Technology",
-                "url": "https://www.nature.com/subjects/information-technology.rss",
-                "keywords": ["AI", "artificial intelligence", "machine learning", "Africa", "research", "funding"],
-                "check_interval": 360,
-                "priority": "low"
-            },
-            {
-                "name": "Science Magazine",
-                "url": "https://www.science.org/rss/news_current.xml",
-                "keywords": ["AI", "artificial intelligence", "Africa", "international", "funding", "research"],
-                "check_interval": 360,
-                "priority": "low"
-            },
-            
-            # === CORPORATE TECH ===
-            {
-                "name": "Google AI Blog",
-                "url": "https://ai.googleblog.com/feeds/posts/default",
-                "keywords": ["Africa", "AI for good", "development", "funding", "grant", "program"],
-                "check_interval": 240,
-                "priority": "medium"
-            },
-            {
-                "name": "Microsoft AI for Good",
-                "url": "https://blogs.microsoft.com/ai-for-good/feed/",
-                "keywords": ["Africa", "development", "funding", "grant", "program", "AI"],
-                "check_interval": 240,
-                "priority": "medium"
-            },
-            
-            # === STARTUP & INNOVATION ===
-            {
-                "name": "VentureBeat - AI",
-                "url": "https://venturebeat.com/category/ai/feed/",
-                "keywords": ["Africa", "funding", "investment", "startup", "AI", "artificial intelligence"],
-                "check_interval": 240,
-                "priority": "medium"
-            },
-            {
-                "name": "AngelList - Startup News",
-                "url": "https://angel.co/feed",
-                "keywords": ["Africa", "AI", "artificial intelligence", "funding", "startup", "accelerator"],
-                "check_interval": 360,
-                "priority": "low"
-            },
-            
-            # === AFRICAN TECH SOURCES ===
-            {
-                "name": "TechCabal - African Tech",
-                "url": "https://techcabal.com/feed/",
-                "keywords": ["AI", "artificial intelligence", "funding", "investment", "startup", "innovation"],
-                "check_interval": 180,
-                "priority": "high"
-            },
-            {
-                "name": "African Business",
-                "url": "https://african.business/feed/",
-                "keywords": ["AI", "artificial intelligence", "technology", "digital", "funding", "innovation"],
-                "check_interval": 240,
-                "priority": "medium"
-            }
-        ]
+        # Load RSS feeds from configuration file
+        config_path = os.path.join(os.path.dirname(__file__), 'config', 'rss_feeds.json')
+        try:
+            with open(config_path, 'r') as f:
+                config = json.load(f)
+                rss_sources = config['rss_sources']
+        except FileNotFoundError:
+            logger.error(f"RSS feeds configuration file not found at {config_path}")
+            rss_sources = []
+        except json.JSONDecodeError as e:
+            logger.error(f"Invalid JSON in RSS feeds configuration: {e}")
+            rss_sources = []
         
         logger.info(f"Setting up {len(rss_sources)} RSS monitors...")
         

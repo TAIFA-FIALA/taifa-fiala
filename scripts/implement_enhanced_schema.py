@@ -18,7 +18,7 @@ load_dotenv()
 async def run_enhanced_migration():
     """Run the enhanced schema migration"""
     
-    DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:stocksight1484@100.75.201.24:5432/TAIFA_db")
+    DATABASE_URL = os.getenv("DATABASE_URL")
     
     print("🚀 Running TAIFA Enhanced Schema Migration")
     print("=" * 60)
@@ -217,7 +217,7 @@ async def run_enhanced_migration():
 async def test_enhanced_features():
     """Test all the enhanced features from competitor analysis"""
     
-    DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:stocksight1484@100.75.201.24:5432/TAIFA_db")
+    DATABASE_URL = os.getenv("DATABASE_URL")
     
     print("\n🧪 Testing Enhanced Features")
     print("=" * 60)

@@ -14,7 +14,7 @@ load_dotenv()
 async def seed_lookup_tables():
     """Populate lookup tables with initial data"""
     
-    DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:stocksight1484@100.75.201.24:5432/TAIFA_db")
+    DATABASE_URL = os.getenv("DATABASE_URL")
     
     print("🌱 Seeding TAIFA Enhanced Schema Lookup Tables")
     print("=" * 60)
@@ -309,7 +309,7 @@ async def seed_lookup_tables():
 async def update_existing_opportunities():
     """Update existing opportunities with default values for new fields"""
     
-    DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:stocksight1484@100.75.201.24:5432/TAIFA_db")
+    DATABASE_URL = os.getenv("DATABASE_URL")
     
     print("\n🔄 Updating existing opportunities with default values...")
     

@@ -13,7 +13,7 @@ load_dotenv()
 async def migrate_organization_data():
     """Migrate existing data to use proper organization relationships"""
     
-    DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:stocksight1484@100.75.201.24:5432/TAIFA_db")
+    DATABASE_URL = os.getenv("DATABASE_URL")
     
     print("🚀 Starting organization data migration")
     print("=" * 60)
@@ -232,7 +232,7 @@ async def test_relationships():
     """Test that relationships work after migration"""
     print("\n🧪 Testing relationships...")
     
-    DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:stocksight1484@100.75.201.24:5432/TAIFA_db")
+    DATABASE_URL = os.getenv("DATABASE_URL")
     conn = await asyncpg.connect(DATABASE_URL)
     
     try:

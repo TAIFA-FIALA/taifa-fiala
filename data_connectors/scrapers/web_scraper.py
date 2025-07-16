@@ -25,10 +25,11 @@ class WebScraper:
                 "url": "https://idrc-crdi.ca/en/funding",
                 "type": "funding_page",
                 "selectors": {
-                    "opportunities": ".funding-opportunity, .opportunity-item, .grant-item",
-                    "title": "h2, h3, .title, .opportunity-title",
-                    "description": ".description, .summary, p",
-                    "deadline": ".deadline, .date, .due-date",
+                    "opportunities": ".view-content .views-row",
+                    "title": ".views-field-title a, .views-field-title",
+                    "description": ".views-field-body, .views-field-field-summary",
+                    "deadline": ".views-field-field-deadline, .deadline",
+                    "call_type": ".views-field-field-call-for",
                     "amount": ".amount, .funding-amount, .grant-amount"
                 },
                 "keywords": ["AI", "artificial intelligence", "digital", "technology", "Africa"],
@@ -100,6 +101,71 @@ class WebScraper:
                 "keywords": ["Africa", "funding", "digital", "AI", "technology"],
                 "check_interval": 720,  # 12 hours
                 "priority": "low"
+            },
+            {
+                "name": "European Commission Generative AI",
+                "url": "https://digital-strategy.ec.europa.eu/en/funding/commission-funds-projects-unlock-potential-generative-ai-africa",
+                "type": "funding_page",
+                "selectors": {
+                    "opportunities": ".ecl-col-lg-8",
+                    "title": "h1",
+                    "description": "p"
+                },
+                "keywords": ["AI", "artificial intelligence", "Africa", "funding", "generative ai"],
+                "check_interval": 240,
+                "priority": "high"
+            },
+            {
+                "name": "Llama Impact Accelerator",
+                "url": "https://www.ictworks.org/african-artificial-intelligence-applications/",
+                "type": "funding_page",
+                "selectors": {
+                    "opportunities": ".entry-content",
+                    "title": "h1",
+                    "description": "p"
+                },
+                "keywords": ["AI", "artificial intelligence", "Africa", "funding", "generative ai", "llama"],
+                "check_interval": 240,
+                "priority": "high"
+            },
+            {
+                "name": "Milken-Motsepe Innovation Prize",
+                "url": "https://www.ictworks.org/african-ai-4th-industrial-revolution/",
+                "type": "funding_page",
+                "selectors": {
+                    "opportunities": ".entry-content",
+                    "title": "h1",
+                    "description": "p"
+                },
+                "keywords": ["AI", "artificial intelligence", "Africa", "funding", "manufacturing"],
+                "check_interval": 240,
+                "priority": "high"
+            },
+            {
+                "name": "AI4PEP",
+                "url": "https://ai4pep.org/funding/",
+                "type": "funding_page",
+                "selectors": {
+                    "opportunities": ".elementor-widget-container",
+                    "title": "h1",
+                    "description": "p"
+                },
+                "keywords": ["AI", "artificial intelligence", "Africa", "funding", "health"],
+                "check_interval": 240,
+                "priority": "high"
+            },
+            {
+                "name": "iAfrica",
+                "url": "https://iafrica.com/unlocking-capital-funding-and-investment-opportunities-for-african-ai-startups/",
+                "type": "funding_page",
+                "selectors": {
+                    "opportunities": ".td-post-content",
+                    "title": "h1",
+                    "description": "p"
+                },
+                "keywords": ["AI", "artificial intelligence", "Africa", "funding", "investment"],
+                "check_interval": 240,
+                "priority": "high"
             }
         ]
     

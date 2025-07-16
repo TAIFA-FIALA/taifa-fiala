@@ -22,7 +22,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Load environment variables
-load_dotenv()
+
 
 # Check required environment variables
 pinecone_api_key = os.getenv('PINECONE_API_KEY')

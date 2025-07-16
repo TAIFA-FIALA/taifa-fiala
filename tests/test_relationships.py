@@ -18,7 +18,7 @@ import asyncpg
 async def test_sqlalchemy_relationships():
     """Test the new SQLAlchemy relationships using direct SQL"""
     
-    DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:stocksight1484@100.75.201.24:5432/TAIFA_db")
+    DATABASE_URL = os.getenv("DATABASE_URL")
     
     print("🧪 Testing SQLAlchemy Relationships")
     print("=" * 50)
