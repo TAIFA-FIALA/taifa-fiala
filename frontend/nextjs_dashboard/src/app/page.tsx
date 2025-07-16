@@ -1,4 +1,7 @@
 import Link from 'next/link';
+import EquityMetricsDashboard from '@/components/homepage/EquityMetricsDashboard';
+import SemanticSearchShowcase from '@/components/homepage/SemanticSearchShowcase';
+import DatabaseScopeVisualization from '@/components/homepage/DatabaseScopeVisualization';
 
 interface AnalyticsSummary {
   total_opportunities?: number;
@@ -428,9 +431,66 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Live Equity Analytics Dashboard */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gray-50">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-12">
+            <div className="inline-block mb-4">
+              <span className="inline-block px-4 py-1 text-sm font-semibold rounded-full bg-blue-600 text-white">
+                🎯 Equity-Aware Intelligence
+              </span>
+            </div>
+            <h2 className="text-3xl font-bold text-blue-dark mb-4">Live Equity Analytics</h2>
+            <p className="max-w-3xl mx-auto text-lg text-gray-600">
+              Real-time monitoring of funding equity across geographic, sectoral, and inclusion dimensions
+            </p>
+          </div>
+          
+          <EquityMetricsDashboard />
+        </div>
+      </section>
+
+      {/* Semantic Search Intelligence */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-12">
+            <div className="inline-block mb-4">
+              <span className="inline-block px-4 py-1 text-sm font-semibold rounded-full bg-purple-600 text-white">
+                🧠 Vector-Powered Search
+              </span>
+            </div>
+            <h2 className="text-3xl font-bold text-blue-dark mb-4">Semantic Search Intelligence</h2>
+            <p className="max-w-3xl mx-auto text-lg text-gray-600">
+              Discover opportunities across languages and contexts with AI-powered semantic understanding
+            </p>
+          </div>
+          
+          <SemanticSearchShowcase />
+        </div>
+      </section>
+
+      {/* Database Intelligence */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gray-50">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-12">
+            <div className="inline-block mb-4">
+              <span className="inline-block px-4 py-1 text-sm font-semibold rounded-full bg-green-600 text-white">
+                🌍 Continental Coverage
+              </span>
+            </div>
+            <h2 className="text-3xl font-bold text-blue-dark mb-4">Database Intelligence</h2>
+            <p className="max-w-3xl mx-auto text-lg text-gray-600">
+              Comprehensive tracking of AI funding opportunities across all 54 African countries
+            </p>
+          </div>
+          
+          <DatabaseScopeVisualization />
+        </div>
+      </section>
       
       {/* Platform Differentiators */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gray-50">
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
             <div className="inline-block mb-4">
