@@ -5,7 +5,7 @@ from sqlalchemy.sql import func
 from app.core.database import Base
 
 class FundingType(Base):
-    """Types of funding opportunities (Grant, Prize, Scholarship, etc.)"""
+    """Types of funding opportunities (Grant, Prize, Scholarship, Investment, etc.)"""
     __tablename__ = "funding_types"
     
     id = Column(Integer, primary_key=True, index=True)
@@ -15,11 +15,29 @@ class FundingType(Base):
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     
+    # Classification fields
+    category = Column(String(20), nullable=False, index=True)  # 'grant', 'investment', 'prize', 'other'
+    requires_equity = Column(Boolean, default=False)
+    requires_repayment = Column(Boolean, default=False)
+    average_processing_time_days = Column(Integer)
+    success_rate_percentage = Column(Integer)
+    required_stage = Column(String(50))  # 'idea', 'prototype', 'mvp', 'revenue', 'growth'
+    
     # Relationships
     opportunities = relationship("FundingOpportunity", back_populates="type")
     
     def __repr__(self):
-        return f"<FundingType(id={self.id}, name='{self.name}')>"
+        return f"<FundingType(id={self.id}, name='{self.name}', category='{self.category}')>"
+    
+    @property
+    def is_investment(self):
+        """Check if this funding type is an investment type"""
+        return self.category == 'investment'
+    
+    @property
+    def is_grant(self):
+        """Check if this funding type is a grant type"""
+        return self.category == 'grant'
 
 class AIDomain(Base):
     """AI application domains (Healthcare, Agriculture, etc.)"""

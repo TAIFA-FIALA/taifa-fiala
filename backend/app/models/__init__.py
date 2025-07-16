@@ -10,6 +10,11 @@ from app.models.lookups import FundingType, AIDomain, GeographicScope, Community
 from app.models.domains import AIDomain as DomainAlias  # Keep existing import if needed
 from app.models.sources import DataSource
 from app.models.rfp import RFP
+from app.models.equity import (
+    GenderFundingData, UnderrepresentedGroup, InclusionMetric, 
+    FeaturedFounder, FundingStageMetric, StageProgression,
+    CollaborationSuggestion, SuggestedOpportunity
+)
 
 # Export all models for easy importing
 __all__ = [
@@ -29,6 +34,16 @@ __all__ = [
     
     # Legacy alias
     "DomainAlias",
+    
+    # Equity analytics models
+    "GenderFundingData",
+    "UnderrepresentedGroup",
+    "InclusionMetric",
+    "FeaturedFounder",
+    "FundingStageMetric",
+    "StageProgression",
+    "CollaborationSuggestion",
+    "SuggestedOpportunity",
 ]
 
 # Model relationships summary for reference:

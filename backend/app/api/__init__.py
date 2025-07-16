@@ -1,18 +1,18 @@
 from fastapi import APIRouter
 
 from app.api.endpoints import (
-    funding, organizations, domains, sources, analytics, search, rfp, source_validation,
-    user_submissions, admin_scraping, automated_discovery
+    funding_opportunities, organizations, domains, sources, analytics, search, rfp, source_validation,
+    user_submissions, admin_scraping, automated_discovery, equity_analyses
 )
 
 # Create main API router
 api_router = APIRouter()
 
-# Include existing endpoint routers
+# Funding opportunities API endpoints
 api_router.include_router(
-    funding.router, 
-    prefix="/funding-opportunities", 
-    tags=["funding"]
+    funding_opportunities.router,
+    prefix="/funding-opportunities",
+    tags=["funding-opportunities"]
 )
 
 api_router.include_router(
@@ -74,4 +74,12 @@ api_router.include_router(
     automated_discovery.router,
     prefix="/discovery",
     tags=["automated-discovery"]
+)
+
+# Opportunities endpoints now merged into funding-opportunities
+
+api_router.include_router(
+    equity_analyses.router,
+    prefix="/equity-analyses",
+    tags=["equity-analyses"]
 )

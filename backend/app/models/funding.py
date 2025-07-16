@@ -34,15 +34,38 @@ class FundingOpportunity(Base):
     
     # Organization relationships (both old and new for backward compatibility)
     organization_name = Column(Text)  # Keep for backward compatibility
-    organization_id = Column(Integer, ForeignKey('organizations.id'), nullable=True, index=True)
+    organization_id = Column(Integer, ForeignKey('organizations.id'), nullable=True, index=True)  # Legacy field
+    
+    # New differentiated organization relationships
+    provider_organization_id = Column(Integer, ForeignKey('organizations.id'), nullable=True, index=True)
+    recipient_organization_id = Column(Integer, ForeignKey('organizations.id'), nullable=True, index=True)
     
     # Enhanced funding details (based on competitor analysis)
     type_id = Column(Integer, ForeignKey('funding_types.id'), index=True)
     status = Column(String(20), default='open', index=True)  # open, closed, under_review
     funding_amount = Column(Text)  # Keep as text for flexibility
+    amount_min = Column(Float, nullable=True)  # Minimum funding amount (numeric)
+    amount_max = Column(Float, nullable=True)  # Maximum funding amount (numeric)
+    amount_exact = Column(Float, nullable=True)  # Exact amount if specified
     currency = Column(String(10), default='USD', index=True)  # USD, EUR, GBP, etc.
     deadline = Column(Date)
     deadline_urgency = Column(String(10), index=True)  # Computed: urgent, moderate, low, expired, unknown
+    
+    # Grant-specific fields
+    reporting_requirements = Column(Text)  # Required for grants
+    grant_duration_months = Column(Integer)  # Duration of grant funding
+    renewable = Column(Boolean, default=False)  # Can the grant be renewed?
+    no_strings_attached = Column(Boolean)  # True if no ownership or repayment required
+    project_based = Column(Boolean, default=True)  # Is funding for specific project vs general ops?
+    
+    # Investment-specific fields
+    equity_percentage = Column(Float)  # % of equity required for investment
+    valuation_cap = Column(Float)  # Valuation cap for convertible notes
+    interest_rate = Column(Float)  # For debt financing
+    repayment_terms = Column(Text)  # Repayment structure
+    investor_rights = Column(Text)  # Special rights requested by investors
+    post_investment_support = Column(Text)  # Mentoring, network, etc.
+    expected_roi = Column(Float)  # Expected return on investment percentage
     
     # Community and quality features
     community_rating = Column(Numeric(2,1), index=True)  # 1.0-5.0 rating
@@ -84,8 +107,12 @@ class FundingOpportunity(Base):
     is_multilingual = Column(Boolean, default=False)
     
     # Relationships
-    organization = relationship("Organization", back_populates="funding_opportunities")
-    type = relationship("FundingType", back_populates="opportunities")
+    organization = relationship("Organization", foreign_keys=[organization_id], back_populates="funding_opportunities")  # Legacy relationship
+    type = relationship("FundingType")
+    
+    # New differentiated organization relationships
+    provider_organization = relationship("Organization", foreign_keys=[provider_organization_id], back_populates="provided_funding")
+    recipient_organization = relationship("Organization", foreign_keys=[recipient_organization_id], back_populates="received_funding")
     submitted_by = relationship("CommunityUser", back_populates="submitted_opportunities")
     
     # Many-to-many relationships
@@ -95,6 +122,80 @@ class FundingOpportunity(Base):
     geographic_scopes = relationship("GeographicScope",
                                    secondary=funding_opportunity_geographic_scopes, 
                                    back_populates="opportunities")
+    
+    # Type-specific properties and methods
+    @property
+    def is_grant(self):
+        """Check if this funding opportunity is a grant"""
+        return self.type and self.type.is_grant
+    
+    @property
+    def is_investment(self):
+        """Check if this funding opportunity is an investment"""
+        return self.type and self.type.is_investment
+    
+    @property
+    def funding_category(self):
+        """Get the funding category (grant, investment, prize, other)"""
+        return self.type.category if self.type else "unknown"
+    
+    @property
+    def provider_is_granting_agency(self):
+        """Check if the provider is a granting agency"""
+        return self.provider_organization and self.provider_organization.provider_type == "granting_agency"
+    
+    @property
+    def provider_is_venture_capital(self):
+        """Check if the provider is a venture capital group"""
+        return self.provider_organization and self.provider_organization.provider_type == "venture_capital"
+    
+    @property
+    def recipient_is_grantee(self):
+        """Check if the recipient is a grantee organization"""
+        return self.recipient_organization and self.recipient_organization.recipient_type == "grantee"
+    
+    @property
+    def recipient_is_startup(self):
+        """Check if the recipient is a startup"""
+        return self.recipient_organization and self.recipient_organization.recipient_type == "startup"
+    
+    @property
+    def requires_equity(self):
+        """Check if equity is required for this opportunity"""
+        if self.type:
+            return self.type.requires_equity
+        # Fallback based on equity_percentage field
+        return bool(self.equity_percentage)
+        
+    @property
+    def grant_properties(self):
+        """Get grant-specific properties if this is a grant"""
+        if not self.is_grant:
+            return None
+            
+        return {
+            "reporting_requirements": self.reporting_requirements,
+            "duration_months": self.grant_duration_months,
+            "renewable": self.renewable,
+            "no_strings_attached": self.no_strings_attached,
+            "project_based": self.project_based
+        }
+    
+    @property
+    def investment_properties(self):
+        """Get investment-specific properties if this is an investment"""
+        if not self.is_investment:
+            return None
+            
+        return {
+            "equity_percentage": self.equity_percentage,
+            "valuation_cap": self.valuation_cap,
+            "interest_rate": self.interest_rate,
+            "repayment_terms": self.repayment_terms,
+            "investor_rights": self.investor_rights,
+            "post_investment_support": self.post_investment_support,
+            "expected_roi": self.expected_roi
+        }
     
     # Virtual attributes for compatibility with existing code
     @property

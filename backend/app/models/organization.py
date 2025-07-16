@@ -13,13 +13,31 @@ organization_geographic_focus = Table(
 )
 
 class Organization(Base):
-    """Enhanced organizations table with monitoring and performance tracking"""
+    """Enhanced organizations table with monitoring and performance tracking.
+    
+    Organizations can be classified as funding providers (granting agencies, venture capital),
+    funding recipients (grantees, startups), or both. This model supports tracking the
+    relationships between funding providers and recipients.
+    """
     __tablename__ = "organizations"
     
     # Core identification
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(300), nullable=False, index=True)
+    
+    # Organization type classification
     type = Column(String(20), default="funder", index=True)  # foundation, government, corporation, university, ngo
+    
+    # Organization role in funding ecosystem
+    role = Column(String(20), default="provider", index=True)  # provider, recipient, both
+    provider_type = Column(String(20), nullable=True, index=True)  # granting_agency, venture_capital, angel_investor, accelerator
+    recipient_type = Column(String(20), nullable=True, index=True)  # grantee, startup, research_institution, non_profit
+    
+    # Stage classification for startups/recipients
+    startup_stage = Column(String(30), nullable=True)  # idea, seed, early, growth, mature, etc.
+    
+    # Funding classification for providers
+    funding_model = Column(String(30), nullable=True)  # grants_only, equity_only, mixed, debt, etc.
     
     # Contact and location
     country = Column(String(100))
@@ -64,9 +82,28 @@ class Organization(Base):
     
     # Relationships
     funding_opportunities = relationship("FundingOpportunity", back_populates="organization")
+    user_submissions = relationship("UserSubmission", back_populates="organization", cascade="all, delete-orphan")
+    monitoring_data = relationship("MonitoringData", back_populates="organization", cascade="all, delete-orphan")
+    scraping_configurations = relationship("ScrapingConfiguration", back_populates="organization", cascade="all, delete-orphan")
+    
+    # New relationships for funding flows
+    provided_funding = relationship("FundingOpportunity", 
+                                  foreign_keys="[FundingOpportunity.provider_organization_id]",
+                                  back_populates="provider_organization")
+    received_funding = relationship("FundingOpportunity", 
+                                   foreign_keys="[FundingOpportunity.recipient_organization_id]",
+                                   back_populates="recipient_organization")
     geographic_focus = relationship("GeographicScope",
                                   secondary=organization_geographic_focus,
                                   back_populates="organizations")
+    
+    # Equity analytics relationships
+    gender_funding_data = relationship("GenderFundingData", back_populates="organization")
+    collaboration_suggestions = relationship(
+        "CollaborationSuggestion",
+        secondary="organization_collaboration", 
+        back_populates="organizations"
+    )
     
     # Computed properties for monitoring insights
     @property

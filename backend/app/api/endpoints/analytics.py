@@ -41,7 +41,5 @@ async def get_funding_trends():
     """Get funding trends over time"""
     return {"message": "Funding trends - coming soon"}
 
-@router.get("/geographical")
-async def get_geographical_distribution():
-    """Get geographical funding distribution"""
-    return {"message": "Geographical distribution - coming soon"}
+# These endpoints have been moved to equity_analyses.py
+# No need for redirects since we're not in production yet

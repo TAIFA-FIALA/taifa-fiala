@@ -57,6 +57,9 @@ export default function RootLayout({
                 <Link href="/rwanda-demo" className="text-gray-200 hover:text-white transition-colors">
                   🇷🇼 Rwanda Demo
                 </Link>
+                <Link href="/about" className="text-gray-200 hover:text-white transition-colors">
+                  ℹ️ About Us
+                </Link>
                 <div className="flex items-center space-x-2 text-sm">
                   <span className="text-gray-300">🌍</span>
                   <button className="text-gray-200 hover:text-white transition-colors">EN</button>
@@ -101,16 +104,16 @@ export default function RootLayout({
               <div>
                 <h4 className="font-semibold text-white mb-3">About</h4>
                 <ul className="space-y-2 text-sm">
-                  <li><a href="#" className="hover:text-white">Our Mission</a></li>
-                  <li><a href="#" className="hover:text-white">API Access</a></li>
-                  <li><a href="#" className="hover:text-white">Community</a></li>
+                  <li><Link href="/about" className="hover:text-white">Our Mission</Link></li>
+                  <li><Link href="/about#roadmap" className="hover:text-white">Roadmap</Link></li>
+                  <li><Link href="/about#contact" className="hover:text-white">Contact Us</Link></li>
                 </ul>
               </div>
               <div>
                 <h4 className="font-semibold text-white mb-3">Connect</h4>
                 <ul className="space-y-2 text-sm">
                   <li><a href="https://github.com/drjforrest/taifa" className="hover:text-white">GitHub</a></li>
-                  <li><a href="#" className="hover:text-white">Contact</a></li>
+                  <li><Link href="/about#contact" className="hover:text-white">Contact</Link></li>
                   <li><span className="text-xs">44 Data Sources • Daily Updates</span></li>
                 </ul>
               </div>
