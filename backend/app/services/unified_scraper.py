@@ -17,9 +17,9 @@ import sys
 import os
 from pathlib import Path
 
-# Add data collectors to path
-data_collectors_path = Path(__file__).parent.parent.parent.parent / "data_collectors"
-sys.path.append(str(data_collectors_path))
+# Add data connectors to path
+data_connectors_path = Path(__file__).parent.parent.parent.parent / "data_connectors"
+sys.path.append(str(data_connectors_path))
 
 from crawl4ai import AsyncWebCrawler, LLMExtractionStrategy
 from serper_search.collector import SerperSearchCollector

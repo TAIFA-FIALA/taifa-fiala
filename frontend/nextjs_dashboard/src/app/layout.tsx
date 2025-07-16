@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
+import Image from "next/image"; // Import the Image component
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,16 +31,18 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {/* Professional Navigation */}
-        <nav className="bg-gradient-to-r from-blue-900 to-red-900 shadow-lg">
+        <nav className="bg-gradient-to-r from-blue-700 to-purple-700 shadow-lg">
           <div className="container mx-auto px-4">
             <div className="flex justify-between items-center py-4">
               {/* TAIFA-FIALA Branding */}
               <Link href="/" className="flex items-center space-x-3">
-                <div className="flex items-center">
-                  <span className="text-2xl font-bold text-blue-100">TAIFA</span>
-                  <span className="text-xl text-gray-300 mx-1">|</span>
-                  <span className="text-2xl font-bold text-red-100">FIALA</span>
-                </div>
+                <Image
+                  src="/TAIFA-FIALA-logo-transparent.png"
+                  alt="TAIFA-FIALA Logo"
+                  width={150} // Adjust width as needed
+                  height={40} // Adjust height as needed
+                  priority
+                />
                 <div className="hidden md:block">
                   <div className="text-xs text-gray-300">Tracking AI Funding for Africa</div>
                   <div className="text-xs text-gray-400">Financement IA pour l'Afrique</div>
@@ -48,23 +51,23 @@ export default function RootLayout({
 
               {/* Navigation Links */}
               <div className="hidden md:flex items-center space-x-6">
-                <Link href="/funding" className="text-gray-200 hover:text-white transition-colors">
+                <Link href="/funding" className="text-white hover:text-yellow-300 transition-colors duration-300 ease-in-out text-base font-medium">
                   💰 Funding Opportunities
                 </Link>
-                <Link href="/organizations" className="text-gray-200 hover:text-white transition-colors">
+                <Link href="/organizations" className="text-white hover:text-yellow-300 transition-colors duration-300 ease-in-out text-base font-medium">
                   🏢 Organizations
                 </Link>
-                <Link href="/rwanda-demo" className="text-gray-200 hover:text-white transition-colors">
+                <Link href="/rwanda-demo" className="text-white hover:text-yellow-300 transition-colors duration-300 ease-in-out text-base font-medium">
                   🇷🇼 Rwanda Demo
                 </Link>
-                <Link href="/about" className="text-gray-200 hover:text-white transition-colors">
+                <Link href="/about" className="text-white hover:text-yellow-300 transition-colors duration-300 ease-in-out text-base font-medium">
                   ℹ️ About Us
                 </Link>
                 <div className="flex items-center space-x-2 text-sm">
-                  <span className="text-gray-300">🌍</span>
-                  <button className="text-gray-200 hover:text-white transition-colors">EN</button>
+                  <span className="text-yellow-300">🌍</span>
+                  <button className="text-white hover:text-yellow-300 transition-colors duration-300 ease-in-out">EN</button>
                   <span className="text-gray-400">|</span>
-                  <button className="text-gray-400 hover:text-white transition-colors">FR</button>
+                  <button className="text-gray-400 hover:text-yellow-300 transition-colors duration-300 ease-in-out">FR</button>
                 </div>
               </div>
 
@@ -81,12 +84,12 @@ export default function RootLayout({
         </nav>
 
         {/* Main Content */}
-        <main className="min-h-screen bg-gray-50">
+        <main className="min-h-screen bg-gray-100">
           {children}
         </main>
 
         {/* Footer */}
-        <footer className="bg-gray-800 text-gray-300 py-8">
+        <footer className="bg-gray-900 text-gray-300 py-8">
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
               <div>
@@ -96,24 +99,24 @@ export default function RootLayout({
               <div>
                 <h4 className="font-semibold text-white mb-3">Platform</h4>
                 <ul className="space-y-2 text-sm">
-                  <li><Link href="/funding" className="hover:text-white">Search Funding</Link></li>
-                  <li><Link href="/organizations" className="hover:text-white">Organizations</Link></li>
-                  <li><Link href="/submit-opportunity" className="hover:text-white">Submit Opportunity</Link></li>
+                  <li><Link href="/funding" className="hover:text-yellow-300 transition-colors duration-300 ease-in-out">Search Funding</Link></li>
+                  <li><Link href="/organizations" className="hover:text-yellow-300 transition-colors duration-300 ease-in-out">Organizations</Link></li>
+                  <li><Link href="/submit-opportunity" className="hover:text-yellow-300 transition-colors duration-300 ease-in-out">Submit Opportunity</Link></li>
                 </ul>
               </div>
               <div>
                 <h4 className="font-semibold text-white mb-3">About</h4>
                 <ul className="space-y-2 text-sm">
-                  <li><Link href="/about" className="hover:text-white">Our Mission</Link></li>
-                  <li><Link href="/about#roadmap" className="hover:text-white">Roadmap</Link></li>
-                  <li><Link href="/about#contact" className="hover:text-white">Contact Us</Link></li>
+                  <li><Link href="/about" className="hover:text-yellow-300 transition-colors duration-300 ease-in-out">Our Mission</Link></li>
+                  <li><Link href="/about#roadmap" className="hover:text-yellow-300 transition-colors duration-300 ease-in-out">Roadmap</Link></li>
+                  <li><Link href="/about#contact" className="hover:text-yellow-300 transition-colors duration-300 ease-in-out">Contact Us</Link></li>
                 </ul>
               </div>
               <div>
                 <h4 className="font-semibold text-white mb-3">Connect</h4>
                 <ul className="space-y-2 text-sm">
-                  <li><a href="https://github.com/drjforrest/taifa" className="hover:text-white">GitHub</a></li>
-                  <li><Link href="/about#contact" className="hover:text-white">Contact</Link></li>
+                  <li><a href="https://github.com/drjforrest/taifa" className="hover:text-yellow-300 transition-colors duration-300 ease-in-out">GitHub</a></li>
+                  <li><Link href="/about#contact" className="hover:text-yellow-300 transition-colors duration-300 ease-in-out">Contact</Link></li>
                   <li><span className="text-xs">44 Data Sources • Daily Updates</span></li>
                 </ul>
               </div>

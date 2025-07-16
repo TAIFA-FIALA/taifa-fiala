@@ -24,9 +24,9 @@ async function getAnalyticsSummary(): Promise<AnalyticsSummary | null> {
     console.error("Failed to fetch analytics summary:", error);
     // Return demo data if API is unavailable
     return {
-      total_opportunities: 127,
-      active_opportunities: 89,
-      total_funding_value: 12500000,
+      total_opportunities: 103,
+      active_opportunities: 70,
+      total_funding_value: 803200000,
       unique_organizations: 34
     };
   }
@@ -38,7 +38,7 @@ export default async function HomePage() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-blue-dark via-primary to-blue-dark py-20 px-4 sm:px-6 lg:px-8 text-white">
+      <section className="bg-gradient-to-br from-purple-800 via-purple-600 to-blue-600 py-20 px-4 sm:px-6 lg:px-8 text-white">
         <div className="max-w-7xl mx-auto text-center">
           {/* Pan-African Map Background */}
           <div className="relative">
@@ -53,12 +53,12 @@ export default async function HomePage() {
             <div className="mb-8 relative z-10">
               <h1 className="text-6xl sm:text-7xl lg:text-8xl font-extrabold leading-tight">
                 <span className="text-white">TAIFA</span>
-                <span className="text-gold mx-2">|</span>
+                <span className="text-accent mx-2">|</span>
                 <span className="text-white">FIALA</span>
               </h1>
               <div className="mt-4 space-y-1">
                 <p className="text-xl text-white font-medium">Tracking AI Funding for Africa</p>
-                <p className="text-lg text-gold">Financement pour l'Intelligence Artificielle en Afrique</p>
+                <p className="text-lg text-accent">Financement pour l'Intelligence Artificielle en Afrique</p>
               </div>
             </div>
           </div>
@@ -66,19 +66,19 @@ export default async function HomePage() {
           {/* Mission Statement */}
           <div className="max-w-4xl mx-auto mb-12">
             <p className="text-xl sm:text-2xl text-white leading-relaxed">
-              Democratizing access to AI funding across the African continent, empowering researchers, entrepreneurs, and innovators to build the future of African AI.
+              Democratizing access to AI funding across the African continent, supporting researchers, entrepreneurs, and innovators to build the future of African AI.
             </p>
             <div className="flex flex-wrap justify-center gap-4 mt-6">
-              <span className="bg-gold bg-opacity-20 text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center">
+              <span className="bg-accent bg-opacity-20 text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center">
                 <span className="mr-2">🌍</span> Pan-African Focus
               </span>
-              <span className="bg-gold bg-opacity-20 text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center">
+              <span className="bg-accent bg-opacity-20 text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center">
                 <span className="mr-2">🔄</span> Daily Updates
               </span>
-              <span className="bg-gold bg-opacity-20 text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center">
+              <span className="bg-accent bg-opacity-20 text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center">
                 <span className="mr-2">🌐</span> 44+ Global Sources
               </span>
-              <span className="bg-gold bg-opacity-20 text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center">
+              <span className="bg-accent bg-opacity-20 text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center">
                 <span className="mr-2">🇬🇧🇫🇷</span> Bilingual Platform
               </span>
             </div>
@@ -97,10 +97,10 @@ export default async function HomePage() {
                   type="text" 
                   name="query" 
                   placeholder="Search for AI grants, fellowships, accelerators..." 
-                  className="pl-10 w-full rounded-lg py-3 bg-white bg-opacity-90 border border-white border-opacity-50 focus:ring-2 focus:ring-gold focus:border-transparent text-blue-dark"
+                  className="pl-10 w-full rounded-lg py-3 bg-white bg-opacity-90 border border-white border-opacity-50 focus:ring-2 focus:ring-accent focus:border-transparent text-gray-800"
                 />
               </div>
-              <button type="submit" className="bg-gold hover:bg-gold-dark text-blue-dark font-bold py-3 px-6 rounded-lg transition-colors shadow-lg flex-shrink-0">
+              <button type="submit" className="bg-accent hover:bg-accent-dark text-white font-bold py-3 px-6 rounded-lg transition-colors shadow-lg flex-shrink-0">
                 Search Now
               </button>
             </form>
@@ -129,7 +129,7 @@ export default async function HomePage() {
         <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
           <div className="max-w-7xl mx-auto">
             <div className="flex flex-col md:flex-row justify-between items-center mb-12">
-              <h2 className="text-3xl font-bold text-blue-dark mb-4 md:mb-0">
+              <h2 className="text-3xl font-bold text-gray-800 mb-4 md:mb-0">
                 Live Analytics Dashboard
               </h2>
               <div className="flex items-center space-x-2 text-primary">
@@ -144,7 +144,7 @@ export default async function HomePage() {
             <div className="relative">
               {/* Subtle Map of Africa in background */}
               <div className="absolute inset-0 opacity-5 pointer-events-none hidden md:block">
-                <svg className="w-full h-full" viewBox="0 0 1200 800" fill="#102F76" xmlns="http://www.w3.org/2000/svg">
+                <svg className="w-full h-full" viewBox="0 0 1200 800" fill="#553C9A" xmlns="http://www.w3.org/2000/svg">
                   <path d="M600,100 Q800,200 850,400 Q900,600 700,700 Q500,800 300,700 Q100,600 200,400 Q300,200 600,100" />
                 </svg>
               </div>
@@ -161,7 +161,7 @@ export default async function HomePage() {
                     </div>
                     <h3 className="text-sm font-medium text-gray-500">Total Opportunities</h3>
                     <div className="mt-2 flex items-baseline">
-                      <div className="text-4xl font-extrabold text-blue-dark">
+                      <div className="text-4xl font-extrabold text-gray-800">
                         {summary.total_opportunities?.toLocaleString() || '127'}
                       </div>
                       <div className="ml-2 text-sm font-medium text-green-500 flex items-center">
@@ -173,7 +173,7 @@ export default async function HomePage() {
                     </div>
                     <div className="text-xs text-gray-500 mt-1">From across Africa and global sources</div>
                   </div>
-                  <div className="bg-blue-50 px-5 py-2">
+                  <div className="bg-purple-50 px-5 py-2">
                     <div className="text-xs text-primary font-medium flex justify-between">
                       <span>View all</span>
                       <span>→</span>
@@ -184,24 +184,24 @@ export default async function HomePage() {
                 {/* Active Opportunities */}
                 <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 hover:shadow-xl transition-shadow duration-300">
                   <div className="p-5 relative">
-                    <div className="absolute top-5 right-5 text-gold opacity-20">
+                    <div className="absolute top-5 right-5 text-accent opacity-20">
                       <svg className="w-12 h-12" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M5 2a1 1 0 011 1v1h8V3a1 1 0 112 0v1h1a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2h1V3a1 1 0 011-1zm11 14a1 1 0 001-1V6a1 1 0 00-1-1H5a1 1 0 00-1 1v10a1 1 0 001 1h11z" clipRule="evenodd" />
                       </svg>
                     </div>
                     <h3 className="text-sm font-medium text-gray-500">Active Now</h3>
                     <div className="mt-2 flex items-baseline">
-                      <div className="text-4xl font-extrabold text-blue-dark">
+                      <div className="text-4xl font-extrabold text-gray-800">
                         {summary.active_opportunities?.toLocaleString() || '89'}
                       </div>
-                      <div className="ml-2 text-sm font-medium text-gold flex items-center">
+                      <div className="ml-2 text-sm font-medium text-accent flex items-center">
                         <span>→</span>
                       </div>
                     </div>
                     <div className="text-xs text-gray-500 mt-1">Current open application windows</div>
                   </div>
-                  <div className="bg-yellow-50 px-5 py-2">
-                    <div className="text-xs text-gold font-medium flex justify-between">
+                  <div className="bg-orange-50 px-5 py-2">
+                    <div className="text-xs text-accent font-medium flex justify-between">
                       <span>Closing soon</span>
                       <span>12</span>
                     </div>
@@ -219,16 +219,16 @@ export default async function HomePage() {
                     </div>
                     <h3 className="text-sm font-medium text-gray-500">Total Available Funding</h3>
                     <div className="mt-2 flex items-baseline">
-                      <div className="text-4xl font-extrabold text-blue-dark">
-                        ${((summary.total_funding_value || 12500000) / 1000000).toFixed(1)}M
+                      <div className="text-4xl font-extrabold text-gray-800">
+                        ${((summary.total_funding_value || 803200000) / 1000000).toFixed(1)}M
                       </div>
                       <div className="ml-2 text-xs font-medium text-gray-500">
                         <span>USD</span>
                       </div>
                     </div>
-                    <div className="text-xs text-gray-500 mt-1">Available for African AI initiatives</div>
+                    <div className="text-xs text-gray-500 mt-1">Available for African AI initiatives (2019-2024), with $641M raised by AI startups (2022-2023)</div>
                   </div>
-                  <div className="bg-blue-50 px-5 py-2">
+                  <div className="bg-purple-50 px-5 py-2">
                     <div className="text-xs text-primary font-medium flex justify-between">
                       <span>By funding type</span>
                       <span>→</span>
@@ -239,21 +239,21 @@ export default async function HomePage() {
                 {/* Organizations */}
                 <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 hover:shadow-xl transition-shadow duration-300">
                   <div className="p-5 relative">
-                    <div className="absolute top-5 right-5 text-gold opacity-20">
+                    <div className="absolute top-5 right-5 text-accent opacity-20">
                       <svg className="w-12 h-12" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
                       </svg>
                     </div>
                     <h3 className="text-sm font-medium text-gray-500">Global Funders</h3>
                     <div className="mt-2 flex items-baseline">
-                      <div className="text-4xl font-extrabold text-blue-dark">
-                        {summary.unique_organizations?.toLocaleString() || '34'}
+                      <div className="text-4xl font-extrabold text-gray-800">
+                        {summary.unique_organizations?.toLocaleString() || '159'}
                       </div>
                     </div>
-                    <div className="text-xs text-gray-500 mt-1">Organizations supporting African AI</div>
+                    <div className="text-xs text-gray-500 mt-1">Across 159 startups, with 5 countries dominating 90% of funding</div>
                   </div>
-                  <div className="bg-yellow-50 px-5 py-2">
-                    <div className="text-xs text-gold font-medium flex justify-between">
+                  <div className="bg-orange-50 px-5 py-2">
+                    <div className="text-xs text-accent font-medium flex justify-between">
                       <span>View funder profiles</span>
                       <span>→</span>
                     </div>
@@ -264,16 +264,16 @@ export default async function HomePage() {
               {/* Filters and Data Freshness */}
               <div className="mt-6 flex flex-col md:flex-row justify-between items-center text-sm">
                 <div className="flex flex-wrap gap-2 mb-4 md:mb-0">
-                  <Link href="/funding?type=grants" className="bg-blue-50 text-primary px-3 py-1 rounded-full hover:bg-blue-100 transition-colors">
+                  <Link href="/funding?type=grants" className="bg-purple-50 text-primary px-3 py-1 rounded-full hover:bg-purple-100 transition-colors">
                     Grants
                   </Link>
-                  <Link href="/funding?type=accelerators" className="bg-blue-50 text-primary px-3 py-1 rounded-full hover:bg-blue-100 transition-colors">
+                  <Link href="/funding?type=accelerators" className="bg-purple-50 text-primary px-3 py-1 rounded-full hover:bg-purple-100 transition-colors">
                     Accelerators
                   </Link>
-                  <Link href="/funding?type=fellowships" className="bg-blue-50 text-primary px-3 py-1 rounded-full hover:bg-blue-100 transition-colors">
+                  <Link href="/funding?type=fellowships" className="bg-purple-50 text-primary px-3 py-1 rounded-full hover:bg-purple-100 transition-colors">
                     Fellowships
                   </Link>
-                  <Link href="/funding?type=competitions" className="bg-blue-50 text-primary px-3 py-1 rounded-full hover:bg-blue-100 transition-colors">
+                  <Link href="/funding?type=competitions" className="bg-purple-50 text-primary px-3 py-1 rounded-full hover:bg-purple-100 transition-colors">
                     Competitions
                   </Link>
                 </div>
@@ -297,7 +297,7 @@ export default async function HomePage() {
                 NEW FEATURES
               </span>
             </div>
-            <h2 className="text-3xl font-bold text-blue-dark mb-4">Equity-Focused Analytics</h2>
+            <h2 className="text-3xl font-bold text-gray-800 mb-4">Equity-Focused Analytics</h2>
             <p className="max-w-3xl mx-auto text-lg text-gray-600">
               Addressing funding disparities and promoting inclusive growth across the African AI ecosystem.
             </p>
@@ -314,7 +314,7 @@ export default async function HomePage() {
                         <path fillRule="evenodd" d="M12 1.586l-4 4v12.828l4-4V1.586zM3.707 3.293A1 1 0 002 4v10a1 1 0 00.293.707L6 18.414V5.586L3.707 3.293zM17.707 5.293L14 1.586v12.828l2.293 2.293A1 1 0 0018 16V6a1 1 0 00-.293-.707z" clipRule="evenodd" />
                       </svg>
                     </div>
-                    <h3 className="text-xl font-bold text-blue-dark">Geographic Equity</h3>
+                    <h3 className="text-xl font-bold text-gray-800">Geographic Equity</h3>
                   </div>
                   <div className="text-blue-600 group-hover:translate-x-1 transition-transform duration-200">
                     <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
@@ -323,10 +323,10 @@ export default async function HomePage() {
                   </div>
                 </div>
                 <p className="text-gray-600 mb-4">
-                  Interactive map highlighting funding distribution disparities across African countries, with 60% of funding going to just 4 countries.
+                  Interactive map highlighting funding distribution disparities across African countries. Five countries dominate 90% of African AI funding, with Tunisia and Kenya leading at over $240 million each, while Central Africa remains critically underserved.
                 </p>
                 <div className="mt-auto pt-4 border-t border-gray-100 flex justify-between items-center text-sm">
-                  <span className="text-red-500 font-semibold">12 underserved regions</span>
+                  <span className="text-red-500 font-semibold">Central Africa critically underserved</span>
                   <span className="text-blue-600 font-semibold">View details →</span>
                 </div>
               </div>
@@ -343,7 +343,7 @@ export default async function HomePage() {
                         <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z" />
                       </svg>
                     </div>
-                    <h3 className="text-xl font-bold text-blue-dark">Sectoral Alignment</h3>
+                    <h3 className="text-xl font-bold text-gray-800">Sectoral Alignment</h3>
                   </div>
                   <div className="text-green-600 group-hover:translate-x-1 transition-transform duration-200">
                     <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
@@ -371,7 +371,7 @@ export default async function HomePage() {
                         <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
                       </svg>
                     </div>
-                    <h3 className="text-xl font-bold text-blue-dark">Gender & Inclusion</h3>
+                    <h3 className="text-xl font-bold text-gray-800">Gender & Inclusion</h3>
                   </div>
                   <div className="text-pink-600 group-hover:translate-x-1 transition-transform duration-200">
                     <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
@@ -399,7 +399,7 @@ export default async function HomePage() {
                         <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
                       </svg>
                     </div>
-                    <h3 className="text-xl font-bold text-blue-dark">Funding Lifecycle</h3>
+                    <h3 className="text-xl font-bold text-gray-800">Funding Lifecycle</h3>
                   </div>
                   <div className="text-purple-600 group-hover:translate-x-1 transition-transform duration-200">
                     <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
@@ -421,7 +421,7 @@ export default async function HomePage() {
           <div className="flex justify-center mt-10">
             <Link 
               href="/analytics" 
-              className="bg-blue-dark hover:bg-blue border text-white font-bold py-3 px-8 rounded-lg text-base transition-colors shadow-md flex items-center gap-2"
+              className="bg-gray-800 hover:bg-blue border text-white font-bold py-3 px-8 rounded-lg text-base transition-colors shadow-md flex items-center gap-2"
             >
               <span>Explore All Analytics</span>
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -441,7 +441,7 @@ export default async function HomePage() {
                 🎯 Equity-Aware Intelligence
               </span>
             </div>
-            <h2 className="text-3xl font-bold text-blue-dark mb-4">Live Equity Analytics</h2>
+            <h2 className="text-3xl font-bold text-gray-800 mb-4">Live Equity Analytics</h2>
             <p className="max-w-3xl mx-auto text-lg text-gray-600">
               Real-time monitoring of funding equity across geographic, sectoral, and inclusion dimensions
             </p>
@@ -460,7 +460,7 @@ export default async function HomePage() {
                 🧠 Vector-Powered Search
               </span>
             </div>
-            <h2 className="text-3xl font-bold text-blue-dark mb-4">Semantic Search Intelligence</h2>
+            <h2 className="text-3xl font-bold text-gray-800 mb-4">Semantic Search Intelligence</h2>
             <p className="max-w-3xl mx-auto text-lg text-gray-600">
               Discover opportunities across languages and contexts with AI-powered semantic understanding
             </p>
@@ -479,7 +479,7 @@ export default async function HomePage() {
                 🌍 Continental Coverage
               </span>
             </div>
-            <h2 className="text-3xl font-bold text-blue-dark mb-4">Database Intelligence</h2>
+            <h2 className="text-3xl font-bold text-gray-800 mb-4">Database Intelligence</h2>
             <p className="max-w-3xl mx-auto text-lg text-gray-600">
               Comprehensive tracking of AI funding opportunities across all 54 African countries
             </p>
@@ -498,9 +498,9 @@ export default async function HomePage() {
                 TAIFA | FIALA Differentiators
               </span>
             </div>
-            <h2 className="text-3xl font-bold text-blue-dark mb-4">Why African Innovators Choose Us</h2>
+            <h2 className="text-3xl font-bold text-gray-800 mb-4">Key Platform Features</h2>
             <p className="max-w-3xl mx-auto text-lg text-gray-600">
-              Our platform is uniquely designed to address the specific needs of African researchers, entrepreneurs, and institutions seeking AI funding.
+              Our platform is designed to address the specific needs of African researchers, entrepreneurs, and institutions seeking AI funding.
             </p>
           </div>
           
@@ -512,7 +512,7 @@ export default async function HomePage() {
                   <path fillRule="evenodd" d="M3 6a3 3 0 013-3h10a1 1 0 01.8 1.6L14.25 8l2.55 3.4A1 1 0 0116 13H6a1 1 0 00-1 1v3a1 1 0 11-2 0V6z" clipRule="evenodd" />
                 </svg>
               </div>
-              <h3 className="text-xl font-bold text-blue-dark mb-3 text-center">Pan-African Focus</h3>
+              <h3 className="text-xl font-bold text-gray-800 mb-3 text-center">Pan-African Focus</h3>
               <p className="text-gray-600 text-center">
                 Our database is curated specifically for African initiatives, prioritizing opportunities that are relevant to the continent's AI ecosystem.
               </p>
@@ -534,7 +534,7 @@ export default async function HomePage() {
                   <path d="M15 7v2a4 4 0 01-4 4H9.828l-1.766 1.767c.28.149.599.233.938.233h2l3 3v-3h2a2 2 0 002-2V9a2 2 0 00-2-2h-1z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-bold text-blue-dark mb-3 text-center">Bilingual Excellence</h3>
+              <h3 className="text-xl font-bold text-gray-800 mb-3 text-center">Bilingual Support</h3>
               <p className="text-gray-600 text-center">
                 Full support for both English and French across all features, ensuring inclusivity for Francophone African communities.
               </p>
@@ -553,7 +553,7 @@ export default async function HomePage() {
                   <path fillRule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11 4a1 1 0 10-2 0v4a1 1 0 102 0V7zm-3 1a1 1 0 10-2 0v3a1 1 0 102 0V8zM8 9a1 1 0 00-2 0v2a1 1 0 102 0V9z" clipRule="evenodd" />
                 </svg>
               </div>
-              <h3 className="text-xl font-bold text-blue-dark mb-3 text-center">Rich Analytics</h3>
+              <h3 className="text-xl font-bold text-gray-800 mb-3 text-center">Rich Analytics</h3>
               <p className="text-gray-600 text-center">
                 Detailed insights on funding trends, geographic distribution, and opportunity types to inform your funding strategy.
               </p>
@@ -577,7 +577,7 @@ export default async function HomePage() {
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
                 </svg>
               </div>
-              <h3 className="text-xl font-bold text-blue-dark mb-3 text-center">Daily Updates</h3>
+              <h3 className="text-xl font-bold text-gray-800 mb-3 text-center">Daily Updates</h3>
               <p className="text-gray-600 text-center">
                 Fresh opportunities added every day, with automated alerts for new funding sources that match your profile.
               </p>
@@ -596,7 +596,7 @@ export default async function HomePage() {
                   <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
                 </svg>
               </div>
-              <h3 className="text-xl font-bold text-blue-dark mb-3 text-center">Advanced Search</h3>
+              <h3 className="text-xl font-bold text-gray-800 mb-3 text-center">Advanced Search</h3>
               <p className="text-gray-600 text-center">
                 Powerful filters by funding type, amount, eligibility, deadlines, and geographic focus to find your perfect opportunity.
               </p>
@@ -617,7 +617,7 @@ export default async function HomePage() {
                   <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-bold text-blue-dark mb-3 text-center">Funder Insights</h3>
+              <h3 className="text-xl font-bold text-gray-800 mb-3 text-center">Funder Insights</h3>
               <p className="text-gray-600 text-center">
                 Detailed profiles of major funding organizations, their priorities, past grants, and tips for successful applications.
               </p>
@@ -641,9 +641,12 @@ export default async function HomePage() {
             <span className="inline-block px-4 py-1 text-sm font-semibold rounded-full bg-white bg-opacity-20 text-white mb-4">
               Success Stories
             </span>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Empowering Africa's AI Ecosystem</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Supporting Africa's AI Ecosystem</h2>
             <p className="max-w-3xl mx-auto text-lg opacity-90">
-              See how organizations across the continent are leveraging TAIFA | FIALA to access critical funding
+              Over CAD$300 million committed to AI development in Africa, with major funding from IDRC, FCDO, and Gates Foundation (2019-2024).
+            </p>
+            <p className="max-w-3xl mx-auto text-lg opacity-90 mt-2">
+              AI4D program expanding from $20M to $100M+, demonstrating increasing investment in African AI.
             </p>
           </div>
           
@@ -655,7 +658,7 @@ export default async function HomePage() {
               </div>
               <h3 className="text-xl font-bold mb-4 text-center">Research Institutions</h3>
               <p className="text-white text-opacity-90 text-center mb-6">
-                Universities across Africa connect with global research grants and collaborative opportunities through our curated database.
+                Universities across Africa utilize our curated database to connect with global research grants and collaborative opportunities.
               </p>
               <div className="flex justify-center">
                 <span className="text-sm inline-flex items-center bg-white bg-opacity-20 rounded-full px-4 py-2">

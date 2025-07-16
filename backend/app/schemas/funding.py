@@ -1,4 +1,4 @@
-from pydantic import BaseModel, HttpUrl
+from pydantic import BaseModel, HttpUrl, validator
 from typing import Optional, List
 from datetime import datetime
 from decimal import Decimal
@@ -186,8 +186,9 @@ class FundingOpportunityResponse(FundingOpportunityBase):
     is_investment: bool = False
     funding_category: str = "other"
     
-    class Config:
-        orm_mode = True
+    model_config = {
+        "from_attributes": True
+    }
 
 class FundingOpportunityList(BaseModel):
     """Schema for paginated funding opportunity lists"""
