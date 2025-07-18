@@ -11,17 +11,11 @@ from app.core.config import settings
 from dotenv import load_dotenv
 load_dotenv()
 
-# Load database URL from environment variables
+# Load database URL directly from environment variables
 database_url = os.environ.get('DATABASE_URL')
 
-# Parse the database URL and replace the driver from asyncpg to psycopg
-if database_url and 'asyncpg' in database_url:
-    # Replace asyncpg with psycopg in the connection string
-    database_url = database_url.replace('postgresql+asyncpg', 'postgresql+psycopg')
-    # Add connection parameters for better compatibility
-    database_url = f"{database_url}?gssencmode=disable&client_encoding=utf8"
-    print(f"Using database URL from environment with psycopg driver")
-else:
+# Use the original asyncpg driver since it was working before
+if not database_url:
     # Fallback to hardcoded values if environment variable is not set
     db_params = {
         "user": "postgres.turcbnsgdlyelzmcqixd",
@@ -30,20 +24,29 @@ else:
         "port": "5432",
         "database": "postgres"
     }
-    database_url = f"postgresql+psycopg://{db_params['user']}:{db_params['password']}@{db_params['host']}:{db_params['port']}/{db_params['database']}?gssencmode=disable&client_encoding=utf8"
+    database_url = f"postgresql+asyncpg://{db_params['user']}:{db_params['password']}@{db_params['host']}:{db_params['port']}/{db_params['database']}"
     print("Using fallback database configuration")
+
+# Add SSL parameters to fix authentication issues
+if database_url and 'supabase.com' in database_url:
+    if '?' not in database_url:
+        database_url += '?ssl=require'
+    else:
+        database_url += '&ssl=require'
 
 print(f"Using database URL: {database_url.split('@')[0].split('://')[-1].split(':')[0]}@...(truncated)")
 
 
 
-# Create SQLAlchemy async engine
+# Create SQLAlchemy async engine with original configuration
 engine = create_async_engine(
     database_url,
     poolclass=NullPool,  # Use NullPool for development
     echo=settings.DEBUG,  # Log SQL queries in debug mode
     connect_args={
-        'sslmode': 'prefer', # Add SSL mode preference for Supabase
+        "server_settings": {
+            "application_name": "ai-africa-funding-tracker",
+        }
     }
 )
 
@@ -84,4 +87,5 @@ async def test_connection():
             return True
     except Exception as e:
         print(f"❌ Database connection failed: {e}")
+        print(f"Database URL format: {database_url.split('@')[0].split('://')[1].split(':')[0]}@...")
         return False
