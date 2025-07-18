@@ -22,7 +22,8 @@ logger = logging.getLogger(__name__)
 # Import directly from libraries rather than from refactored structure
 try:
     from supabase import create_client, Client
-    from pinecone import Pinecone, ServerlessSpec
+    from pinecone.spec import ServerlessSpec
+    from app.core.pinecone_client import get_pinecone_client
 except ImportError:
     logger.error("❌ Required libraries not found. Please run: pip install supabase pinecone-client python-dotenv")
     sys.exit(1)
@@ -62,44 +63,37 @@ async def test_pinecone_connection():
     logger.info("Testing Pinecone connection...")
     
     # Get environment variables
-    pinecone_api_key = os.getenv("PINECONE_API_KEY")
     pinecone_index_name = os.getenv("PINECONE_INDEX_NAME", "taifa-fiala")
-    
-    if not pinecone_api_key:
-        logger.error("❌ Missing Pinecone API key. Please check your .env file for PINECONE_API_KEY.")
-        return False
     
     if not pinecone_index_name:
         logger.warning("⚠️ PINECONE_INDEX_NAME not found, using default: 'taifa-fiala'")
     
     # Initialize Pinecone
     try:
-        pc = Pinecone(api_key=pinecone_api_key)
+        pc = get_pinecone_client()
+        if not pc:
+            raise ConnectionError("Failed to initialize Pinecone client.")
         logger.info("✅ Successfully created Pinecone client!")
         
         # List indexes to verify connection
-        try:
-            indexes = pc.list_indexes()
-            logger.info(f"✅ Successfully connected to Pinecone! Available indexes: {indexes.names()}")
+        indexes = pc.list_indexes()
+        logger.info(f"✅ Successfully connected to Pinecone! Available indexes: {indexes.names()}")
+        
+        # Check if our index exists
+        if pinecone_index_name in indexes.names():
+            logger.info(f"✅ Index '{pinecone_index_name}' exists!")
             
-            # Check if our index exists
-            if pinecone_index_name in indexes.names():
-                logger.info(f"✅ Index '{pinecone_index_name}' exists!")
-                
-                # Get index stats
-                try:
-                    index = pc.Index(pinecone_index_name)
-                    stats = index.describe_index_stats()
-                    logger.info(f"✅ Index stats: {stats}")
-                except Exception as e:
-                    logger.error(f"❌ Failed to get index stats: {e}")
-            else:
-                logger.warning(f"⚠️ Index '{pinecone_index_name}' does not exist. You may need to create it.")
-                
-            return True
-        except Exception as e:
-            logger.error(f"❌ Pinecone list indexes failed: {e}")
-            return False
+            # Get index stats
+            try:
+                index = pc.Index(pinecone_index_name)
+                stats = index.describe_index_stats()
+                logger.info(f"✅ Index stats: {stats}")
+            except Exception as e:
+                logger.error(f"❌ Failed to get index stats: {e}")
+        else:
+            logger.warning(f"⚠️ Index '{pinecone_index_name}' does not exist. You may need to create it.")
+            
+        return True
     except Exception as e:
         logger.error(f"❌ Failed to create Pinecone client: {e}")
         return False

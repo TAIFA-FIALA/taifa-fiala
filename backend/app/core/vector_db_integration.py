@@ -13,10 +13,10 @@ import logging
 from typing import Dict, List, Any, Optional, Tuple
 from datetime import datetime
 
-import pinecone
-from pinecone import Pinecone, ServerlessSpec
+from pinecone.spec import ServerlessSpec
 from pinecone.core.client.models import QueryResponse
 
+from app.core.pinecone_client import get_pinecone_client
 from app.core.vector_db_config import PineconeConfig, VectorIndexType, EmbeddingProvider, default_config
 from app.models.funding import AfricaIntelligenceItem
 from app.models.validation import ValidationResult
@@ -38,13 +38,11 @@ class VectorDBIntegration:
     
     async def initialize(self) -> bool:
         """Initialize connection to Pinecone"""
-        if not self.config.api_key:
-            self.logger.error("Pinecone API key not provided")
-            return False
-            
         try:
             # Initialize Pinecone client
-            self.pinecone_client = Pinecone(api_key=self.config.api_key)
+            self.pinecone_client = get_pinecone_client()
+            if not self.pinecone_client:
+                raise ConnectionError("Failed to initialize Pinecone client.")
             
             # Check if index exists, create if not
             index_list = self.pinecone_client.list_indexes()

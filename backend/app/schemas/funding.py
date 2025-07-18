@@ -59,7 +59,7 @@ class AfricaIntelligenceItemCreate(AfricaIntelligenceItemBase):
     recipient_organization_id: Optional[int] = None
     
     # Funding type classification
-    type_id: int  # Funding type ID is required
+    funding_type_id: int  # Funding type ID is required
     
     # Optional type-specific fields
     grant_specific: Optional[GrantFundingSpecific] = None
@@ -97,7 +97,7 @@ class AfricaIntelligenceItemUpdate(BaseModel):
     recipient_organization_id: Optional[int] = None
     
     # Classification
-    type_id: Optional[int] = None
+    funding_type_id: Optional[int] = None
     
     # Type-specific fields
     grant_specific: Optional[GrantFundingSpecific] = None

@@ -9,9 +9,11 @@ from urllib.parse import quote_plus
 # Import settings for configuration
 from app.core.config import settings
 
-# Load environment variables directly
+# Load environment variables directly from backend directory
 from dotenv import load_dotenv
-load_dotenv()
+backend_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+env_path = os.path.join(backend_dir, '.env')
+load_dotenv(env_path)
 
 # Import Supabase client for API-based operations
 from app.core.supabase_client import get_supabase_client, test_supabase_connection
@@ -20,8 +22,9 @@ from app.core.supabase_client import get_supabase_client, test_supabase_connecti
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Load database URL directly from environment variables
+# Load database URL and service key from environment variables
 database_url = os.environ.get('DATABASE_URL')
+service_key = os.environ.get('SUPABASE_SERVICE_API_KEY')
 
 # Check if we can use the production database or fall back to SQLite
 use_sqlite_fallback = os.environ.get('USE_SQLITE_FALLBACK', 'false').lower() == 'true'
@@ -33,6 +36,11 @@ if use_sqlite_fallback:
     db_path = os.path.join(backend_dir, "ai_africa_funding.db")
     database_url = f"sqlite+aiosqlite:///{db_path}"
     logger.info(f"Using SQLite fallback database for development: {db_path}")
+elif service_key:
+    # Service key available - prefer Supabase API over direct connection
+    logger.info("Service key available - will use Supabase API for database operations")
+    # Set database_url to None to force API-only mode
+    database_url = None
 elif not database_url:
     # Fallback to hardcoded Supabase values if environment variable is not set
     db_params = {
@@ -67,18 +75,27 @@ else:
 # Configure for Supabase compatibility
 supabase_connection = database_url and 'supabase.com' in database_url
 sqlite_connection = database_url and 'sqlite' in database_url
+api_only_mode = database_url is None and service_key
 
-if supabase_connection:
+if api_only_mode:
+    logger.info("Configuring for Supabase API-only mode with service key")
+    # Create a dummy engine that won't be used
+    engine = None
+elif supabase_connection:
     logger.info("Configuring connection parameters for Supabase compatibility")
 elif sqlite_connection:
     logger.info("Configuring connection parameters for SQLite compatibility")
 
-logger.info(f"Using database URL: {database_url.split('@')[0].split('://')[-1].split(':')[0] if '@' in database_url else 'sqlite'}@...(truncated)")
-
-
+if database_url:
+    logger.info(f"Using database URL: {database_url.split('@')[0].split('://')[-1].split(':')[0] if '@' in database_url else 'sqlite'}@...(truncated)")
+else:
+    logger.info("No direct database connection - using Supabase API only")
 
 # Create SQLAlchemy async engine with appropriate configuration
-if supabase_connection:
+if api_only_mode:
+    logger.info("Skipping SQLAlchemy engine creation - using Supabase API only")
+    engine = None
+elif supabase_connection:
     engine = create_async_engine(
         database_url,
         poolclass=NullPool,  # Use NullPool for development
@@ -107,12 +124,16 @@ else:
     )
 
 # Create async session factory
-SessionLocal = sessionmaker(
-    autocommit=False,
-    autoflush=False,
-    bind=engine,
-    class_=AsyncSession, # Use AsyncSession for async operations
-)
+if engine:
+    SessionLocal = sessionmaker(
+        autocommit=False,
+        autoflush=False,
+        bind=engine,
+        class_=AsyncSession, # Use AsyncSession for async operations
+    )
+else:
+    # API-only mode - no SQLAlchemy sessions
+    SessionLocal = None
 
 # Create declarative base for models
 Base = declarative_base()
@@ -122,21 +143,36 @@ Base = declarative_base()
 
 async def get_db():
     """Dependency to get async database session"""
-    async with SessionLocal() as session:
-        yield session
+    if SessionLocal is None:
+        # API-only mode - return Supabase client instead
+        yield get_supabase_client()
+    else:
+        async with SessionLocal() as session:
+            yield session
 
 # Alias for backward compatibility
 get_database = get_db
 
 async def create_tables():
-    """Create all tables"""
+    """Create all tables - gracefully handle connection failures"""
+    if api_only_mode:
+        logger.info("✅ Using Supabase API-only mode - skipping table creation")
+        return
+    
     try:
+        from sqlalchemy import text
+        # First test if we can connect
+        async with engine.connect() as conn:
+            await conn.execute(text("SELECT 1"))
+        
+        # If connection works, proceed with table creation
         async with engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
         logger.info("✅ Database tables created successfully")
     except Exception as e:
         logger.error(f"⚠️ Database table creation failed: {e}")
-        logger.info("🔄 Application will continue with limited functionality")
+        logger.info("🔄 Application will continue with Supabase API-only functionality")
+        # Don't re-raise the exception - let the app continue with API-only access
 
 async def test_connection():
     """Test database connection - tries Supabase API first, then SQLAlchemy"""

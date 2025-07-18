@@ -12,13 +12,14 @@ import logging
 from typing import Dict, List, Any, Optional
 from datetime import datetime
 
-from pinecone import Pinecone, ServerlessSpec
+from pinecone.spec import ServerlessSpec
 from dotenv import load_dotenv
 
 from ..etl_architecture import ETLTask, PipelineStage, Priority, ProcessingResult
 from .pinecone_config import PineconeConfig, VectorIndexType, default_config
 from ...models.funding import AfricaIntelligenceItem
 from ...models.organization import Organization
+from ..pinecone_client import get_pinecone_client
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -42,13 +43,11 @@ class VectorIndexingService:
         if self.initialized:
             return True
             
-        if not self.config.api_key:
-            self.logger.error("Pinecone API key not provided")
-            return False
-            
         try:
             # Initialize Pinecone client
-            self.pinecone_client = Pinecone(api_key=self.config.api_key)
+            self.pinecone_client = get_pinecone_client()
+            if not self.pinecone_client:
+                raise ConnectionError("Failed to initialize Pinecone client.")
             
             # Check if index exists
             index_list = self.pinecone_client.list_indexes()

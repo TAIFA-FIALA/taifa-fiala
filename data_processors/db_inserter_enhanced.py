@@ -217,7 +217,7 @@ async def insert_enhanced_africa_intelligence_feed(opportunities: List[Dict[str,
                     select(FundingType).where(FundingType.name == funding_type_name)
                 )
                 funding_type = type_result.scalars().first()
-                type_id = funding_type.id if funding_type else None
+                funding_type_id = funding_type.id if funding_type else None
                 
                 # Enhanced currency detection
                 detected_currency = detect_currency(opp_data.get("amount", ""))
@@ -237,7 +237,7 @@ async def insert_enhanced_africa_intelligence_feed(opportunities: List[Dict[str,
                     organization_id=organization.id if organization else None,
                     
                     # New competitor analysis features
-                    type_id=type_id,
+                    funding_type_id=funding_type_id,
                     status="open",  # Default to open for new opportunities
                     currency=detected_currency,
                     

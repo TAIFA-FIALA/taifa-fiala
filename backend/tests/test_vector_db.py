@@ -7,7 +7,10 @@ import os
 import asyncio
 import logging
 
-from pinecone import Pinecone, ServerlessSpec
+from pinecone.spec import ServerlessSpec
+
+# Local imports
+from app.core.pinecone_client import get_pinecone_client
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -15,14 +18,15 @@ logger = logging.getLogger(__name__)
 
 # Load environment variables
 
-api_key = os.getenv("PINECONE_API_KEY")
 index_name = os.getenv("PINECONE_INDEX_NAME", "taifa-fiala")
 
 async def test_pinecone_connection():
     """Test basic connection to Pinecone"""
     try:
         # Initialize Pinecone client
-        pc = Pinecone(api_key=api_key)
+        pc = get_pinecone_client()
+        if not pc:
+            raise ConnectionError("Failed to initialize Pinecone client.")
         
         # List available indexes
         indexes = pc.list_indexes()

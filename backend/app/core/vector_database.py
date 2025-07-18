@@ -23,9 +23,9 @@ import hashlib
 import numpy as np
 from concurrent.futures import ThreadPoolExecutor
 import openai
-import pinecone
-from pinecone import Pinecone, ServerlessSpec
+from pinecone.spec import ServerlessSpec
 
+from app.core.pinecone_client import get_pinecone_client
 from app.core.etl_architecture import ETLTask, PipelineStage, ProcessingResult
 from app.models.funding import AfricaIntelligenceItem
 from app.models.validation import ValidationResult
@@ -56,7 +56,6 @@ class VectorConfig:
     """Configuration for vector database operations"""
     
     # Pinecone Configuration
-    pinecone_api_key: str
     pinecone_environment: str = "us-east1-gcp"
     
     # Index Configuration
@@ -132,7 +131,9 @@ class VectorDatabaseManager:
         """Initialize Pinecone connection and index"""
         try:
             # Initialize Pinecone
-            self.pinecone_client = Pinecone(api_key=self.config.pinecone_api_key)
+            self.pinecone_client = get_pinecone_client()
+            if not self.pinecone_client:
+                raise ConnectionError("Failed to initialize Pinecone client.")
             
             # Create index if it doesn't exist
             if self.config.index_name not in self.pinecone_client.list_indexes().names():

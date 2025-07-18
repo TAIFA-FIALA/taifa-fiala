@@ -11,31 +11,61 @@ from app.models import Organization, AfricaIntelligenceItem, CommunityUser, Geog
 router = APIRouter()
 
 @router.get("/summary")
-async def get_equity_summary(db: Session = Depends(get_db)):
+async def get_equity_summary(db = Depends(get_db)):
     """Get a summary of key equity metrics for the dashboard"""
     
+    # Check if we're in API-only mode (Supabase client)
+    if not hasattr(db, 'execute'):
+        # API-only mode - return mock data or use Supabase client
+        return {
+            "total_opportunities": 156,
+            "total_funding": 12500000,
+            "geo_distribution": [
+                {"name": "Nigeria", "opportunity_count": 35},
+                {"name": "Kenya", "opportunity_count": 28},
+                {"name": "South Africa", "opportunity_count": 24},
+                {"name": "Ghana", "opportunity_count": 19},
+                {"name": "Rwanda", "opportunity_count": 15}
+            ],
+            "domain_distribution": [
+                {"name": "Healthcare", "opportunity_count": 42},
+                {"name": "Agriculture", "opportunity_count": 38},
+                {"name": "Education", "opportunity_count": 29},
+                {"name": "Financial Services", "opportunity_count": 25},
+                {"name": "Climate", "opportunity_count": 22}
+            ],
+            "recent_opportunities": []
+        }
+    
+    # SQLAlchemy mode - original logic
     # Get total funding opportunities
-    total_opportunities = db.query(func.count(distinct(AfricaIntelligenceItem.id))).scalar() or 0
+    total_opportunities_query = select(func.count(distinct(AfricaIntelligenceItem.id)))
+    total_opportunities_result = await db.execute(total_opportunities_query)
+    total_opportunities = total_opportunities_result.scalar() or 0
     
     # Get total funding amount
-    total_funding = db.query(func.sum(cast(AfricaIntelligenceItem.funding_amount, Float))).scalar() or 0
+    total_funding_query = select(func.sum(cast(AfricaIntelligenceItem.funding_amount, Float)))
+    total_funding_result = await db.execute(total_funding_query)
+    total_funding = total_funding_result.scalar() or 0
     
     # Get geographic distribution summary (top 5)
-    geo_distribution = db.query(
+    geo_distribution_query = select(
         GeographicScope.name,
         func.count(distinct(AfricaIntelligenceItem.id)).label('opportunity_count')
     ).join(
         AfricaIntelligenceItem.geographic_scopes
     ).filter(
-        GeographicScope.scope_type == 'country'
+        GeographicScope.type == 'country'
     ).group_by(
         GeographicScope.name
     ).order_by(
         desc('opportunity_count')
-    ).limit(5).all()
+    ).limit(5)
+    geo_distribution_result = await db.execute(geo_distribution_query)
+    geo_distribution = geo_distribution_result.all()
     
     # Get domain distribution summary (top 5)
-    domain_distribution = db.query(
+    domain_distribution_query = select(
         AIDomain.name,
         func.count(distinct(AfricaIntelligenceItem.id)).label('opportunity_count')
     ).join(
@@ -44,17 +74,21 @@ async def get_equity_summary(db: Session = Depends(get_db)):
         AIDomain.name
     ).order_by(
         desc('opportunity_count')
-    ).limit(5).all()
+    ).limit(5)
+    domain_distribution_result = await db.execute(domain_distribution_query)
+    domain_distribution = domain_distribution_result.all()
     
     # Get organization type distribution
-    org_distribution = db.query(
+    org_distribution_query = select(
         Organization.recipient_type,
         func.count(distinct(Organization.id)).label('org_count')
     ).filter(
         Organization.recipient_type.isnot(None)
     ).group_by(
         Organization.recipient_type
-    ).all()
+    )
+    org_distribution_result = await db.execute(org_distribution_query)
+    org_distribution = org_distribution_result.all()
     
     return {
         "total_opportunities": total_opportunities,
@@ -71,26 +105,28 @@ async def get_equity_summary(db: Session = Depends(get_db)):
     }
 
 @router.get("/geographical")
-async def get_geographical_distribution(db: Session = Depends(get_db)):
+async def get_geographical_distribution(db: AsyncSession = Depends(get_db)):
     """Get geographical funding distribution"""
     # Query to get funding by region/country
-    results = db.query(
+    results_query = select(
         GeographicScope.name,
-        GeographicScope.scope_type,
+        GeographicScope.type,
         func.count(distinct(AfricaIntelligenceItem.id)).label('opportunity_count'),
         func.sum(cast(AfricaIntelligenceItem.funding_amount, Float)).label('total_funding')
     ).join(
         AfricaIntelligenceItem.geographic_scopes
     ).filter(
-        GeographicScope.scope_type.in_(['country', 'region']),
+        GeographicScope.type.in_(['country', 'region']),
         GeographicScope.name.in_([
             'Nigeria', 'Kenya', 'South Africa', 'Egypt', 'Ghana',
             'Rwanda', 'Ethiopia', 'Uganda', 'Senegal', 'Tanzania',
             'Morocco', 'Tunisia', 'Cameroon', 'Mali', 'Chad'
         ])
     ).group_by(
-        GeographicScope.name, GeographicScope.scope_type
-    ).all()
+        GeographicScope.name, GeographicScope.type
+    )
+    results_result = await db.execute(results_query)
+    results = results_result.all()
     
     # Calculate total funding for percentage calculations
     total_funding = sum(row[3] for row in results) if results else 0
@@ -116,7 +152,7 @@ async def get_geographical_distribution(db: Session = Depends(get_db)):
 
 
 @router.get("/gender-distribution")
-async def get_gender_distribution(db: Session = Depends(get_db)):
+async def get_gender_distribution(db: AsyncSession = Depends(get_db)):
     """Get gender distribution of funding recipients"""
     # This would normally query from a users or founders table with gender information
     # For demo purposes, we'll return representative data for Africa
@@ -146,7 +182,7 @@ async def get_gender_distribution(db: Session = Depends(get_db)):
 
 
 @router.get("/inclusion-trends")
-async def get_inclusion_trends(db: Session = Depends(get_db)):
+async def get_inclusion_trends(db: AsyncSession = Depends(get_db)):
     """Get trends in funding inclusion across different dimensions"""
     # In a real implementation, this would query actual demographic data
     # For demo purposes, we'll return representative data
@@ -186,7 +222,7 @@ async def get_inclusion_trends(db: Session = Depends(get_db)):
 
 
 @router.get("/featured-founders")
-async def get_featured_founders(db: Session = Depends(get_db)):
+async def get_featured_founders(db: AsyncSession = Depends(get_db)):
     """Get featured founders with focus on underrepresented groups"""
     # This would normally query from a founders or success stories database
     # For demo purposes, we'll return representative data
@@ -242,7 +278,7 @@ async def get_featured_founders(db: Session = Depends(get_db)):
 
 
 @router.get("/funding-stages")
-async def get_funding_stages(db: Session = Depends(get_db)):
+async def get_funding_stages(db: AsyncSession = Depends(get_db)):
     """Get funding stage distribution and progression data"""
     # This would normally query from intelligence feed with stage information
     # For demo purposes, we'll return representative data based on the statistic
@@ -283,7 +319,7 @@ async def get_funding_stages(db: Session = Depends(get_db)):
 
 
 @router.get("/funding-distribution")
-async def get_funding_distribution(db: Session = Depends(get_db)):
+async def get_funding_distribution(db: AsyncSession = Depends(get_db)):
     """Get detailed funding distribution across African countries"""
     # This would normally query from intelligence feed with geographic data
     # For demo purposes, we'll return representative data based on the 83% statistic
@@ -327,7 +363,7 @@ async def get_funding_distribution(db: Session = Depends(get_db)):
 
 
 @router.get("/collaboration-suggestions")
-async def get_collaboration_suggestions(db: Session = Depends(get_db)):
+async def get_collaboration_suggestions(db: AsyncSession = Depends(get_db)):
     """Get collaboration suggestions for organizations and projects"""
     # In a real implementation, this would use an algorithm to match organizations based on
     # complementary strengths, shared interests, or geographic proximity

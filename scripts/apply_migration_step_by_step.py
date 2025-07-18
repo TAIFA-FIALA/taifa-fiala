@@ -107,7 +107,7 @@ async def apply_migration_step_by_step():
         print("\n3️⃣ Enhancing africa_intelligence_feed table...")
         
         opportunity_columns = [
-            ("type_id", "INTEGER"),
+            ("funding_type_id", "INTEGER"),
             ("status", "VARCHAR(20) DEFAULT 'open'"),
             ("currency", "VARCHAR(10) DEFAULT 'USD'"),
             ("community_rating", "DECIMAL(2,1)"),
@@ -237,7 +237,7 @@ async def apply_migration_step_by_step():
             "ALTER TABLE intelligence_item_geographic_scopes ADD CONSTRAINT fk_fo_geo_scopes_geo FOREIGN KEY (geographic_scope_id) REFERENCES geographic_scopes(id) ON DELETE CASCADE",
             "ALTER TABLE organization_geographic_focus ADD CONSTRAINT fk_org_geo_focus_org FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE",
             "ALTER TABLE organization_geographic_focus ADD CONSTRAINT fk_org_geo_focus_geo FOREIGN KEY (geographic_scope_id) REFERENCES geographic_scopes(id) ON DELETE CASCADE",
-            "ALTER TABLE africa_intelligence_feed ADD CONSTRAINT fk_africa_intelligence_feed_type FOREIGN KEY (type_id) REFERENCES funding_types(id)",
+            "ALTER TABLE africa_intelligence_feed ADD CONSTRAINT fk_africa_intelligence_feed_type FOREIGN KEY (funding_type_id) REFERENCES funding_types(id)",
             "ALTER TABLE africa_intelligence_feed ADD CONSTRAINT fk_africa_intelligence_feed_user FOREIGN KEY (submitted_by_user_id) REFERENCES community_users(id)"
         ]
         
@@ -252,7 +252,7 @@ async def apply_migration_step_by_step():
         print("\n8️⃣ Creating performance indexes...")
         
         indexes = [
-            "CREATE INDEX IF NOT EXISTS idx_africa_intelligence_feed_type_id ON africa_intelligence_feed(type_id)",
+            "CREATE INDEX IF NOT EXISTS idx_africa_intelligence_feed_funding_type_id ON africa_intelligence_feed(funding_type_id)",
             "CREATE INDEX IF NOT EXISTS idx_africa_intelligence_feed_status ON africa_intelligence_feed(status)",
             "CREATE INDEX IF NOT EXISTS idx_africa_intelligence_feed_deadline_urgency ON africa_intelligence_feed(deadline_urgency)",
             "CREATE INDEX IF NOT EXISTS idx_africa_intelligence_feed_currency ON africa_intelligence_feed(currency)",
@@ -284,7 +284,7 @@ async def apply_migration_step_by_step():
                 print(f"   ❌ {table}: Not accessible")
         
         # Check new columns
-        new_columns = ['status', 'currency', 'deadline_urgency', 'type_id']
+        new_columns = ['status', 'currency', 'deadline_urgency', 'funding_type_id']
         for col in new_columns:
             try:
                 exists = await conn.fetchval(f"""

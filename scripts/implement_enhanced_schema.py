@@ -94,7 +94,7 @@ async def run_enhanced_migration():
             
             # Add columns to africa_intelligence_feed (check if they exist first)
             columns_to_add = [
-                ("type_id", "INTEGER"),
+                ("funding_type_id", "INTEGER"),
                 ("status", "VARCHAR(20) DEFAULT 'open'"),
                 ("currency", "VARCHAR(10) DEFAULT 'USD'"),
                 ("community_rating", "DECIMAL(2,1)"),
@@ -191,7 +191,7 @@ async def run_enhanced_migration():
             print("   📝 Creating performance indexes...")
             
             indexes = [
-                "CREATE INDEX IF NOT EXISTS idx_africa_intelligence_feed_type_id ON africa_intelligence_feed(type_id)",
+                "CREATE INDEX IF NOT EXISTS idx_africa_intelligence_feed_funding_type_id ON africa_intelligence_feed(funding_type_id)",
                 "CREATE INDEX IF NOT EXISTS idx_africa_intelligence_feed_status ON africa_intelligence_feed(status)",
                 "CREATE INDEX IF NOT EXISTS idx_africa_intelligence_feed_deadline_urgency ON africa_intelligence_feed(deadline_urgency)",
                 "CREATE INDEX IF NOT EXISTS idx_africa_intelligence_feed_currency ON africa_intelligence_feed(currency)",

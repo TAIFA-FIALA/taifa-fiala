@@ -5,6 +5,7 @@ import GeographicDistributionMap from '@/components/homepage/GeographicDistribut
 import SectorAllocationChart from '@/components/homepage/SectorAllocationChart';
 import { FileText, Database, BarChart3, BookOpen, Users, TrendingUp, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
+import SearchBar from '@/components/homepage/SearchBar';
 
 interface AnalyticsSummary {
   total_opportunities?: number;
@@ -15,8 +16,7 @@ interface AnalyticsSummary {
 
 async function getAnalyticsSummary(): Promise<AnalyticsSummary | null> {
   try {
-    const res = await fetch('http://localhost:8000/api/v1/equity-analyses/summary', { 
-      cache: 'no-store',
+    const res = await fetch('http://localhost:8000/api/v1/equity-analyses/summary', {
       next: { revalidate: 300 } // Revalidate every 5 minutes
     });
     if (!res.ok) {
@@ -80,30 +80,7 @@ export default async function HomePage() {
           
           {/* Search Bar - Centered */}
           <div className="max-w-2xl mx-auto mb-12">
-            <form 
-              className="relative flex shadow-md rounded-lg overflow-hidden"
-              onSubmit={(e) => {
-                e.preventDefault();
-                const formData = new FormData(e.currentTarget);
-                const searchParams = new URLSearchParams();
-                searchParams.set('query', formData.get('query') as string);
-                window.location.href = `/funding?${searchParams.toString()}`;
-              }}
-            >
-              <input
-                type="text"
-                name="query"
-                placeholder="Search for funds by funder, recipient, or project"
-                className="pl-6 pr-4 py-4 w-full rounded-l-lg border-0 focus:ring-2 focus:ring-taifa-secondary text-lg"
-              />
-              <button 
-                type="submit" 
-                className="bg-taifa-secondary hover:bg-yellow-400 text-taifa-primary px-6 py-4 font-medium text-lg transition-colors duration-200 flex items-center"
-              >
-                Search
-                <ChevronRight className="ml-2 h-5 w-5" />
-              </button>
-            </form>
+            <SearchBar />
           </div>
           
           {/* Quick Navigation Links */}

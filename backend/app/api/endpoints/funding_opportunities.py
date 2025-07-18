@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List, Optional
 from datetime import datetime
 
@@ -30,41 +30,67 @@ async def get_africa_intelligence_feed(
     ai_domain: Optional[str] = Query(None),
     funding_type: Optional[str] = Query(None, description="Filter by funding type category: 'grant', 'investment', 'prize', or 'other'"),
     requires_equity: Optional[bool] = Query(None, description="Filter for opportunities requiring equity"),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """Get intelligence feed with optional filtering"""
-    query = db.query(AfricaIntelligenceItem).join(AfricaIntelligenceItem.type)
+    # Check if db is a Supabase client or SQLAlchemy session
+    if hasattr(db, 'table'):  # Supabase client
+        query = db.table('africa_intelligence_feed').select('*, funding_types!fk_africa_intelligence_feed_funding_type_id(*)')
+
+        # Apply filters
+        if status:
+            query = query.filter('status', 'eq', status)
+        if min_amount:
+            query = query.or_(f'amount_exact.gte.{min_amount},amount_min.gte.{min_amount}')
+        if max_amount:
+            query = query.or_(f'amount_exact.lte.{max_amount},amount_max.lte.{max_amount}')
+        if deadline_after:
+            query = query.filter('deadline', 'gte', deadline_after.isoformat())
+        if deadline_before:
+            query = query.filter('deadline', 'lte', deadline_before.isoformat())
+        if organization_id:
+            query = query.filter('organization_id', 'eq', organization_id)
+        if funding_type:
+            query = query.filter('funding_types.category', 'eq', funding_type)
+        if requires_equity is not None:
+            query = query.filter('funding_types.requires_equity', 'eq', requires_equity)
+
+        # Execute query with pagination
+        response = query.range(skip, skip + limit - 1).execute()
+        opportunities = response.data
+    else:  # SQLAlchemy session
+        query = db.query(AfricaIntelligenceItem).join(AfricaIntelligenceItem.type)
     
-    # Apply filters
-    if status:
-        query = query.filter(AfricaIntelligenceItem.status == status)
-    if min_amount:
-        # Use the new numeric amount fields
-        query = query.filter(
-            (AfricaIntelligenceItem.amount_exact >= min_amount) | 
-            (AfricaIntelligenceItem.amount_min >= min_amount)
-        )
-    if max_amount:
-        # Use the new numeric amount fields
-        query = query.filter(
-            (AfricaIntelligenceItem.amount_exact <= max_amount) | 
-            (AfricaIntelligenceItem.amount_max <= max_amount) |
-            (AfricaIntelligenceItem.amount_max == None, AfricaIntelligenceItem.amount_exact <= max_amount)
-        )
-    if deadline_after:
-        query = query.filter(AfricaIntelligenceItem.deadline >= deadline_after)
-    if deadline_before:
-        query = query.filter(AfricaIntelligenceItem.deadline <= deadline_before)
-    if organization_id:
-        query = query.filter(AfricaIntelligenceItem.organization_id == organization_id)
-    if funding_type:
-        # Filter by the funding type category
-        query = query.filter(FundingType.category == funding_type)
-    if requires_equity is not None:
-        query = query.filter(FundingType.requires_equity == requires_equity)
+        # Apply filters
+        if status:
+            query = query.filter(AfricaIntelligenceItem.status == status)
+        if min_amount:
+            # Use the new numeric amount fields
+            query = query.filter(
+                (AfricaIntelligenceItem.amount_exact >= min_amount) |
+                (AfricaIntelligenceItem.amount_min >= min_amount)
+            )
+        if max_amount:
+            # Use the new numeric amount fields
+            query = query.filter(
+                (AfricaIntelligenceItem.amount_exact <= max_amount) |
+                (AfricaIntelligenceItem.amount_max <= max_amount) |
+                (AfricaIntelligenceItem.amount_max == None, AfricaIntelligenceItem.amount_exact <= max_amount)
+            )
+        if deadline_after:
+            query = query.filter(AfricaIntelligenceItem.deadline >= deadline_after)
+        if deadline_before:
+            query = query.filter(AfricaIntelligenceItem.deadline <= deadline_before)
+        if organization_id:
+            query = query.filter(AfricaIntelligenceItem.organization_id == organization_id)
+        if funding_type:
+            # Filter by the funding type category
+            query = query.filter(FundingType.category == funding_type)
+        if requires_equity is not None:
+            query = query.filter(FundingType.requires_equity == requires_equity)
     
-    # Execute query with pagination
-    opportunities = query.offset(skip).limit(limit).all()
+        # Execute query with pagination
+        opportunities = query.offset(skip).limit(limit).all()
     
     # Prepare responses with type-specific data
     results = []
@@ -90,7 +116,7 @@ async def get_africa_intelligence_feed(
 @router.get("/{opportunity_id}", response_model=AfricaIntelligenceItemResponse)
 async def get_intelligence_item(
     opportunity_id: int,
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """Get a specific intelligence item by ID"""
     opportunity = db.query(AfricaIntelligenceItem).filter(AfricaIntelligenceItem.id == opportunity_id).first()
@@ -117,11 +143,11 @@ async def get_intelligence_item(
 @router.post("/", response_model=AfricaIntelligenceItemResponse)
 async def create_intelligence_item(
     opportunity: AfricaIntelligenceItemCreate,
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """Create a new intelligence item"""
     # Validate the funding type exists and get its category
-    funding_type = db.query(FundingType).filter(FundingType.id == opportunity.type_id).first()
+    funding_type = db.query(FundingType).filter(FundingType.id == opportunity.funding_type_id).first()
     if not funding_type:
         raise HTTPException(status_code=404, detail="Funding type not found")
     
@@ -168,7 +194,7 @@ async def get_grants(
     renewable: Optional[bool] = Query(None, description="Filter for renewable grants"),
     project_based: Optional[bool] = Query(None, description="Filter for project-based grants"),
     min_duration: Optional[int] = Query(None, description="Minimum grant duration in months"),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """Get grant intelligence feed with specialized filters"""
     query = db.query(AfricaIntelligenceItem).join(AfricaIntelligenceItem.type)
@@ -209,7 +235,7 @@ async def get_investments(
     limit: int = Query(50, ge=1, le=500),
     max_equity: Optional[float] = Query(None, description="Maximum equity percentage required"),
     min_valuation_cap: Optional[float] = Query(None, description="Minimum valuation cap"),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """Get investment intelligence feed with specialized filters"""
     query = db.query(AfricaIntelligenceItem).join(AfricaIntelligenceItem.type)
@@ -247,7 +273,7 @@ async def search_africa_intelligence_feed(
     q: str = Query(..., description="Search query"),
     limit: int = Query(10, ge=1, le=100),
     funding_type: Optional[str] = Query(None, description="Limit search to specific funding type: 'grant', 'investment', etc."),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """Search intelligence feed by title or description"""
     search_term = f"%{q}%"
@@ -295,7 +321,7 @@ async def get_stage_matched_opportunities(
     stage: str = Query(None, description="Funding stage to match (e.g., 'Pre-seed', 'Seed', 'Series A')"),
     domain: str = Query(None, description="AI domain to filter by"),
     country: str = Query(None, description="Country to filter by"),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """
     Get intelligence feed matched to a specific stage and optionally filtered by domain and country.
@@ -488,7 +514,7 @@ async def get_stage_matched_opportunities(
 #
 
 @router.get("/geographic-availability")
-async def get_geographic_availability(db: Session = Depends(get_db)):
+async def get_geographic_availability(db: AsyncSession = Depends(get_db)):
     """
     Get intelligence feed availability by geographic region
     This endpoint helps users understand which regions have available funding
@@ -513,7 +539,7 @@ async def get_geographic_availability(db: Session = Depends(get_db)):
 
 
 @router.get("/domain-funding")
-async def get_domain_funding(db: Session = Depends(get_db)):
+async def get_domain_funding(db: AsyncSession = Depends(get_db)):
     """
     Get intelligence feed by AI domain
     This endpoint helps users understand which AI domains receive the most funding

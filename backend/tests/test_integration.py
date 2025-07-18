@@ -13,8 +13,10 @@ import asyncio
 import logging
 from typing import Dict, List, Any, Optional
 from dotenv import load_dotenv
-from pinecone import Pinecone
 from supabase import create_client, Client
+
+# Local imports
+from app.core.pinecone_client import get_pinecone_client
 
 # Configure logging
 logging.basicConfig(
@@ -40,8 +42,7 @@ else:
 supabase_url = os.getenv("SUPABASE_PROJECT_URL")
 supabase_key = os.getenv("SUPABASE_API_KEY")
 
-# Pinecone Configuration  
-pinecone_api_key = os.getenv("PINECONE_API_KEY")
+# Pinecone Configuration
 pinecone_host = os.getenv("PINECONE_HOST", "")
 
 
@@ -79,7 +80,7 @@ async def test_supabase():
 
 async def test_pinecone():
     """Test connection to Pinecone and verify index"""
-    if not pinecone_api_key or not pinecone_host:
+    if not pinecone_host:
         logger.error("❌ Missing Pinecone environment variables")
         return False
     
@@ -87,7 +88,9 @@ async def test_pinecone():
         logger.info(f"Connecting to Pinecone at {pinecone_host}")
         
         # Initialize Pinecone with new API
-        pc = Pinecone(api_key=pinecone_api_key)
+        pc = get_pinecone_client()
+        if not pc:
+            raise ConnectionError("Failed to initialize Pinecone client.")
         
         # Get list of indexes
         indexes = pc.list_indexes()

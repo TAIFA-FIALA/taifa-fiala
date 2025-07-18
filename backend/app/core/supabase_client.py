@@ -7,15 +7,18 @@ from typing import Optional
 from supabase import create_client, Client
 from dotenv import load_dotenv
 
-# Load environment variables
-load_dotenv()
+# Load environment variables from backend directory
+import os
+backend_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+env_path = os.path.join(backend_dir, '.env')
+load_dotenv(env_path)
 
 # Configure logging
 logger = logging.getLogger(__name__)
 
 # Supabase configuration
 SUPABASE_URL = os.environ.get('SUPABASE_PROJECT_URL')
-SUPABASE_KEY = os.environ.get('SUPABASE_API_KEY')  # This should be the service key for backend
+SUPABASE_KEY = os.environ.get('SUPABASE_SERVICE_API_KEY')  # Use the service key for backend operations
 SUPABASE_ANON_KEY = os.environ.get('SUPABASE_PUBLISHABLE_KEY')  # This is the anon key for client-side
 
 def create_supabase_client(use_service_key: bool = True) -> Optional[Client]:

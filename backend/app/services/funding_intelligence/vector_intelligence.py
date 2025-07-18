@@ -14,11 +14,12 @@ import hashlib
 from dataclasses import dataclass, field
 
 # Vector and embedding imports
-from pinecone import Pinecone, ServerlessSpec
+from pinecone.spec import ServerlessSpec
 import openai
 from openai import OpenAI
 
 # Local imports
+from app.core.pinecone_client import get_pinecone_client
 from .content_analyzer import FundingIntelligence, FundingEventType
 from .entity_extraction import Entity, Relationship
 
@@ -61,15 +62,12 @@ class FundingIntelligenceVectorDB:
     """
     
     def __init__(self, use_integrated_embedding: bool = True):
-        self.pinecone_api_key = os.getenv('PINECONE_API_KEY')
-        self.pinecone_environment = os.getenv('PINECONE_ENVIRONMENT', 'us-east-1')
         self.openai_api_key = os.getenv('OPENAI_API_KEY')
         
-        if not self.pinecone_api_key:
-            raise ValueError("PINECONE_API_KEY environment variable not set")
-        
         # Initialize Pinecone
-        self.pc = Pinecone(api_key=self.pinecone_api_key)
+        self.pc = get_pinecone_client()
+        if not self.pc:
+            raise ConnectionError("Failed to initialize Pinecone client.")
         
         # Initialize OpenAI if not using integrated embedding
         self.use_integrated_embedding = use_integrated_embedding

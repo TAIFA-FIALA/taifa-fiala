@@ -75,8 +75,8 @@ def upgrade() -> None:
     )
     
     # Add new columns to africa_intelligence_feed table
-    op.add_column('africa_intelligence_feed', 
-                  sa.Column('type_id', sa.Integer()))
+    op.add_column('africa_intelligence_feed',
+                  sa.Column('funding_type_id', sa.Integer()))
     op.add_column('africa_intelligence_feed', 
                   sa.Column('status', sa.String(20), default='open'))
     op.add_column('africa_intelligence_feed', 
@@ -110,9 +110,9 @@ def upgrade() -> None:
     """)
     
     # Add foreign key constraints for africa_intelligence_feed
-    op.create_foreign_key('fk_africa_intelligence_feed_type_id',
+    op.create_foreign_key('fk_africa_intelligence_feed_funding_type_id',
                          'africa_intelligence_feed', 'funding_types',
-                         ['type_id'], ['id'])
+                         ['funding_type_id'], ['id'])
     op.create_foreign_key('fk_africa_intelligence_feed_submitted_by_user_id',
                          'africa_intelligence_feed', 'community_users',
                          ['submitted_by_user_id'], ['id'])
@@ -179,7 +179,7 @@ def upgrade() -> None:
     )
     
     # Create indexes for performance
-    op.create_index('idx_africa_intelligence_feed_type_id', 'africa_intelligence_feed', ['type_id'])
+    op.create_index('idx_africa_intelligence_feed_funding_type_id', 'africa_intelligence_feed', ['funding_type_id'])
     op.create_index('idx_africa_intelligence_feed_status', 'africa_intelligence_feed', ['status'])
     op.create_index('idx_africa_intelligence_feed_deadline_urgency', 'africa_intelligence_feed', ['deadline_urgency'])
     op.create_index('idx_africa_intelligence_feed_community_rating', 'africa_intelligence_feed', ['community_rating'])
@@ -198,7 +198,7 @@ def downgrade() -> None:
     op.drop_index('idx_africa_intelligence_feed_community_rating', table_name='africa_intelligence_feed')
     op.drop_index('idx_africa_intelligence_feed_deadline_urgency', table_name='africa_intelligence_feed')
     op.drop_index('idx_africa_intelligence_feed_status', table_name='africa_intelligence_feed')
-    op.drop_index('idx_africa_intelligence_feed_type_id', table_name='africa_intelligence_feed')
+    op.drop_index('idx_africa_intelligence_feed_funding_type_id', table_name='africa_intelligence_feed')
     
     # Drop junction tables
     op.drop_table('organization_geographic_focus')
@@ -207,7 +207,7 @@ def downgrade() -> None:
     
     # Drop foreign key constraints
     op.drop_constraint('fk_africa_intelligence_feed_submitted_by_user_id', 'africa_intelligence_feed', type_='foreignkey')
-    op.drop_constraint('fk_africa_intelligence_feed_type_id', 'africa_intelligence_feed', type_='foreignkey')
+    op.drop_constraint('fk_africa_intelligence_feed_funding_type_id', 'africa_intelligence_feed', type_='foreignkey')
     
     # Drop columns from organizations
     op.drop_column('organizations', 'data_completeness_score')
@@ -235,7 +235,7 @@ def downgrade() -> None:
     op.drop_column('africa_intelligence_feed', 'community_rating')
     op.drop_column('africa_intelligence_feed', 'currency')
     op.drop_column('africa_intelligence_feed', 'status')
-    op.drop_column('africa_intelligence_feed', 'type_id')
+    op.drop_column('africa_intelligence_feed', 'funding_type_id')
     
     # Drop lookup tables
     op.drop_table('community_users')

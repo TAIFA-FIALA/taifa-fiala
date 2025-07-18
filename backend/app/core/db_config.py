@@ -15,7 +15,10 @@ from typing import Optional
 from pydantic import BaseModel, Field
 from dotenv import load_dotenv
 from supabase import create_client, Client
-from pinecone import Pinecone, ServerlessSpec
+from pinecone.spec import ServerlessSpec
+
+# Local imports
+from app.core.pinecone_client import get_pinecone_client
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -67,8 +70,10 @@ class DatabaseService:
             logger.warning("Supabase configuration not valid. Skipping connection.")
             success = False
             
-        # Initialize Pinecone - reuse existing code from vector_indexing.py
-        # This is now handled by VectorIndexingService in vector_indexing.py
+        # Initialize Pinecone
+        self.pinecone_client = get_pinecone_client()
+        if not self.pinecone_client:
+            success = False
             
         return success
     

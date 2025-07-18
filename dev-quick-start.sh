@@ -17,12 +17,8 @@ lsof -ti :8501 | xargs kill -9 2>/dev/null || true
 # Start Backend
 echo "🔧 Starting Backend..."
 cd "$PROJECT_ROOT/backend"
-if [ ! -d "venv" ]; then
-    python3 -m venv venv
-fi
-source venv/bin/activate
-pip install -r requirements.txt > /dev/null 2>&1
-uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload &
+uv pip install -r requirements.txt > /dev/null 2>&1
+uv run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload &
 
 # Start Frontend
 echo "🎨 Starting Frontend..."

@@ -51,25 +51,19 @@ start_backend() {
     
     cd "$BACKEND_DIR"
     
-    # Check if virtual environment exists
-    if [ ! -d "venv" ]; then
-        echo -e "${YELLOW}📦 Creating Python virtual environment...${NC}"
-        python3 -m venv venv
-    fi
+    # UV handles environment management automatically
+    echo -e "${YELLOW}📦 UV will handle environment management...${NC}"
     
-    # Activate virtual environment
-    source venv/bin/activate
-    
-    # Install dependencies
-    echo -e "${YELLOW}📦 Installing Python dependencies...${NC}"
-    pip install -r requirements.txt
+    # Install dependencies with UV
+    echo -e "${YELLOW}📦 Installing Python dependencies with UV...${NC}"
+    uv pip install -r requirements.txt
     
     # Kill any existing process on port 8000
     kill_port 8000
     
-    # Start FastAPI with uvicorn
+    # Start FastAPI with uvicorn using UV
     echo -e "${GREEN}🚀 Starting FastAPI server on http://localhost:8000${NC}"
-    uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload &
+    uv run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload &
     BACKEND_PID=$!
     
     echo -e "${GREEN}✅ Backend started (PID: $BACKEND_PID)${NC}"

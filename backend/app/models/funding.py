@@ -41,7 +41,7 @@ class AfricaIntelligenceItem(Base):
     recipient_organization_id = Column(Integer, ForeignKey('organizations.id'), nullable=True, index=True)
     
     # Enhanced funding details (based on competitor analysis)
-    type_id = Column(Integer, ForeignKey('funding_types.id'), index=True)
+    funding_type_id = Column(Integer, ForeignKey('funding_types.id'), index=True)
     status = Column(String(20), default='open', index=True)  # open, closed, under_review
     funding_amount = Column(Text)  # Keep as text for flexibility
     amount_min = Column(Float, nullable=True)  # Minimum funding amount (numeric)

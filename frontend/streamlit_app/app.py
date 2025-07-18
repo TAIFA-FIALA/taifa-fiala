@@ -32,21 +32,38 @@ API_BASE_URL = os.getenv("TAIFA_API_BASE_URL", "http://localhost:8000/api/v1")
 def main():
     """Main TAIFA-FIALA application"""
     # Initialize i18n
-i18n = get_i18n()
+    i18n = get_i18n()
 
-# Detect language from URL or default
-query_params = st.experimental_get_query_params()
-if 'lang' in query_params:
-    i18n.set_language(query_params['lang'])
+    # Detect language from URL or default
+    query_params = st.experimental_get_query_params()
+    if 'lang' in query_params:
+        i18n.set_language(query_params['lang'][0])
 
-# Language switcher in sidebar (created once)
-selected_lang = create_language_switcher(i18n, key="main_language_switcher")
-if selected_lang != i18n.get_current_language():
-    i18n.set_language(selected_lang)
-    st.rerun()
+    # Language switcher in sidebar
+    with st.sidebar:
+        st.markdown("---")
+        st.subheader("🌍 Language")
+        
+        languages = {"en": "🇬🇧 English", "fr": "🇫🇷 Français"}
+        current_lang_code = i18n.get_current_language()
+        
+        # Get the index of the current language
+        lang_codes = list(languages.keys())
+        current_lang_index = lang_codes.index(current_lang_code) if current_lang_code in lang_codes else 0
 
-def main():
-    """Main TAIFA-FIALA application"""
+        selected_lang_code = st.selectbox(
+            "Choose Language",
+            options=lang_codes,
+            format_func=lambda code: languages[code],
+            index=current_lang_index,
+            key=f"lang_selector_{current_lang_code}"
+        )
+        
+        if selected_lang_code != current_lang_code:
+            i18n.set_language(selected_lang_code)
+            st.experimental_set_query_params(lang=selected_lang_code)
+            # Use st.rerun() for a cleaner refresh
+            st.rerun()
     
     # Create bilingual header
     create_bilingual_header(i18n)
@@ -64,7 +81,7 @@ def main():
             t("nav.submit"),
             "🛠️ Admin Portal"  # Add admin portal
         ],
-        key="main_navigation"
+        key="main_navigation_selectbox"
     )
     
     # Page routing
@@ -419,8 +436,6 @@ def show_search():
         else:
             st.warning("Please enter a search query.")
 
-if __name__ == "__main__":
-    main()
 def show_rwanda_demo():
     """Special demo page for Rwanda presentation"""
     st.header("🇷🇼 TAIFA Rwanda Demo")
