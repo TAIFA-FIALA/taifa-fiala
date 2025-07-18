@@ -141,43 +141,59 @@ start_streamlit() {
 
 # Function to wait for services to be ready
 wait_for_services() {
+    local services_to_check="$1"
     echo -e "${YELLOW}⏳ Waiting for services to be ready...${NC}"
     
     # Wait for backend
-    echo -e "${YELLOW}  Checking backend...${NC}"
-    timeout=60
-    while ! curl -s http://localhost:8000/docs > /dev/null; do
-        sleep 1
-        timeout=$((timeout - 1))
-        if [ $timeout -le 0 ]; then
-            echo -e "${RED}❌ Backend failed to start within 60 seconds${NC}"
-            break
+    if [[ "$services_to_check" == *"backend"* ]]; then
+        echo -e "${YELLOW}  Checking backend...${NC}"
+        timeout=30
+        while ! curl -s --max-time 5 http://localhost:8000/docs > /dev/null 2>&1; do
+            sleep 2
+            timeout=$((timeout - 2))
+            if [ $timeout -le 0 ]; then
+                echo -e "${RED}❌ Backend failed to start within 30 seconds${NC}"
+                break
+            fi
+        done
+        if [ $timeout -gt 0 ]; then
+            echo -e "${GREEN}✅ Backend is ready${NC}"
         fi
-    done
+    fi
     
     # Wait for frontend
-    echo -e "${YELLOW}  Checking frontend...${NC}"
-    timeout=60
-    while ! curl -s http://localhost:3000 > /dev/null; do
-        sleep 1
-        timeout=$((timeout - 1))
-        if [ $timeout -le 0 ]; then
-            echo -e "${RED}❌ Frontend failed to start within 60 seconds${NC}"
-            break
+    if [[ "$services_to_check" == *"frontend"* ]]; then
+        echo -e "${YELLOW}  Checking frontend...${NC}"
+        timeout=30
+        while ! curl -s --max-time 5 http://localhost:3000 > /dev/null 2>&1; do
+            sleep 2
+            timeout=$((timeout - 2))
+            if [ $timeout -le 0 ]; then
+                echo -e "${RED}❌ Frontend failed to start within 30 seconds${NC}"
+                break
+            fi
+        done
+        if [ $timeout -gt 0 ]; then
+            echo -e "${GREEN}✅ Frontend is ready${NC}"
         fi
-    done
+    fi
     
     # Wait for streamlit
-    echo -e "${YELLOW}  Checking streamlit...${NC}"
-    timeout=60
-    while ! curl -s http://localhost:8501 > /dev/null; do
-        sleep 1
-        timeout=$((timeout - 1))
-        if [ $timeout -le 0 ]; then
-            echo -e "${RED}❌ Streamlit failed to start within 60 seconds${NC}"
-            break
+    if [[ "$services_to_check" == *"streamlit"* ]]; then
+        echo -e "${YELLOW}  Checking streamlit...${NC}"
+        timeout=30
+        while ! curl -s --max-time 5 http://localhost:8501 > /dev/null 2>&1; do
+            sleep 2
+            timeout=$((timeout - 2))
+            if [ $timeout -le 0 ]; then
+                echo -e "${RED}❌ Streamlit failed to start within 30 seconds${NC}"
+                break
+            fi
+        done
+        if [ $timeout -gt 0 ]; then
+            echo -e "${GREEN}✅ Streamlit is ready${NC}"
         fi
-    done
+    fi
 }
 
 # Function to display service URLs
@@ -227,17 +243,17 @@ trap cleanup EXIT INT TERM
 case "${1:-all}" in
     "backend")
         start_backend
-        wait_for_services
+        wait_for_services "backend"
         display_urls
         ;;
     "frontend")
         start_frontend
-        wait_for_services
+        wait_for_services "frontend"
         display_urls
         ;;
     "streamlit")
         start_streamlit
-        wait_for_services
+        wait_for_services "streamlit"
         display_urls
         ;;
     "all"|"")
@@ -249,7 +265,7 @@ case "${1:-all}" in
         start_streamlit
         
         # Wait for all services to be ready
-        wait_for_services
+        wait_for_services "backend frontend streamlit"
         
         # Display URLs
         display_urls

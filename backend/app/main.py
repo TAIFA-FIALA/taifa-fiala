@@ -31,7 +31,16 @@ app.include_router(api_router, prefix=settings.API_V1_STR)
 @app.on_event("startup")
 async def startup_event():
     """Initialize database tables on startup"""
-    await create_tables()
+    try:
+        print("🔄 Attempting to create database tables...")
+        await create_tables()
+        print("✅ Database tables created successfully")
+    except Exception as e:
+        print(f"⚠️ Database table creation failed: {e}")
+        print("⚠️ Application will continue without database tables")
+        # Log the error but don't crash the application
+        import logging
+        logging.error(f"Database initialization failed: {e}", exc_info=True)
 
 @app.get("/")
 async def root():

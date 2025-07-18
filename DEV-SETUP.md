@@ -103,6 +103,20 @@ The requirements.txt has been updated to fix deprecated packages and conflicts:
 - Removed unused `emails` package
 - Used version ranges for better compatibility
 
+**Added missing packages:**
+- `cloudscraper>=1.2.71` - For web scraping with anti-bot protection
+- `fake-useragent>=1.4.0` - For generating random user agents
+- `aiofiles>=0.8.0` - For async file operations
+- `psutil>=5.9.0` - For system and process monitoring
+- `psycopg[binary]>=3.1.0` - PostgreSQL adapter for Supabase compatibility
+
+**Fixed database connection issues:**
+- Added Supabase-specific configuration with command timeout
+- Added graceful error handling for database connection issues
+- The backend now starts successfully and continues to operate even if database connection fails
+- Database initialization errors are logged but don't crash the application
+- Added `python-Levenshtein>=0.21.0` to fix fuzzywuzzy warnings
+
 ### Node.js Module Issues
 
 If you have issues with Node.js modules, try:

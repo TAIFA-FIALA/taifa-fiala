@@ -27,28 +27,39 @@ if not database_url:
     database_url = f"postgresql+asyncpg://{db_params['user']}:{db_params['password']}@{db_params['host']}:{db_params['port']}/{db_params['database']}"
     print("Using fallback database configuration")
 
-# Add SSL parameters to fix authentication issues
-if database_url and 'supabase.com' in database_url:
-    if '?' not in database_url:
-        database_url += '?ssl=require'
-    else:
-        database_url += '&ssl=require'
+# Configure for Supabase compatibility
+supabase_connection = database_url and 'supabase.com' in database_url
+if supabase_connection:
+    print("Configuring connection parameters for Supabase compatibility")
 
 print(f"Using database URL: {database_url.split('@')[0].split('://')[-1].split(':')[0]}@...(truncated)")
 
 
 
-# Create SQLAlchemy async engine with original configuration
-engine = create_async_engine(
-    database_url,
-    poolclass=NullPool,  # Use NullPool for development
-    echo=settings.DEBUG,  # Log SQL queries in debug mode
-    connect_args={
-        "server_settings": {
-            "application_name": "ai-africa-funding-tracker",
+# Create SQLAlchemy async engine with Supabase-specific configuration
+if supabase_connection:
+    engine = create_async_engine(
+        database_url,
+        poolclass=NullPool,  # Use NullPool for development
+        echo=settings.DEBUG,  # Log SQL queries in debug mode
+        connect_args={
+            "server_settings": {
+                "application_name": "ai-africa-funding-tracker",
+            },
+            "command_timeout": 60,  # Set command timeout for Supabase
         }
-    }
-)
+    )
+else:
+    engine = create_async_engine(
+        database_url,
+        poolclass=NullPool,  # Use NullPool for development
+        echo=settings.DEBUG,  # Log SQL queries in debug mode
+        connect_args={
+            "server_settings": {
+                "application_name": "ai-africa-funding-tracker",
+            }
+        }
+    )
 
 # Create async session factory
 SessionLocal = sessionmaker(

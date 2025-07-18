@@ -1,10 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { ComposableMap, Geographies, Geography } from 'react-simple-maps';
+import { useState, useEffect, useRef } from 'react';
 import { scaleLinear } from 'd3-scale';
-import { format } from 'd3-format';
-import ReactTooltip from 'react-tooltip';
+import { Map, Overlay } from 'pigeon-maps';
 import africanCountriesGeo from '@/data/african_countries_geo.json';
 import VisualizationErrorBoundary from '@/components/common/VisualizationErrorBoundary';
 
@@ -13,21 +11,71 @@ interface CountryData {
   fundingAmount: number;
   fundingCount: number;
   percentageTotal: number;
+  center?: [number, number]; // [longitude, latitude]
 }
 
+// Map center coordinates for Africa
+const AFRICA_CENTER: [number, number] = [20, 5];
+const DEFAULT_ZOOM = 2.5;
+
 const GeographicDistributionMap = () => {
-  const [tooltipContent, setTooltipContent] = useState('');
+  const [tooltipContent, setTooltipContent] = useState<string | null>(null);
+  const [tooltipPosition, setTooltipPosition] = useState<{x: number, y: number} | null>(null);
+  const tooltipRef = useRef<HTMLDivElement>(null);
   const [data, setData] = useState<CountryData[]>([]);
+  const [countryPolygons, setCountryPolygons] = useState<any[]>([]);
 
   useEffect(() => {
+    // Process GeoJSON data to extract polygons for each country
+    const countries = africanCountriesGeo.features.map(feature => {
+      const countryName = feature.properties.name;
+      
+      // Extract center point for the country if available
+      let centerPoint: [number, number] | undefined;
+      
+      // Check for custom lat/lon properties in the GeoJSON if available
+      const customLat = (feature.properties as any).lat;
+      const customLon = (feature.properties as any).lon;
+      
+      if (customLat && customLon) {
+        centerPoint = [customLon, customLat];
+      } else if (feature.geometry.type === 'Polygon' && 
+                feature.geometry.coordinates && 
+                Array.isArray(feature.geometry.coordinates) && 
+                feature.geometry.coordinates.length > 0 && 
+                Array.isArray(feature.geometry.coordinates[0])) {
+        // Calculate rough center from first polygon
+        const coords = feature.geometry.coordinates[0];
+        
+        // Ensure coords is an array and each element is an array with at least 2 elements
+        if (Array.isArray(coords) && coords.length > 0 && coords.every(c => Array.isArray(c) && c.length >= 2)) {
+          const lons = coords.map((c: number[]) => c[0]);
+          const lats = coords.map((c: number[]) => c[1]);
+          
+          const avgLon = lons.reduce((sum: number, val: number) => sum + val, 0) / lons.length;
+          const avgLat = lats.reduce((sum: number, val: number) => sum + val, 0) / lats.length;
+          
+          centerPoint = [avgLon, avgLat];
+        }
+      }
+      
+      return {
+        name: countryName,
+        center: centerPoint,
+        geometry: feature.geometry
+      };
+    });
+    
+    setCountryPolygons(countries);
+    
     // Simulated data - replace with actual API call
     const mockData: CountryData[] = [
-      { country: 'Nigeria', fundingAmount: 245000000, fundingCount: 487, percentageTotal: 28.4 },
-      { country: 'Kenya', fundingAmount: 198000000, fundingCount: 412, percentageTotal: 22.9 },
-      { country: 'South Africa', fundingAmount: 167000000, fundingCount: 356, percentageTotal: 19.3 },
-      { country: 'Egypt', fundingAmount: 112000000, fundingCount: 289, percentageTotal: 12.9 },
-      { country: 'Rwanda', fundingAmount: 45000000, fundingCount: 98, percentageTotal: 5.2 },
-      { country: 'Ghana', fundingAmount: 34000000, fundingCount: 76, percentageTotal: 3.9 },
+      { country: 'Nigeria', fundingAmount: 245000000, fundingCount: 487, percentageTotal: 28.4, center: [8.6753, 9.0820] },
+      { country: 'Kenya', fundingAmount: 198000000, fundingCount: 412, percentageTotal: 22.9, center: [37.9062, 0.0236] },
+      { country: 'South Africa', fundingAmount: 167000000, fundingCount: 356, percentageTotal: 19.3, center: [22.9375, -30.5595] },
+      { country: 'Egypt', fundingAmount: 112000000, fundingCount: 289, percentageTotal: 12.9, center: [30.8025, 26.8206] },
+      { country: 'Rwanda', fundingAmount: 45000000, fundingCount: 98, percentageTotal: 5.2, center: [29.8739, -1.9403] },
+      { country: 'Ghana', fundingAmount: 34000000, fundingCount: 76, percentageTotal: 3.9, center: [-1.0232, 7.9465] },
       // Add more countries as needed
     ];
 
@@ -46,27 +94,39 @@ const GeographicDistributionMap = () => {
     return colorScale(countryData.percentageTotal);
   };
 
-  const formatNumber = format(',');
+  // Simple number formatter with thousands separator
+  const formatNumber = (num: number): string => {
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  };
 
-  const handleMouseEnter = (geo: any) => {
-    const countryData = data.find(d => d.country === geo.properties.name);
+  const handleCountryHover = (countryName: string, event: React.MouseEvent) => {
+    const countryData = data.find(d => d.country === countryName);
+    
+    // Get mouse position for tooltip positioning
+    setTooltipPosition({
+      x: event.clientX,
+      y: event.clientY
+    });
+    
     if (countryData) {
-      setTooltipContent(`
-        <div class="p-2">
-          <strong>${geo.properties.name}</strong><br/>
-          Funding: $${formatNumber(countryData.fundingAmount)}<br/>
-          Events: ${countryData.fundingCount}<br/>
-          Share: ${countryData.percentageTotal}%
-        </div>
-      `);
+      setTooltipContent(
+        `${countryName} - $${formatNumber(countryData.fundingAmount)} - ${countryData.fundingCount} events - ${countryData.percentageTotal}% share`
+      );
     } else {
-      setTooltipContent(`
-        <div class="p-2">
-          <strong>${geo.properties.name}</strong><br/>
-          No funding data available
-        </div>
-      `);
+      setTooltipContent(`${countryName} - No funding data available`);
     }
+  };
+  
+  const handleMouseLeave = () => {
+    setTooltipContent(null);
+  };
+
+  // Function to convert coordinates from GeoJSON format to pigeon-maps format
+  const convertCoordinates = (coords: number[][]): [number, number][] => {
+    return coords.map((coord): [number, number] => {
+      // Convert longitude and latitude to pigeon-maps coordinates
+      return [coord[0], coord[1]];
+    });
   };
 
   return (
@@ -74,76 +134,99 @@ const GeographicDistributionMap = () => {
       <figure className="chart-container relative">
         <div className="chart-title" id="figure-1">Figure 1: Geographic Distribution of AI Funding (2019-2024)</div>
       
-      <div className="relative w-full h-[500px]" data-tip="">
-        <ComposableMap
-          projectionConfig={{ scale: 450 }}
-          width={800}
-          height={500}
-          style={{
-            width: "100%",
-            height: "auto"
-          }}
-        >
-          <Geographies geography={africanCountriesGeo}>
-            {({ geographies }) =>
-              geographies.map(geo => (
-                <Geography
-                  key={geo.rsmKey}
-                  geography={geo}
-                  onMouseEnter={() => handleMouseEnter(geo)}
-                  onMouseLeave={() => setTooltipContent('')}
-                  style={{
-                    default: {
-                      fill: getFundingColor(geo.properties.name),
-                      stroke: "#FFFFFF",
-                      strokeWidth: 0.5,
-                      outline: "none",
-                    },
-                    hover: {
-                      fill: '#7B1F1D',
-                      stroke: "#FFFFFF",
-                      strokeWidth: 0.5,
-                      outline: "none",
-                    },
-                    pressed: {
-                      fill: '#7B1F1D',
-                      stroke: "#FFFFFF",
-                      strokeWidth: 0.5,
-                      outline: "none",
-                    },
-                  }}
-                />
-              ))
-            }
-          </Geographies>
-        </ComposableMap>
-      </div>
-
-      <figcaption className="chart-caption">
-        Note: The map shows percentage distribution of tracked AI funding across Africa from 2019 to 2024. 
-        Darker shades indicate higher funding concentration. Four countries (Nigeria, Kenya, South Africa, 
-        and Egypt) account for 83% of total funding.
-      </figcaption>
-      
-      {/* Legend */}
-      <div className="absolute top-4 right-4 bg-white p-4 border border-gray-200 rounded">
-        <div className="text-sm font-medium mb-2">Funding Share (%)</div>
-        <div className="flex items-center space-x-2">
-          <div className="w-4 h-4 bg-[#E5E7EB]"></div>
-          <span className="text-xs">0%</span>
+        <div className="relative w-full h-[500px]" data-tip="">
+          <Map
+            height={500}
+            defaultCenter={AFRICA_CENTER}
+            defaultZoom={DEFAULT_ZOOM}
+            attribution={false}
+          >
+            {/* Render African countries with color-coding based on funding data */}
+            {countryPolygons.map((country, index) => {
+              const countryName = country.name;
+              const fillColor = getFundingColor(countryName);
+              
+              // Display markers for countries with significant funding
+              const countryData = data.find(d => d.country === countryName);
+              if (countryData && countryData.center) {
+                return (
+                  <Overlay key={`marker-${index}`} anchor={countryData.center} offset={[0, 0]}>
+                    <div
+                      className="relative"
+                      style={{
+                        width: '100px',
+                        height: '100px',
+                        transform: 'translate(-50%, -50%)'
+                      }}
+                      onMouseEnter={(e) => handleCountryHover(countryName, e)}
+                      onMouseLeave={handleMouseLeave}
+                    >
+                      <div
+                        className="absolute rounded-full opacity-70 cursor-pointer"
+                        style={{
+                          backgroundColor: fillColor,
+                          width: `${Math.max(20, countryData.percentageTotal * 3)}px`,
+                          height: `${Math.max(20, countryData.percentageTotal * 3)}px`,
+                          top: '50%',
+                          left: '50%',
+                          transform: 'translate(-50%, -50%)',
+                          border: '1px solid rgba(255, 255, 255, 0.5)',
+                        }}
+                      />
+                      <div 
+                        className="absolute text-xs font-bold text-center whitespace-nowrap"
+                        style={{
+                          top: '100%',
+                          left: '50%',
+                          transform: 'translateX(-50%)',
+                          color: countryData.percentageTotal > 10 ? '#1B365D' : '#666',
+                          textShadow: '0 0 3px rgba(255, 255, 255, 0.8)'
+                        }}
+                      >
+                        {countryName}
+                      </div>
+                    </div>
+                  </Overlay>
+                );
+              }
+              return null;
+            })}
+          </Map>
         </div>
-        <div className="flex items-center space-x-2">
-          <div className="w-4 h-4 bg-[#1B365D]"></div>
-          <span className="text-xs">30%+</span>
-        </div>
-      </div>
 
-      <ReactTooltip
-        className="!bg-white !text-gray-800 !border !border-gray-200 !shadow-sm"
-        html={true}
-        data-html>
-        {tooltipContent}
-      </ReactTooltip>
+        <figcaption className="chart-caption">
+          Note: The map shows percentage distribution of tracked AI funding across Africa from 2019 to 2024. 
+          Larger circles indicate higher funding concentration. Four countries (Nigeria, Kenya, South Africa, 
+          and Egypt) account for 83% of total funding.
+        </figcaption>
+        
+        {/* Legend */}
+        <div className="absolute top-4 right-4 bg-white p-4 border border-gray-200 rounded">
+          <div className="text-sm font-medium mb-2">Funding Share (%)</div>
+          <div className="flex items-center space-x-2">
+            <div className="w-4 h-4 rounded-full bg-[#E5E7EB]"></div>
+            <span className="text-xs">0%</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <div className="w-4 h-4 rounded-full bg-[#1B365D]"></div>
+            <span className="text-xs">30%+</span>
+          </div>
+        </div>
+
+        {/* Custom tooltip implementation */}
+        {tooltipContent && tooltipPosition && (
+          <div
+            ref={tooltipRef}
+            className="absolute bg-white text-gray-800 border border-gray-200 shadow-sm p-2 rounded z-50 pointer-events-none"
+            style={{
+              left: `${tooltipPosition.x + 10}px`,
+              top: `${tooltipPosition.y - 10}px`,
+              maxWidth: '250px'
+            }}
+          >
+            {tooltipContent}
+          </div>
+        )}
       </figure>
     </VisualizationErrorBoundary>
   );
