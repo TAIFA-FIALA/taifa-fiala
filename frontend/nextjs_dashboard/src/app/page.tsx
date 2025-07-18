@@ -2,6 +2,7 @@ import Link from 'next/link';
 import EquityMetricsDashboard from '@/components/homepage/EquityMetricsDashboard';
 import SemanticSearchShowcase from '@/components/homepage/SemanticSearchShowcase';
 import DatabaseScopeVisualization from '@/components/homepage/DatabaseScopeVisualization';
+import DatabaseGrowthChart from '@/components/homepage/DatabaseGrowthChart';
 import { Globe, RefreshCw, Users2, Languages, Search, Building2, Target, Brain, MapPin, TrendingUp, Award } from 'lucide-react';
 import Image from 'next/image';
 
@@ -63,8 +64,8 @@ export default async function HomePage() {
               <span className="text-[#F0E68C]">FIALA</span>
             </h1>
             <div className="mt-2 mb-1">
-              <p className="text-2xl text-white font-medium leading-tight">Tracking Artificial Intelligence Funding for Africa</p>
-              <p className="text-xl text-[#4b9cd3] leading-tight">Financement pour l'Intelligence Artificielle en Afrique</p>
+              <p className="text-2xl text-white font-medium leading-tight">Comprehensive AI Intelligence Platform for Africa</p>
+              <p className="text-xl text-[#4b9cd3] leading-tight">Plateforme d'Intelligence Artificielle Complète pour l'Afrique</p>
             </div>
           </div>
 
@@ -89,7 +90,7 @@ export default async function HomePage() {
               </div>
               
               <p className="text-base sm:text-lg text-white leading-snug text-center mb-4">
-                Democratizing access to AI funding opportunities with equity, transparency, and accountability for funders, investors, researchers, and entrepreneurs.
+                Democratizing access to AI intelligence with comprehensive data collection, funding opportunities, policy insights, and market intelligence for the African AI ecosystem.
               </p>
               
               <div className="flex flex-wrap justify-center gap-x-6 gap-y-1">
@@ -113,7 +114,7 @@ export default async function HomePage() {
                 <input 
                   type="text" 
                   name="query" 
-                  placeholder="Search for AI grants, fellowships, accelerators..." 
+                  placeholder="Search AI funding, policy updates, market intelligence..." 
                   className="pl-10 w-full rounded-lg py-3 bg-white bg-opacity-90 border border-white border-opacity-50 focus:ring-2 focus:ring-accent focus:border-transparent text-gray-800"
                 />
               </div>
@@ -130,7 +131,7 @@ export default async function HomePage() {
               className="bg-[#F0E68C] hover:bg-[#E6D768] text-[#1F2A44] font-bold py-3 px-7 rounded-md text-base transition-colors shadow-md flex items-center gap-2"
             >
               <Search className="h-5 w-5" />
-              Explore All Opportunities
+              Explore AI Intelligence
             </Link>
             <Link 
               href="/funders" 
@@ -149,13 +150,13 @@ export default async function HomePage() {
           <div className="max-w-7xl mx-auto">
             <div className="flex flex-col md:flex-row justify-between items-center mb-12">
               <h2 className="text-3xl font-bold text-gray-800 mb-4 md:mb-0">
-                Live Analytics Dashboard
+                Live Intelligence Dashboard
               </h2>
               <div className="flex items-center space-x-2 text-[#4B9CD3]">
                 <svg className="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                 </svg>
-                <span className="text-sm font-medium">Realtime data from across Africa</span>
+                <span className="text-sm font-medium">Realtime intelligence from across Africa</span>
               </div>
             </div>
             
@@ -185,7 +186,7 @@ export default async function HomePage() {
                         <path fillRule="evenodd" d="M3.5 2a.5.5 0 01.5.5v14a.5.5 0 01-1 0v-14a.5.5 0 01.5-.5zm4 0a.5.5 0 01.5.5v14a.5.5 0 01-1 0v-14a.5.5 0 01.5-.5zm4 0a.5.5 0 01.5.5v14a.5.5 0 01-1 0v-14a.5.5 0 01.5-.5zm4 0a.5.5 0 01.5.5v14a.5.5 0 01-1 0v-14a.5.5 0 01.5-.5z" clipRule="evenodd" />
                       </svg>
                     </div>
-                    <h3 className="text-sm font-medium text-gray-500">Total Opportunities</h3>
+                    <h3 className="text-sm font-medium text-gray-500">Total Intelligence Records</h3>
                     <div className="mt-2 flex items-baseline">
                       <div className="text-4xl font-extrabold text-gray-800">
                         {summary.total_opportunities?.toLocaleString() || '127'}
@@ -197,7 +198,7 @@ export default async function HomePage() {
                         <span>+12%</span>
                       </div>
                     </div>
-                    <div className="text-xs text-gray-500 mt-1">From across Africa and global sources</div>
+                    <div className="text-xs text-gray-500 mt-1">Funding, policy, market & tech intelligence</div>
                   </div>
                   <div className="bg-[#4B9CD3] bg-opacity-10 px-5 py-2">
                     <div className="text-xs text-[#4B9CD3] font-medium flex justify-between">
@@ -215,7 +216,7 @@ export default async function HomePage() {
                         <path fillRule="evenodd" d="M5 2a1 1 0 011 1v1h8V3a1 1 0 112 0v1h1a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2h1V3a1 1 0 011-1zm11 14a1 1 0 001-1V6a1 1 0 00-1-1H5a1 1 0 00-1 1v10a1 1 0 001 1h11z" clipRule="evenodd" />
                       </svg>
                     </div>
-                    <h3 className="text-sm font-medium text-gray-500">Active Now</h3>
+                    <h3 className="text-sm font-medium text-gray-500">Active Opportunities</h3>
                     <div className="mt-2 flex items-baseline">
                       <div className="text-4xl font-extrabold text-gray-800">
                         {summary.active_opportunities?.toLocaleString() || '89'}
@@ -224,7 +225,7 @@ export default async function HomePage() {
                         <span>→</span>
                       </div>
                     </div>
-                    <div className="text-xs text-gray-500 mt-1">Current open application windows</div>
+                    <div className="text-xs text-gray-500 mt-1">Current open funding applications</div>
                   </div>
                   <div className="bg-[#F0E68C] bg-opacity-10 px-5 py-2">
                     <div className="text-xs text-[#F0E68C] font-medium flex justify-between">
@@ -243,7 +244,7 @@ export default async function HomePage() {
                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clipRule="evenodd" />
                       </svg>
                     </div>
-                    <h3 className="text-sm font-medium text-gray-500">Total Available Funding</h3>
+                    <h3 className="text-sm font-medium text-gray-500">Total AI Funding Tracked</h3>
                     <div className="mt-2 flex items-baseline">
                       <div className="text-4xl font-extrabold text-gray-800">
                         ${((summary.total_funding_value || 803200000) / 1000000).toFixed(1)}M
@@ -252,7 +253,7 @@ export default async function HomePage() {
                         <span>USD</span>
                       </div>
                     </div>
-                    <div className="text-xs text-gray-500 mt-1">Available for African AI initiatives (2019-2024), with $641M raised by AI startups (2022-2023)</div>
+                    <div className="text-xs text-gray-500 mt-1">Available for African AI initiatives (2019-2024)</div>
                   </div>
                   <div className="bg-[#4B9CD3] bg-opacity-10 px-5 py-2">
                     <div className="text-xs text-[#4B9CD3] font-medium flex justify-between">
@@ -270,21 +271,26 @@ export default async function HomePage() {
                         <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
                       </svg>
                     </div>
-                    <h3 className="text-sm font-medium text-gray-500">Global Funders</h3>
+                    <h3 className="text-sm font-medium text-gray-500">Data Sources</h3>
                     <div className="mt-2 flex items-baseline">
                       <div className="text-4xl font-extrabold text-gray-800">
                         {summary.unique_organizations?.toLocaleString() || '159'}
                       </div>
                     </div>
-                    <div className="text-xs text-gray-500 mt-1">Across 159 startups, with 5 countries dominating 90% of funding</div>
+                    <div className="text-xs text-gray-500 mt-1">RSS feeds, APIs, and intelligence sources</div>
                   </div>
                   <div className="bg-[#F0E68C] bg-opacity-10 px-5 py-2">
                     <div className="text-xs text-[#F0E68C] font-medium flex justify-between">
-                      <span>View funder profiles</span>
+                      <span>View data sources</span>
                       <span>→</span>
                     </div>
                   </div>
                 </div>
+              </div>
+              
+              {/* Database Growth Chart */}
+              <div className="mt-12">
+                <DatabaseGrowthChart className="" />
               </div>
               
               {/* Filters and Data Freshness */}
