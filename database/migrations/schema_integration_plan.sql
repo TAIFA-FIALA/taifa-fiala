@@ -7,7 +7,7 @@ the existing funding intelligence system to create a unified database for
 "All AI in Africa" - covering organizations, people, projects, funding, and intelligence.
 
 INTEGRATION STRATEGY:
-1. Connect existing funding_opportunities with new projects and contacts
+1. Connect existing africa_intelligence_feed with new projects and contacts
 2. Link organizations with comprehensive contact management
 3. Integrate financial tracking with funding intelligence
 4. Create unified views for complete business intelligence
@@ -22,13 +22,13 @@ the entire African AI ecosystem.
 -- 1. SCHEMA INTEGRATION CONNECTIONS
 -- ==========================================
 
--- Connect funding opportunities with projects
-ALTER TABLE projects ADD COLUMN IF NOT EXISTS funding_opportunity_id BIGINT REFERENCES funding_opportunities(id);
-CREATE INDEX IF NOT EXISTS idx_projects_funding_opportunity ON projects(funding_opportunity_id);
+-- Connect intelligence feed with projects
+ALTER TABLE projects ADD COLUMN IF NOT EXISTS intelligence_item_id BIGINT REFERENCES africa_intelligence_feed(id);
+CREATE INDEX IF NOT EXISTS idx_projects_intelligence_item ON projects(intelligence_item_id);
 
--- Connect funding opportunities with primary contacts
-ALTER TABLE funding_opportunities ADD COLUMN IF NOT EXISTS primary_contact_id BIGINT REFERENCES contacts(id);
-CREATE INDEX IF NOT EXISTS idx_funding_opportunities_contact ON funding_opportunities(primary_contact_id);
+-- Connect intelligence feed with primary contacts
+ALTER TABLE africa_intelligence_feed ADD COLUMN IF NOT EXISTS primary_contact_id BIGINT REFERENCES contacts(id);
+CREATE INDEX IF NOT EXISTS idx_africa_intelligence_feed_contact ON africa_intelligence_feed(primary_contact_id);
 
 -- Connect funding signals with contacts (who we heard about it from)
 ALTER TABLE funding_signals ADD COLUMN IF NOT EXISTS source_contact_id BIGINT REFERENCES contacts(id);
@@ -125,9 +125,9 @@ CREATE TRIGGER sync_contact_org_changes
 -- 4. UNIFIED PROJECT-FUNDING INTEGRATION
 -- ==========================================
 
--- Function to create projects from funding opportunities
-CREATE OR REPLACE FUNCTION create_project_from_funding_opportunity(
-    p_funding_opportunity_id BIGINT,
+-- Function to create projects from intelligence feed
+CREATE OR REPLACE FUNCTION create_project_from_intelligence_item(
+    p_intelligence_item_id BIGINT,
     p_organization_id BIGINT,
     p_project_manager_id BIGINT DEFAULT NULL
 ) RETURNS BIGINT AS $$
@@ -135,10 +135,10 @@ DECLARE
     v_project_id BIGINT;
     v_funding_opp RECORD;
 BEGIN
-    -- Get funding opportunity details
+    -- Get intelligence item details
     SELECT * INTO v_funding_opp 
-    FROM funding_opportunities 
-    WHERE id = p_funding_opportunity_id;
+    FROM africa_intelligence_feed 
+    WHERE id = p_intelligence_item_id;
     
     -- Create project
     INSERT INTO projects (
@@ -146,7 +146,7 @@ BEGIN
         description,
         project_type,
         organization_id,
-        funding_opportunity_id,
+        intelligence_item_id,
         project_manager_id,
         planned_start_date,
         planned_end_date,
@@ -163,7 +163,7 @@ BEGIN
         v_funding_opp.description,
         'funding_application',
         p_organization_id,
-        p_funding_opportunity_id,
+        p_intelligence_item_id,
         p_project_manager_id,
         CURRENT_DATE,
         v_funding_opp.deadline,
@@ -190,7 +190,7 @@ BEGIN
         status
     ) VALUES (
         'Project Budget: ' || v_funding_opp.title,
-        'Initial project budget based on funding opportunity',
+        'Initial project budget based on intelligence item',
         p_organization_id,
         v_project_id,
         'project',
@@ -234,7 +234,7 @@ SELECT
     COUNT(DISTINCT CASE WHEN p.project_type = 'research' THEN p.id END) as research_projects,
     
     -- Funding Overview
-    COUNT(DISTINCT fo.id) as total_funding_opportunities,
+    COUNT(DISTINCT fo.id) as total_africa_intelligence_feed,
     COUNT(DISTINCT CASE WHEN fo.status = 'active' THEN fo.id END) as active_opportunities,
     SUM(fo.funding_amount) as total_funding_available,
     
@@ -253,7 +253,7 @@ SELECT
 FROM organizations o
 LEFT JOIN contacts c ON o.id = c.organization_id
 LEFT JOIN projects p ON o.id = p.organization_id
-LEFT JOIN funding_opportunities fo ON o.id = fo.organization_id
+LEFT JOIN africa_intelligence_feed fo ON o.id = fo.organization_id
 LEFT JOIN budgets b ON o.id = b.organization_id
 LEFT JOIN financial_transactions ft ON o.id = ft.organization_id;
 
@@ -283,8 +283,8 @@ SELECT
     SUM(p.spent_amount) as total_project_spent,
     
     -- Funding Intelligence
-    COUNT(DISTINCT fo.id) as funding_opportunities_found,
-    COUNT(DISTINCT CASE WHEN fo.status = 'active' THEN fo.id END) as active_funding_opportunities,
+    COUNT(DISTINCT fo.id) as africa_intelligence_feed_found,
+    COUNT(DISTINCT CASE WHEN fo.status = 'active' THEN fo.id END) as active_africa_intelligence_feed,
     
     -- Communication Intelligence
     COUNT(DISTINCT ci.id) as total_interactions,
@@ -312,7 +312,7 @@ SELECT
 FROM organizations o
 LEFT JOIN contacts c ON o.id = c.organization_id
 LEFT JOIN projects p ON o.id = p.organization_id
-LEFT JOIN funding_opportunities fo ON o.id = fo.organization_id
+LEFT JOIN africa_intelligence_feed fo ON o.id = fo.organization_id
 LEFT JOIN contact_interactions ci ON c.id = ci.contact_id
 LEFT JOIN financial_transactions ft ON o.id = ft.organization_id
 LEFT JOIN funding_signals fs ON o.id = fs.organization_id
@@ -333,10 +333,10 @@ SELECT
     p.spent_amount,
     p.remaining_budget,
     
-    -- Funding Opportunity Details
-    fo.id as funding_opportunity_id,
-    fo.title as funding_opportunity_title,
-    fo.status as funding_opportunity_status,
+    -- Intelligence Item Details
+    fo.id as intelligence_item_id,
+    fo.title as intelligence_item_title,
+    fo.status as intelligence_item_status,
     fo.funding_amount as available_funding,
     fo.deadline as funding_deadline,
     
@@ -381,7 +381,7 @@ SELECT
     END as funding_status_description
 
 FROM projects p
-LEFT JOIN funding_opportunities fo ON p.funding_opportunity_id = fo.id
+LEFT JOIN africa_intelligence_feed fo ON p.intelligence_item_id = fo.id
 LEFT JOIN organizations o ON p.organization_id = o.id
 LEFT JOIN contacts pm ON p.project_manager_id = pm.id
 LEFT JOIN budgets b ON p.id = b.project_id AND b.status = 'active';
@@ -407,9 +407,9 @@ SELECT
     SUM(p.spent_amount) as total_project_spent,
     SUM(p.remaining_budget) as total_remaining_budget,
     
-    -- Funding Opportunity Pipeline
-    COUNT(DISTINCT fo.id) as total_funding_opportunities,
-    COUNT(DISTINCT CASE WHEN fo.status = 'active' THEN fo.id END) as active_funding_opportunities,
+    -- Intelligence Item Pipeline
+    COUNT(DISTINCT fo.id) as total_africa_intelligence_feed,
+    COUNT(DISTINCT CASE WHEN fo.status = 'active' THEN fo.id END) as active_africa_intelligence_feed,
     SUM(fo.funding_amount) as total_funding_available,
     
     -- Transaction Intelligence
@@ -440,7 +440,7 @@ SELECT
 
 FROM organizations o
 LEFT JOIN projects p ON o.id = p.organization_id
-LEFT JOIN funding_opportunities fo ON o.id = fo.organization_id
+LEFT JOIN africa_intelligence_feed fo ON o.id = fo.organization_id
 LEFT JOIN financial_transactions ft ON o.id = ft.organization_id
 LEFT JOIN budgets b ON o.id = b.organization_id;
 
@@ -493,13 +493,13 @@ BEGIN
         
     END LOOP;
     
-    -- Create projects for existing funding opportunities that don't have projects
+    -- Create projects for existing intelligence feed that don't have projects
     INSERT INTO projects (
         name,
         description,
         project_type,
         organization_id,
-        funding_opportunity_id,
+        intelligence_item_id,
         status,
         project_category,
         total_budget,
@@ -530,8 +530,8 @@ BEGIN
         fo.ai_domains,
         fo.geographic_scopes,
         fo.created_at
-    FROM funding_opportunities fo
-    WHERE fo.id NOT IN (SELECT DISTINCT funding_opportunity_id FROM projects WHERE funding_opportunity_id IS NOT NULL);
+    FROM africa_intelligence_feed fo
+    WHERE fo.id NOT IN (SELECT DISTINCT intelligence_item_id FROM projects WHERE intelligence_item_id IS NOT NULL);
     
     RAISE NOTICE 'Data migration completed successfully';
 END;
@@ -607,7 +607,7 @@ INTEGRATION COMPLETION SUMMARY
 This integration creates a unified database system that combines:
 
 1. EXISTING SYSTEMS:
-   ✅ Funding Intelligence (funding_opportunities, funding_signals, etc.)
+   ✅ Funding Intelligence (africa_intelligence_feed, funding_signals, etc.)
    ✅ AI Analysis (content processing, entity extraction, etc.)
    ✅ High-Volume Ingestion (raw_content, processed_content, etc.)
    ✅ Multilingual Support (translations, language management, etc.)

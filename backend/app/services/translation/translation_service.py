@@ -291,8 +291,8 @@ class TranslationService:
         
         # Create context-aware prompt
         context_prompts = {
-            ContentType.TITLE: "This is a funding opportunity title. Translate precisely while maintaining professional tone.",
-            ContentType.DESCRIPTION: "This is a funding opportunity description. Translate accurately while preserving technical terms and maintaining clarity.",
+            ContentType.TITLE: "This is a intelligence item title. Translate precisely while maintaining professional tone.",
+            ContentType.DESCRIPTION: "This is a intelligence item description. Translate accurately while preserving technical terms and maintaining clarity.",
             ContentType.TECHNICAL: "This is technical content about AI/technology funding. Preserve technical terminology and acronyms.",
             ContentType.LEGAL: "This is legal/formal text. Maintain formal register and precise legal terminology.",
             ContentType.MARKETING: "This is marketing content. Maintain persuasive tone and cultural appropriateness."
@@ -387,12 +387,12 @@ async def test_translation_service():
         # Test different content types
         test_cases = [
             {
-                "text": "AI Funding Opportunity for African Startups",
+                "text": "AI Intelligence Item for African Startups",
                 "content_type": ContentType.TITLE,
                 "description": "Title translation"
             },
             {
-                "text": "This funding opportunity supports artificial intelligence research and implementation projects across Africa, with a focus on healthcare, agriculture, and education applications.",
+                "text": "This intelligence item supports artificial intelligence research and implementation projects across Africa, with a focus on healthcare, agriculture, and education applications.",
                 "content_type": ContentType.DESCRIPTION,
                 "description": "Description translation"
             },

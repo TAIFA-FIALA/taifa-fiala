@@ -18,7 +18,7 @@ from pinecone import Pinecone, ServerlessSpec
 from pinecone.core.client.models import QueryResponse
 
 from app.core.vector_db_config import PineconeConfig, VectorIndexType, EmbeddingProvider, default_config
-from app.models.funding import FundingOpportunity
+from app.models.funding import AfricaIntelligenceItem
 from app.models.validation import ValidationResult
 from app.models.organization import Organization
 
@@ -81,8 +81,8 @@ class VectorDBIntegration:
             self.logger.error(f"Failed to initialize Pinecone: {e}")
             return False
     
-    async def index_funding_opportunity(self, opportunity: FundingOpportunity) -> bool:
-        """Index a funding opportunity with equity-aware metadata"""
+    async def index_intelligence_item(self, opportunity: AfricaIntelligenceItem) -> bool:
+        """Index a intelligence item with equity-aware metadata"""
         if not self.initialized:
             await self.initialize()
             
@@ -169,7 +169,7 @@ class VectorDBIntegration:
                                  filters: Optional[Dict[str, Any]] = None,
                                  top_k: int = 10) -> List[Dict[str, Any]]:
         """
-        Search for funding opportunities with equity-aware filtering
+        Search for intelligence feed with equity-aware filtering
         
         Parameters:
         - query: Search text (will be embedded by Microsoft's multilingual model)
@@ -233,7 +233,7 @@ class VectorDBIntegration:
             self.logger.error(f"Search failed: {e}")
             return []
     
-    def _prepare_opportunity_content(self, opportunity: FundingOpportunity) -> str:
+    def _prepare_opportunity_content(self, opportunity: AfricaIntelligenceItem) -> str:
         """Prepare opportunity content for embedding with multilingual support"""
         content_parts = [
             f"Title: {opportunity.title}",
@@ -276,7 +276,7 @@ class VectorDBIntegration:
         
         return "\n".join(content_parts)
     
-    def _prepare_opportunity_metadata(self, opportunity: FundingOpportunity) -> Dict[str, Any]:
+    def _prepare_opportunity_metadata(self, opportunity: AfricaIntelligenceItem) -> Dict[str, Any]:
         """Prepare metadata for opportunity with enhanced equity-aware fields"""
         metadata = {
             'opportunity_id': opportunity.id,
@@ -285,7 +285,7 @@ class VectorDBIntegration:
             'funding_amount': str(opportunity.funding_amount or '') if hasattr(opportunity, 'funding_amount') else '',
             'currency': opportunity.currency or 'USD' if hasattr(opportunity, 'currency') else 'USD',
             'status': opportunity.status or 'unknown' if hasattr(opportunity, 'status') else 'unknown',
-            'content_type': 'funding_opportunity',
+            'content_type': 'intelligence_item',
         }
         
         # Add deadline if available

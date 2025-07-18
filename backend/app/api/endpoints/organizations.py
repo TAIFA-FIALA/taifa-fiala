@@ -4,9 +4,9 @@ from sqlalchemy import distinct, func, and_, or_
 from typing import List, Optional, Dict, Any
 
 from app.core.database import get_db
-from app.models import Organization, FundingOpportunity
+from app.models import Organization, AfricaIntelligenceItem
 from app.schemas.organization import OrganizationResponse, OrganizationWithFundingResponse
-from app.schemas.funding import FundingOpportunityResponse # todo: not implemented
+from app.schemas.funding import AfricaIntelligenceItemResponse # todo: not implemented
 
 router = APIRouter()
 
@@ -77,15 +77,15 @@ async def get_organization_funding(
     
     # Get provided funding count and latest relationships
     if organization.role in ["provider", "both"]:
-        # Count provided funding opportunities
-        provided_count = db.query(func.count(FundingOpportunity.id)).filter(
-            FundingOpportunity.provider_organization_id == organization_id
+        # Count provided intelligence feed
+        provided_count = db.query(func.count(AfricaIntelligenceItem.id)).filter(
+            AfricaIntelligenceItem.provider_organization_id == organization_id
         ).scalar() or 0
         
-        # Get the latest provided funding opportunities
-        provided_funding = db.query(FundingOpportunity).filter(
-            FundingOpportunity.provider_organization_id == organization_id
-        ).order_by(FundingOpportunity.created_at.desc()).limit(limit_relationships).all()
+        # Get the latest provided intelligence feed
+        provided_funding = db.query(AfricaIntelligenceItem).filter(
+            AfricaIntelligenceItem.provider_organization_id == organization_id
+        ).order_by(AfricaIntelligenceItem.created_at.desc()).limit(limit_relationships).all()
         
         # Add to response
         response.provided_funding_count = provided_count
@@ -115,15 +115,15 @@ async def get_organization_funding(
     
     # Get received funding count and latest relationships
     if organization.role in ["recipient", "both"]:
-        # Count received funding opportunities
-        received_count = db.query(func.count(FundingOpportunity.id)).filter(
-            FundingOpportunity.recipient_organization_id == organization_id
+        # Count received intelligence feed
+        received_count = db.query(func.count(AfricaIntelligenceItem.id)).filter(
+            AfricaIntelligenceItem.recipient_organization_id == organization_id
         ).scalar() or 0
         
-        # Get the latest received funding opportunities
-        received_funding = db.query(FundingOpportunity).filter(
-            FundingOpportunity.recipient_organization_id == organization_id
-        ).order_by(FundingOpportunity.created_at.desc()).limit(limit_relationships).all()
+        # Get the latest received intelligence feed
+        received_funding = db.query(AfricaIntelligenceItem).filter(
+            AfricaIntelligenceItem.recipient_organization_id == organization_id
+        ).order_by(AfricaIntelligenceItem.created_at.desc()).limit(limit_relationships).all()
         
         # Add to response
         response.received_funding_count = received_count
@@ -162,7 +162,7 @@ async def get_unique_countries(db: Session = Depends(get_db)):
 @router.get("/providers", response_model=List[OrganizationResponse])
 async def get_funding_providers(
     provider_type: Optional[str] = Query(None, description="Filter by specific provider type (granting_agency, venture_capital, angel_investor, accelerator)"),
-    min_funding_count: int = Query(0, ge=0, description="Minimum number of funding opportunities provided"),
+    min_funding_count: int = Query(0, ge=0, description="Minimum number of intelligence feed provided"),
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=200),
     db: Session = Depends(get_db)
@@ -183,7 +183,7 @@ async def get_funding_providers(
         # Filter organizations that have provided at least min_funding_count opportunities
         query = query.join(Organization.provided_funding)\
             .group_by(Organization.id)\
-            .having(func.count(FundingOpportunity.id) >= min_funding_count)
+            .having(func.count(AfricaIntelligenceItem.id) >= min_funding_count)
     
     providers = query.offset(skip).limit(limit).all()
     return providers
@@ -224,24 +224,24 @@ async def get_funding_relationships(
     db: Session = Depends(get_db)
 ):
     """Get funding relationships between providers and recipients"""
-    # Query funding opportunities with provider and recipient information
-    query = db.query(FundingOpportunity)\
+    # Query intelligence feed with provider and recipient information
+    query = db.query(AfricaIntelligenceItem)\
         .options(
-            joinedload(FundingOpportunity.provider_organization),
-            joinedload(FundingOpportunity.recipient_organization),
-            joinedload(FundingOpportunity.type)
+            joinedload(AfricaIntelligenceItem.provider_organization),
+            joinedload(AfricaIntelligenceItem.recipient_organization),
+            joinedload(AfricaIntelligenceItem.type)
         )
     
     # Apply filters
     if provider_id:
-        query = query.filter(FundingOpportunity.provider_organization_id == provider_id)
+        query = query.filter(AfricaIntelligenceItem.provider_organization_id == provider_id)
     if recipient_id:
-        query = query.filter(FundingOpportunity.recipient_organization_id == recipient_id)
+        query = query.filter(AfricaIntelligenceItem.recipient_organization_id == recipient_id)
     
-    # Get funding opportunities with relationships
+    # Get intelligence feed with relationships
     opportunities = query.filter(
-        FundingOpportunity.provider_organization_id != None,
-        FundingOpportunity.recipient_organization_id != None
+        AfricaIntelligenceItem.provider_organization_id != None,
+        AfricaIntelligenceItem.recipient_organization_id != None
     ).limit(limit).all()
     
     # Group by provider type

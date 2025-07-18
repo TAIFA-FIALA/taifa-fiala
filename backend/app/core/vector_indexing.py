@@ -18,7 +18,7 @@ from pinecone import Pinecone, ServerlessSpec
 
 from .etl_architecture import ETLTask, PipelineStage, Priority, ProcessingResult
 from .vector_db_config import PineconeConfig, VectorIndexType, default_config
-from ..models.funding import FundingOpportunity
+from ..models.funding import AfricaIntelligenceItem
 from ..models.organization import Organization
 
 # Configure logging
@@ -84,8 +84,8 @@ class VectorIndexingService:
             payload = task.payload
             data_type = payload.get('data_type')
             
-            if data_type == 'funding_opportunity':
-                return await self._index_funding_opportunity(task)
+            if data_type == 'intelligence_item':
+                return await self._index_intelligence_item(task)
             elif data_type == 'organization':
                 return await self._index_organization(task)
             elif data_type == 'crawl4ai_result':
@@ -109,8 +109,8 @@ class VectorIndexingService:
                 error=str(e)
             )
     
-    async def _index_funding_opportunity(self, task: ETLTask) -> ProcessingResult:
-        """Index a funding opportunity in the vector database"""
+    async def _index_intelligence_item(self, task: ETLTask) -> ProcessingResult:
+        """Index a intelligence item in the vector database"""
         opportunity_data = task.payload.get('opportunity')
         
         if not opportunity_data:
@@ -329,7 +329,7 @@ class VectorIndexingService:
                     'confidence_score': str(opportunity.get('confidence_score', 0.85)),  # Higher default confidence for RSS
                     'requires_review': False,  # Trusted sources need less review
                     'extraction_method': 'rss_feed',
-                    'content_type': 'funding_opportunity',
+                    'content_type': 'intelligence_item',
                     'published_date': published_date
                 }
                 
@@ -486,7 +486,7 @@ class VectorIndexingService:
                     'confidence_score': str(opportunity.get('confidence_score', 0)),
                     'requires_review': opportunity.get('requires_review', True),
                     'extraction_method': opportunity.get('extraction_method', 'crawl4ai'),
-                    'content_type': 'funding_opportunity',
+                    'content_type': 'intelligence_item',
                 }
                 
                 # Add funding category if available
@@ -655,7 +655,7 @@ class VectorIndexingService:
             'funding_amount': str(opportunity_data.get('funding_amount', '')),
             'currency': opportunity_data.get('currency', 'USD'),
             'status': opportunity_data.get('status', 'unknown'),
-            'content_type': 'funding_opportunity',
+            'content_type': 'intelligence_item',
         }
         
         # Add organization role information

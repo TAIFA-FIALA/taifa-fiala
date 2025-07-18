@@ -64,7 +64,7 @@ class DatabaseConnector:
         async with self.pool.acquire() as conn:
             # Create opportunities table if it doesn't exist
             await conn.execute("""
-                CREATE TABLE IF NOT EXISTS funding_opportunities (
+                CREATE TABLE IF NOT EXISTS africa_intelligence_feed (
                     id SERIAL PRIMARY KEY,
                     title TEXT NOT NULL,
                     description TEXT,
@@ -97,10 +97,10 @@ class DatabaseConnector:
                     active BOOLEAN DEFAULT TRUE
                 );
                 
-                CREATE INDEX IF NOT EXISTS idx_content_hash ON funding_opportunities(content_hash);
-                CREATE INDEX IF NOT EXISTS idx_source_type ON funding_opportunities(source_type);
-                CREATE INDEX IF NOT EXISTS idx_relevance_score ON funding_opportunities(overall_relevance_score);
-                CREATE INDEX IF NOT EXISTS idx_discovered_date ON funding_opportunities(discovered_date);
+                CREATE INDEX IF NOT EXISTS idx_content_hash ON africa_intelligence_feed(content_hash);
+                CREATE INDEX IF NOT EXISTS idx_source_type ON africa_intelligence_feed(source_type);
+                CREATE INDEX IF NOT EXISTS idx_relevance_score ON africa_intelligence_feed(overall_relevance_score);
+                CREATE INDEX IF NOT EXISTS idx_discovered_date ON africa_intelligence_feed(discovered_date);
             """)
             
             logger.info("✅ Database tables verified/created")
@@ -119,7 +119,7 @@ class DatabaseConnector:
                 try:
                     # Check for duplicates by content hash
                     existing = await conn.fetchrow(
-                        "SELECT id FROM funding_opportunities WHERE content_hash = $1",
+                        "SELECT id FROM africa_intelligence_feed WHERE content_hash = $1",
                         opp.get("content_hash")
                     )
                     
@@ -141,7 +141,7 @@ class DatabaseConnector:
                     
                     # Insert opportunity
                     await conn.execute("""
-                        INSERT INTO funding_opportunities (
+                        INSERT INTO africa_intelligence_feed (
                             title, description, source_url, organization_name,
                             funding_amount, deadline, application_url,
                             source_type, source_name, search_query,
@@ -252,7 +252,7 @@ class DatabaseConnector:
             URL: {opp.get('source_url', '')}
             """
             
-            prompt = f"""Parse this funding opportunity and extract structured information. 
+            prompt = f"""Parse this intelligence item and extract structured information. 
             Return JSON only with these fields:
             {{
                 "organization_name": "name of funding organization",
@@ -334,7 +334,7 @@ class DatabaseConnector:
                     ai_relevance_score, africa_relevance_score,
                     funding_relevance_score, overall_relevance_score,
                     discovered_date, parsed_with_ai
-                FROM funding_opportunities 
+                FROM africa_intelligence_feed 
                 WHERE active = true
                 ORDER BY discovered_date DESC 
                 LIMIT $1
@@ -354,7 +354,7 @@ class DatabaseConnector:
                     AVG(overall_relevance_score) as avg_relevance_score,
                     COUNT(*) FILTER (WHERE discovered_date >= NOW() - INTERVAL '24 hours') as today_opportunities,
                     COUNT(*) FILTER (WHERE discovered_date >= NOW() - INTERVAL '7 days') as week_opportunities
-                FROM funding_opportunities 
+                FROM africa_intelligence_feed 
                 WHERE active = true
             """)
             

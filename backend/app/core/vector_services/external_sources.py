@@ -155,7 +155,7 @@ async def _index_crawl4ai_result(self, task: ETLTask) -> ProcessingResult:
                 'confidence_score': str(opportunity.get('confidence_score', 0.7)),
                 'requires_review': opportunity.get('requires_review', True),
                 'extraction_method': 'crawl4ai',
-                'content_type': 'funding_opportunity'
+                'content_type': 'intelligence_item'
             }
             
             # Add organization role information if available
@@ -404,7 +404,7 @@ async def _index_rss_feed_result(self, task: ETLTask) -> ProcessingResult:
                 'confidence_score': str(opportunity.get('confidence_score', 0.85)),  # Higher default confidence for RSS
                 'requires_review': False,  # Trusted sources need less review
                 'extraction_method': 'rss_feed',
-                'content_type': 'funding_opportunity',
+                'content_type': 'intelligence_item',
                 'published_date': published_date
             }
             

@@ -219,12 +219,12 @@ class ScrapingQueueProcessor:
         fields_text = ", ".join(item.requested_fields)
         
         extraction_prompt = f"""
-        Extract the following information from this funding opportunity webpage:
+        Extract the following information from this intelligence item webpage:
         
         Required fields: {fields_text}
         
         Please extract:
-        - Title: The main title of the funding opportunity
+        - Title: The main title of the intelligence item
         - Description: A comprehensive description of the opportunity
         - Amount: Any funding amounts mentioned
         - Deadline: Application deadline or closing date
@@ -232,7 +232,7 @@ class ScrapingQueueProcessor:
         - Application Process: How to apply
         - Contact Information: Contact details for inquiries
         
-        Context: {item.source_context or 'General funding opportunity'}
+        Context: {item.source_context or 'General intelligence item'}
         
         Return the information in JSON format with clear field names.
         """
@@ -304,9 +304,9 @@ class ScrapingQueueProcessor:
             logger.error(f"❌ Error saving scraping result: {e}")
     
     async def _update_opportunity_with_scraped_data(self, opportunity_id: int, scraped_data: Dict[str, Any]):
-        """Update the funding opportunity with scraped data"""
+        """Update the intelligence item with scraped data"""
         try:
-            # Update funding_opportunities table with scraped data
+            # Update intelligence_feed table with scraped data
             update_data = {}
             
             # Map scraped fields to opportunity fields
@@ -329,7 +329,7 @@ class ScrapingQueueProcessor:
                 update_data['contact_information'] = scraped_data['contact_information']
             
             if update_data:
-                result = self.supabase.table('funding_opportunities').update(update_data).eq('id', opportunity_id).execute()
+                result = self.supabase.table('africa_intelligence_feed').update(update_data).eq('id', opportunity_id).execute()
                 logger.info(f"✅ Updated opportunity {opportunity_id} with scraped data")
                 
         except Exception as e:
@@ -421,7 +421,7 @@ async def main():
         url="https://idrc-crdi.ca/en/funding",
         requested_fields=["title", "description", "deadline", "amount"],
         priority="high",
-        source_context="Testing queue system for IDRC funding opportunities"
+        source_context="Testing queue system for IDRC funding intelligence_items"
     )
     
     logger.info("✅ Queue processor test completed")

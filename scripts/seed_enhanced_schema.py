@@ -318,7 +318,7 @@ async def update_existing_opportunities():
     try:
         # Set default status for existing opportunities
         updated_status = await conn.execute("""
-            UPDATE funding_opportunities 
+            UPDATE africa_intelligence_feed 
             SET status = CASE 
                 WHEN deadline IS NULL THEN 'open'
                 WHEN deadline < CURRENT_DATE THEN 'closed' 
@@ -329,7 +329,7 @@ async def update_existing_opportunities():
         
         # Set default currency based on content analysis
         await conn.execute("""
-            UPDATE funding_opportunities 
+            UPDATE africa_intelligence_feed 
             SET currency = CASE 
                 WHEN funding_amount ILIKE '%€%' OR funding_amount ILIKE '%eur%' THEN 'EUR'
                 WHEN funding_amount ILIKE '%£%' OR funding_amount ILIKE '%gbp%' THEN 'GBP'
@@ -342,7 +342,7 @@ async def update_existing_opportunities():
         
         # Set view_count and application_count to 0 for existing records
         await conn.execute("""
-            UPDATE funding_opportunities 
+            UPDATE africa_intelligence_feed 
             SET view_count = 0, application_count = 0 
             WHERE view_count IS NULL OR application_count IS NULL
         """)

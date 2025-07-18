@@ -22,7 +22,7 @@ class UserRole(Enum):
     ADMIN = "admin"             # Platform administration
 
 class ContributionType(Enum):
-    FUNDING_OPPORTUNITY = "funding_opportunity"
+    FUNDING_OPPORTUNITY = "intelligence_item"
     TRANSLATION_IMPROVEMENT = "translation_improvement"
     CONTENT_VALIDATION = "content_validation"
     SUCCESS_STORY = "success_story"
@@ -163,7 +163,7 @@ CREATE TABLE IF NOT EXISTS community_discussions (
     author_id INTEGER REFERENCES community_users(id),
     
     -- Discussion context
-    context_type VARCHAR(50), -- 'funding_opportunity', 'general', 'feature_request'
+    context_type VARCHAR(50), -- 'intelligence_item', 'general', 'feature_request'
     context_id INTEGER, -- ID of related item
     
     -- Engagement
@@ -406,7 +406,7 @@ $$ LANGUAGE plpgsql;
 -- Insert community badges
 INSERT INTO community_badges (name, description, icon, category, requirements, auto_award) VALUES
 ('New Contributor', 'Welcome to the community! Your first approved contribution.', '🌱', 'contribution', '{"min_contributions": 1}', TRUE),
-('Opportunity Hunter', 'Discovered and shared 10+ funding opportunities.', '🔍', 'contribution', '{"min_contributions": 10}', TRUE),
+('Opportunity Hunter', 'Discovered and shared 10+ intelligence feed.', '🔍', 'contribution', '{"min_contributions": 10}', TRUE),
 ('Quality Validator', 'Provided 50+ helpful peer reviews.', '✅', 'validation', '{"min_validations": 50}', TRUE),
 ('Translation Expert', 'Improved 100+ translations for better accessibility.', '🌐', 'contribution', '{"min_translations": 100}', TRUE),
 ('Knowledge Sharer', 'Shared 5+ success stories or best practices.', '📚', 'community', '{"min_stories": 5}', TRUE),

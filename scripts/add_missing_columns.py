@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
-Add Missing Columns to funding_opportunities Table
+Add Missing Columns to africa_intelligence_feed Table
 =================================================
 
 This script adds the missing columns needed for data ingestion
-to the existing funding_opportunities table.
+to the existing africa_intelligence_feed table.
 """
 
 import os
@@ -15,27 +15,27 @@ from supabase import create_client
 load_dotenv()
 
 def add_missing_columns():
-    """Add missing columns to funding_opportunities table"""
+    """Add missing columns to africa_intelligence_feed table"""
     
     client = create_client(os.getenv('SUPABASE_PROJECT_URL'), os.getenv('SUPABASE_API_KEY'))
     
     # SQL to add missing columns
     alter_statements = [
-        "ALTER TABLE funding_opportunities ADD COLUMN IF NOT EXISTS funding_type VARCHAR(100);",
-        "ALTER TABLE funding_opportunities ADD COLUMN IF NOT EXISTS application_deadline TIMESTAMP;",
-        "ALTER TABLE funding_opportunities ADD COLUMN IF NOT EXISTS funding_amount VARCHAR(200);",
-        "ALTER TABLE funding_opportunities ADD COLUMN IF NOT EXISTS eligibility_criteria TEXT;",
-        "ALTER TABLE funding_opportunities ADD COLUMN IF NOT EXISTS application_process TEXT;",
-        "ALTER TABLE funding_opportunities ADD COLUMN IF NOT EXISTS contact_information TEXT;",
-        "ALTER TABLE funding_opportunities ADD COLUMN IF NOT EXISTS additional_notes TEXT;",
-        "ALTER TABLE funding_opportunities ADD COLUMN IF NOT EXISTS source_url VARCHAR(2000);",
-        "ALTER TABLE funding_opportunities ADD COLUMN IF NOT EXISTS source_type VARCHAR(50) DEFAULT 'rss';",
-        "ALTER TABLE funding_opportunities ADD COLUMN IF NOT EXISTS collected_at TIMESTAMP DEFAULT NOW();",
-        "ALTER TABLE funding_opportunities ADD COLUMN IF NOT EXISTS keywords JSONB;",
-        "ALTER TABLE funding_opportunities ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'active';"
+        "ALTER TABLE africa_intelligence_feed ADD COLUMN IF NOT EXISTS funding_type VARCHAR(100);",
+        "ALTER TABLE africa_intelligence_feed ADD COLUMN IF NOT EXISTS application_deadline TIMESTAMP;",
+        "ALTER TABLE africa_intelligence_feed ADD COLUMN IF NOT EXISTS funding_amount VARCHAR(200);",
+        "ALTER TABLE africa_intelligence_feed ADD COLUMN IF NOT EXISTS eligibility_criteria TEXT;",
+        "ALTER TABLE africa_intelligence_feed ADD COLUMN IF NOT EXISTS application_process TEXT;",
+        "ALTER TABLE africa_intelligence_feed ADD COLUMN IF NOT EXISTS contact_information TEXT;",
+        "ALTER TABLE africa_intelligence_feed ADD COLUMN IF NOT EXISTS additional_notes TEXT;",
+        "ALTER TABLE africa_intelligence_feed ADD COLUMN IF NOT EXISTS source_url VARCHAR(2000);",
+        "ALTER TABLE africa_intelligence_feed ADD COLUMN IF NOT EXISTS source_type VARCHAR(50) DEFAULT 'rss';",
+        "ALTER TABLE africa_intelligence_feed ADD COLUMN IF NOT EXISTS collected_at TIMESTAMP DEFAULT NOW();",
+        "ALTER TABLE africa_intelligence_feed ADD COLUMN IF NOT EXISTS keywords JSONB;",
+        "ALTER TABLE africa_intelligence_feed ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'active';"
     ]
     
-    print("Adding missing columns to funding_opportunities table...")
+    print("Adding missing columns to africa_intelligence_feed table...")
     print("=" * 60)
     
     success_count = 0
@@ -79,12 +79,12 @@ def add_missing_columns():
     }
     
     try:
-        result = client.table('funding_opportunities').insert(test_record).execute()
+        result = client.table('africa_intelligence_feed').insert(test_record).execute()
         print("✅ Schema test successful! All columns are working.")
         
         # Clean up test record
         if result.data:
-            client.table('funding_opportunities').delete().eq('title', 'Schema Test').execute()
+            client.table('africa_intelligence_feed').delete().eq('title', 'Schema Test').execute()
             print("✅ Test record cleaned up")
         
         return True
@@ -102,7 +102,7 @@ def show_manual_instructions():
     print("="*60)
     print("\nIf the automatic column addition failed, you can add them manually:")
     print("\n1. Go to your Supabase Dashboard")
-    print("2. Navigate to Table Editor > funding_opportunities")
+    print("2. Navigate to Table Editor > africa_intelligence_feed")
     print("3. Click 'Add Column' and add these columns:")
     print()
     
@@ -138,4 +138,4 @@ if __name__ == "__main__":
         show_manual_instructions()
     else:
         print("\n✅ Database schema is now ready for data ingestion!")
-        print("\nYou can now run: python start_data_ingestion.py")
+        print("\nYou can now run: python tools/ingestion/start_data_ingestion.py")

@@ -169,5 +169,5 @@ class SuggestedOpportunity(Base):
     # Relationships
     collaboration_id = Column(Integer, ForeignKey("collaboration_suggestions.id"))
     collaboration = relationship("CollaborationSuggestion", back_populates="suggested_opportunities")
-    funding_opportunity_id = Column(Integer, ForeignKey("funding_opportunities.id"), nullable=True)
-    funding_opportunity = relationship("FundingOpportunity")
+    intelligence_item_id = Column(Integer, ForeignKey("africa_intelligence_feed.id"), nullable=True)
+    intelligence_item = relationship("AfricaIntelligenceItem")

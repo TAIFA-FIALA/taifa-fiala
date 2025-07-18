@@ -70,7 +70,7 @@ def main():
     if page == t("nav.dashboard"):
         show_dashboard()
     elif page == t("nav.opportunities"):
-        show_funding_opportunities()
+        show_africa_intelligence_feed()
     elif page == t("nav.organizations"):
         show_organizations()
     elif page == t("nav.analytics"):
@@ -174,7 +174,7 @@ def show_dashboard():
     
     if api_connected and opportunities:
         # Show real recent opportunities
-        st.subheader("🆕 Recent Funding Opportunities")
+        st.subheader("🆕 Recent Intelligence Feed")
         
         # Sort by created date and show top 5
         sorted_opps = sorted(
@@ -217,10 +217,10 @@ def show_dashboard():
                 ])
                 
                 fig = px.line(chart_data, x='Date', y='Opportunities', 
-                            title='Daily Funding Opportunity Discoveries')
+                            title='Daily Intelligence Item Discoveries')
                 st.plotly_chart(fig, use_container_width=True)
     else:
-        st.info("📊 Connect to the API to see real funding opportunities and trends.")
+        st.info("📊 Connect to the API to see real intelligence feed and trends.")
         
         # Sample chart placeholder
         chart_data = pd.DataFrame({
@@ -231,7 +231,7 @@ def show_dashboard():
         fig = px.line(chart_data, x='Month', y='Funding', title='Monthly Funding Trends (Demo)')
         st.plotly_chart(fig, use_container_width=True)
 
-def show_funding_opportunities():
+def show_africa_intelligence_feed():
     """Funding opportunities page with real search"""
     st.header("💰 " + t("opportunities.title"))
     
@@ -356,7 +356,7 @@ def show_funding_opportunities():
     else:
         # API not connected - show demo message
         st.warning("⚠️ Backend API not connected")
-        st.info("**Demo Mode:** Start the FastAPI server to see real funding opportunities.")
+        st.info("**Demo Mode:** Start the FastAPI server to see real intelligence feed.")
         
         # Show sample data structure
         st.subheader("📋 Expected Data Format")
@@ -409,7 +409,7 @@ def show_search():
     """Search page"""
     st.header("🔍 Search")
     
-    search_query = st.text_input("Search funding opportunities", placeholder="e.g., AI healthcare grants")
+    search_query = st.text_input("Search intelligence feed", placeholder="e.g., AI healthcare grants")
     
     if st.button("Search") or search_query:
         if search_query:
@@ -464,7 +464,7 @@ def show_rwanda_demo():
         st.info("This shows how users experience TAIFA - instant search of local database")
         
         search_query = st.text_input(
-            "Search for funding opportunities:", 
+            "Search for intelligence feed:", 
             placeholder="Try: Rwanda AI, healthcare, grants, innovation"
         )
         
@@ -573,7 +573,7 @@ def run_rwanda_demo_pipeline(search_query: str):
     # Step 1: SERPER Discovery
     st.markdown("### 🔍 Step 1: Discovering Opportunities with SERPER")
     
-    with st.spinner("Searching for Rwanda funding opportunities..."):
+    with st.spinner("Searching for Rwanda intelligence feed..."):
         # Simulate SERPER discovery (in real demo, this would call the actual script)
         import time
         time.sleep(2)  # Simulate API call
@@ -598,7 +598,7 @@ def run_rwanda_demo_pipeline(search_query: str):
             }
         ]
     
-    st.success(f"✅ Discovered {len(demo_opportunities)} new funding opportunities!")
+    st.success(f"✅ Discovered {len(demo_opportunities)} new intelligence feed!")
     
     # Show discovered opportunities
     for i, opp in enumerate(demo_opportunities, 1):
@@ -663,16 +663,16 @@ def run_rwanda_demo_pipeline(search_query: str):
     with col3:
         st.metric("Searchable", len(search_results) if search_results else 0)
     
-    st.success("✅ **Demo Impact:** TAIFA can now help Rwandan researchers discover AI funding opportunities in real-time!")
+    st.success("✅ **Demo Impact:** TAIFA can now help Rwandan researchers discover AI intelligence feed in real-time!")
 
 def show_submit_opportunity():
     """Enhanced submit opportunity page"""
     st.header("📝 " + t("nav.submit"))
     
     st.markdown("""
-    ### Submit a Funding Opportunity
+    ### Submit a Intelligence Item
     
-    Help grow the TAIFA database by submitting funding opportunities you've discovered.
+    Help grow the TAIFA database by submitting intelligence feed you've discovered.
     All submissions are reviewed before being added to the platform.
     """)
     
@@ -699,7 +699,7 @@ def show_submit_opportunity():
         
         description = st.text_area(
             "Description*", 
-            placeholder="Describe the funding opportunity, eligibility criteria, and focus areas...",
+            placeholder="Describe the intelligence item, eligibility criteria, and focus areas...",
             height=100
         )
         
@@ -766,7 +766,7 @@ def show_submit_opportunity():
     with col1:
         st.markdown("""
         **✅ What to Submit:**
-        - AI/technology funding opportunities
+        - AI/technology intelligence feed
         - Grants, scholarships, prizes, accelerators
         - Africa-focused or inclusive programs
         - Active or upcoming opportunities
@@ -944,7 +944,7 @@ def run_complete_architecture_demo():
         """)
     
     st.success("""
-    🎯 **Bottom Line:** TAIFA gives African researchers instant access to global funding opportunities, 
+    🎯 **Bottom Line:** TAIFA gives African researchers instant access to global intelligence feed, 
     updated daily, accessible in multiple languages, without requiring high-speed internet.
     """)
 
@@ -955,7 +955,7 @@ def show_search():
     st.info("⚡ **Instant Search** - Results from local database (no internet dependency)")
     
     search_query = st.text_input(
-        "Search funding opportunities", 
+        "Search intelligence feed", 
         placeholder="e.g., Rwanda AI, healthcare grants, innovation prizes"
     )
     

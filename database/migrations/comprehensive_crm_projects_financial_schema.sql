@@ -188,7 +188,7 @@ CREATE TABLE IF NOT EXISTS projects (
     
     -- Relationships
     organization_id BIGINT REFERENCES organizations(id),
-    funding_opportunity_id BIGINT REFERENCES funding_opportunities(id),
+    intelligence_item_id BIGINT REFERENCES africa_intelligence_feed(id),
     parent_project_id BIGINT REFERENCES projects(id), -- For sub-projects
     
     -- Project Management
@@ -864,7 +864,7 @@ CREATE INDEX IF NOT EXISTS idx_contact_interactions_org_id ON contact_interactio
 CREATE INDEX IF NOT EXISTS idx_projects_organization_id ON projects(organization_id);
 CREATE INDEX IF NOT EXISTS idx_projects_status ON projects(status);
 CREATE INDEX IF NOT EXISTS idx_projects_project_manager_id ON projects(project_manager_id);
-CREATE INDEX IF NOT EXISTS idx_projects_funding_opportunity_id ON projects(funding_opportunity_id);
+CREATE INDEX IF NOT EXISTS idx_projects_intelligence_item_id ON projects(intelligence_item_id);
 CREATE INDEX IF NOT EXISTS idx_projects_start_date ON projects(planned_start_date);
 CREATE INDEX IF NOT EXISTS idx_projects_end_date ON projects(planned_end_date);
 

@@ -103,8 +103,8 @@ async def apply_migration_step_by_step():
             except Exception as e:
                 print(f"   ⚠️  Foreign key constraint: {e}")
         
-        # Step 3: Add columns to funding_opportunities
-        print("\n3️⃣ Enhancing funding_opportunities table...")
+        # Step 3: Add columns to africa_intelligence_feed
+        print("\n3️⃣ Enhancing africa_intelligence_feed table...")
         
         opportunity_columns = [
             ("type_id", "INTEGER"),
@@ -120,7 +120,7 @@ async def apply_migration_step_by_step():
         
         for col_name, col_def in opportunity_columns:
             try:
-                await conn.execute(f"ALTER TABLE funding_opportunities ADD COLUMN IF NOT EXISTS {col_name} {col_def}")
+                await conn.execute(f"ALTER TABLE africa_intelligence_feed ADD COLUMN IF NOT EXISTS {col_name} {col_def}")
                 print(f"   ✅ Added column: {col_name}")
             except Exception as e:
                 print(f"   ⚠️  Column {col_name}: {e}")
@@ -132,14 +132,14 @@ async def apply_migration_step_by_step():
             column_exists = await conn.fetchval("""
                 SELECT EXISTS (
                     SELECT 1 FROM information_schema.columns 
-                    WHERE table_name = 'funding_opportunities' 
+                    WHERE table_name = 'africa_intelligence_feed' 
                     AND column_name = 'deadline_urgency'
                 )
             """)
             
             if not column_exists:
                 await conn.execute("""
-                    ALTER TABLE funding_opportunities 
+                    ALTER TABLE africa_intelligence_feed 
                     ADD COLUMN deadline_urgency VARCHAR(10) 
                     GENERATED ALWAYS AS (
                         CASE 
@@ -189,22 +189,22 @@ async def apply_migration_step_by_step():
         
         junction_tables = [
             {
-                "name": "funding_opportunity_ai_domains",
+                "name": "intelligence_item_ai_domains",
                 "sql": """
-                    CREATE TABLE IF NOT EXISTS funding_opportunity_ai_domains (
-                        funding_opportunity_id INTEGER NOT NULL,
+                    CREATE TABLE IF NOT EXISTS intelligence_item_ai_domains (
+                        intelligence_item_id INTEGER NOT NULL,
                         ai_domain_id INTEGER NOT NULL,
-                        PRIMARY KEY (funding_opportunity_id, ai_domain_id)
+                        PRIMARY KEY (intelligence_item_id, ai_domain_id)
                     )
                 """
             },
             {
-                "name": "funding_opportunity_geographic_scopes",
+                "name": "intelligence_item_geographic_scopes",
                 "sql": """
-                    CREATE TABLE IF NOT EXISTS funding_opportunity_geographic_scopes (
-                        funding_opportunity_id INTEGER NOT NULL,
+                    CREATE TABLE IF NOT EXISTS intelligence_item_geographic_scopes (
+                        intelligence_item_id INTEGER NOT NULL,
                         geographic_scope_id INTEGER NOT NULL,
-                        PRIMARY KEY (funding_opportunity_id, geographic_scope_id)
+                        PRIMARY KEY (intelligence_item_id, geographic_scope_id)
                     )
                 """
             },
@@ -231,14 +231,14 @@ async def apply_migration_step_by_step():
         print("\n7️⃣ Adding junction table foreign keys...")
         
         junction_fks = [
-            "ALTER TABLE funding_opportunity_ai_domains ADD CONSTRAINT fk_fo_ai_domains_fo FOREIGN KEY (funding_opportunity_id) REFERENCES funding_opportunities(id) ON DELETE CASCADE",
-            "ALTER TABLE funding_opportunity_ai_domains ADD CONSTRAINT fk_fo_ai_domains_ai FOREIGN KEY (ai_domain_id) REFERENCES ai_domains(id) ON DELETE CASCADE",
-            "ALTER TABLE funding_opportunity_geographic_scopes ADD CONSTRAINT fk_fo_geo_scopes_fo FOREIGN KEY (funding_opportunity_id) REFERENCES funding_opportunities(id) ON DELETE CASCADE",
-            "ALTER TABLE funding_opportunity_geographic_scopes ADD CONSTRAINT fk_fo_geo_scopes_geo FOREIGN KEY (geographic_scope_id) REFERENCES geographic_scopes(id) ON DELETE CASCADE",
+            "ALTER TABLE intelligence_item_ai_domains ADD CONSTRAINT fk_fo_ai_domains_fo FOREIGN KEY (intelligence_item_id) REFERENCES africa_intelligence_feed(id) ON DELETE CASCADE",
+            "ALTER TABLE intelligence_item_ai_domains ADD CONSTRAINT fk_fo_ai_domains_ai FOREIGN KEY (ai_domain_id) REFERENCES ai_domains(id) ON DELETE CASCADE",
+            "ALTER TABLE intelligence_item_geographic_scopes ADD CONSTRAINT fk_fo_geo_scopes_fo FOREIGN KEY (intelligence_item_id) REFERENCES africa_intelligence_feed(id) ON DELETE CASCADE",
+            "ALTER TABLE intelligence_item_geographic_scopes ADD CONSTRAINT fk_fo_geo_scopes_geo FOREIGN KEY (geographic_scope_id) REFERENCES geographic_scopes(id) ON DELETE CASCADE",
             "ALTER TABLE organization_geographic_focus ADD CONSTRAINT fk_org_geo_focus_org FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE",
             "ALTER TABLE organization_geographic_focus ADD CONSTRAINT fk_org_geo_focus_geo FOREIGN KEY (geographic_scope_id) REFERENCES geographic_scopes(id) ON DELETE CASCADE",
-            "ALTER TABLE funding_opportunities ADD CONSTRAINT fk_funding_opportunities_type FOREIGN KEY (type_id) REFERENCES funding_types(id)",
-            "ALTER TABLE funding_opportunities ADD CONSTRAINT fk_funding_opportunities_user FOREIGN KEY (submitted_by_user_id) REFERENCES community_users(id)"
+            "ALTER TABLE africa_intelligence_feed ADD CONSTRAINT fk_africa_intelligence_feed_type FOREIGN KEY (type_id) REFERENCES funding_types(id)",
+            "ALTER TABLE africa_intelligence_feed ADD CONSTRAINT fk_africa_intelligence_feed_user FOREIGN KEY (submitted_by_user_id) REFERENCES community_users(id)"
         ]
         
         for fk in junction_fks:
@@ -252,11 +252,11 @@ async def apply_migration_step_by_step():
         print("\n8️⃣ Creating performance indexes...")
         
         indexes = [
-            "CREATE INDEX IF NOT EXISTS idx_funding_opportunities_type_id ON funding_opportunities(type_id)",
-            "CREATE INDEX IF NOT EXISTS idx_funding_opportunities_status ON funding_opportunities(status)",
-            "CREATE INDEX IF NOT EXISTS idx_funding_opportunities_deadline_urgency ON funding_opportunities(deadline_urgency)",
-            "CREATE INDEX IF NOT EXISTS idx_funding_opportunities_currency ON funding_opportunities(currency)",
-            "CREATE INDEX IF NOT EXISTS idx_funding_opportunities_community_rating ON funding_opportunities(community_rating)",
+            "CREATE INDEX IF NOT EXISTS idx_africa_intelligence_feed_type_id ON africa_intelligence_feed(type_id)",
+            "CREATE INDEX IF NOT EXISTS idx_africa_intelligence_feed_status ON africa_intelligence_feed(status)",
+            "CREATE INDEX IF NOT EXISTS idx_africa_intelligence_feed_deadline_urgency ON africa_intelligence_feed(deadline_urgency)",
+            "CREATE INDEX IF NOT EXISTS idx_africa_intelligence_feed_currency ON africa_intelligence_feed(currency)",
+            "CREATE INDEX IF NOT EXISTS idx_africa_intelligence_feed_community_rating ON africa_intelligence_feed(community_rating)",
             "CREATE INDEX IF NOT EXISTS idx_organizations_ai_relevance_score ON organizations(ai_relevance_score)",
             "CREATE INDEX IF NOT EXISTS idx_organizations_africa_relevance_score ON organizations(africa_relevance_score)",
             "CREATE INDEX IF NOT EXISTS idx_organizations_monitoring_status ON organizations(monitoring_status)",
@@ -290,14 +290,14 @@ async def apply_migration_step_by_step():
                 exists = await conn.fetchval(f"""
                     SELECT EXISTS (
                         SELECT 1 FROM information_schema.columns 
-                        WHERE table_name = 'funding_opportunities' 
+                        WHERE table_name = 'africa_intelligence_feed' 
                         AND column_name = '{col}'
                     )
                 """)
                 status = "✅" if exists else "❌"
-                print(f"   {status} funding_opportunities.{col}: {'Available' if exists else 'Missing'}")
+                print(f"   {status} africa_intelligence_feed.{col}: {'Available' if exists else 'Missing'}")
             except Exception:
-                print(f"   ❌ funding_opportunities.{col}: Check failed")
+                print(f"   ❌ africa_intelligence_feed.{col}: Check failed")
         
     except Exception as e:
         print(f"❌ Migration failed: {e}")

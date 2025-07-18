@@ -17,7 +17,7 @@ import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 # Import components to test
-from data_processors.crews.enhanced_funding_crew import EnhancedFundingOpportunityProcessor
+from data_processors.crews.enhanced_funding_crew import EnhancedAfricaIntelligenceItemProcessor
 from data_processors.crews.organization_enrichment_crew import OrganizationEnrichmentPipeline
 from data_processors.translation.translation_pipeline import TranslationPipelineService, create_translation_service
 from data_processors.community.validation_service import CommunityValidationService, create_validation_service
@@ -46,7 +46,7 @@ class CrewAITestSuite:
         print("=" * 50)
         
         # Test individual components
-        await self.test_funding_opportunity_processor()
+        await self.test_intelligence_item_processor()
         await self.test_organization_enrichment()
         await self.test_translation_pipeline()
         await self.test_community_validation()
@@ -55,10 +55,10 @@ class CrewAITestSuite:
         # Generate test report
         self.generate_test_report()
     
-    async def test_funding_opportunity_processor(self):
-        """Test the enhanced funding opportunity processor"""
+    async def test_intelligence_item_processor(self):
+        """Test the enhanced intelligence item processor"""
         
-        print("\n🔍 Testing Enhanced Funding Opportunity Processor...")
+        print("\n🔍 Testing Enhanced Intelligence Item Processor...")
         
         try:
             # Create test data
@@ -70,7 +70,7 @@ class CrewAITestSuite:
             }
             
             # Initialize processor
-            processor = EnhancedFundingOpportunityProcessor()
+            processor = EnhancedAfricaIntelligenceItemProcessor()
             
             # Process opportunity
             start_time = time.time()
@@ -264,7 +264,7 @@ class CrewAITestSuite:
             # Test manual submission processing
             test_submission = {
                 "title": "Test Manual Submission",
-                "description": "This is a test funding opportunity submitted manually",
+                "description": "This is a test intelligence item submitted manually",
                 "source_type": "manual_test"
             }
             
@@ -357,7 +357,7 @@ async def run_quick_test():
     
     try:
         # Test 1: Basic funding processor initialization
-        processor = EnhancedFundingOpportunityProcessor()
+        processor = EnhancedAfricaIntelligenceItemProcessor()
         print("✅ Funding processor initialized")
         
         # Test 2: Organization enrichment initialization
@@ -398,7 +398,7 @@ async def run_performance_test():
     ]
     
     try:
-        processor = EnhancedFundingOpportunityProcessor()
+        processor = EnhancedAfricaIntelligenceItemProcessor()
         
         # Measure processing time for batch
         start_time = time.time()

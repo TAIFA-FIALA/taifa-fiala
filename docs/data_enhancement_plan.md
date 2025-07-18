@@ -147,7 +147,7 @@
 - [ ] **25+ web scraping targets** implemented
 - [ ] **10+ email newsletters** subscribed and parsing
 - [ ] **15+ social media accounts** monitored
-- [ ] **200+ funding opportunities** in database
+- [ ] **200+ intelligence feed** in database
 - [ ] **95%+ uptime** for all collection methods
 
 ## 🚀 Implementation Timeline

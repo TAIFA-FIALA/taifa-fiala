@@ -188,7 +188,7 @@ class PerformanceTracker:
         opportunities = await db.fetch_all(
             """
             SELECT agent_scores, processing_metadata
-            FROM funding_opportunities 
+            FROM africa_intelligence_feed 
             WHERE source_id = $1 AND created_at BETWEEN $2 AND $3
             """,
             source_id, start_date, end_date
@@ -240,7 +240,7 @@ class PerformanceTracker:
         validations = await db.fetch_all(
             """
             SELECT fo.id, fo.review_status, fo.confidence_score
-            FROM funding_opportunities fo
+            FROM africa_intelligence_feed fo
             WHERE fo.source_id = $1 
             AND fo.created_at BETWEEN $2 AND $3
             AND fo.review_status IS NOT NULL
@@ -265,7 +265,7 @@ class PerformanceTracker:
             """
             SELECT COUNT(*) as duplicate_count
             FROM deduplication_logs dl
-            JOIN funding_opportunities fo ON dl.opportunity_id = fo.id
+            JOIN africa_intelligence_feed fo ON dl.opportunity_id = fo.id
             WHERE fo.source_id = $1
             AND dl.checked_at BETWEEN $2 AND $3  
             AND dl.is_duplicate = true
@@ -281,7 +281,7 @@ class PerformanceTracker:
         complete_records = await db.fetch_all(
             """
             SELECT fo.id
-            FROM funding_opportunities fo
+            FROM africa_intelligence_feed fo
             WHERE fo.source_id = $1
             AND fo.created_at BETWEEN $2 AND $3
             AND fo.title IS NOT NULL 
@@ -296,7 +296,7 @@ class PerformanceTracker:
         total_records = await db.fetch_one(
             """
             SELECT COUNT(*) as total
-            FROM funding_opportunities 
+            FROM africa_intelligence_feed 
             WHERE source_id = $1 AND created_at BETWEEN $2 AND $3
             """,
             source_id, start_date, end_date
@@ -369,7 +369,7 @@ class PerformanceTracker:
         unique_opportunities = await db.fetch_all(
             """
             SELECT fo.id, fo.amount
-            FROM funding_opportunities fo
+            FROM africa_intelligence_feed fo
             LEFT JOIN deduplication_logs dl ON fo.id = dl.opportunity_id
             WHERE fo.source_id = $1 
             AND fo.created_at BETWEEN $2 AND $3
@@ -392,7 +392,7 @@ class PerformanceTracker:
             """
             SELECT COUNT(*) as count
             FROM application_outcomes ao
-            JOIN funding_opportunities fo ON ao.opportunity_id = fo.id
+            JOIN africa_intelligence_feed fo ON ao.opportunity_id = fo.id
             WHERE fo.source_id = $1
             AND ao.outcome = 'successful'
             AND ao.created_at BETWEEN $2 AND $3

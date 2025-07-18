@@ -1,6 +1,6 @@
 """
 TAIFA-FIALA Translation Queue Processor
-Automated translation workflow for funding opportunities
+Automated translation workflow for intelligence feed
 """
 
 import asyncio
@@ -179,9 +179,9 @@ class TranslationQueueProcessor:
         try:
             async with self.db_connector.pool.acquire() as conn:
                 # Check if language is already detected
-                if source_table == 'funding_opportunities':
+                if source_table == 'africa_intelligence_feed':
                     detected_lang = await conn.fetchval(
-                        "SELECT detected_language FROM funding_opportunities WHERE id = $1", 
+                        "SELECT detected_language FROM africa_intelligence_feed WHERE id = $1", 
                         source_id
                     )
                     return detected_lang or 'en'
@@ -308,7 +308,7 @@ class TranslationQueueProcessor:
 
 # Integration with data collection pipeline
 async def auto_translate_new_opportunities():
-    """Automatically queue new funding opportunities for translation"""
+    """Automatically queue new intelligence feed for translation"""
     processor = TranslationQueueProcessor()
     await processor.initialize()
     
@@ -317,9 +317,9 @@ async def auto_translate_new_opportunities():
         async with processor.db_connector.pool.acquire() as conn:
             recent_opportunities = await conn.fetch("""
                 SELECT fo.id, fo.title, fo.description
-                FROM funding_opportunities fo
+                FROM africa_intelligence_feed fo
                 LEFT JOIN translation_queue tq ON fo.id = tq.source_id 
-                    AND tq.source_table = 'funding_opportunities'
+                    AND tq.source_table = 'africa_intelligence_feed'
                 WHERE fo.discovered_date > NOW() - INTERVAL '24 hours'
                 AND tq.id IS NULL
                 LIMIT 50
@@ -330,7 +330,7 @@ async def auto_translate_new_opportunities():
             
             for opp in recent_opportunities:
                 await processor.queue_content_for_translation(
-                    'funding_opportunities',
+                    'africa_intelligence_feed',
                     opp['id'],
                     ['title', 'description'],
                     ['fr'],  # Translate to French

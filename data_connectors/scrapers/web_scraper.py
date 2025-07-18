@@ -21,7 +21,7 @@ class WebScraper:
         # Target sources for web scraping
         self.scraping_targets = [
             {
-                "name": "IDRC Funding Opportunities",
+                "name": "IDRC Intelligence Feed",
                 "url": "https://idrc-crdi.ca/en/funding",
                 "type": "funding_page",
                 "selectors": {

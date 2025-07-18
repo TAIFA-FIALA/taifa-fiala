@@ -1,7 +1,7 @@
 """
 Organization Mention Parser
 
-Extracts organization mentions from funding opportunity descriptions and triggers 
+Extracts organization mentions from intelligence item descriptions and triggers 
 enrichment pipeline for incomplete organizations.
 """
 import re
@@ -12,13 +12,13 @@ from sqlalchemy.orm import Session
 from sqlalchemy import or_, and_
 
 from app.models.organization import Organization
-from app.models.funding import FundingOpportunity
+from app.models.funding import AfricaIntelligenceItem
 from app.core.logging import logger
 
 
 class OrganizationMentionParser:
     """
-    Parses funding opportunity descriptions to extract organization mentions
+    Parses intelligence item descriptions to extract organization mentions
     and identify organizations that need enrichment.
     """
     
@@ -219,12 +219,12 @@ class OrganizationMentionParser:
         
         return 'unknown'
     
-    def process_funding_opportunity(self, opportunity: FundingOpportunity) -> Dict:
+    def process_intelligence_item(self, opportunity: AfricaIntelligenceItem) -> Dict:
         """
-        Process a funding opportunity to extract organization mentions.
+        Process a intelligence item to extract organization mentions.
         
         Args:
-            opportunity: FundingOpportunity instance
+            opportunity: AfricaIntelligenceItem instance
             
         Returns:
             Dictionary with processing results
@@ -273,14 +273,14 @@ class OrganizationMentionParser:
             return result
             
         except Exception as e:
-            logger.error(f"Error processing funding opportunity {opportunity.id}: {str(e)}")
+            logger.error(f"Error processing intelligence item {opportunity.id}: {str(e)}")
             return {
                 'opportunity_id': opportunity.id,
                 'error': str(e),
                 'processed_at': datetime.utcnow().isoformat()
             }
     
-    def _create_organization_from_mention(self, mention: Dict, opportunity: FundingOpportunity) -> Optional[Organization]:
+    def _create_organization_from_mention(self, mention: Dict, opportunity: AfricaIntelligenceItem) -> Optional[Organization]:
         """Create new organization from high-confidence mention"""
         try:
             # Determine role based on opportunity context
@@ -292,7 +292,7 @@ class OrganizationMentionParser:
                 role=role,
                 country=opportunity.country,
                 region=opportunity.region,
-                description=f"Organization discovered from funding opportunity: {opportunity.title}",
+                description=f"Organization discovered from intelligence item: {opportunity.title}",
                 enrichment_status='pending',
                 enrichment_completeness=10,  # Basic info only
                 source_type='auto_discovered',
@@ -322,7 +322,7 @@ class OrganizationMentionParser:
     
     def batch_process_opportunities(self, opportunity_ids: List[int] = None) -> Dict:
         """
-        Process multiple funding opportunities in batch.
+        Process multiple intelligence feed in batch.
         
         Args:
             opportunity_ids: List of opportunity IDs to process, or None for all
@@ -331,13 +331,13 @@ class OrganizationMentionParser:
             Batch processing results
         """
         if opportunity_ids:
-            opportunities = self.db.query(FundingOpportunity).filter(
-                FundingOpportunity.id.in_(opportunity_ids)
+            opportunities = self.db.query(AfricaIntelligenceItem).filter(
+                AfricaIntelligenceItem.id.in_(opportunity_ids)
             ).all()
         else:
             # Process recent opportunities that haven't been processed for mentions
-            opportunities = self.db.query(FundingOpportunity).filter(
-                FundingOpportunity.created_at >= datetime.utcnow().replace(day=1)  # This month
+            opportunities = self.db.query(AfricaIntelligenceItem).filter(
+                AfricaIntelligenceItem.created_at >= datetime.utcnow().replace(day=1)  # This month
             ).all()
         
         results = {
@@ -350,7 +350,7 @@ class OrganizationMentionParser:
         
         for opportunity in opportunities:
             try:
-                result = self.process_funding_opportunity(opportunity)
+                result = self.process_intelligence_item(opportunity)
                 
                 if 'error' not in result:
                     results['processed'] += 1

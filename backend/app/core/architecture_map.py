@@ -105,7 +105,7 @@ class ModuleStatus(Enum):
 
 class ContentType(Enum):
     """Types of content detected"""
-    FUNDING_OPPORTUNITY = "funding_opportunity"
+    FUNDING_OPPORTUNITY = "intelligence_item"
     FUNDING_ANNOUNCEMENT = "funding_announcement"
     NEWS_ARTICLE = "news_article"
     PRESS_RELEASE = "press_release"

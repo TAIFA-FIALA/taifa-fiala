@@ -230,7 +230,7 @@ class FastStakeholderReportGenerator:
                     COUNT(CASE WHEN discovered_date >= :start_time THEN 1 END) as new_opportunities,
                     COUNT(CASE WHEN validation_score >= 0.8 THEN 1 END) as high_quality_opportunities,
                     AVG(validation_score) as avg_validation_score
-                FROM funding_opportunities 
+                FROM africa_intelligence_feed 
                 WHERE discovered_date >= :start_time AND discovered_date <= :end_time
             """)
             
@@ -351,7 +351,7 @@ class FastStakeholderReportGenerator:
                     COUNT(*) as opportunity_count,
                     AVG(validation_score) as avg_quality,
                     COUNT(CASE WHEN funding_amount IS NOT NULL THEN 1 END) as funded_opportunities
-                FROM funding_opportunities 
+                FROM africa_intelligence_feed 
                 WHERE discovered_date >= :start_time AND discovered_date <= :end_time
                 AND organization_name IS NOT NULL
                 GROUP BY organization_name
@@ -367,7 +367,7 @@ class FastStakeholderReportGenerator:
                 SELECT 
                     unnest(string_to_array(sectors, ',')) as sector,
                     COUNT(*) as opportunity_count
-                FROM funding_opportunities 
+                FROM africa_intelligence_feed 
                 WHERE discovered_date >= :start_time AND discovered_date <= :end_time
                 AND sectors IS NOT NULL
                 GROUP BY sector
@@ -391,7 +391,7 @@ class FastStakeholderReportGenerator:
                         ELSE 'Over $1M'
                     END as funding_range,
                     COUNT(*) as opportunity_count
-                FROM funding_opportunities 
+                FROM africa_intelligence_feed 
                 WHERE discovered_date >= :start_time AND discovered_date <= :end_time
                 AND funding_amount IS NOT NULL
                 GROUP BY funding_range
@@ -511,7 +511,7 @@ class FastStakeholderReportGenerator:
                     SUM(CASE WHEN funding_amount IS NOT NULL THEN 
                         CAST(REGEXP_REPLACE(funding_amount, '[^0-9.]', '', 'g') AS NUMERIC) 
                         ELSE 0 END) as total_funding
-                FROM funding_opportunities 
+                FROM africa_intelligence_feed 
                 WHERE discovered_date >= :start_time AND discovered_date <= :end_time
                 GROUP BY DATE_TRUNC('day', discovered_date)
                 ORDER BY date
@@ -532,7 +532,7 @@ class FastStakeholderReportGenerator:
                     SUM(CASE WHEN funding_amount IS NOT NULL THEN 
                         CAST(REGEXP_REPLACE(funding_amount, '[^0-9.]', '', 'g') AS NUMERIC) 
                         ELSE 0 END) as ai_total_funding
-                FROM funding_opportunities 
+                FROM africa_intelligence_feed 
                 WHERE discovered_date >= :start_time AND discovered_date <= :end_time
                 AND (LOWER(title) LIKE '%ai%' OR LOWER(title) LIKE '%artificial intelligence%' 
                      OR LOWER(description) LIKE '%ai%' OR LOWER(description) LIKE '%artificial intelligence%')
@@ -583,7 +583,7 @@ class FastStakeholderReportGenerator:
                     COUNT(*) as opportunity_count,
                     COUNT(CASE WHEN funding_amount IS NOT NULL THEN 1 END) as funded_count,
                     AVG(validation_score) as avg_quality
-                FROM funding_opportunities 
+                FROM africa_intelligence_feed 
                 WHERE discovered_date >= :start_time AND discovered_date <= :end_time
                 GROUP BY geographic_scope
                 ORDER BY opportunity_count DESC
@@ -642,7 +642,7 @@ class FastStakeholderReportGenerator:
                     COUNT(*) as opportunities,
                     AVG(validation_score) as avg_quality,
                     COUNT(CASE WHEN funding_amount IS NOT NULL THEN 1 END) as funded_count
-                FROM funding_opportunities 
+                FROM africa_intelligence_feed 
                 WHERE discovered_date >= :start_time AND discovered_date <= :end_time
             """)
             
@@ -652,7 +652,7 @@ class FastStakeholderReportGenerator:
                     COUNT(*) as opportunities,
                     AVG(validation_score) as avg_quality,
                     COUNT(CASE WHEN funding_amount IS NOT NULL THEN 1 END) as funded_count
-                FROM funding_opportunities 
+                FROM africa_intelligence_feed 
                 WHERE discovered_date >= :prev_start AND discovered_date <= :start_time
             """)
             
@@ -714,7 +714,7 @@ class FastStakeholderReportGenerator:
                     COUNT(CASE WHEN validation_score < 0.6 THEN 1 END) as low_quality,
                     AVG(validation_score) as avg_score,
                     COUNT(CASE WHEN requires_human_review = true THEN 1 END) as requires_review
-                FROM funding_opportunities 
+                FROM africa_intelligence_feed 
                 WHERE discovered_date >= :start_time AND discovered_date <= :end_time
             """)
             
@@ -981,7 +981,7 @@ async def get_quick_summary(
                 COUNT(CASE WHEN validation_score >= 0.8 THEN 1 END) as high_quality,
                 COUNT(CASE WHEN funding_amount IS NOT NULL THEN 1 END) as funded_opportunities,
                 AVG(validation_score) as avg_quality
-            FROM funding_opportunities 
+            FROM africa_intelligence_feed 
             WHERE discovered_date >= :start_time
         """)
         

@@ -4,7 +4,7 @@ from typing import List, Optional
 from datetime import datetime
 
 from app.core.database import get_db
-from app.models import FundingOpportunity, Organization, AIDomain, FundingType
+from app.models import AfricaIntelligenceItem, Organization, AIDomain, FundingType
 
 router = APIRouter()
 
@@ -16,7 +16,7 @@ async def get_stage_matched_opportunities(
     db: Session = Depends(get_db)
 ):
     """
-    Get funding opportunities matched to a specific stage and optionally filtered by domain and country.
+    Get intelligence feed matched to a specific stage and optionally filtered by domain and country.
     This endpoint helps founders find opportunities appropriate for their current funding stage.
     """
     # In a real implementation, this would query the database based on the parameters

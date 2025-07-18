@@ -7,7 +7,7 @@ This system uses Serper strategically for targeted searches when:
 1. New organizations are detected
 2. Geographic/sector gaps are identified
 3. Specific funding details are missing
-4. Trend analysis reveals new opportunities
+4. Trend analysis reveals new intelligence_items
 
 No more wasteful bulk searches - only intelligent, targeted queries.
 """
@@ -78,7 +78,7 @@ class IntelligentSerperSystem:
         
         logger.info("✅ Intelligent Serper System initialized")
     
-    async def detect_search_opportunities(self) -> List[SearchRequest]:
+    async def detect_search_intelligence_items(self) -> List[SearchRequest]:
         """Analyze database to detect when targeted searches are needed"""
         search_requests = []
         
@@ -86,7 +86,7 @@ class IntelligentSerperSystem:
         new_org_requests = await self._detect_new_organizations()
         search_requests.extend(new_org_requests)
         
-        # 2. Find opportunities missing critical data
+        # 2. Find intelligence_items missing critical data
         missing_data_requests = await self._detect_missing_data()
         search_requests.extend(missing_data_requests)
         
@@ -99,13 +99,13 @@ class IntelligentSerperSystem:
         search_requests.extend(sector_requests)
         
         # 5. Trend-based searches (new funding patterns)
-        trend_requests = await self._detect_trending_opportunities()
+        trend_requests = await self._detect_trending_intelligence_items()
         search_requests.extend(trend_requests)
         
         # Filter out duplicates and prioritize
         unique_requests = self._deduplicate_and_prioritize(search_requests)
         
-        logger.info(f"🎯 Detected {len(unique_requests)} intelligent search opportunities")
+        logger.info(f"🎯 Detected {len(unique_requests)} intelligent search intelligence_items")
         return unique_requests
     
     async def _detect_new_organizations(self) -> List[SearchRequest]:
@@ -113,12 +113,12 @@ class IntelligentSerperSystem:
         requests = []
         
         try:
-            # Get recent opportunities mentioning organization names
-            recent_opportunities = self.supabase.table('funding_opportunities').select(
+            # Get recent intelligence_items mentioning organization names
+            recent_intelligence_items = self.supabase.table('africa_intelligence_feed').select(
                 'id,title,description,additional_notes,created_at'
             ).gte('created_at', (datetime.now() - timedelta(days=7)).isoformat()).execute()
             
-            if not recent_opportunities.data:
+            if not recent_intelligence_items.data:
                 return requests
             
             # Extract organization names from content
@@ -129,7 +129,7 @@ class IntelligentSerperSystem:
             
             detected_orgs = set()
             
-            for opp in recent_opportunities.data:
+            for opp in recent_intelligence_items.data:
                 text = f"{opp.get('title', '')} {opp.get('description', '')} {opp.get('additional_notes', '')}"
                 
                 # Simple organization detection
@@ -163,19 +163,19 @@ class IntelligentSerperSystem:
         return requests
     
     async def _detect_missing_data(self) -> List[SearchRequest]:
-        """Detect opportunities with missing critical data"""
+        """Detect intelligence_items with missing critical data"""
         requests = []
         
         try:
-            # Get opportunities missing key fields
-            incomplete_opportunities = self.supabase.table('funding_opportunities').select(
+            # Get intelligence_items missing key fields
+            incomplete_intelligence_items = self.supabase.table('africa_intelligence_feed').select(
                 'id,title,source_url,funding_amount,application_deadline,eligibility_criteria'
             ).is_('funding_amount', 'null').limit(10).execute()
             
-            if not incomplete_opportunities.data:
+            if not incomplete_intelligence_items.data:
                 return requests
             
-            for opp in incomplete_opportunities.data:
+            for opp in incomplete_intelligence_items.data:
                 # Search for missing funding amount
                 if not opp.get('funding_amount'):
                     requests.append(SearchRequest(
@@ -198,7 +198,7 @@ class IntelligentSerperSystem:
                         expected_results=2
                     ))
             
-            logger.info(f"📋 Detected {len(requests)} opportunities with missing data")
+            logger.info(f"📋 Detected {len(requests)} intelligence_items with missing data")
             
         except Exception as e:
             logger.error(f"❌ Error detecting missing data: {e}")
@@ -264,7 +264,7 @@ class IntelligentSerperSystem:
         
         return requests
     
-    async def _detect_trending_opportunities(self) -> List[SearchRequest]:
+    async def _detect_trending_intelligence_items(self) -> List[SearchRequest]:
         """Detect trending funding patterns or new programs"""
         requests = []
         
@@ -291,7 +291,7 @@ class IntelligentSerperSystem:
             logger.info(f"📈 Detected {len(requests)} trending opportunity searches")
             
         except Exception as e:
-            logger.error(f"❌ Error detecting trending opportunities: {e}")
+            logger.error(f"❌ Error detecting trending intelligence_items: {e}")
         
         return requests
     
@@ -450,11 +450,11 @@ class IntelligentSerperSystem:
         """Run one cycle of intelligent searches"""
         logger.info("🧠 Starting intelligent search cycle")
         
-        # Detect search opportunities
-        search_requests = await self.detect_search_opportunities()
+        # Detect search intelligence_items
+        search_requests = await self.detect_search_intelligence_items()
         
         if not search_requests:
-            logger.info("💤 No intelligent search opportunities detected")
+            logger.info("💤 No intelligent search intelligence_items detected")
             return {
                 'searches_performed': 0,
                 'results_found': 0,

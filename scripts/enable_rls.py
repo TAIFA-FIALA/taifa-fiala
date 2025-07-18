@@ -21,7 +21,7 @@ def enable_rls():
     # Tables to enable RLS on
     tables = [
         'health_check',
-        'funding_opportunities',
+        'africa_intelligence_feed',
         'organizations',
         'funding_types'
     ]
@@ -90,7 +90,7 @@ def show_manual_instructions():
     print("\nTo enable RLS manually in Supabase Dashboard:")
     print("\n1. Go to your Supabase Dashboard")
     print("2. Navigate to Authentication > Policies")
-    print("3. For each table (health_check, funding_opportunities, etc.):")
+    print("3. For each table (health_check, africa_intelligence_feed, etc.):")
     print("   a. Click 'Enable RLS' if not already enabled")
     print("   b. Click 'New Policy'")
     print("   c. Choose 'Full customization' or use a template")

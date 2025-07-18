@@ -100,7 +100,7 @@ async def start_discovery(
     
     This endpoint handles Method 3 of the data importation system:
     - Initiates Serper searches with specified parameters
-    - Discovers new funding opportunities automatically
+    - Discovers new intelligence feed automatically
     - Returns job ID for status tracking
     - Processes in background
     """

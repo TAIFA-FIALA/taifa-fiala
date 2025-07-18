@@ -52,7 +52,7 @@ async def run_vector_search_tests():
     print("\n==== TAIFA-FIALA Advanced Vector Search Testing ====\n")
     
     # 1. Test searching for grant opportunities from granting agencies
-    print("\n=== Test 1: Searching for Grant Funding Opportunities ===")
+    print("\n=== Test 1: Searching for Grant Intelligence Feed ===")
     grant_query = "research grants for AI projects in Africa"
     grant_results = await search_with_filters(
         vector_service, 
@@ -65,7 +65,7 @@ async def run_vector_search_tests():
     )
     
     # 2. Test searching for investment opportunities for startups
-    print("\n=== Test 2: Searching for Investment Funding Opportunities ===")
+    print("\n=== Test 2: Searching for Investment Intelligence Feed ===")
     investment_query = "seed funding for AI startups in Nigeria"
     investment_results = await search_with_filters(
         vector_service,
@@ -115,7 +115,7 @@ async def run_vector_search_tests():
     
     # 6. Test searching for recent RSS feed results only
     print("\n=== Test 6: Recent RSS Feed Results Only ===")
-    recent_query = "recent AI funding opportunities"
+    recent_query = "recent AI intelligence feed"
     recent_results = await search_with_filters(
         vector_service,
         query=recent_query,

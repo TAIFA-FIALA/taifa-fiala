@@ -31,7 +31,7 @@ def verify_supabase_schema():
             "ai_domains",
             "community_users",
             "organizations",
-            "funding_opportunities",
+            "africa_intelligence_feed",
             "applications",
             "funding_rounds",
             "investments",

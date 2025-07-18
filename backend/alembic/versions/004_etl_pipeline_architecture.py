@@ -17,38 +17,38 @@ depends_on = None
 
 
 def upgrade():
-    # Add ETL Pipeline fields to funding_opportunities table
-    op.add_column('funding_opportunities', sa.Column('title_hash', sa.String(64), nullable=True))
-    op.add_column('funding_opportunities', sa.Column('semantic_hash', sa.String(64), nullable=True))
-    op.add_column('funding_opportunities', sa.Column('url_hash', sa.String(64), nullable=True))
+    # Add ETL Pipeline fields to africa_intelligence_feed table
+    op.add_column('africa_intelligence_feed', sa.Column('title_hash', sa.String(64), nullable=True))
+    op.add_column('africa_intelligence_feed', sa.Column('semantic_hash', sa.String(64), nullable=True))
+    op.add_column('africa_intelligence_feed', sa.Column('url_hash', sa.String(64), nullable=True))
     
     # Content classification fields
-    op.add_column('funding_opportunities', sa.Column('content_type', sa.String(50), nullable=True, default='funding_opportunity'))
-    op.add_column('funding_opportunities', sa.Column('content_classification_confidence', sa.Float(), nullable=True))
-    op.add_column('funding_opportunities', sa.Column('classification_method', sa.String(50), nullable=True))
+    op.add_column('africa_intelligence_feed', sa.Column('content_type', sa.String(50), nullable=True, default='intelligence_item'))
+    op.add_column('africa_intelligence_feed', sa.Column('content_classification_confidence', sa.Float(), nullable=True))
+    op.add_column('africa_intelligence_feed', sa.Column('classification_method', sa.String(50), nullable=True))
     
     # Validation tracking fields
-    op.add_column('funding_opportunities', sa.Column('validation_status', sa.String(20), nullable=True, default='pending'))
-    op.add_column('funding_opportunities', sa.Column('validation_confidence_score', sa.Float(), nullable=True))
-    op.add_column('funding_opportunities', sa.Column('validation_flags', postgresql.JSONB(astext_type=sa.Text()), nullable=True))
-    op.add_column('funding_opportunities', sa.Column('validation_notes', sa.Text(), nullable=True))
-    op.add_column('funding_opportunities', sa.Column('validated_at', sa.DateTime(timezone=True), nullable=True))
-    op.add_column('funding_opportunities', sa.Column('validated_by', sa.String(50), nullable=True))
-    op.add_column('funding_opportunities', sa.Column('requires_human_review', sa.Boolean(), nullable=True, default=True))
+    op.add_column('africa_intelligence_feed', sa.Column('validation_status', sa.String(20), nullable=True, default='pending'))
+    op.add_column('africa_intelligence_feed', sa.Column('validation_confidence_score', sa.Float(), nullable=True))
+    op.add_column('africa_intelligence_feed', sa.Column('validation_flags', postgresql.JSONB(astext_type=sa.Text()), nullable=True))
+    op.add_column('africa_intelligence_feed', sa.Column('validation_notes', sa.Text(), nullable=True))
+    op.add_column('africa_intelligence_feed', sa.Column('validated_at', sa.DateTime(timezone=True), nullable=True))
+    op.add_column('africa_intelligence_feed', sa.Column('validated_by', sa.String(50), nullable=True))
+    op.add_column('africa_intelligence_feed', sa.Column('requires_human_review', sa.Boolean(), nullable=True, default=True))
     
     # Module tracking fields
-    op.add_column('funding_opportunities', sa.Column('ingestion_module', sa.String(50), nullable=True))
-    op.add_column('funding_opportunities', sa.Column('processing_id', sa.String(50), nullable=True))
-    op.add_column('funding_opportunities', sa.Column('processing_metadata', postgresql.JSONB(astext_type=sa.Text()), nullable=True))
+    op.add_column('africa_intelligence_feed', sa.Column('ingestion_module', sa.String(50), nullable=True))
+    op.add_column('africa_intelligence_feed', sa.Column('processing_id', sa.String(50), nullable=True))
+    op.add_column('africa_intelligence_feed', sa.Column('processing_metadata', postgresql.JSONB(astext_type=sa.Text()), nullable=True))
     
     # Create indexes for ETL fields
-    op.create_index('idx_funding_opportunities_title_hash', 'funding_opportunities', ['title_hash'])
-    op.create_index('idx_funding_opportunities_semantic_hash', 'funding_opportunities', ['semantic_hash'])
-    op.create_index('idx_funding_opportunities_url_hash', 'funding_opportunities', ['url_hash'])
-    op.create_index('idx_funding_opportunities_content_type', 'funding_opportunities', ['content_type'])
-    op.create_index('idx_funding_opportunities_validation_status', 'funding_opportunities', ['validation_status'])
-    op.create_index('idx_funding_opportunities_ingestion_module', 'funding_opportunities', ['ingestion_module'])
-    op.create_index('idx_funding_opportunities_processing_id', 'funding_opportunities', ['processing_id'])
+    op.create_index('idx_africa_intelligence_feed_title_hash', 'africa_intelligence_feed', ['title_hash'])
+    op.create_index('idx_africa_intelligence_feed_semantic_hash', 'africa_intelligence_feed', ['semantic_hash'])
+    op.create_index('idx_africa_intelligence_feed_url_hash', 'africa_intelligence_feed', ['url_hash'])
+    op.create_index('idx_africa_intelligence_feed_content_type', 'africa_intelligence_feed', ['content_type'])
+    op.create_index('idx_africa_intelligence_feed_validation_status', 'africa_intelligence_feed', ['validation_status'])
+    op.create_index('idx_africa_intelligence_feed_ingestion_module', 'africa_intelligence_feed', ['ingestion_module'])
+    op.create_index('idx_africa_intelligence_feed_processing_id', 'africa_intelligence_feed', ['processing_id'])
     
     # Create validation_results table
     op.create_table('validation_results',
@@ -72,7 +72,7 @@ def upgrade():
         sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
         sa.Column('updated_at', sa.DateTime(timezone=True), nullable=True),
         sa.Column('validated_at', sa.DateTime(timezone=True), nullable=True),
-        sa.ForeignKeyConstraint(['opportunity_id'], ['funding_opportunities.id'], ),
+        sa.ForeignKeyConstraint(['opportunity_id'], ['africa_intelligence_feed.id'], ),
         sa.ForeignKeyConstraint(['validated_by_user_id'], ['community_users.id'], ),
         sa.PrimaryKeyConstraint('id')
     )
@@ -98,8 +98,8 @@ def upgrade():
         sa.Column('detection_details', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
         sa.Column('detected_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
         sa.Column('resolved_at', sa.DateTime(timezone=True), nullable=True),
-        sa.ForeignKeyConstraint(['duplicate_opportunity_id'], ['funding_opportunities.id'], ),
-        sa.ForeignKeyConstraint(['original_opportunity_id'], ['funding_opportunities.id'], ),
+        sa.ForeignKeyConstraint(['duplicate_opportunity_id'], ['africa_intelligence_feed.id'], ),
+        sa.ForeignKeyConstraint(['original_opportunity_id'], ['africa_intelligence_feed.id'], ),
         sa.PrimaryKeyConstraint('id')
     )
     
@@ -185,7 +185,7 @@ def upgrade():
         sa.Column('extraction_metadata', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
         sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
         sa.Column('updated_at', sa.DateTime(timezone=True), nullable=True),
-        sa.ForeignKeyConstraint(['opportunity_id'], ['funding_opportunities.id'], ),
+        sa.ForeignKeyConstraint(['opportunity_id'], ['africa_intelligence_feed.id'], ),
         sa.PrimaryKeyConstraint('id'),
         sa.UniqueConstraint('opportunity_id')
     )
@@ -229,30 +229,30 @@ def upgrade():
     op.create_index('idx_source_quality_quality_grade', 'source_quality', ['quality_grade'])
     
     # Create optimized compound indexes for common queries
-    op.create_index('idx_funding_opportunities_validation_review', 'funding_opportunities', ['validation_status', 'requires_human_review'])
-    op.create_index('idx_funding_opportunities_content_module', 'funding_opportunities', ['content_type', 'ingestion_module'])
-    op.create_index('idx_funding_opportunities_validation_confidence', 'funding_opportunities', ['validation_status', 'validation_confidence_score'])
+    op.create_index('idx_africa_intelligence_feed_validation_review', 'africa_intelligence_feed', ['validation_status', 'requires_human_review'])
+    op.create_index('idx_africa_intelligence_feed_content_module', 'africa_intelligence_feed', ['content_type', 'ingestion_module'])
+    op.create_index('idx_africa_intelligence_feed_validation_confidence', 'africa_intelligence_feed', ['validation_status', 'validation_confidence_score'])
     
     # Create full-text search index for enhanced search
     op.execute("""
-        CREATE INDEX IF NOT EXISTS idx_funding_opportunities_search_vector 
-        ON funding_opportunities USING gin(to_tsvector('english', title || ' ' || COALESCE(description, '')))
+        CREATE INDEX IF NOT EXISTS idx_africa_intelligence_feed_search_vector 
+        ON africa_intelligence_feed USING gin(to_tsvector('english', title || ' ' || COALESCE(description, '')))
     """)
     
     # Set default values for existing records
-    op.execute("UPDATE funding_opportunities SET content_type = 'funding_opportunity' WHERE content_type IS NULL")
-    op.execute("UPDATE funding_opportunities SET validation_status = 'pending' WHERE validation_status IS NULL")
-    op.execute("UPDATE funding_opportunities SET requires_human_review = true WHERE requires_human_review IS NULL")
+    op.execute("UPDATE africa_intelligence_feed SET content_type = 'intelligence_item' WHERE content_type IS NULL")
+    op.execute("UPDATE africa_intelligence_feed SET validation_status = 'pending' WHERE validation_status IS NULL")
+    op.execute("UPDATE africa_intelligence_feed SET requires_human_review = true WHERE requires_human_review IS NULL")
 
 
 def downgrade():
     # Drop full-text search index
-    op.drop_index('idx_funding_opportunities_search_vector', table_name='funding_opportunities')
+    op.drop_index('idx_africa_intelligence_feed_search_vector', table_name='africa_intelligence_feed')
     
     # Drop compound indexes
-    op.drop_index('idx_funding_opportunities_validation_confidence', table_name='funding_opportunities')
-    op.drop_index('idx_funding_opportunities_content_module', table_name='funding_opportunities')
-    op.drop_index('idx_funding_opportunities_validation_review', table_name='funding_opportunities')
+    op.drop_index('idx_africa_intelligence_feed_validation_confidence', table_name='africa_intelligence_feed')
+    op.drop_index('idx_africa_intelligence_feed_content_module', table_name='africa_intelligence_feed')
+    op.drop_index('idx_africa_intelligence_feed_validation_review', table_name='africa_intelligence_feed')
     
     # Drop source_quality table
     op.drop_table('source_quality')
@@ -272,29 +272,29 @@ def downgrade():
     # Drop validation_results table
     op.drop_table('validation_results')
     
-    # Drop ETL indexes from funding_opportunities
-    op.drop_index('idx_funding_opportunities_processing_id', table_name='funding_opportunities')
-    op.drop_index('idx_funding_opportunities_ingestion_module', table_name='funding_opportunities')
-    op.drop_index('idx_funding_opportunities_validation_status', table_name='funding_opportunities')
-    op.drop_index('idx_funding_opportunities_content_type', table_name='funding_opportunities')
-    op.drop_index('idx_funding_opportunities_url_hash', table_name='funding_opportunities')
-    op.drop_index('idx_funding_opportunities_semantic_hash', table_name='funding_opportunities')
-    op.drop_index('idx_funding_opportunities_title_hash', table_name='funding_opportunities')
+    # Drop ETL indexes from africa_intelligence_feed
+    op.drop_index('idx_africa_intelligence_feed_processing_id', table_name='africa_intelligence_feed')
+    op.drop_index('idx_africa_intelligence_feed_ingestion_module', table_name='africa_intelligence_feed')
+    op.drop_index('idx_africa_intelligence_feed_validation_status', table_name='africa_intelligence_feed')
+    op.drop_index('idx_africa_intelligence_feed_content_type', table_name='africa_intelligence_feed')
+    op.drop_index('idx_africa_intelligence_feed_url_hash', table_name='africa_intelligence_feed')
+    op.drop_index('idx_africa_intelligence_feed_semantic_hash', table_name='africa_intelligence_feed')
+    op.drop_index('idx_africa_intelligence_feed_title_hash', table_name='africa_intelligence_feed')
     
-    # Drop ETL columns from funding_opportunities
-    op.drop_column('funding_opportunities', 'processing_metadata')
-    op.drop_column('funding_opportunities', 'processing_id')
-    op.drop_column('funding_opportunities', 'ingestion_module')
-    op.drop_column('funding_opportunities', 'requires_human_review')
-    op.drop_column('funding_opportunities', 'validated_by')
-    op.drop_column('funding_opportunities', 'validated_at')
-    op.drop_column('funding_opportunities', 'validation_notes')
-    op.drop_column('funding_opportunities', 'validation_flags')
-    op.drop_column('funding_opportunities', 'validation_confidence_score')
-    op.drop_column('funding_opportunities', 'validation_status')
-    op.drop_column('funding_opportunities', 'classification_method')
-    op.drop_column('funding_opportunities', 'content_classification_confidence')
-    op.drop_column('funding_opportunities', 'content_type')
-    op.drop_column('funding_opportunities', 'url_hash')
-    op.drop_column('funding_opportunities', 'semantic_hash')
-    op.drop_column('funding_opportunities', 'title_hash')
+    # Drop ETL columns from africa_intelligence_feed
+    op.drop_column('africa_intelligence_feed', 'processing_metadata')
+    op.drop_column('africa_intelligence_feed', 'processing_id')
+    op.drop_column('africa_intelligence_feed', 'ingestion_module')
+    op.drop_column('africa_intelligence_feed', 'requires_human_review')
+    op.drop_column('africa_intelligence_feed', 'validated_by')
+    op.drop_column('africa_intelligence_feed', 'validated_at')
+    op.drop_column('africa_intelligence_feed', 'validation_notes')
+    op.drop_column('africa_intelligence_feed', 'validation_flags')
+    op.drop_column('africa_intelligence_feed', 'validation_confidence_score')
+    op.drop_column('africa_intelligence_feed', 'validation_status')
+    op.drop_column('africa_intelligence_feed', 'classification_method')
+    op.drop_column('africa_intelligence_feed', 'content_classification_confidence')
+    op.drop_column('africa_intelligence_feed', 'content_type')
+    op.drop_column('africa_intelligence_feed', 'url_hash')
+    op.drop_column('africa_intelligence_feed', 'semantic_hash')
+    op.drop_column('africa_intelligence_feed', 'title_hash')

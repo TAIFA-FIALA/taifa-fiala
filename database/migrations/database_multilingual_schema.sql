@@ -77,7 +77,7 @@ CREATE TABLE IF NOT EXISTS translation_services (
 -- =======================================================
 
 -- Add language detection and translation status to existing table
-ALTER TABLE funding_opportunities 
+ALTER TABLE africa_intelligence_feed 
 ADD COLUMN IF NOT EXISTS detected_language VARCHAR(5) DEFAULT 'en',
 ADD COLUMN IF NOT EXISTS translation_status JSONB DEFAULT '{"en": "original"}',
 ADD COLUMN IF NOT EXISTS is_multilingual BOOLEAN DEFAULT FALSE;
@@ -126,9 +126,9 @@ CREATE INDEX IF NOT EXISTS idx_translation_queue_status ON translation_queue(sta
 CREATE INDEX IF NOT EXISTS idx_translation_queue_priority ON translation_queue(priority, scheduled_at);
 CREATE INDEX IF NOT EXISTS idx_translation_queue_source ON translation_queue(source_table, source_id);
 
--- Indexes for funding opportunities language features
-CREATE INDEX IF NOT EXISTS idx_funding_language ON funding_opportunities(detected_language);
-CREATE INDEX IF NOT EXISTS idx_funding_multilingual ON funding_opportunities(is_multilingual);
+-- Indexes for intelligence feed language features
+CREATE INDEX IF NOT EXISTS idx_funding_language ON africa_intelligence_feed(detected_language);
+CREATE INDEX IF NOT EXISTS idx_funding_multilingual ON africa_intelligence_feed(is_multilingual);
 
 -- =======================================================
 -- HELPER FUNCTIONS
@@ -190,7 +190,7 @@ $$ LANGUAGE plpgsql;
 -- TRANSLATION STATUS UPDATE TRIGGERS
 -- =======================================================
 
--- Function to update translation status in funding_opportunities
+-- Function to update translation status in africa_intelligence_feed
 CREATE OR REPLACE FUNCTION update_translation_status() RETURNS TRIGGER AS $$
 DECLARE
     source_record RECORD;
@@ -200,10 +200,10 @@ BEGIN
     EXECUTE format('SELECT * FROM %I WHERE id = %s', NEW.source_table, NEW.source_id) INTO source_record;
     
     -- Update translation status
-    IF NEW.source_table = 'funding_opportunities' THEN
+    IF NEW.source_table = 'africa_intelligence_feed' THEN
         -- Get current translation status
         SELECT translation_status INTO lang_status
-        FROM funding_opportunities 
+        FROM africa_intelligence_feed 
         WHERE id = NEW.source_id;
         
         -- Update status for this language
@@ -211,7 +211,7 @@ BEGIN
                      jsonb_build_object(NEW.target_language, 'translated');
         
         -- Update the record
-        UPDATE funding_opportunities 
+        UPDATE africa_intelligence_feed 
         SET translation_status = lang_status,
             is_multilingual = (jsonb_object_keys(lang_status)::TEXT[] && ARRAY['en', 'fr'])
         WHERE id = NEW.source_id;
@@ -232,14 +232,14 @@ CREATE TRIGGER trigger_update_translation_status
 -- VIEWS FOR EASY ACCESS
 -- =======================================================
 
--- Bilingual funding opportunities view
-CREATE OR REPLACE VIEW funding_opportunities_bilingual AS
+-- Bilingual intelligence feed view
+CREATE OR REPLACE VIEW africa_intelligence_feed_bilingual AS
 SELECT 
     fo.id,
     fo.title as title_original,
-    get_translated_text('funding_opportunities', fo.id, 'title', 'fr', fo.title) as title_fr,
+    get_translated_text('africa_intelligence_feed', fo.id, 'title', 'fr', fo.title) as title_fr,
     fo.description as description_original,
-    get_translated_text('funding_opportunities', fo.id, 'description', 'fr', fo.description) as description_fr,
+    get_translated_text('africa_intelligence_feed', fo.id, 'description', 'fr', fo.description) as description_fr,
     fo.source_url,
     fo.funding_amount,
     fo.deadline,
@@ -251,7 +251,7 @@ SELECT
     fo.is_multilingual,
     fo.discovered_date as created_at,
     fo.last_updated as updated_at
-FROM funding_opportunities fo;
+FROM africa_intelligence_feed fo;
 
 -- Translation queue summary view
 CREATE OR REPLACE VIEW translation_queue_summary AS
@@ -288,7 +288,7 @@ DO $$
 BEGIN 
     RAISE NOTICE '✅ TAIFA-FIALA Multilingual Database Schema Enhancement Complete!';
     RAISE NOTICE '📊 Tables Created: translations, supported_languages, translation_queue, translation_services';
-    RAISE NOTICE '🔍 Views Created: funding_opportunities_bilingual, translation_queue_summary, translation_service_usage';
+    RAISE NOTICE '🔍 Views Created: africa_intelligence_feed_bilingual, translation_queue_summary, translation_service_usage';
     RAISE NOTICE '⚡ Functions Created: get_translated_text(), queue_for_translation()';
     RAISE NOTICE '🎯 Ready for: English ↔ French translation pipeline';
 END $$;

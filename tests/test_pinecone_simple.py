@@ -67,18 +67,20 @@ try:
                 index_names = indexes.names()
                 print(f"Available index names: {index_names}")
                 
-                if index_name in index_names:
-                    print(f"✅ Index '{index_name}' exists")
+                # Use the first available index name instead of parsing from host
+                if index_names:
+                    actual_index_name = index_names[0]
+                    print(f"✅ Using index '{actual_index_name}'")
                     
                     # Connect to index and get stats
                     print("Connecting to index...")
-                    index = pc.Index(index_name)
+                    index = pc.Index(actual_index_name)
                     stats = index.describe_index_stats()
                     print(f"✅ Index stats: {stats}")
                     
                     print("🎉 Pinecone connection successful!")
                 else:
-                    print(f"❌ Index '{index_name}' not found in available indexes")
+                    print(f"❌ No indexes found")
             else:
                 print(f"❌ Could not get index names from response")
     else:

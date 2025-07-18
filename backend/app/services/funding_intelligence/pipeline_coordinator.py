@@ -285,7 +285,7 @@ class FundingIntelligencePipeline:
             return []
     
     async def _predict_opportunities(self, content: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """Step 6: Predict funding opportunities"""
+        """Step 6: Predict intelligence feed"""
         try:
             # Extract events from content
             events = []
@@ -353,7 +353,7 @@ class FundingIntelligencePipeline:
             
             # Store opportunities
             for opp in opportunities:
-                await self.vector_db.upsert_funding_opportunity(opp)
+                await self.vector_db.upsert_intelligence_item(opp)
                 self.processing_stats.vector_documents_created += 1
             
             logger.info(f"Stored {self.processing_stats.vector_documents_created} documents in vector DB")

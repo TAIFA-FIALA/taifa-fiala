@@ -175,7 +175,7 @@ curl https://your-collector-service.up.railway.app/health
 
 ### 4. **API Endpoints**
 ```bash
-# Test funding opportunities endpoint
+# Test intelligence feed endpoint
 curl https://api.taifa-fiala.net/api/v1/funding-opportunities/
 
 # Test search endpoint

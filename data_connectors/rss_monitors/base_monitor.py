@@ -132,7 +132,7 @@ class RSSMonitor:
         return has_ai_keyword and has_africa_term
     
     async def _process_entry(self, entry) -> Optional[Dict[str, Any]]:
-        """Process a relevant RSS entry into a funding opportunity"""
+        """Process a relevant RSS entry into a intelligence item"""
         try:
             opportunity = {
                 'title': getattr(entry, 'title', 'Untitled'),

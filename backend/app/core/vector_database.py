@@ -27,7 +27,7 @@ import pinecone
 from pinecone import Pinecone, ServerlessSpec
 
 from app.core.etl_architecture import ETLTask, PipelineStage, ProcessingResult
-from app.models.funding import FundingOpportunity
+from app.models.funding import AfricaIntelligenceItem
 from app.models.validation import ValidationResult
 
 # Configure logging
@@ -118,7 +118,7 @@ class SearchResult:
 # =============================================================================
 
 class VectorDatabaseManager:
-    """Manages vector database operations for funding opportunities"""
+    """Manages vector database operations for intelligence feed"""
     
     def __init__(self, config: VectorConfig):
         self.config = config
@@ -193,8 +193,8 @@ class VectorDatabaseManager:
             self.logger.error(f"Failed to generate embeddings: {e}")
             raise
     
-    async def index_funding_opportunity(self, opportunity: FundingOpportunity) -> bool:
-        """Index a funding opportunity in the vector database"""
+    async def index_intelligence_item(self, opportunity: AfricaIntelligenceItem) -> bool:
+        """Index a intelligence item in the vector database"""
         try:
             # Prepare content for embedding
             content = self._prepare_opportunity_content(opportunity)
@@ -255,7 +255,7 @@ class VectorDatabaseManager:
             self.logger.error(f"Failed to index validation result {validation_result.id}: {e}")
             return False
     
-    async def batch_index_opportunities(self, opportunities: List[FundingOpportunity]) -> Dict[str, Any]:
+    async def batch_index_opportunities(self, opportunities: List[AfricaIntelligenceItem]) -> Dict[str, Any]:
         """Batch index multiple opportunities"""
         try:
             # Prepare all content
@@ -375,7 +375,7 @@ class VectorDatabaseManager:
             return []
     
     async def answer_question(self, question: str, context_filter: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
-        """Answer questions about funding opportunities using RAG"""
+        """Answer questions about intelligence feed using RAG"""
         try:
             # Search for relevant context
             search_results = await self.semantic_search(
@@ -450,7 +450,7 @@ class VectorDatabaseManager:
     # PRIVATE HELPER METHODS
     # =============================================================================
     
-    def _prepare_opportunity_content(self, opportunity: FundingOpportunity) -> str:
+    def _prepare_opportunity_content(self, opportunity: AfricaIntelligenceItem) -> str:
         """Prepare opportunity content for embedding"""
         content_parts = [
             f"Title: {opportunity.title}",
@@ -486,7 +486,7 @@ class VectorDatabaseManager:
         
         return "\n".join(content_parts)
     
-    def _prepare_opportunity_metadata(self, opportunity: FundingOpportunity) -> Dict[str, Any]:
+    def _prepare_opportunity_metadata(self, opportunity: AfricaIntelligenceItem) -> Dict[str, Any]:
         """Prepare metadata for opportunity"""
         metadata = {
             'opportunity_id': opportunity.id,
@@ -498,7 +498,7 @@ class VectorDatabaseManager:
             'deadline': opportunity.deadline.isoformat() if opportunity.deadline else None,
             'is_grant': opportunity.is_grant,
             'is_investment': opportunity.is_investment,
-            'content_type': opportunity.content_type or 'funding_opportunity',
+            'content_type': opportunity.content_type or 'intelligence_item',
             'validation_status': opportunity.validation_status or 'pending',
             'confidence_score': opportunity.validation_confidence_score or 0.0,
             'geographic_scopes': opportunity.geographic_scope_names or [],
@@ -656,7 +656,7 @@ class VectorDatabaseManager:
         """Generate answer using OpenAI"""
         try:
             prompt = f"""
-            You are an AI assistant specializing in African AI funding opportunities. 
+            You are an AI assistant specializing in African AI intelligence feed. 
             Based on the following context, answer the user's question accurately and concisely.
             
             Context:
@@ -703,7 +703,7 @@ class VectorDatabaseManager:
                 context += f"Content: {opp.get('content', 'No content')}\n\n"
             
             prompt = f"""
-            Compare the following funding opportunities for African AI development:
+            Compare the following intelligence feed for African AI development:
             
             {context}
             
@@ -741,13 +741,13 @@ class VectorETLProcessor:
         self.vector_manager = vector_manager
         self.logger = logging.getLogger(__name__)
     
-    async def process_validated_opportunity(self, opportunity: FundingOpportunity, 
+    async def process_validated_opportunity(self, opportunity: AfricaIntelligenceItem, 
                                          validation_result: ValidationResult) -> ProcessingResult:
         """Process validated opportunity for vector indexing"""
         try:
             # Index opportunity if validation passed
             if validation_result.status in ['approved', 'auto_approved']:
-                success = await self.vector_manager.index_funding_opportunity(opportunity)
+                success = await self.vector_manager.index_intelligence_item(opportunity)
                 
                 if success:
                     return ProcessingResult(
@@ -776,7 +776,7 @@ class VectorETLProcessor:
                 error=str(e)
             )
     
-    async def batch_process_opportunities(self, opportunities: List[FundingOpportunity]) -> ProcessingResult:
+    async def batch_process_opportunities(self, opportunities: List[AfricaIntelligenceItem]) -> ProcessingResult:
         """Batch process opportunities for vector indexing"""
         try:
             # Filter approved opportunities

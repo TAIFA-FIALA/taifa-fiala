@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
 from app.api.endpoints import (
-    funding_opportunities, organizations, domains, sources, analytics, search, rfp, source_validation,
+    africa_intelligence_feed, organizations, domains, sources, analytics, search, rfp, source_validation,
     user_submissions, admin_scraping, automated_discovery, equity_analyses, stakeholder_reports
 )
 
@@ -10,7 +10,7 @@ api_router = APIRouter()
 
 # Funding opportunities API endpoints
 api_router.include_router(
-    funding_opportunities.router,
+    africa_intelligence_feed.router,
     prefix="/funding-opportunities",
     tags=["funding-opportunities"]
 )

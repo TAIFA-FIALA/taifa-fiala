@@ -33,7 +33,7 @@ async def test_sqlalchemy_relationships():
         column_check = await conn.fetchval("""
             SELECT EXISTS (
                 SELECT 1 FROM information_schema.columns 
-                WHERE table_name = 'funding_opportunities' 
+                WHERE table_name = 'africa_intelligence_feed' 
                 AND column_name = 'organization_id'
             )
         """)
@@ -50,7 +50,7 @@ async def test_sqlalchemy_relationships():
                 SELECT 1 FROM information_schema.table_constraints tc
                 JOIN information_schema.key_column_usage kcu 
                 ON tc.constraint_name = kcu.constraint_name
-                WHERE tc.table_name = 'funding_opportunities'
+                WHERE tc.table_name = 'africa_intelligence_feed'
                 AND tc.constraint_type = 'FOREIGN KEY'
                 AND kcu.column_name = 'organization_id'
             )
@@ -65,8 +65,8 @@ async def test_sqlalchemy_relationships():
         index_check = await conn.fetchval("""
             SELECT EXISTS (
                 SELECT 1 FROM pg_indexes 
-                WHERE tablename = 'funding_opportunities' 
-                AND indexname = 'idx_funding_opportunities_organization_id'
+                WHERE tablename = 'africa_intelligence_feed' 
+                AND indexname = 'idx_africa_intelligence_feed_organization_id'
             )
         """)
         
@@ -84,7 +84,7 @@ async def test_sqlalchemy_relationships():
                 COUNT(*) as total_opportunities,
                 COUNT(organization_id) as with_relationships,
                 COUNT(DISTINCT organization_id) as unique_organizations
-            FROM funding_opportunities
+            FROM africa_intelligence_feed
         """)
         
         print(f"   📊 Total opportunities: {stats['total_opportunities']}")
@@ -94,10 +94,10 @@ async def test_sqlalchemy_relationships():
         # Test 3: Test JOIN queries (simulate SQLAlchemy relationships)
         print("\n3️⃣ Testing JOIN queries...")
         
-        # Test accessing organization data through funding opportunity
+        # Test accessing organization data through intelligence item
         opp_to_org = await conn.fetch("""
             SELECT f.title, f.funding_amount, o.name as org_name, o.type as org_type
-            FROM funding_opportunities f
+            FROM africa_intelligence_feed f
             JOIN organizations o ON f.organization_id = o.id
             LIMIT 3
         """)
@@ -109,12 +109,12 @@ async def test_sqlalchemy_relationships():
         else:
             print("   ❌ No JOIN results found")
         
-        # Test accessing funding opportunities through organization
+        # Test accessing intelligence feed through organization
         org_to_opp = await conn.fetch("""
             SELECT o.name, o.type, COUNT(f.id) as opportunity_count,
                    ARRAY_AGG(f.title ORDER BY f.title LIMIT 3) as sample_titles
             FROM organizations o
-            JOIN funding_opportunities f ON o.id = f.organization_id
+            JOIN africa_intelligence_feed f ON o.id = f.organization_id
             GROUP BY o.id, o.name, o.type
             ORDER BY opportunity_count DESC
             LIMIT 3
@@ -135,7 +135,7 @@ async def test_sqlalchemy_relationships():
         raw_data_check = await conn.fetch("""
             SELECT id, title, organization_id, 
                    raw_data->>'organization_id' as raw_data_org_id
-            FROM funding_opportunities 
+            FROM africa_intelligence_feed 
             WHERE organization_id IS NOT NULL 
             AND raw_data ? 'organization_id'
             LIMIT 3
@@ -154,7 +154,7 @@ async def test_sqlalchemy_relationships():
         
         performance_test = await conn.fetch("""
             SELECT f.title, o.name, f.funding_amount
-            FROM funding_opportunities f
+            FROM africa_intelligence_feed f
             LEFT JOIN organizations o ON f.organization_id = o.id
             ORDER BY f.discovered_date DESC
             LIMIT 50
@@ -175,7 +175,7 @@ async def test_sqlalchemy_relationships():
         # Test that opportunities can still be accessed by organization_name
         legacy_access = await conn.fetchval("""
             SELECT COUNT(*) 
-            FROM funding_opportunities 
+            FROM africa_intelligence_feed 
             WHERE organization_name IS NOT NULL 
             AND organization_name != 'Unknown'
         """)
@@ -185,7 +185,7 @@ async def test_sqlalchemy_relationships():
         # Test that new relationship method also works
         relationship_access = await conn.fetchval("""
             SELECT COUNT(*) 
-            FROM funding_opportunities f
+            FROM africa_intelligence_feed f
             JOIN organizations o ON f.organization_id = o.id
         """)
         
@@ -202,8 +202,8 @@ async def test_sqlalchemy_relationships():
         
         print("\n🚀 Ready for use! You can now:")
         print("   1. Use proper SQLAlchemy relationships in your code")
-        print("   2. Query organizations with their funding opportunities")
-        print("   3. Access funding opportunities with their organizations")
+        print("   2. Query organizations with their intelligence feed")
+        print("   3. Access intelligence feed with their organizations")
         print("   4. Enjoy better performance with indexed queries")
         
     except Exception as e:
@@ -220,27 +220,27 @@ async def demo_usage_examples():
     
     print("🐍 SQLAlchemy usage examples:")
     print("""
-# Example 1: Get organization with all its funding opportunities
+# Example 1: Get organization with all its intelligence feed
 from sqlalchemy.orm import selectinload
 
 async with SessionLocal() as db:
     result = await db.execute(
         select(Organization)
-        .options(selectinload(Organization.funding_opportunities))
+        .options(selectinload(Organization.africa_intelligence_feed))
         .where(Organization.name == "Google")
     )
     org = result.scalars().first()
     
     print(f"Organization: {org.name}")
-    for opp in org.funding_opportunities:
+    for opp in org.africa_intelligence_feed:
         print(f"  - {opp.title}")
 
-# Example 2: Get funding opportunity with its organization
+# Example 2: Get intelligence item with its organization
 async with SessionLocal() as db:
     result = await db.execute(
-        select(FundingOpportunity)
-        .options(selectinload(FundingOpportunity.organization))
-        .where(FundingOpportunity.id == 1)
+        select(AfricaIntelligenceItem)
+        .options(selectinload(AfricaIntelligenceItem.organization))
+        .where(AfricaIntelligenceItem.id == 1)
     )
     opp = result.scalars().first()
     
@@ -251,10 +251,10 @@ async with SessionLocal() as db:
 # Example 3: Filter opportunities by organization type
 async with SessionLocal() as db:
     result = await db.execute(
-        select(FundingOpportunity)
+        select(AfricaIntelligenceItem)
         .join(Organization)
         .where(Organization.type == "funder")
-        .where(FundingOpportunity.funding_amount.isnot(None))
+        .where(AfricaIntelligenceItem.funding_amount.isnot(None))
     )
     opportunities = result.scalars().all()
 """)

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Discover the exact schema of the funding_opportunities table
+Discover the exact schema of the africa_intelligence_feed table
 """
 
 import os
@@ -48,19 +48,19 @@ def discover_schema():
         {'title': 'Test', 'description': 'Test description', 'organization_name': 'Test Org'},
     ]
     
-    print("Discovering schema for funding_opportunities table...")
+    print("Discovering schema for africa_intelligence_feed table...")
     print("=" * 50)
     
     for i, fields in enumerate(field_combinations):
         print(f"\nAttempt {i+1}: {list(fields.keys())}")
         
         try:
-            result = client.table('funding_opportunities').insert(fields).execute()
+            result = client.table('africa_intelligence_feed').insert(fields).execute()
             print(f"✅ SUCCESS! Working schema: {list(fields.keys())}")
             
             # Clean up the test record
             if result.data:
-                client.table('funding_opportunities').delete().eq('title', 'Test').execute()
+                client.table('africa_intelligence_feed').delete().eq('title', 'Test').execute()
                 print("✅ Test record cleaned up")
             
             return list(fields.keys())

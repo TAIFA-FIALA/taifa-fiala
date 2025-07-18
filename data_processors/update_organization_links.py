@@ -15,7 +15,7 @@ load_dotenv()
 # Import the database config and models
 from backend.app.core.database import engine, SessionLocal
 from backend.app.models.organization import Organization
-from backend.app.models.funding import FundingOpportunity
+from backend.app.models.funding import AfricaIntelligenceItem
 
 async def get_or_create_organization(db: AsyncSession, org_name: str) -> Optional[Organization]:
     """Find an existing organization by name or create a new one if it doesn't exist"""
@@ -46,14 +46,14 @@ async def get_or_create_organization(db: AsyncSession, org_name: str) -> Optiona
         return new_org
 
 async def link_opportunities_to_organizations():
-    """Update existing funding opportunities to link them to organizations"""
+    """Update existing intelligence feed to link them to organizations"""
     async with SessionLocal() as db:
         try:
-            # Get all funding opportunities
-            result = await db.execute(select(FundingOpportunity))
+            # Get all intelligence feed
+            result = await db.execute(select(AfricaIntelligenceItem))
             opportunities = result.scalars().all()
             
-            print(f"Found {len(opportunities)} funding opportunities to process")
+            print(f"Found {len(opportunities)} intelligence feed to process")
             updated_count = 0
             
             for opp in opportunities:
@@ -79,9 +79,9 @@ async def link_opportunities_to_organizations():
             
             if updated_count > 0:
                 await db.commit()
-                print(f"Successfully updated {updated_count} funding opportunities with organization links")
+                print(f"Successfully updated {updated_count} intelligence feed with organization links")
             else:
-                print("No funding opportunities were updated")
+                print("No intelligence feed were updated")
                 
         except Exception as e:
             await db.rollback()

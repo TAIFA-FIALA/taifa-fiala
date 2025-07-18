@@ -81,9 +81,9 @@ def create_tables():
                 );
             """))
             
-            # Funding Opportunities table
+            # Intelligence Feed table
             conn.execute(text("""
-                CREATE TABLE IF NOT EXISTS funding_opportunities (
+                CREATE TABLE IF NOT EXISTS africa_intelligence_feed (
                     id SERIAL PRIMARY KEY,
                     title VARCHAR(500) NOT NULL,
                     description TEXT,
@@ -111,7 +111,7 @@ def create_tables():
             # Association tables for many-to-many relationships
             conn.execute(text("""
                 CREATE TABLE IF NOT EXISTS funding_ai_domains (
-                    funding_id INTEGER REFERENCES funding_opportunities(id),
+                    funding_id INTEGER REFERENCES africa_intelligence_feed(id),
                     ai_domain_id INTEGER REFERENCES ai_domains(id),
                     PRIMARY KEY (funding_id, ai_domain_id)
                 );
@@ -119,7 +119,7 @@ def create_tables():
             
             conn.execute(text("""
                 CREATE TABLE IF NOT EXISTS funding_categories_rel (
-                    funding_id INTEGER REFERENCES funding_opportunities(id),
+                    funding_id INTEGER REFERENCES africa_intelligence_feed(id),
                     category_id INTEGER REFERENCES funding_categories(id),
                     PRIMARY KEY (funding_id, category_id)
                 );
@@ -191,9 +191,9 @@ def load_sample_data():
                 WHERE NOT EXISTS (SELECT 1 FROM data_sources WHERE data_sources.name = t.name);
             """))
             
-            # Insert a sample funding opportunity
+            # Insert a sample intelligence item
             conn.execute(text("""
-                INSERT INTO funding_opportunities (
+                INSERT INTO africa_intelligence_feed (
                     title, description, amount, currency, amount_usd, status, 
                     source_url, geographical_scope, eligibility_criteria, source_organization_id
                 )
@@ -206,7 +206,7 @@ def load_sample_data():
                     'African organizations, universities, and researchers',
                     1
                 )) AS t(title, description, amount, currency, amount_usd, status, source_url, geographical_scope, eligibility_criteria, source_organization_id)
-                WHERE NOT EXISTS (SELECT 1 FROM funding_opportunities WHERE funding_opportunities.title = t.title);
+                WHERE NOT EXISTS (SELECT 1 FROM africa_intelligence_feed WHERE africa_intelligence_feed.title = t.title);
             """))
             
             conn.commit()

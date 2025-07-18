@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Enhanced Serper Search for AI Africa Funding Tracker Demo
-This script uses Serper.dev API to find the latest funding opportunities
+This script uses Serper.dev API to find the latest intelligence feed
 """
 
 import asyncio
@@ -209,7 +209,7 @@ class EnhancedSerperSearch:
         logger.info("✅ Enhanced Serper search initialized")
     
     async def search_query(self, query_info: Dict[str, Any]) -> List[Dict[str, Any]]:
-        """Search for funding opportunities using Serper API"""
+        """Search for intelligence feed using Serper API"""
         headers = {
             "X-API-KEY": self.api_key,
             "Content-Type": "application/json"
@@ -239,7 +239,7 @@ class EnhancedSerperSearch:
             return []
     
     def _process_search_results(self, data: Dict[str, Any], query_info: Dict[str, Any]) -> List[Dict[str, Any]]:
-        """Process search results into funding opportunities"""
+        """Process search results into intelligence feed"""
         opportunities = []
         
         # Process organic results

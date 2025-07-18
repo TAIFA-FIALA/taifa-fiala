@@ -149,7 +149,7 @@ class DataValidationEngine:
         self.validation_cache = {}
         
     async def validate_opportunity(self, raw_data: Dict[str, Any], source_type: str) -> ValidationResult:
-        """Validate a single funding opportunity"""
+        """Validate a single intelligence item"""
         start_time = datetime.now()
         validation_id = str(uuid.uuid4())
         
@@ -306,7 +306,7 @@ class DataValidationEngine:
         """AI-powered content validation and extraction"""
         try:
             prompt = f"""
-            Analyze this funding opportunity data and validate its legitimacy and relevance for African AI development:
+            Analyze this intelligence item data and validate its legitimacy and relevance for African AI development:
             
             Source Type: {source_type}
             Raw Data: {json.dumps(raw_data, indent=2)}

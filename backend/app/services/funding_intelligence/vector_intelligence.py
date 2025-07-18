@@ -56,7 +56,7 @@ class VectorDocument:
 class FundingIntelligenceVectorDB:
     """
     Pinecone vector database integration for funding intelligence
-    Enables semantic search and similarity matching for funding opportunities
+    Enables semantic search and similarity matching for intelligence feed
     Updated for Pinecone SDK v5.0.0+
     """
     
@@ -326,9 +326,9 @@ class FundingIntelligenceVectorDB:
             logger.error(f"Failed to upsert funding entity: {e}")
             return False
     
-    async def upsert_funding_opportunity(self, opportunity: Dict[str, Any]) -> bool:
+    async def upsert_intelligence_item(self, opportunity: Dict[str, Any]) -> bool:
         """
-        Add or update a funding opportunity in the vector database
+        Add or update a intelligence item in the vector database
         """
         try:
             # Create content for embedding
@@ -363,7 +363,7 @@ class FundingIntelligenceVectorDB:
             
             # Prepare metadata
             metadata = {
-                "type": "funding_opportunity",
+                "type": "intelligence_item",
                 "opportunity_type": opportunity.get('opportunity_type', 'unknown'),
                 "predicted_funder": opportunity.get('predicted_funder', ''),
                 "estimated_amount": opportunity.get('estimated_amount', ''),
@@ -390,11 +390,11 @@ class FundingIntelligenceVectorDB:
                 namespace="funding-intelligence"
             )
             
-            logger.info(f"Upserted funding opportunity to vector DB: {doc_id}")
+            logger.info(f"Upserted intelligence item to vector DB: {doc_id}")
             return True
             
         except Exception as e:
-            logger.error(f"Failed to upsert funding opportunity: {e}")
+            logger.error(f"Failed to upsert intelligence item: {e}")
             return False
     
     async def semantic_search(self, query: str, document_type: str = None, 
@@ -442,11 +442,11 @@ class FundingIntelligenceVectorDB:
     async def find_similar_opportunities(self, opportunity_text: str, 
                                        top_k: int = 5) -> List[Dict[str, Any]]:
         """
-        Find similar funding opportunities based on text description
+        Find similar intelligence feed based on text description
         """
         return await self.semantic_search(
             query=opportunity_text,
-            document_type="funding_opportunity",
+            document_type="intelligence_item",
             top_k=top_k,
             min_score=0.7
         )
@@ -511,7 +511,7 @@ class FundingIntelligenceVectorDB:
         # Search for opportunities
         opportunities = await self.semantic_search(
             query=query,
-            document_type="funding_opportunity",
+            document_type="intelligence_item",
             top_k=20,
             min_score=0.5
         )
@@ -642,7 +642,7 @@ class VectorSearchService:
             )
             
             # Categorize results
-            opportunities = [r for r in results if r['metadata'].get('type') == 'funding_opportunity']
+            opportunities = [r for r in results if r['metadata'].get('type') == 'intelligence_item']
             funders = [r for r in results if r['metadata'].get('type') == 'funding_entity']
             signals = [r for r in results if r['metadata'].get('type') == 'funding_signal']
             

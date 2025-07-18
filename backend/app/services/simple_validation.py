@@ -1,6 +1,6 @@
 """
 Simple Validation Service for TAIFA Unified Scraper
-Validates individual funding opportunities for quality and relevance
+Validates individual intelligence feed for quality and relevance
 """
 
 import re
@@ -12,7 +12,7 @@ from urllib.parse import urlparse
 logger = logging.getLogger(__name__)
 
 class ValidationService:
-    """Simple validation service for funding opportunities"""
+    """Simple validation service for intelligence feed"""
     
     def __init__(self):
         # Keywords that indicate AI/tech relevance
@@ -54,7 +54,7 @@ class ValidationService:
     
     async def validate_opportunity(self, opportunity: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Validate a single funding opportunity
+        Validate a single intelligence item
         
         Returns:
             Dict with score, flags, and validation details

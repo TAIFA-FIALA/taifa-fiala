@@ -72,7 +72,7 @@ class EnhancedDataIngestionEngine:
             logger.error(f"❌ Database connection failed: {e}")
             return False
     
-    def _needs_detailed_scraping(self, opportunity_data: Dict[str, Any]) -> bool:
+    def _needs_detailed_scraping(self, intelligence_data: Dict[str, Any]) -> bool:
         """Determine if an opportunity needs detailed scraping"""
         
         # Check if essential fields are missing or too brief
@@ -80,20 +80,20 @@ class EnhancedDataIngestionEngine:
         brief_fields = []
         
         # Check for missing critical fields
-        if not opportunity_data.get('funding_amount'):
+        if not intelligence_data.get('funding_amount'):
             missing_fields.append('funding_amount')
         
-        if not opportunity_data.get('application_deadline'):
+        if not intelligence_data.get('application_deadline'):
             missing_fields.append('application_deadline')
         
-        if not opportunity_data.get('eligibility_criteria'):
+        if not intelligence_data.get('eligibility_criteria'):
             missing_fields.append('eligibility_criteria')
         
-        if not opportunity_data.get('application_process'):
+        if not intelligence_data.get('application_process'):
             missing_fields.append('application_process')
         
         # Check for brief descriptions
-        description = opportunity_data.get('description', '')
+        description = intelligence_data.get('description', '')
         if len(description) < 200:  # Less than 200 characters
             brief_fields.append('description')
         
@@ -105,27 +105,27 @@ class EnhancedDataIngestionEngine:
         
         return needs_scraping
     
-    def _get_missing_fields(self, opportunity_data: Dict[str, Any]) -> List[str]:
+    def _get_missing_fields(self, intelligence_data: Dict[str, Any]) -> List[str]:
         """Get list of fields that need to be scraped"""
         missing_fields = []
         
-        if not opportunity_data.get('funding_amount'):
+        if not intelligence_data.get('funding_amount'):
             missing_fields.append('amount')
         
-        if not opportunity_data.get('application_deadline'):
+        if not intelligence_data.get('application_deadline'):
             missing_fields.append('deadline')
         
-        if not opportunity_data.get('eligibility_criteria'):
+        if not intelligence_data.get('eligibility_criteria'):
             missing_fields.append('eligibility_criteria')
         
-        if not opportunity_data.get('application_process'):
+        if not intelligence_data.get('application_process'):
             missing_fields.append('application_process')
         
-        if not opportunity_data.get('contact_information') or len(opportunity_data.get('contact_information', '')) < 20:
+        if not intelligence_data.get('contact_information') or len(intelligence_data.get('contact_information', '')) < 20:
             missing_fields.append('contact_information')
         
         # Always try to get a better description
-        if len(opportunity_data.get('description', '')) < 200:
+        if len(intelligence_data.get('description', '')) < 200:
             missing_fields.append('description')
         
         return missing_fields
@@ -156,7 +156,7 @@ class EnhancedDataIngestionEngine:
                 
                 if any(keyword.lower() in content_text for keyword in keywords):
                     # This looks relevant, let's store it
-                    opportunity_data = {
+                    intelligence_data = {
                         'title': title,
                         'description': summary,
                         'funding_type': 'opportunity',
@@ -173,11 +173,11 @@ class EnhancedDataIngestionEngine:
                     }
                     
                     # Check if we need more detailed information
-                    needs_scraping = self._needs_detailed_scraping(opportunity_data)
+                    needs_scraping = self._needs_detailed_scraping(intelligence_data)
                     
                     try:
-                        # Insert into funding_opportunities table
-                        result = self.supabase_client.table('funding_opportunities').insert(opportunity_data).execute()
+                        # Insert into intelligence_feed table
+                        result = self.supabase_client.table('africa_intelligence_feed').insert(intelligence_data).execute()
                         
                         if result.data and len(result.data) > 0:
                             opportunity_id = result.data[0]['id']
@@ -186,7 +186,7 @@ class EnhancedDataIngestionEngine:
                             
                             # Queue for scraping if needed
                             if needs_scraping and entry.get('link'):
-                                missing_fields = self._get_missing_fields(opportunity_data)
+                                missing_fields = self._get_missing_fields(intelligence_data)
                                 
                                 success = await self.scrape_queue_manager.queue_scrape_request(
                                     url=entry.get('link'),
@@ -251,7 +251,7 @@ class EnhancedDataIngestionEngine:
             logger.info("💡 Next steps:")
             logger.info("   - Start the scraping queue processor to get detailed information")
             logger.info("   - Monitor the scraping_queue table for progress")
-            logger.info("   - Check funding_opportunities table for updated records")
+            logger.info("   - Check intelligence_feed table for updated records")
     
     async def start_queue_processor_demo(self):
         """Demo function to show how the queue processor would work"""

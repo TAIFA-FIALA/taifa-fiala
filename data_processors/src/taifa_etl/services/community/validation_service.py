@@ -18,7 +18,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 # Database imports (adapt to your actual setup)
-from app.models.funding import FundingOpportunity
+from app.models.funding import AfricaIntelligenceItem
 from app.core.database import get_db
 
 class ValidationAction(Enum):
@@ -252,7 +252,7 @@ class CommunityValidationService:
 <body>
     <div class="header">
         <h1>🌍 TAIFA-FIALA Community Review</h1>
-        <p>{{ batch.opportunities|length }} new AI funding opportunities need your review</p>
+        <p>{{ batch.opportunities|length }} new AI intelligence feed need your review</p>
         <p><strong>Review Deadline:</strong> {{ batch.review_deadline.strftime('%B %d, %Y at %H:%M UTC') }}</p>
     </div>
     
@@ -265,7 +265,7 @@ class CommunityValidationService:
             <li><strong>Review Window:</strong> {{ review_window_hours }} hours</li>
         </ul>
         
-        <p><strong>🎯 Your Mission:</strong> Help ensure only high-quality, relevant AI funding opportunities 
+        <p><strong>🎯 Your Mission:</strong> Help ensure only high-quality, relevant AI intelligence feed 
         reach the African AI community. Review each opportunity and provide feedback within {{ review_window_hours }} hours.</p>
         
         {% for opp in batch.opportunities %}
@@ -355,7 +355,7 @@ class CommunityValidationService:
         
         try:
             # Prepare email
-            subject = f"🌍 TAIFA Community Review: {len(batch.opportunities)} New AI Funding Opportunities"
+            subject = f"🌍 TAIFA Community Review: {len(batch.opportunities)} New AI Intelligence Feed"
             
             # Get active validators
             active_validators = [v for v in self.validators.values() if v.is_active]
@@ -432,7 +432,7 @@ class CommunityValidationService:
         for opp in opportunities:
             try:
                 # Update database record
-                # This would update the funding_opportunities table
+                # This would update the africa_intelligence_feed table
                 update_data = {
                     "review_status": ReviewStatus.PENDING_COMMUNITY.value,
                     "processing_batch_id": batch_id,
@@ -598,7 +598,7 @@ class CommunityValidationService:
     
     async def _update_opportunity_status(self, opportunity_id: int, status: str):
         """Update opportunity review status"""
-        # This would update the funding_opportunities table
+        # This would update the africa_intelligence_feed table
         pass
     
     async def _notify_moderators(self, opportunity_id: int, decision: str):
@@ -766,7 +766,7 @@ if __name__ == "__main__":
                 validator_id="validator_1",
                 action=ValidationAction.APPROVE,
                 confidence="high",
-                reasoning="This looks like a legitimate and relevant funding opportunity",
+                reasoning="This looks like a legitimate and relevant intelligence item",
                 relevance_score=5,
                 accuracy_score=4,
                 completeness_score=4

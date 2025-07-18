@@ -144,11 +144,11 @@ async function createTables() {
       }
     }
 
-    // Create funding_opportunities table
-    console.log('Creating funding_opportunities table...');
+    // Create africa_intelligence_feed table
+    console.log('Creating africa_intelligence_feed table...');
     const { error: oppsError } = await supabase.rpc('execute_sql', {
       sql_statement: `
-        CREATE TABLE IF NOT EXISTS funding_opportunities (
+        CREATE TABLE IF NOT EXISTS africa_intelligence_feed (
           id SERIAL PRIMARY KEY,
           title VARCHAR(255) NOT NULL,
           description TEXT NOT NULL,
@@ -190,18 +190,18 @@ async function createTables() {
       `
     });
     if (oppsError) {
-      console.error('❌ Error creating funding_opportunities table:', oppsError.message);
+      console.error('❌ Error creating africa_intelligence_feed table:', oppsError.message);
     } else {
       console.log('✅ Funding opportunities table created');
       
-      // Create indexes for funding_opportunities table
+      // Create indexes for africa_intelligence_feed table
       const oppsIndexes = [
-        `CREATE INDEX IF NOT EXISTS idx_funding_opportunities_provider_org ON funding_opportunities(provider_organization_id);`,
-        `CREATE INDEX IF NOT EXISTS idx_funding_opportunities_recipient_org ON funding_opportunities(recipient_organization_id);`,
-        `CREATE INDEX IF NOT EXISTS idx_funding_opportunities_funding_type ON funding_opportunities(funding_type_id);`,
-        `CREATE INDEX IF NOT EXISTS idx_funding_opportunities_women_focus ON funding_opportunities(women_focus);`,
-        `CREATE INDEX IF NOT EXISTS idx_funding_opportunities_underserved_focus ON funding_opportunities(underserved_focus);`,
-        `CREATE INDEX IF NOT EXISTS idx_funding_opportunities_youth_focus ON funding_opportunities(youth_focus);`
+        `CREATE INDEX IF NOT EXISTS idx_africa_intelligence_feed_provider_org ON africa_intelligence_feed(provider_organization_id);`,
+        `CREATE INDEX IF NOT EXISTS idx_africa_intelligence_feed_recipient_org ON africa_intelligence_feed(recipient_organization_id);`,
+        `CREATE INDEX IF NOT EXISTS idx_africa_intelligence_feed_funding_type ON africa_intelligence_feed(funding_type_id);`,
+        `CREATE INDEX IF NOT EXISTS idx_africa_intelligence_feed_women_focus ON africa_intelligence_feed(women_focus);`,
+        `CREATE INDEX IF NOT EXISTS idx_africa_intelligence_feed_underserved_focus ON africa_intelligence_feed(underserved_focus);`,
+        `CREATE INDEX IF NOT EXISTS idx_africa_intelligence_feed_youth_focus ON africa_intelligence_feed(youth_focus);`
       ];
       
       for (const idx of oppsIndexes) {

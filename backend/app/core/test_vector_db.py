@@ -101,7 +101,7 @@ async def insert_test_data():
                 "id": "test-opportunity-1",
                 "text": """
                 Healthcare AI Innovation Grant
-                This funding opportunity supports innovative AI solutions in healthcare
+                This intelligence item supports innovative AI solutions in healthcare
                 with a focus on underserved communities in Kenya, Uganda, and Tanzania.
                 Grants range from $25,000 to $100,000 for early-stage startups.
                 Special consideration for women-led enterprises.

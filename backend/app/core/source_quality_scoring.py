@@ -19,7 +19,7 @@ import json
 from statistics import mean, median, stdev
 
 from app.models.validation import SourceQuality, ValidationResult
-from app.models.funding import FundingOpportunity
+from app.models.funding import AfricaIntelligenceItem
 from app.core.database import get_db_session
 
 # Configure logging
@@ -484,7 +484,7 @@ class SourceQualityScorer:
                 query = """
                     SELECT fo.*, vr.status as validation_status, vr.confidence_score,
                            vr.completeness_score, vr.relevance_score, vr.legitimacy_score
-                    FROM funding_opportunities fo
+                    FROM africa_intelligence_feed fo
                     LEFT JOIN validation_results vr ON fo.id = vr.opportunity_id
                     WHERE fo.source_url LIKE :source_pattern
                     AND fo.discovered_date >= (NOW() - INTERVAL ':days days')
@@ -581,7 +581,7 @@ class SourceQualityScorer:
                         SUM(CASE WHEN validation_status = 'rejected' THEN 1 ELSE 0 END) as rejected_items,
                         SUM(CASE WHEN validation_status = 'duplicate' THEN 1 ELSE 0 END) as duplicate_items,
                         SUM(CASE WHEN validation_status = 'pending' THEN 1 ELSE 0 END) as pending_items
-                    FROM funding_opportunities
+                    FROM africa_intelligence_feed
                     WHERE source_url LIKE :source_pattern
                     AND discovered_date >= (NOW() - INTERVAL ':days days')
                     """,
@@ -714,13 +714,13 @@ class SourceQualityScorer:
         """Get all unique sources"""
         try:
             async with get_db_session() as session:
-                # Extract unique source names from funding opportunities
+                # Extract unique source names from intelligence feed
                 result = await session.execute(
                     """
                     SELECT DISTINCT 
                         COALESCE(source_name, 'unknown') as source_name,
                         COALESCE(source_type, 'website') as source_type
-                    FROM funding_opportunities
+                    FROM africa_intelligence_feed
                     WHERE discovered_date >= (NOW() - INTERVAL '30 days')
                     """
                 )

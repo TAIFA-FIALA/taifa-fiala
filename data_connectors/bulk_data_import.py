@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Bulk Data Import Script for AI Africa Funding Tracker Demo
-This script rapidly imports funding opportunities from multiple sources for demo purposes.
+This script rapidly imports intelligence feed from multiple sources for demo purposes.
 """
 
 import asyncio
@@ -44,8 +44,8 @@ class BulkDataImporter:
         self.session = aiohttp.ClientSession()
         logger.info("✅ Bulk data importer initialized")
     
-    async def import_sample_funding_opportunities(self):
-        """Import sample funding opportunities for demo"""
+    async def import_sample_africa_intelligence_feed(self):
+        """Import sample intelligence feed for demo"""
         
         sample_opportunities = [
             {
@@ -206,7 +206,7 @@ class BulkDataImporter:
             }
         ]
         
-        logger.info(f"📝 Importing {len(sample_opportunities)} sample funding opportunities...")
+        logger.info(f"📝 Importing {len(sample_opportunities)} sample intelligence feed...")
         
         # Convert to the format expected by the database
         formatted_opportunities = []
@@ -343,8 +343,8 @@ class BulkDataImporter:
         total_duplicates = 0
         total_errors = 0
         
-        # Import sample funding opportunities
-        result1 = await self.import_sample_funding_opportunities()
+        # Import sample intelligence feed
+        result1 = await self.import_sample_africa_intelligence_feed()
         total_saved += result1['saved']
         total_duplicates += result1['duplicates']
         total_errors += result1['errors']

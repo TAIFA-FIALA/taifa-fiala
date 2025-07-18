@@ -17,7 +17,7 @@ from dotenv import load_dotenv
 
 from ..etl_architecture import ETLTask, PipelineStage, Priority, ProcessingResult
 from .pinecone_config import PineconeConfig, VectorIndexType, default_config
-from ...models.funding import FundingOpportunity
+from ...models.funding import AfricaIntelligenceItem
 from ...models.organization import Organization
 
 # Configure logging
@@ -80,8 +80,8 @@ class VectorIndexingService:
         
         # Route to appropriate processor based on data type
         try:
-            if data_type == 'funding_opportunity':
-                return await self._index_funding_opportunity(task)
+            if data_type == 'intelligence_item':
+                return await self._index_intelligence_item(task)
             elif data_type == 'organization':
                 return await self._index_organization(task)
             elif data_type == 'crawl4ai_result':

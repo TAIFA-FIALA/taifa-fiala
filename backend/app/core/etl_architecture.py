@@ -26,7 +26,7 @@ import logging
 # =============================================================================
 
 class PipelineStage(Enum):
-    """ETL Pipeline stages for processing funding opportunities"""
+    """ETL Pipeline stages for processing intelligence feed"""
     INGESTION = "ingestion"           # Data collection from sources
     VALIDATION = "validation"         # Data quality and validation
     ENRICHMENT = "enrichment"         # AI-powered content enhancement
@@ -115,7 +115,7 @@ class ETLConfig:
     
     # Cache Configuration
     CACHE_TTL = {
-        'funding_opportunities': 300,     # 5 minutes
+        'africa_intelligence_feed': 300,     # 5 minutes
         'organizations': 600,             # 10 minutes
         'search_results': 180,            # 3 minutes
         'analytics': 900,                 # 15 minutes

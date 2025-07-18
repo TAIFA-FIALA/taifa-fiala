@@ -4,13 +4,13 @@ from typing import List, Optional
 from datetime import datetime
 
 from app.core.database import get_db
-from app.models import FundingOpportunity
-from app.schemas.funding import FundingOpportunityResponse, FundingOpportunityCreate
+from app.models import AfricaIntelligenceItem
+from app.schemas.funding import AfricaIntelligenceItemResponse, AfricaIntelligenceItemCreate
 
 router = APIRouter()
 
-@router.get("/", response_model=List[FundingOpportunityResponse])
-async def get_funding_opportunities(
+@router.get("/", response_model=List[AfricaIntelligenceItemResponse])
+async def get_africa_intelligence_feed(
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=1000),
     status: Optional[str] = Query(None),
@@ -23,35 +23,35 @@ async def get_funding_opportunities(
     ai_domain: Optional[str] = Query(None),
     db: Session = Depends(get_db)
 ):
-    """Get funding opportunities with optional filtering"""
-    query = db.query(FundingOpportunity)
+    """Get intelligence feed with optional filtering"""
+    query = db.query(AfricaIntelligenceItem)
     
     # Apply filters
     if status:
-        query = query.filter(FundingOpportunity.status == status)
+        query = query.filter(AfricaIntelligenceItem.status == status)
     if min_amount:
-        query = query.filter(FundingOpportunity.amount_usd >= min_amount)
+        query = query.filter(AfricaIntelligenceItem.amount_usd >= min_amount)
     if max_amount:
-        query = query.filter(FundingOpportunity.amount_usd <= max_amount)
+        query = query.filter(AfricaIntelligenceItem.amount_usd <= max_amount)
     if deadline_after:
-        query = query.filter(FundingOpportunity.deadline >= deadline_after)
+        query = query.filter(AfricaIntelligenceItem.deadline >= deadline_after)
     if deadline_before:
-        query = query.filter(FundingOpportunity.deadline <= deadline_before)
+        query = query.filter(AfricaIntelligenceItem.deadline <= deadline_before)
     if organization_id:
-        query = query.filter(FundingOpportunity.source_organization_id == organization_id)
+        query = query.filter(AfricaIntelligenceItem.source_organization_id == organization_id)
     
     # Execute query with pagination
     opportunities = query.offset(skip).limit(limit).all()
     return opportunities
 
-@router.get("/{opportunity_id}", response_model=FundingOpportunityResponse)
-async def get_funding_opportunity(
+@router.get("/{opportunity_id}", response_model=AfricaIntelligenceItemResponse)
+async def get_intelligence_item(
     opportunity_id: int,
     db: Session = Depends(get_db)
 ):
-    """Get a specific funding opportunity by ID"""
-    opportunity = db.query(FundingOpportunity).filter(
-        FundingOpportunity.id == opportunity_id
+    """Get a specific intelligence item by ID"""
+    opportunity = db.query(AfricaIntelligenceItem).filter(
+        AfricaIntelligenceItem.id == opportunity_id
     ).first()
     
     if not opportunity:
@@ -59,29 +59,29 @@ async def get_funding_opportunity(
     
     return opportunity
 
-@router.post("/", response_model=FundingOpportunityResponse)
-async def create_funding_opportunity(
-    opportunity: FundingOpportunityCreate,
+@router.post("/", response_model=AfricaIntelligenceItemResponse)
+async def create_intelligence_item(
+    opportunity: AfricaIntelligenceItemCreate,
     db: Session = Depends(get_db)
 ):
-    """Create a new funding opportunity"""
-    db_opportunity = FundingOpportunity(**opportunity.dict())
+    """Create a new intelligence item"""
+    db_opportunity = AfricaIntelligenceItem(**opportunity.dict())
     db.add(db_opportunity)
     db.commit()
     db.refresh(db_opportunity)
     return db_opportunity
 
-@router.get("/search/", response_model=List[FundingOpportunityResponse])
-async def search_funding_opportunities(
+@router.get("/search/", response_model=List[AfricaIntelligenceItemResponse])
+async def search_africa_intelligence_feed(
     q: str = Query(..., description="Search query"),
     limit: int = Query(10, ge=1, le=100),
     db: Session = Depends(get_db)
 ):
-    """Search funding opportunities by title or description"""
+    """Search intelligence feed by title or description"""
     search_filter = f"%{q}%"
-    opportunities = db.query(FundingOpportunity).filter(
-        (FundingOpportunity.title.ilike(search_filter)) |
-        (FundingOpportunity.description.ilike(search_filter))
+    opportunities = db.query(AfricaIntelligenceItem).filter(
+        (AfricaIntelligenceItem.title.ilike(search_filter)) |
+        (AfricaIntelligenceItem.description.ilike(search_filter))
     ).limit(limit).all()
     
     return opportunities

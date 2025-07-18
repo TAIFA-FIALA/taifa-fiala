@@ -7,7 +7,7 @@
 
 ## 🌍 **Mission**
 
-TAIFA-FIALA is the comprehensive bilingual platform for tracking artificial intelligence funding opportunities across Africa. We democratize access to funding information by breaking down language barriers and centralizing opportunities from 40+ sources into one reliable, searchable platform.
+TAIFA-FIALA is the comprehensive bilingual platform for tracking artificial intelligence intelligence feed across Africa. We democratize access to funding information by breaking down language barriers and centralizing opportunities from 40+ sources into one reliable, searchable platform.
 
 **English**: Tracking AI Funding for Africa  
 **Français**: Financement pour l'Intelligence Artificielle en Afrique
@@ -146,7 +146,7 @@ taifa/
 ### **API Endpoints**
 
 #### **Core Data**
-- `GET /api/v1/funding-opportunities/` - List funding opportunities
+- `GET /api/v1/funding-opportunities/` - List intelligence feed
 - `GET /api/v1/funding-opportunities/{id}` - Detailed opportunity view
 - `GET /api/v1/organizations/` - Funding organizations directory
 

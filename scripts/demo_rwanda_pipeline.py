@@ -75,7 +75,7 @@ class RwandaDemoOrchestrator:
         logger.info("=" * 60)
         
         print("\n🎯 DEMO OVERVIEW:")
-        print("1. 🔍 Search for Rwanda AI funding opportunities using SERPER")
+        print("1. 🔍 Search for Rwanda AI intelligence feed using SERPER")
         print("2. 📊 Parse and process the discovered opportunities")
         print("3. 💾 Add new opportunities to TAIFA database")
         print("4. 👤 Simulate user search experience")
@@ -110,7 +110,7 @@ class RwandaDemoOrchestrator:
     
     async def demo_serper_discovery(self):
         """Demo Part 1: SERPER API discovery"""
-        print("\n🔍 Searching for Rwanda AI funding opportunities...")
+        print("\n🔍 Searching for Rwanda AI intelligence feed...")
         
         discovered_opportunities = []
         
@@ -250,7 +250,7 @@ class RwandaDemoOrchestrator:
             for opp in opportunities:
                 # Check if opportunity already exists
                 cursor.execute(
-                    "SELECT id, title FROM funding_opportunities WHERE source_url = %s OR title = %s",
+                    "SELECT id, title FROM africa_intelligence_feed WHERE source_url = %s OR title = %s",
                     (opp['source_url'], opp['title'])
                 )
                 existing = cursor.fetchone()
@@ -261,7 +261,7 @@ class RwandaDemoOrchestrator:
                 
                 # Insert new opportunity
                 insert_query = """
-                INSERT INTO funding_opportunities (
+                INSERT INTO africa_intelligence_feed (
                     title, description, source_url, status, 
                     geographical_scope, created_at, last_checked
                 ) VALUES (%s, %s, %s, %s, %s, %s, %s)
@@ -327,7 +327,7 @@ class RwandaDemoOrchestrator:
                 # Search in database
                 search_query = """
                 SELECT id, title, description, source_url, created_at
-                FROM funding_opportunities 
+                FROM africa_intelligence_feed 
                 WHERE (title ILIKE %s OR description ILIKE %s)
                 AND status = 'active'
                 ORDER BY created_at DESC

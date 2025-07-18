@@ -4,7 +4,7 @@
 ## 🚀 **Current Status: PRODUCTION READY**
 
 ### ✅ **What's Working**
-- **44 Data Sources** actively collecting funding opportunities
+- **44 Data Sources** actively collecting intelligence feed
 - **Multilingual Database** with English ↔ French translation infrastructure  
 - **Translation Pipeline** with 4 AI providers (Azure, Google, DeepL, OpenAI)
 - **Bilingual Frontend** framework ready for deployment
@@ -79,7 +79,7 @@ Data Collection: 44 sources → Database: TAIFA_db → Translation: 4 AI provide
 ### **Database Schema**
 ```sql
 -- Core tables
-funding_opportunities (enhanced with language detection)
+africa_intelligence_feed (enhanced with language detection)
 translations (multilingual content storage)
 translation_queue (automated processing)
 translation_services (provider management)
@@ -144,7 +144,7 @@ cd frontend/streamlit_app
 ## 📈 **Performance Targets**
 
 ### **Immediate (Next Week)**
-- [ ] **200+ funding opportunities** in database
+- [ ] **200+ intelligence feed** in database
 - [ ] **95%+ translation accuracy** for French content
 - [ ] **<2 second page load** times for frontend
 - [ ] **99%+ uptime** for data collection

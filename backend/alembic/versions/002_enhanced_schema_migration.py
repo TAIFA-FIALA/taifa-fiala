@@ -74,29 +74,29 @@ def upgrade() -> None:
         sa.UniqueConstraint('email')
     )
     
-    # Add new columns to funding_opportunities table
-    op.add_column('funding_opportunities', 
+    # Add new columns to africa_intelligence_feed table
+    op.add_column('africa_intelligence_feed', 
                   sa.Column('type_id', sa.Integer()))
-    op.add_column('funding_opportunities', 
+    op.add_column('africa_intelligence_feed', 
                   sa.Column('status', sa.String(20), default='open'))
-    op.add_column('funding_opportunities', 
+    op.add_column('africa_intelligence_feed', 
                   sa.Column('currency', sa.String(10), default='USD'))
-    op.add_column('funding_opportunities', 
+    op.add_column('africa_intelligence_feed', 
                   sa.Column('community_rating', sa.Numeric(2,1)))
-    op.add_column('funding_opportunities', 
+    op.add_column('africa_intelligence_feed', 
                   sa.Column('application_tips', sa.Text()))
-    op.add_column('funding_opportunities', 
+    op.add_column('africa_intelligence_feed', 
                   sa.Column('submitted_by_user_id', sa.Integer()))
-    op.add_column('funding_opportunities', 
+    op.add_column('africa_intelligence_feed', 
                   sa.Column('view_count', sa.Integer(), default=0))
-    op.add_column('funding_opportunities', 
+    op.add_column('africa_intelligence_feed', 
                   sa.Column('application_count', sa.Integer(), default=0))
-    op.add_column('funding_opportunities', 
+    op.add_column('africa_intelligence_feed', 
                   sa.Column('tags', postgresql.JSONB()))
     
     # Add computed deadline urgency column
     op.execute("""
-        ALTER TABLE funding_opportunities 
+        ALTER TABLE africa_intelligence_feed 
         ADD COLUMN deadline_urgency VARCHAR(10) 
         GENERATED ALWAYS AS (
             CASE 
@@ -109,12 +109,12 @@ def upgrade() -> None:
         ) STORED
     """)
     
-    # Add foreign key constraints for funding_opportunities
-    op.create_foreign_key('fk_funding_opportunities_type_id',
-                         'funding_opportunities', 'funding_types',
+    # Add foreign key constraints for africa_intelligence_feed
+    op.create_foreign_key('fk_africa_intelligence_feed_type_id',
+                         'africa_intelligence_feed', 'funding_types',
                          ['type_id'], ['id'])
-    op.create_foreign_key('fk_funding_opportunities_submitted_by_user_id',
-                         'funding_opportunities', 'community_users',
+    op.create_foreign_key('fk_africa_intelligence_feed_submitted_by_user_id',
+                         'africa_intelligence_feed', 'community_users',
                          ['submitted_by_user_id'], ['id'])
     
     # Add enhanced columns to organizations table
@@ -151,22 +151,22 @@ def upgrade() -> None:
     
     # Create junction tables for many-to-many relationships
     
-    # Funding Opportunities <-> AI Domains
-    op.create_table('funding_opportunity_ai_domains',
-        sa.Column('funding_opportunity_id', sa.Integer(), nullable=False),
+    # Intelligence Feed <-> AI Domains
+    op.create_table('intelligence_item_ai_domains',
+        sa.Column('intelligence_item_id', sa.Integer(), nullable=False),
         sa.Column('ai_domain_id', sa.Integer(), nullable=False),
-        sa.ForeignKeyConstraint(['funding_opportunity_id'], ['funding_opportunities.id'], ondelete='CASCADE'),
+        sa.ForeignKeyConstraint(['intelligence_item_id'], ['africa_intelligence_feed.id'], ondelete='CASCADE'),
         sa.ForeignKeyConstraint(['ai_domain_id'], ['ai_domains.id'], ondelete='CASCADE'),
-        sa.PrimaryKeyConstraint('funding_opportunity_id', 'ai_domain_id')
+        sa.PrimaryKeyConstraint('intelligence_item_id', 'ai_domain_id')
     )
     
-    # Funding Opportunities <-> Geographic Scopes
-    op.create_table('funding_opportunity_geographic_scopes',
-        sa.Column('funding_opportunity_id', sa.Integer(), nullable=False),
+    # Intelligence Feed <-> Geographic Scopes
+    op.create_table('intelligence_item_geographic_scopes',
+        sa.Column('intelligence_item_id', sa.Integer(), nullable=False),
         sa.Column('geographic_scope_id', sa.Integer(), nullable=False),
-        sa.ForeignKeyConstraint(['funding_opportunity_id'], ['funding_opportunities.id'], ondelete='CASCADE'),
+        sa.ForeignKeyConstraint(['intelligence_item_id'], ['africa_intelligence_feed.id'], ondelete='CASCADE'),
         sa.ForeignKeyConstraint(['geographic_scope_id'], ['geographic_scopes.id'], ondelete='CASCADE'),
-        sa.PrimaryKeyConstraint('funding_opportunity_id', 'geographic_scope_id')
+        sa.PrimaryKeyConstraint('intelligence_item_id', 'geographic_scope_id')
     )
     
     # Organizations <-> Geographic Focus
@@ -179,10 +179,10 @@ def upgrade() -> None:
     )
     
     # Create indexes for performance
-    op.create_index('idx_funding_opportunities_type_id', 'funding_opportunities', ['type_id'])
-    op.create_index('idx_funding_opportunities_status', 'funding_opportunities', ['status'])
-    op.create_index('idx_funding_opportunities_deadline_urgency', 'funding_opportunities', ['deadline_urgency'])
-    op.create_index('idx_funding_opportunities_community_rating', 'funding_opportunities', ['community_rating'])
+    op.create_index('idx_africa_intelligence_feed_type_id', 'africa_intelligence_feed', ['type_id'])
+    op.create_index('idx_africa_intelligence_feed_status', 'africa_intelligence_feed', ['status'])
+    op.create_index('idx_africa_intelligence_feed_deadline_urgency', 'africa_intelligence_feed', ['deadline_urgency'])
+    op.create_index('idx_africa_intelligence_feed_community_rating', 'africa_intelligence_feed', ['community_rating'])
     op.create_index('idx_organizations_ai_relevance_score', 'organizations', ['ai_relevance_score'])
     op.create_index('idx_organizations_africa_relevance_score', 'organizations', ['africa_relevance_score'])
     op.create_index('idx_organizations_monitoring_status', 'organizations', ['monitoring_status'])
@@ -195,19 +195,19 @@ def downgrade() -> None:
     op.drop_index('idx_organizations_monitoring_status', table_name='organizations')
     op.drop_index('idx_organizations_africa_relevance_score', table_name='organizations')
     op.drop_index('idx_organizations_ai_relevance_score', table_name='organizations')
-    op.drop_index('idx_funding_opportunities_community_rating', table_name='funding_opportunities')
-    op.drop_index('idx_funding_opportunities_deadline_urgency', table_name='funding_opportunities')
-    op.drop_index('idx_funding_opportunities_status', table_name='funding_opportunities')
-    op.drop_index('idx_funding_opportunities_type_id', table_name='funding_opportunities')
+    op.drop_index('idx_africa_intelligence_feed_community_rating', table_name='africa_intelligence_feed')
+    op.drop_index('idx_africa_intelligence_feed_deadline_urgency', table_name='africa_intelligence_feed')
+    op.drop_index('idx_africa_intelligence_feed_status', table_name='africa_intelligence_feed')
+    op.drop_index('idx_africa_intelligence_feed_type_id', table_name='africa_intelligence_feed')
     
     # Drop junction tables
     op.drop_table('organization_geographic_focus')
-    op.drop_table('funding_opportunity_geographic_scopes')
-    op.drop_table('funding_opportunity_ai_domains')
+    op.drop_table('intelligence_item_geographic_scopes')
+    op.drop_table('intelligence_item_ai_domains')
     
     # Drop foreign key constraints
-    op.drop_constraint('fk_funding_opportunities_submitted_by_user_id', 'funding_opportunities', type_='foreignkey')
-    op.drop_constraint('fk_funding_opportunities_type_id', 'funding_opportunities', type_='foreignkey')
+    op.drop_constraint('fk_africa_intelligence_feed_submitted_by_user_id', 'africa_intelligence_feed', type_='foreignkey')
+    op.drop_constraint('fk_africa_intelligence_feed_type_id', 'africa_intelligence_feed', type_='foreignkey')
     
     # Drop columns from organizations
     op.drop_column('organizations', 'data_completeness_score')
@@ -225,17 +225,17 @@ def downgrade() -> None:
     op.drop_column('organizations', 'africa_relevance_score')
     op.drop_column('organizations', 'ai_relevance_score')
     
-    # Drop columns from funding_opportunities
-    op.drop_column('funding_opportunities', 'deadline_urgency')
-    op.drop_column('funding_opportunities', 'tags')
-    op.drop_column('funding_opportunities', 'application_count')
-    op.drop_column('funding_opportunities', 'view_count')
-    op.drop_column('funding_opportunities', 'submitted_by_user_id')
-    op.drop_column('funding_opportunities', 'application_tips')
-    op.drop_column('funding_opportunities', 'community_rating')
-    op.drop_column('funding_opportunities', 'currency')
-    op.drop_column('funding_opportunities', 'status')
-    op.drop_column('funding_opportunities', 'type_id')
+    # Drop columns from africa_intelligence_feed
+    op.drop_column('africa_intelligence_feed', 'deadline_urgency')
+    op.drop_column('africa_intelligence_feed', 'tags')
+    op.drop_column('africa_intelligence_feed', 'application_count')
+    op.drop_column('africa_intelligence_feed', 'view_count')
+    op.drop_column('africa_intelligence_feed', 'submitted_by_user_id')
+    op.drop_column('africa_intelligence_feed', 'application_tips')
+    op.drop_column('africa_intelligence_feed', 'community_rating')
+    op.drop_column('africa_intelligence_feed', 'currency')
+    op.drop_column('africa_intelligence_feed', 'status')
+    op.drop_column('africa_intelligence_feed', 'type_id')
     
     # Drop lookup tables
     op.drop_table('community_users')

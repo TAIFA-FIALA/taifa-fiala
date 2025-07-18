@@ -235,7 +235,7 @@ class CommunityValidationIntegration:
                 """
                 SELECT id, title, description, organization_name, amount, 
                        deadline, url, agent_scores, confidence_score
-                FROM funding_opportunities 
+                FROM africa_intelligence_feed 
                 WHERE id = $1
                 """,
                 opportunity_id
@@ -262,7 +262,7 @@ class CommunityValidationIntegration:
             
             # Update opportunity status
             await db.execute(
-                "UPDATE funding_opportunities SET review_status = 'pending_community_validation' WHERE id = $1",
+                "UPDATE africa_intelligence_feed SET review_status = 'pending_community_validation' WHERE id = $1",
                 opportunity_id
             )
             
@@ -357,7 +357,7 @@ class CommunityValidationIntegration:
             db = await get_database()
             await db.execute(
                 """
-                UPDATE funding_opportunities SET
+                UPDATE africa_intelligence_feed SET
                     review_status = $1,
                     community_approval_rate = $2,
                     community_feedback = $3,
@@ -413,7 +413,7 @@ class TranslationIntegration:
                 """
                 SELECT title, description, organization_name, 
                        amount, deadline, confidence_score
-                FROM funding_opportunities 
+                FROM africa_intelligence_feed 
                 WHERE id = $1
                 """,
                 opportunity_id
@@ -491,7 +491,7 @@ class TranslationIntegration:
             ) VALUES ($1, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP)
             RETURNING id
             """,
-            'funding_opportunity', opportunity_id, source_lang, target_lang,
+            'intelligence_item', opportunity_id, source_lang, target_lang,
             priority, 'pending'
         )
         

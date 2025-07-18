@@ -610,14 +610,14 @@ class SourceValidator:
             suggestions.append("Consider having a staff member from the organization submit this source")
         
         if checks["content_relevant"]["ai_relevance_score"] < 0.5:
-            suggestions.append("Ensure the source specifically covers AI/ML funding opportunities")
+            suggestions.append("Ensure the source specifically covers AI/ML intelligence feed")
         
         if checks["technical_feasibility"]["feasibility_score"] < 0.7:
             if submission.source_type == "webpage":
                 suggestions.append("Check if the organization offers RSS feeds or email newsletters")
         
         if checks["sample_quality"]["sample_quality"] < 0.8:
-            suggestions.append("Provide more specific URLs to funding opportunity pages rather than general pages")
+            suggestions.append("Provide more specific URLs to intelligence item pages rather than general pages")
         
         return suggestions
     

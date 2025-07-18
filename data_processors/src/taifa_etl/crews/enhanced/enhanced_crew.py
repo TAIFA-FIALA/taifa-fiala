@@ -1,5 +1,5 @@
 """
-TAIFA Enhanced CrewAI Funding Opportunity Processing System
+TAIFA Enhanced CrewAI Intelligence Item Processing System
 Advanced ETL pipeline with learning, conflict resolution, and rejection analysis
 """
 
@@ -18,7 +18,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 
 # Database imports (adapt to your actual database setup)
-from app.models.funding import FundingOpportunity
+from app.models.funding import AfricaIntelligenceItem
 from app.models.organization import Organization
 from app.core.database import get_db
 
@@ -239,7 +239,7 @@ class ConflictResolver:
         }
         print(f"Conflict resolved: {log_data}")  # Replace with actual logging
 
-class EnhancedFundingOpportunityProcessor:
+class EnhancedAfricaIntelligenceItemProcessor:
     """Enhanced processor with learning and conflict resolution"""
     
     def __init__(self):
@@ -276,7 +276,7 @@ class EnhancedFundingOpportunityProcessor:
         
         self.relevancy_agent = Agent(
             role='Africa AI Funding Relevancy Expert',
-            goal='Assess whether content is relevant to AI funding opportunities in Africa',
+            goal='Assess whether content is relevant to AI intelligence feed in Africa',
             backstory=f"""You are a leading expert on African AI ecosystem, funding landscapes, 
             and technology development across the continent. You deeply understand:
             - All 54 African countries and their tech ecosystems
@@ -296,7 +296,7 @@ class EnhancedFundingOpportunityProcessor:
         
         self.summarizer_agent = Agent(
             role='Technical Content Summarizer',
-            goal='Create clear, concise, and standardized descriptions of funding opportunities',
+            goal='Create clear, concise, and standardized descriptions of intelligence feed',
             backstory="""You are an expert technical writer specializing in funding and grant descriptions. 
             You excel at:
             - Creating clear, jargon-free summaries accessible to diverse audiences
@@ -311,7 +311,7 @@ class EnhancedFundingOpportunityProcessor:
         
         self.extractor_agent = Agent(
             role='Structured Data Extraction Expert',
-            goal='Extract specific database fields from funding opportunity content',
+            goal='Extract specific database fields from intelligence item content',
             backstory=f"""You are a data extraction specialist with expertise in:
             - Parsing monetary amounts in various currencies and formats
             - Extracting and standardizing dates across different formats
@@ -370,7 +370,7 @@ class EnhancedFundingOpportunityProcessor:
             Assess three key dimensions:
             1. AI/Technology Relevance (0-1): Does this involve AI, ML, or relevant technology?
             2. Africa Relevance (0-1): Is this specifically for African organizations/projects?
-            3. Funding Relevance (0-1): Is this actually a funding opportunity (not just news)?
+            3. Funding Relevance (0-1): Is this actually a intelligence item (not just news)?
             
             Pay special attention to organizations you recognize from your knowledge base.
             
@@ -392,7 +392,7 @@ class EnhancedFundingOpportunityProcessor:
         )
         
         summarize_task = Task(
-            description="""Create a clear, standardized summary of this funding opportunity.
+            description="""Create a clear, standardized summary of this intelligence item.
             
             Requirements:
             1. Write a concise 2-3 sentence summary highlighting key opportunity details
@@ -635,7 +635,7 @@ class EnhancedFundingOpportunityProcessor:
 async def process_serper_results_enhanced(search_results: List[Dict]) -> Tuple[List[Dict], List[Dict]]:
     """Enhanced processing with rejection tracking"""
     
-    processor = EnhancedFundingOpportunityProcessor()
+    processor = EnhancedAfricaIntelligenceItemProcessor()
     processed_opportunities = []
     rejected_opportunities = []
     

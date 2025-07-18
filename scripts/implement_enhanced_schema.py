@@ -92,7 +92,7 @@ async def run_enhanced_migration():
             # Add new columns to existing tables
             print("   📝 Adding enhanced columns...")
             
-            # Add columns to funding_opportunities (check if they exist first)
+            # Add columns to africa_intelligence_feed (check if they exist first)
             columns_to_add = [
                 ("type_id", "INTEGER"),
                 ("status", "VARCHAR(20) DEFAULT 'open'"),
@@ -107,14 +107,14 @@ async def run_enhanced_migration():
             
             for col_name, col_type in columns_to_add:
                 try:
-                    await conn.execute(f"ALTER TABLE funding_opportunities ADD COLUMN {col_name} {col_type}")
+                    await conn.execute(f"ALTER TABLE africa_intelligence_feed ADD COLUMN {col_name} {col_type}")
                 except Exception:
                     pass  # Column already exists
             
             # Add computed deadline urgency column
             try:
                 await conn.execute("""
-                    ALTER TABLE funding_opportunities 
+                    ALTER TABLE africa_intelligence_feed 
                     ADD COLUMN deadline_urgency VARCHAR(10) 
                     GENERATED ALWAYS AS (
                         CASE 
@@ -158,21 +158,21 @@ async def run_enhanced_migration():
             # Create junction tables
             print("   📝 Creating junction tables...")
             
-            # Funding Opportunities <-> AI Domains
+            # Intelligence Feed <-> AI Domains
             await conn.execute("""
-                CREATE TABLE IF NOT EXISTS funding_opportunity_ai_domains (
-                    funding_opportunity_id INTEGER REFERENCES funding_opportunities(id) ON DELETE CASCADE,
+                CREATE TABLE IF NOT EXISTS intelligence_item_ai_domains (
+                    intelligence_item_id INTEGER REFERENCES africa_intelligence_feed(id) ON DELETE CASCADE,
                     ai_domain_id INTEGER REFERENCES ai_domains(id) ON DELETE CASCADE,
-                    PRIMARY KEY (funding_opportunity_id, ai_domain_id)
+                    PRIMARY KEY (intelligence_item_id, ai_domain_id)
                 )
             """)
             
-            # Funding Opportunities <-> Geographic Scopes
+            # Intelligence Feed <-> Geographic Scopes
             await conn.execute("""
-                CREATE TABLE IF NOT EXISTS funding_opportunity_geographic_scopes (
-                    funding_opportunity_id INTEGER REFERENCES funding_opportunities(id) ON DELETE CASCADE,
+                CREATE TABLE IF NOT EXISTS intelligence_item_geographic_scopes (
+                    intelligence_item_id INTEGER REFERENCES africa_intelligence_feed(id) ON DELETE CASCADE,
                     geographic_scope_id INTEGER REFERENCES geographic_scopes(id) ON DELETE CASCADE,
-                    PRIMARY KEY (funding_opportunity_id, geographic_scope_id)
+                    PRIMARY KEY (intelligence_item_id, geographic_scope_id)
                 )
             """)
             
@@ -191,10 +191,10 @@ async def run_enhanced_migration():
             print("   📝 Creating performance indexes...")
             
             indexes = [
-                "CREATE INDEX IF NOT EXISTS idx_funding_opportunities_type_id ON funding_opportunities(type_id)",
-                "CREATE INDEX IF NOT EXISTS idx_funding_opportunities_status ON funding_opportunities(status)",
-                "CREATE INDEX IF NOT EXISTS idx_funding_opportunities_deadline_urgency ON funding_opportunities(deadline_urgency)",
-                "CREATE INDEX IF NOT EXISTS idx_funding_opportunities_currency ON funding_opportunities(currency)",
+                "CREATE INDEX IF NOT EXISTS idx_africa_intelligence_feed_type_id ON africa_intelligence_feed(type_id)",
+                "CREATE INDEX IF NOT EXISTS idx_africa_intelligence_feed_status ON africa_intelligence_feed(status)",
+                "CREATE INDEX IF NOT EXISTS idx_africa_intelligence_feed_deadline_urgency ON africa_intelligence_feed(deadline_urgency)",
+                "CREATE INDEX IF NOT EXISTS idx_africa_intelligence_feed_currency ON africa_intelligence_feed(currency)",
                 "CREATE INDEX IF NOT EXISTS idx_organizations_ai_relevance_score ON organizations(ai_relevance_score)",
                 "CREATE INDEX IF NOT EXISTS idx_organizations_africa_relevance_score ON organizations(africa_relevance_score)",
                 "CREATE INDEX IF NOT EXISTS idx_organizations_monitoring_status ON organizations(monitoring_status)"
@@ -230,7 +230,7 @@ async def test_enhanced_features():
         
         urgency_stats = await conn.fetch("""
             SELECT deadline_urgency, COUNT(*) as count
-            FROM funding_opportunities
+            FROM africa_intelligence_feed
             WHERE deadline_urgency IS NOT NULL
             GROUP BY deadline_urgency
             ORDER BY count DESC
@@ -306,13 +306,13 @@ async def test_enhanced_features():
                 print(f"      • {org['name']}: {org['unique_opportunities_added']} unique opportunities")
                 print(f"        AI Relevance: {org['ai_relevance_score']}%, Africa Relevance: {org['africa_relevance_score']}%")
         
-        # Test 5: Enhanced funding opportunity features
-        print("\n5️⃣ Testing enhanced funding opportunity features...")
+        # Test 5: Enhanced intelligence item features
+        print("\n5️⃣ Testing enhanced intelligence item features...")
         
         # Test currency distribution
         currency_stats = await conn.fetch("""
             SELECT currency, COUNT(*) as count
-            FROM funding_opportunities
+            FROM africa_intelligence_feed
             WHERE currency IS NOT NULL
             GROUP BY currency
             ORDER BY count DESC
@@ -333,7 +333,7 @@ async def test_enhanced_features():
         # Test status distribution
         status_stats = await conn.fetch("""
             SELECT status, COUNT(*) as count
-            FROM funding_opportunities
+            FROM africa_intelligence_feed
             WHERE status IS NOT NULL
             GROUP BY status
             ORDER BY count DESC

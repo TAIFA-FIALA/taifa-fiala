@@ -3,7 +3,7 @@ Test script for integrating Crawl4AI with Pinecone Vector Indexing
 ==================================================================
 
 This script demonstrates the end-to-end process of:
-1. Crawling funding opportunities using Crawl4AI
+1. Crawling intelligence feed using Crawl4AI
 2. Processing the extracted data through your ETL pipeline
 3. Indexing the opportunities in Pinecone with the Microsoft multilingual model
 4. Testing vector search capabilities with multilingual queries
@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
 # Load environment variables
 
 
-# Test URLs - funding opportunities for African AI initiatives
+# Test URLs - intelligence feed for African AI initiatives
 TEST_URLS = [
     "https://www.convergence.finance/funding-opportunities",
     "https://www.gatesfoundation.org/ideas/articles/artificial-intelligence-funding-announcement",
@@ -61,8 +61,8 @@ async def test_crawl_and_index():
             created_at=datetime.now(),
             payload={
                 'url': url,
-                'context': 'African AI funding opportunity',
-                'extraction_type': 'funding_opportunity'
+                'context': 'African AI intelligence item',
+                'extraction_type': 'intelligence_item'
             }
         )
         

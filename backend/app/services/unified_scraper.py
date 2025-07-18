@@ -143,7 +143,7 @@ class UnifiedScraperModule:
         """
         Handle Method 1: User submissions from Next.js frontend
         
-        Process user-submitted funding opportunities with validation
+        Process user-submitted intelligence feed with validation
         """
         logger.info("👤 Processing user submission...")
         
@@ -224,7 +224,7 @@ class UnifiedScraperModule:
                     provider="openai/gpt-4o-mini",
                     api_token=os.getenv("OPENAI_API_KEY"),
                     instruction="""
-                    Extract funding opportunity information from this webpage.
+                    Extract intelligence item information from this webpage.
                     Look for:
                     - Funding program titles and names
                     - Organization offering the funding (name and website URL)
@@ -260,7 +260,7 @@ class UnifiedScraperModule:
             if not opportunities:
                 return {
                     "status": "no_opportunities_found",
-                    "error": "No funding opportunities detected in content",
+                    "error": "No intelligence feed detected in content",
                     "source": "admin_portal"
                 }
             
@@ -296,7 +296,7 @@ class UnifiedScraperModule:
         """
         Handle Method 3: Automated discovery via Serper searches
         
-        Process search terms and discover new funding opportunities
+        Process search terms and discover new intelligence feed
         """
         logger.info("🤖 Processing automated discovery...")
         
@@ -403,7 +403,7 @@ class UnifiedScraperModule:
             else:
                 # For non-JSON content, create a single opportunity
                 opportunities = [{
-                    "title": "Extracted Funding Opportunity",
+                    "title": "Extracted Intelligence Item",
                     "description": content[:1000],  # Truncate long content
                     "source_url": source_url,
                     "source_type": source_type
@@ -413,7 +413,7 @@ class UnifiedScraperModule:
             standardized_opportunities = []
             for opp in opportunities:
                 standardized_opp = {
-                    "title": opp.get("title", "Unknown Funding Opportunity"),
+                    "title": opp.get("title", "Unknown Intelligence Item"),
                     "organization_name": opp.get("organization_name", "Unknown Organization"),
                     "description": opp.get("description", ""),
                     "amount": opp.get("amount"),

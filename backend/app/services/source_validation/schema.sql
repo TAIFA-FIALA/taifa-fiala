@@ -163,7 +163,7 @@ CREATE INDEX idx_source_performance_metrics_overall_score ON source_performance_
 -- Deduplication logs table
 CREATE TABLE IF NOT EXISTS deduplication_logs (
     id SERIAL PRIMARY KEY,
-    opportunity_id INTEGER, -- May reference funding_opportunities table
+    opportunity_id INTEGER, -- May reference africa_intelligence_feed table
     source_table VARCHAR(50), -- Which table the content came from
     source_content_id INTEGER, -- ID in the source table
     
@@ -227,7 +227,7 @@ CREATE INDEX idx_source_monitoring_logs_success ON source_monitoring_logs(succes
 -- Application outcomes table (for tracking funding application success)
 CREATE TABLE IF NOT EXISTS application_outcomes (
     id SERIAL PRIMARY KEY,
-    opportunity_id INTEGER NOT NULL, -- References funding_opportunities table
+    opportunity_id INTEGER NOT NULL, -- References africa_intelligence_feed table
     user_id INTEGER, -- References users table if available
     applicant_organization VARCHAR(255),
     applicant_email VARCHAR(255),
@@ -258,17 +258,17 @@ CREATE INDEX idx_application_outcomes_opportunity_id ON application_outcomes(opp
 CREATE INDEX idx_application_outcomes_outcome ON application_outcomes(outcome);
 CREATE INDEX idx_application_outcomes_applied_at ON application_outcomes(applied_at);
 
--- Add content hash column to funding_opportunities table for deduplication
+-- Add content hash column to africa_intelligence_feed table for deduplication
 -- (This may already exist, so using IF NOT EXISTS equivalent)
 DO $$ 
 BEGIN
     IF NOT EXISTS (
         SELECT 1 FROM information_schema.columns 
-        WHERE table_name = 'funding_opportunities' 
+        WHERE table_name = 'africa_intelligence_feed' 
         AND column_name = 'content_hash'
     ) THEN
-        ALTER TABLE funding_opportunities ADD COLUMN content_hash VARCHAR(64);
-        CREATE INDEX idx_funding_opportunities_content_hash ON funding_opportunities(content_hash);
+        ALTER TABLE africa_intelligence_feed ADD COLUMN content_hash VARCHAR(64);
+        CREATE INDEX idx_africa_intelligence_feed_content_hash ON africa_intelligence_feed(content_hash);
     END IF;
 END $$;
 
@@ -277,69 +277,69 @@ DO $$
 BEGIN
     IF NOT EXISTS (
         SELECT 1 FROM information_schema.columns 
-        WHERE table_name = 'funding_opportunities' 
+        WHERE table_name = 'africa_intelligence_feed' 
         AND column_name = 'embedding'
     ) THEN
-        ALTER TABLE funding_opportunities ADD COLUMN embedding FLOAT[];
+        ALTER TABLE africa_intelligence_feed ADD COLUMN embedding FLOAT[];
     END IF;
 END $$;
 
--- Add source validation related columns to funding_opportunities
+-- Add source validation related columns to africa_intelligence_feed
 DO $$ 
 BEGIN
     -- Agent scores from CrewAI processing
     IF NOT EXISTS (
         SELECT 1 FROM information_schema.columns 
-        WHERE table_name = 'funding_opportunities' 
+        WHERE table_name = 'africa_intelligence_feed' 
         AND column_name = 'agent_scores'
     ) THEN
-        ALTER TABLE funding_opportunities ADD COLUMN agent_scores JSONB;
+        ALTER TABLE africa_intelligence_feed ADD COLUMN agent_scores JSONB;
     END IF;
     
     -- Processing metadata
     IF NOT EXISTS (
         SELECT 1 FROM information_schema.columns 
-        WHERE table_name = 'funding_opportunities' 
+        WHERE table_name = 'africa_intelligence_feed' 
         AND column_name = 'processing_metadata'
     ) THEN
-        ALTER TABLE funding_opportunities ADD COLUMN processing_metadata JSONB;
+        ALTER TABLE africa_intelligence_feed ADD COLUMN processing_metadata JSONB;
     END IF;
     
     -- Conflicts detected during processing
     IF NOT EXISTS (
         SELECT 1 FROM information_schema.columns 
-        WHERE table_name = 'funding_opportunities' 
+        WHERE table_name = 'africa_intelligence_feed' 
         AND column_name = 'conflicts_detected'
     ) THEN
-        ALTER TABLE funding_opportunities ADD COLUMN conflicts_detected JSONB;
+        ALTER TABLE africa_intelligence_feed ADD COLUMN conflicts_detected JSONB;
     END IF;
     
     -- Resolution applied to conflicts
     IF NOT EXISTS (
         SELECT 1 FROM information_schema.columns 
-        WHERE table_name = 'funding_opportunities' 
+        WHERE table_name = 'africa_intelligence_feed' 
         AND column_name = 'resolution_applied'
     ) THEN
-        ALTER TABLE funding_opportunities ADD COLUMN resolution_applied JSONB;
+        ALTER TABLE africa_intelligence_feed ADD COLUMN resolution_applied JSONB;
     END IF;
     
     -- Review status for community validation
     IF NOT EXISTS (
         SELECT 1 FROM information_schema.columns 
-        WHERE table_name = 'funding_opportunities' 
+        WHERE table_name = 'africa_intelligence_feed' 
         AND column_name = 'review_status'
     ) THEN
-        ALTER TABLE funding_opportunities ADD COLUMN review_status VARCHAR(50) DEFAULT 'pending';
-        CREATE INDEX idx_funding_opportunities_review_status ON funding_opportunities(review_status);
+        ALTER TABLE africa_intelligence_feed ADD COLUMN review_status VARCHAR(50) DEFAULT 'pending';
+        CREATE INDEX idx_africa_intelligence_feed_review_status ON africa_intelligence_feed(review_status);
     END IF;
     
     -- Confidence score from processing
     IF NOT EXISTS (
         SELECT 1 FROM information_schema.columns 
-        WHERE table_name = 'funding_opportunities' 
+        WHERE table_name = 'africa_intelligence_feed' 
         AND column_name = 'confidence_score'
     ) THEN
-        ALTER TABLE funding_opportunities ADD COLUMN confidence_score FLOAT CHECK (confidence_score BETWEEN 0 AND 1);
+        ALTER TABLE africa_intelligence_feed ADD COLUMN confidence_score FLOAT CHECK (confidence_score BETWEEN 0 AND 1);
     END IF;
 END $$;
 

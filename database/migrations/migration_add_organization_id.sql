@@ -4,17 +4,17 @@
 BEGIN;
 
 -- Add organization_id column
-ALTER TABLE funding_opportunities 
+ALTER TABLE africa_intelligence_feed 
 ADD COLUMN organization_id INTEGER;
 
 -- Add foreign key constraint
-ALTER TABLE funding_opportunities 
-ADD CONSTRAINT fk_funding_opportunities_organization_id 
+ALTER TABLE africa_intelligence_feed 
+ADD CONSTRAINT fk_africa_intelligence_feed_organization_id 
 FOREIGN KEY (organization_id) REFERENCES organizations(id);
 
 -- Add index for performance
-CREATE INDEX idx_funding_opportunities_organization_id 
-ON funding_opportunities(organization_id);
+CREATE INDEX idx_africa_intelligence_feed_organization_id 
+ON africa_intelligence_feed(organization_id);
 
 -- Add note about migration
 INSERT INTO alembic_version (version_num) VALUES ('001') 
@@ -24,5 +24,5 @@ COMMIT;
 
 -- Display completion message
 \echo 'Migration completed successfully!'
-\echo 'Column organization_id added to funding_opportunities table'
+\echo 'Column organization_id added to africa_intelligence_feed table'
 \echo 'Foreign key constraint and index created'

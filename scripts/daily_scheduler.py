@@ -28,7 +28,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 class DailyCollectionScheduler:
-    """Schedules and manages daily funding opportunity collection"""
+    """Schedules and manages daily intelligence item collection"""
     
     def __init__(self):
         load_dotenv()
@@ -43,7 +43,7 @@ class DailyCollectionScheduler:
         
     async def run_daily_collection(self):
         """Execute the daily collection process"""
-        logger.info("🚀 Starting daily funding opportunity collection")
+        logger.info("🚀 Starting daily intelligence item collection")
         
         start_time = datetime.now()
         
@@ -80,7 +80,7 @@ class DailyCollectionScheduler:
             for opp in opportunities:
                 # Check for duplicates
                 cursor.execute(
-                    "SELECT id FROM funding_opportunities WHERE source_url = %s OR title = %s",
+                    "SELECT id FROM africa_intelligence_feed WHERE source_url = %s OR title = %s",
                     (opp.get('source_url'), opp.get('title'))
                 )
                 
@@ -89,7 +89,7 @@ class DailyCollectionScheduler:
                 
                 # Insert new opportunity
                 insert_query = """
-                INSERT INTO funding_opportunities (
+                INSERT INTO africa_intelligence_feed (
                     title, description, source_url, status, 
                     geographical_scope, created_at, last_checked
                 ) VALUES (%s, %s, %s, %s, %s, %s, %s)
@@ -193,7 +193,7 @@ class DailyCollectionScheduler:
             
             # Mark opportunities as expired if deadline has passed
             cursor.execute("""
-                UPDATE funding_opportunities 
+                UPDATE africa_intelligence_feed 
                 SET status = 'expired' 
                 WHERE deadline < NOW() AND status = 'active'
             """)

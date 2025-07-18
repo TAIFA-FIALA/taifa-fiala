@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS community_users (
 -- Applications table
 CREATE TABLE IF NOT EXISTS applications (
     id SERIAL PRIMARY KEY,
-    funding_opportunity_id INTEGER REFERENCES funding_opportunities(id) ON DELETE CASCADE,
+    intelligence_item_id INTEGER REFERENCES africa_intelligence_feed(id) ON DELETE CASCADE,
     organization_id INTEGER REFERENCES organizations(id) ON DELETE CASCADE,
     status VARCHAR(20) DEFAULT 'submitted',
     amount_requested DECIMAL(15,2),

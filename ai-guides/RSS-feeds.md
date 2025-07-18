@@ -1,4 +1,4 @@
-Here are several suitable RSS feeds and sources for AI funding opportunities and technology development in Africa:
+Here are several suitable RSS feeds and sources for AI intelligence feed and technology development in Africa:
 
 1. ICTworks – Funding & AI Opportunities
 
@@ -8,7 +8,7 @@ ICTworks regularly publishes updates on AI funding, grants, and accelerator prog
 
 2. African Development Bank Group – Funding & Project Feeds
 
-The African Development Bank offers a range of RSS feeds covering news, events, and funding opportunities across sectors, including technology and innovation:
+The African Development Bank offers a range of RSS feeds covering news, events, and intelligence feed across sectors, including technology and innovation:
  • African Development Bank RSS Feeds (https://www.afdb.org/en/rss-feeds)
  • Relevant feeds: News & Events, African Development Fund, Private Sector ​⁠https://www.afdb.org/en/rss-feeds
 
@@ -38,16 +38,16 @@ While not Africa-specific, Google’s MENA AI Fund and related initiatives often
 
 To be exhaustive, include RSS feeds from grant sources, accelerators, VC funds, and tech news aggregators focused on Africa.
 
-Here’s a comprehensive list of RSS feeds and sources—covering grants, accelerators, venture capital, and alternative funding—for AI and tech funding opportunities in Africa. This will help you track both advertised and less-visible calls:
+Here’s a comprehensive list of RSS feeds and sources—covering grants, accelerators, venture capital, and alternative funding—for AI and tech intelligence feed in Africa. This will help you track both advertised and less-visible calls:
 
-1. Grant and Funding Opportunity Feeds
+1. Grant and Intelligence Item Feeds
  • ICTworks: Regularly posts about AI and tech grants, accelerators, and funding calls for Africa.
 ICTworks RSS Feed (https://www.ictworks.org/feed/) ​⁠https://www.ictworks.org/funding-responsible-ai-solutions/
  • AI4PEP: Grants for responsible AI in public health preparedness in Africa and the Global South.
 AI4PEP Funding Page (https://ai4pep.org/funding/) ​⁠https://ai4pep.org/funding/
  • Mozilla Foundation: Research grants for AI and social justice in Africa.
 Mozilla Foundation Blog RSS (https://foundation.mozilla.org/en/blog/rss/) ​⁠https://www.mozillafoundation.org/en/what-we-fund/programs/Africa-Mradi-Research-Grants/
- • African Development Bank: Offers RSS feeds for news, events, and funding opportunities across sectors.
+ • African Development Bank: Offers RSS feeds for news, events, and intelligence feed across sectors.
 AfDB RSS Feeds (https://www.afdb.org/en/rss-feeds) ​⁠https://www.afdb.org/en/rss-feeds
 
 2. Venture Capital and Investment Feeds

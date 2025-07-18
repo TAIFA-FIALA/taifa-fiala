@@ -286,7 +286,7 @@ class FundingIntelligenceMigration:
             INSERT INTO funding_predictions (
                 prediction_type, predicted_opportunity, expected_date, confidence, rationale
             ) VALUES (
-                'funding_opportunity', 'Google AI for Africa Challenge', 
+                'intelligence_item', 'Google AI for Africa Challenge', 
                 CURRENT_DATE + INTERVAL '90 days', 0.7,
                 'Based on partnership announcement patterns'
             ) ON CONFLICT DO NOTHING;

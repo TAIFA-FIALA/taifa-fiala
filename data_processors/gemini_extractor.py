@@ -8,18 +8,18 @@ import google.generativeai as genai
 load_dotenv()
 
 # Define the Pydantic model for the extracted data, based on the database schema
-class FundingOpportunity(BaseModel):
-    title: str = Field(..., description="The title of the funding opportunity.")
-    description: Optional[str] = Field(None, description="A brief description of the funding opportunity.")
+class AfricaIntelligenceItem(BaseModel):
+    title: str = Field(..., description="The title of the intelligence item.")
+    description: Optional[str] = Field(None, description="A brief description of the intelligence item.")
     amount: Optional[str] = Field(None, description="The amount of funding available.")
     currency: Optional[str] = Field(None, description="The currency of the funding amount.")
     deadline: Optional[str] = Field(None, description="The application deadline.")
-    source_url: Optional[str] = Field(None, description="The URL to the original funding opportunity page.")
-    geographical_scope: Optional[str] = Field(None, description="The geographical scope of the funding opportunity.")
+    source_url: Optional[str] = Field(None, description="The URL to the original intelligence item page.")
+    geographical_scope: Optional[str] = Field(None, description="The geographical scope of the intelligence item.")
     eligibility_criteria: Optional[str] = Field(None, description="The eligibility criteria for applicants.")
 
 class FundingData(BaseModel):
-    data: List[FundingOpportunity] = Field(..., description="A list of funding opportunities.")
+    data: List[AfricaIntelligenceItem] = Field(..., description="A list of intelligence feed.")
 
 
 def main():
@@ -34,9 +34,9 @@ def main():
         print("Error: grantsdatabase_africa.md not found. Please run the crawler first.")
         return
 
-    # Manually construct a simplified schema for FundingOpportunity
+    # Manually construct a simplified schema for AfricaIntelligenceItem
     # This is to avoid issues with the full Pydantic JSON schema output
-    funding_opportunity_schema = {
+    intelligence_item_schema = {
         "type": "array",
         "items": {
             "type": "object",
@@ -59,12 +59,12 @@ def main():
         model_name="gemini-2.5-flash",
         generation_config={
             "response_mime_type": "application/json",
-            "response_schema": funding_opportunity_schema, # Pass the simplified schema
+            "response_schema": intelligence_item_schema, # Pass the simplified schema
         },
     )
 
     # Create the prompt
-    prompt_text = f"""Extract ALL funding opportunities from the following markdown content into a JSON array. Each object in the array should conform to the FundingOpportunity schema. Ensure all fields are extracted accurately. If a field is not present, set it to null. The source_url should be the direct link to the funding opportunity, not the category page. The geographical_scope should be 'Africa' unless specified otherwise. The eligibility_criteria should be extracted from the description if available.\n\n{markdown_content}"""
+    prompt_text = f"""Extract ALL intelligence feed from the following markdown content into a JSON array. Each object in the array should conform to the AfricaIntelligenceItem schema. Ensure all fields are extracted accurately. If a field is not present, set it to null. The source_url should be the direct link to the intelligence item, not the category page. The geographical_scope should be 'Africa' unless specified otherwise. The eligibility_criteria should be extracted from the description if available.\n\n{markdown_content}"""
 
     # Generate content
     try:
@@ -74,9 +74,9 @@ def main():
         if response.text:
             extracted_data = json.loads(response.text)
             # Save to JSON
-            with open("funding_opportunities.json", "w", encoding="utf-8") as f:
+            with open("africa_intelligence_feed.json", "w", encoding="utf-8") as f:
                 json.dump(extracted_data, f, indent=4)
-            print("Extracted data saved to funding_opportunities.json")
+            print("Extracted data saved to africa_intelligence_feed.json")
         else:
             print("No data extracted from Gemini API.")
             print(f"Raw response: {response}")

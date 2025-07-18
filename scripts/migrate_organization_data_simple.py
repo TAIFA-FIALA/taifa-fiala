@@ -27,7 +27,7 @@ async def migrate_organization_data():
                 COUNT(*) as total_opportunities,
                 COUNT(organization_id) as with_org_id,
                 COUNT(*) FILTER (WHERE organization_id IS NULL) as without_org_id
-            FROM funding_opportunities
+            FROM africa_intelligence_feed
         """)
         
         print(f"📊 Current state:")
@@ -42,7 +42,7 @@ async def migrate_organization_data():
         # Get opportunities without organization_id
         opportunities = await conn.fetch("""
             SELECT id, title, organization_name, raw_data, source_url
-            FROM funding_opportunities 
+            FROM africa_intelligence_feed 
             WHERE organization_id IS NULL
             LIMIT 50
         """)
@@ -128,7 +128,7 @@ async def migrate_organization_data():
                                 created_orgs_count += 1
                                 print(f"🆕 Created org from content: {org_name}")
                     
-                    # Update funding opportunity
+                    # Update intelligence item
                     if org_id:
                         # Prepare updated raw_data
                         if not raw_data_dict:
@@ -136,7 +136,7 @@ async def migrate_organization_data():
                         raw_data_dict['organization_id'] = org_id
                         
                         await conn.execute("""
-                            UPDATE funding_opportunities 
+                            UPDATE africa_intelligence_feed 
                             SET organization_id = $1, raw_data = $2
                             WHERE id = $3
                         """, org_id, json.dumps(raw_data_dict), opp['id'])
@@ -163,7 +163,7 @@ async def migrate_organization_data():
                 COUNT(*) as total,
                 COUNT(organization_id) as with_org_id,
                 COUNT(*) FILTER (WHERE organization_id IS NULL) as without_org_id
-            FROM funding_opportunities
+            FROM africa_intelligence_feed
         """)
         
         print(f"\n📊 Final state:")
@@ -175,7 +175,7 @@ async def migrate_organization_data():
         org_counts = await conn.fetch("""
             SELECT o.name, COUNT(f.id) as opportunity_count
             FROM organizations o
-            JOIN funding_opportunities f ON o.id = f.organization_id
+            JOIN africa_intelligence_feed f ON o.id = f.organization_id
             GROUP BY o.name
             ORDER BY opportunity_count DESC
         """)
@@ -239,7 +239,7 @@ async def test_relationships():
         # Test joining opportunities with organizations
         test_data = await conn.fetch("""
             SELECT f.title, o.name as org_name
-            FROM funding_opportunities f
+            FROM africa_intelligence_feed f
             JOIN organizations o ON f.organization_id = o.id
             LIMIT 5
         """)

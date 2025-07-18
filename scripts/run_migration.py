@@ -30,7 +30,7 @@ async def run_migration():
         
         # Check if migration is already applied
         try:
-            await conn.fetchval("SELECT organization_id FROM funding_opportunities LIMIT 1")
+            await conn.fetchval("SELECT organization_id FROM africa_intelligence_feed LIMIT 1")
             print("⚠️  Migration already applied - organization_id column exists")
             return
         except asyncpg.UndefinedColumnError:
@@ -40,21 +40,21 @@ async def run_migration():
         async with conn.transaction():
             print("📝 Adding organization_id column...")
             await conn.execute("""
-                ALTER TABLE funding_opportunities 
+                ALTER TABLE africa_intelligence_feed 
                 ADD COLUMN organization_id INTEGER
             """)
             
             print("🔗 Adding foreign key constraint...")
             await conn.execute("""
-                ALTER TABLE funding_opportunities 
-                ADD CONSTRAINT fk_funding_opportunities_organization_id 
+                ALTER TABLE africa_intelligence_feed 
+                ADD CONSTRAINT fk_africa_intelligence_feed_organization_id 
                 FOREIGN KEY (organization_id) REFERENCES organizations(id)
             """)
             
             print("⚡ Adding performance index...")
             await conn.execute("""
-                CREATE INDEX idx_funding_opportunities_organization_id 
-                ON funding_opportunities(organization_id)
+                CREATE INDEX idx_africa_intelligence_feed_organization_id 
+                ON africa_intelligence_feed(organization_id)
             """)
             
             # Create alembic_version table if it doesn't exist
@@ -76,7 +76,7 @@ async def run_migration():
             column_exists = await conn.fetchval("""
                 SELECT EXISTS (
                     SELECT 1 FROM information_schema.columns 
-                    WHERE table_name = 'funding_opportunities' 
+                    WHERE table_name = 'africa_intelligence_feed' 
                     AND column_name = 'organization_id'
                 )
             """)
@@ -103,20 +103,20 @@ async def test_relationship():
     # Test imports
     try:
         sys.path.append(os.path.join(os.path.dirname(__file__), 'backend'))
-        from app.models.funding import FundingOpportunity
+        from app.models.funding import AfricaIntelligenceItem
         from app.models.organization import Organization
         print("✅ Model imports successful")
         
         # Test relationship attributes
-        if hasattr(FundingOpportunity, 'organization'):
-            print("✅ FundingOpportunity.organization relationship exists")
+        if hasattr(AfricaIntelligenceItem, 'organization'):
+            print("✅ AfricaIntelligenceItem.organization relationship exists")
         else:
-            print("❌ FundingOpportunity.organization relationship missing")
+            print("❌ AfricaIntelligenceItem.organization relationship missing")
             
-        if hasattr(Organization, 'funding_opportunities'):
-            print("✅ Organization.funding_opportunities relationship exists")
+        if hasattr(Organization, 'africa_intelligence_feed'):
+            print("✅ Organization.africa_intelligence_feed relationship exists")
         else:
-            print("❌ Organization.funding_opportunities relationship missing")
+            print("❌ Organization.africa_intelligence_feed relationship missing")
             
     except ImportError as e:
         print(f"⚠️  Could not test relationships due to import error: {e}")

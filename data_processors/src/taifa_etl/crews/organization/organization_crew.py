@@ -504,7 +504,7 @@ class OrganizationEnrichmentPipeline:
         self.processor_id = f"enricher_{int(time.time())}"
     
     async def enrich_organization(self, org_name: str, org_type: str = None, 
-                                org_country: str = None, trigger_source: str = "funding_opportunity") -> Dict[str, Any]:
+                                org_country: str = None, trigger_source: str = "intelligence_item") -> Dict[str, Any]:
         """Main enrichment function with full pipeline"""
         
         enrichment_result = {
@@ -778,7 +778,7 @@ class OrganizationEnrichmentPipeline:
         """Update the known organizations cache to improve agent prompts"""
         try:
             # This would trigger an update of the OrganizationKnowledgeBase
-            # in the CrewAI funding opportunity processor
+            # in the CrewAI intelligence item processor
             pass
         
         except Exception as e:

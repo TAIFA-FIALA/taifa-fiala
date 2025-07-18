@@ -129,7 +129,7 @@ class ClassificationResult:
 # =============================================================================
 
 class GeographicBiasDetector:
-    """Detects and corrects geographic bias in funding opportunities"""
+    """Detects and corrects geographic bias in intelligence feed"""
     
     def __init__(self):
         self.logger = logging.getLogger(__name__)
@@ -767,7 +767,7 @@ class EquityAwareContentClassifier:
         
         # Base content classification patterns
         self.content_type_patterns = {
-            'funding_opportunity': [
+            'intelligence_item': [
                 r'application|apply|deadline|eligibility|criteria',
                 r'grant|funding|investment|prize|award|competition',
                 r'call for proposals|request for proposals|RFP|CFP',

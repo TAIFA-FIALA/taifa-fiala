@@ -17,9 +17,9 @@ from ..etl_architecture import ETLTask, ProcessingResult, PipelineStage
 
 logger = logging.getLogger(__name__)
 
-async def _index_funding_opportunity(self, task: ETLTask) -> ProcessingResult:
-    """Process and index a funding opportunity"""
-    opportunity_data = task.payload.get('funding_opportunity', {})
+async def _index_intelligence_item(self, task: ETLTask) -> ProcessingResult:
+    """Process and index a intelligence item"""
+    opportunity_data = task.payload.get('intelligence_item', {})
     
     if not opportunity_data:
         return ProcessingResult(
@@ -51,7 +51,7 @@ async def _index_funding_opportunity(self, task: ETLTask) -> ProcessingResult:
             host_text=content
         )
         
-        self.logger.info(f"Indexed funding opportunity: {opportunity_id}")
+        self.logger.info(f"Indexed intelligence item: {opportunity_id}")
         
         return ProcessingResult(
             task_id=task.id,
@@ -192,5 +192,5 @@ async def _index_organization(self, task: ETLTask) -> ProcessingResult:
         )
 
 # Add these methods to VectorIndexingService class
-VectorIndexingService._index_funding_opportunity = _index_funding_opportunity
+VectorIndexingService._index_intelligence_item = _index_intelligence_item
 VectorIndexingService._index_organization = _index_organization

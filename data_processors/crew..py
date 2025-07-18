@@ -15,7 +15,7 @@ import os
 
 # Import all our CrewAI components
 from data_processors.crews.enhanced_funding_crew import (
-    EnhancedFundingOpportunityProcessor, 
+    EnhancedAfricaIntelligenceItemProcessor, 
     process_serper_results_enhanced
 )
 from data_processors.crews.organization_enrichment_crew import (
@@ -75,8 +75,8 @@ class TaifaCrewAIPipeline:
         try:
             logging.info("Initializing TAIFA CrewAI Pipeline...")
             
-            # Initialize funding opportunity processor
-            self.funding_processor = EnhancedFundingOpportunityProcessor()
+            # Initialize intelligence item processor
+            self.funding_processor = EnhancedAfricaIntelligenceItemProcessor()
             logging.info("✅ Funding opportunity processor initialized")
             
             # Initialize organization enrichment pipeline
@@ -190,7 +190,7 @@ class TaifaCrewAIPipeline:
             translation_requests = []
             for opportunity in processed_opportunities:
                 if opportunity.get("review_status") in ["auto_approved", "community_review_queue"]:
-                    translation_id = await self.translation_service.translate_funding_opportunity(
+                    translation_id = await self.translation_service.translate_intelligence_item(
                         opportunity.get("content_id", opportunity["id"])
                     )
                     translation_requests.append(translation_id)
@@ -264,8 +264,8 @@ class TaifaCrewAIPipeline:
         try:
             # Store approved/review opportunities
             for opportunity in processed_opportunities:
-                # This would insert into funding_opportunities table
-                stored_id = await self._store_funding_opportunity(opportunity, batch_id)
+                # This would insert into africa_intelligence_feed table
+                stored_id = await self._store_intelligence_item(opportunity, batch_id)
                 if stored_id:
                     stored_ids.append(stored_id)
             
@@ -280,10 +280,10 @@ class TaifaCrewAIPipeline:
         
         return stored_ids
     
-    async def _store_funding_opportunity(self, opportunity: Dict, batch_id: str) -> Optional[int]:
-        """Store individual funding opportunity"""
+    async def _store_intelligence_item(self, opportunity: Dict, batch_id: str) -> Optional[int]:
+        """Store individual intelligence item"""
         try:
-            # This would insert into your funding_opportunities table
+            # This would insert into your africa_intelligence_feed table
             # For now, return mock ID
             return hash(opportunity.get("title", "")) % 10000
         except Exception as e:
@@ -403,7 +403,7 @@ class TaifaCrewAIPipeline:
             logging.error(f"Error updating organization knowledge base: {e}")
     
     async def process_manual_submission(self, submission_data: Dict[str, Any]) -> Dict[str, Any]:
-        """Process manually submitted funding opportunity"""
+        """Process manually submitted intelligence item"""
         
         try:
             logging.info(f"📝 Processing manual submission: {submission_data.get('title', 'Unknown')}")
@@ -423,7 +423,7 @@ class TaifaCrewAIPipeline:
                 processed["translation_request_id"] = translation_id
             
             # Store result
-            opportunity_id = await self._store_funding_opportunity(processed, "manual_submission")
+            opportunity_id = await self._store_intelligence_item(processed, "manual_submission")
             processed["stored_id"] = opportunity_id
             
             logging.info(f"✅ Manual submission processed: {opportunity_id}")

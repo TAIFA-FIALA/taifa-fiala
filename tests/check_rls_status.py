@@ -27,7 +27,7 @@ def check_rls_status():
         END as status
     FROM pg_tables 
     WHERE schemaname = 'public' 
-    AND tablename IN ('health_check', 'funding_opportunities', 'organizations', 'funding_types')
+    AND tablename IN ('health_check', 'africa_intelligence_feed', 'organizations', 'funding_types')
     ORDER BY tablename;
     """
     
@@ -48,7 +48,7 @@ def check_rls_status():
             cmd as command
         FROM pg_policies 
         WHERE schemaname = 'public' 
-        AND tablename IN ('health_check', 'funding_opportunities', 'organizations', 'funding_types')
+        AND tablename IN ('health_check', 'africa_intelligence_feed', 'organizations', 'funding_types')
         ORDER BY tablename, policyname;
         """
         

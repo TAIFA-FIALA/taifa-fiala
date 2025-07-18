@@ -4,7 +4,7 @@ Test Pinecone Integration
 ========================
 
 This script tests the Pinecone vector database integration for storing and retrieving
-AI funding opportunity embeddings.
+AI intelligence item embeddings.
 """
 
 import os
@@ -67,8 +67,8 @@ def test_pinecone_connection():
                 "id": f"test-{datetime.now().strftime('%Y%m%d-%H%M%S')}",
                 "values": sample_vector,
                 "metadata": {
-                    "title": "Test Funding Opportunity",
-                    "description": "This is a test funding opportunity for AI projects in Africa",
+                    "title": "Test Intelligence Item",
+                    "description": "This is a test intelligence item for AI projects in Africa",
                     "source": "test",
                     "type": "grant",
                     "amount": 100000,
@@ -129,7 +129,7 @@ def test_embedding_generation():
         import numpy as np
         
         # Generate a test embedding (normally would use OpenAI or local model)
-        test_text = "AI funding opportunity for African startups in machine learning"
+        test_text = "AI intelligence item for African startups in machine learning"
         
         # Simulate embedding generation (in real implementation, use OpenAI API)
         # For now, create a deterministic embedding based on text hash
@@ -246,7 +246,7 @@ def main():
     
     if pipeline_success:
         logger.info("\n🎉 All Pinecone tests passed!")
-        logger.info("✅ Vector database is ready for AI funding opportunity storage")
+        logger.info("✅ Vector database is ready for AI intelligence item storage")
         logger.info("✅ Semantic search capabilities are working")
         logger.info("✅ Ready for production data ingestion")
     else:

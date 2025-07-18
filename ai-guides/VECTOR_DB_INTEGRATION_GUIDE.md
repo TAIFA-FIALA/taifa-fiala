@@ -1,7 +1,7 @@
 # Vector Database Integration Guide
 ## How Vector DB Powers Equity-Aware AI Funding Discovery
 
-The vector database serves as the **semantic intelligence layer** that connects all equity-aware components, enabling sophisticated similarity search, Q&A, and bias detection across African AI funding opportunities.
+The vector database serves as the **semantic intelligence layer** that connects all equity-aware components, enabling sophisticated similarity search, Q&A, and bias detection across African AI intelligence feed.
 
 ---
 
@@ -46,11 +46,11 @@ The vector database serves as the **semantic intelligence layer** that connects 
 ```python
 # From vector_database.py - ETL Integration
 class VectorETLProcessor:
-    async def process_validated_opportunity(self, opportunity: FundingOpportunity, 
+    async def process_validated_opportunity(self, opportunity: AfricaIntelligenceItem, 
                                          validation_result: ValidationResult):
         # Index opportunity if validation passed
         if validation_result.status in ['approved', 'auto_approved']:
-            success = await self.vector_manager.index_funding_opportunity(opportunity)
+            success = await self.vector_manager.index_intelligence_item(opportunity)
             
         # Index validation result for search enhancement
         await self.vector_manager.index_validation_result(validation_result)
@@ -65,7 +65,7 @@ class VectorETLProcessor:
 ### **2. Equity-Aware Content Enhancement**
 ```python
 # Enhanced opportunity preparation with equity metadata
-def _prepare_opportunity_content(self, opportunity: FundingOpportunity) -> str:
+def _prepare_opportunity_content(self, opportunity: AfricaIntelligenceItem) -> str:
     content_parts = [
         f"Title: {opportunity.title}",
         f"Description: {opportunity.description}",
@@ -87,7 +87,7 @@ def _prepare_opportunity_content(self, opportunity: FundingOpportunity) -> str:
 ### **3. Metadata-Rich Vector Storage**
 ```python
 # From vector_database.py - Metadata preparation
-def _prepare_opportunity_metadata(self, opportunity: FundingOpportunity) -> Dict[str, Any]:
+def _prepare_opportunity_metadata(self, opportunity: AfricaIntelligenceItem) -> Dict[str, Any]:
     metadata = {
         'geographic_scopes': opportunity.geographic_scope_names,
         'ai_domains': opportunity.ai_domain_names,
@@ -319,4 +319,4 @@ The vector database transforms the AI Africa Funding Tracker from a simple searc
 6. **🌐 Language Agnostic**: Semantic search across 6+ languages
 7. **📈 Analytics**: Vector-based equity scoring and tracking
 
-The vector database is the **semantic brain** that makes all our equity-aware components work together intelligently, ensuring that African AI funding opportunities are discovered, analyzed, and surfaced in a way that actively promotes equity and inclusion.
+The vector database is the **semantic brain** that makes all our equity-aware components work together intelligently, ensuring that African AI intelligence feed are discovered, analyzed, and surfaced in a way that actively promotes equity and inclusion.

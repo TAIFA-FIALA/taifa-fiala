@@ -45,30 +45,30 @@ async def check_tables():
             
             print(f"Found {len(tables)} tables: {', '.join(tables)}")
             
-            # Check if funding_opportunities table exists
-            if 'funding_opportunities' in tables:
-                # Get columns for funding_opportunities table
+            # Check if africa_intelligence_feed table exists
+            if 'africa_intelligence_feed' in tables:
+                # Get columns for africa_intelligence_feed table
                 result = await conn.execute(text("""
                     SELECT column_name, data_type, character_maximum_length
                     FROM information_schema.columns
-                    WHERE table_name = 'funding_opportunities'
+                    WHERE table_name = 'africa_intelligence_feed'
                     ORDER BY ordinal_position
                 """))
                 
                 columns = [(row[0], row[1], row[2]) for row in result]
-                print("\nColumns in 'funding_opportunities' table:")
+                print("\nColumns in 'africa_intelligence_feed' table:")
                 for col_name, data_type, max_length in columns:
                     if max_length:
                         print(f"  - {col_name}: {data_type}({max_length})")
                     else:
                         print(f"  - {col_name}: {data_type}")
             else:
-                print("Table 'funding_opportunities' does not exist")
+                print("Table 'africa_intelligence_feed' does not exist")
                 
                 # Create tables if they don't exist
-                from backend.app.models import FundingOpportunity, Organization, DataSource
-                print("\nModel FundingOpportunity columns:")
-                for column in FundingOpportunity.__table__.columns:
+                from backend.app.models import AfricaIntelligenceItem, Organization, DataSource
+                print("\nModel AfricaIntelligenceItem columns:")
+                for column in AfricaIntelligenceItem.__table__.columns:
                     print(f"  - {column.name}: {column.type}")
     except Exception as e:
         print(f"Error checking database schema: {e}")

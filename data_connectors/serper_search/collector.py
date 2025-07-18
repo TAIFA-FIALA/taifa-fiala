@@ -11,7 +11,7 @@ from urllib.parse import urlparse
 logger = logging.getLogger(__name__)
 
 class SerperSearchCollector:
-    """Collects funding opportunities using Serper Google Search API"""
+    """Collects intelligence feed using Serper Google Search API"""
     
     def __init__(self, api_key: str):
         self.api_key = api_key
@@ -160,7 +160,7 @@ class SerperSearchCollector:
             for query_config in self.search_queries:
                 logger.info(f"Searching: {query_config['name']}")
                 
-                opportunities = await self._search_funding_opportunities(query_config)
+                opportunities = await self._search_africa_intelligence_feed(query_config)
                 all_opportunities.extend(opportunities)
                 
                 # Rate limiting - be respectful to the API
@@ -177,7 +177,7 @@ class SerperSearchCollector:
             if self.session:
                 await self.session.close()
     
-    async def _search_funding_opportunities(self, query_config: Dict[str, str]) -> List[Dict[str, Any]]:
+    async def _search_africa_intelligence_feed(self, query_config: Dict[str, str]) -> List[Dict[str, Any]]:
         """Execute a single search query with alternating locations"""
         
         # Alternate between London and New York based on day of year
@@ -222,7 +222,7 @@ class SerperSearchCollector:
             return []
     
     def _parse_search_results(self, data: Dict[str, Any], query_config: Dict[str, str]) -> List[Dict[str, Any]]:
-        """Parse Serper search results into funding opportunities"""
+        """Parse Serper search results into intelligence feed"""
         opportunities = []
         
         # Parse organic results
@@ -467,7 +467,7 @@ async def test_serper_collector():
     collector = SerperSearchCollector(api_key)
     opportunities = await collector.start_collection()
     
-    print(f"\n🎉 Found {len(opportunities)} funding opportunities!")
+    print(f"\n🎉 Found {len(opportunities)} intelligence feed!")
     
     # Print top 5 results
     for i, opp in enumerate(opportunities[:5], 1):

@@ -10,7 +10,7 @@ from app.api import api_router
 # Create FastAPI application
 app = FastAPI(
     title="AI Africa Funding Tracker",
-    description="Comprehensive platform to track AI funding opportunities in Africa",
+    description="Comprehensive platform to track AI intelligence feed in Africa",
     version="1.0.0",
     docs_url="/docs",
     redoc_url="/redoc",

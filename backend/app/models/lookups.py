@@ -5,7 +5,7 @@ from sqlalchemy.sql import func
 from app.core.database import Base
 
 class FundingType(Base):
-    """Types of funding opportunities (Grant, Prize, Scholarship, Investment, etc.)"""
+    """Types of intelligence feed (Grant, Prize, Scholarship, Investment, etc.)"""
     __tablename__ = "funding_types"
     
     id = Column(Integer, primary_key=True, index=True)
@@ -24,7 +24,7 @@ class FundingType(Base):
     required_stage = Column(String(50))  # 'idea', 'prototype', 'mvp', 'revenue', 'growth'
     
     # Relationships
-    opportunities = relationship("FundingOpportunity", back_populates="type")
+    opportunities = relationship("AfricaIntelligenceItem", back_populates="type")
     
     def __repr__(self):
         return f"<FundingType(id={self.id}, name='{self.name}', category='{self.category}')>"
@@ -54,9 +54,9 @@ class AIDomain(Base):
     parent_domain = relationship("AIDomain", remote_side=[id], back_populates="sub_domains")
     sub_domains = relationship("AIDomain", back_populates="parent_domain")
     
-    # Many-to-many relationship with funding opportunities
-    opportunities = relationship("FundingOpportunity", 
-                               secondary="funding_opportunity_ai_domains",
+    # Many-to-many relationship with intelligence feed
+    opportunities = relationship("AfricaIntelligenceItem", 
+                               secondary="intelligence_item_ai_domains",
                                back_populates="ai_domains")
     
     def __repr__(self):
@@ -79,8 +79,8 @@ class GeographicScope(Base):
     sub_scopes = relationship("GeographicScope", back_populates="parent_scope")
     
     # Many-to-many relationships
-    opportunities = relationship("FundingOpportunity",
-                               secondary="funding_opportunity_geographic_scopes",
+    opportunities = relationship("AfricaIntelligenceItem",
+                               secondary="intelligence_item_geographic_scopes",
                                back_populates="geographic_scopes")
     organizations = relationship("Organization",
                                secondary="organization_geographic_focus", 
@@ -102,7 +102,7 @@ class CommunityUser(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     
     # Relationships
-    submitted_opportunities = relationship("FundingOpportunity", back_populates="submitted_by")
+    submitted_opportunities = relationship("AfricaIntelligenceItem", back_populates="submitted_by")
     
     def __repr__(self):
         return f"<CommunityUser(id={self.id}, username='{self.username}', reputation={self.reputation_score})>"

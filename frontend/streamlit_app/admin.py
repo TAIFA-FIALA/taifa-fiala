@@ -94,7 +94,7 @@ class AdminPortal:
                 url = st.text_input(
                     "Source URL *", 
                     placeholder="https://example.com/funding-opportunities",
-                    help="Enter the URL of a funding opportunity or source page"
+                    help="Enter the URL of a intelligence item or source page"
                 )
                 
                 col_a, col_b = st.columns(2)
@@ -843,7 +843,7 @@ class AdminPortal:
         with col1:
             st.markdown("""
             **✅ Encourage users to submit:**
-            - AI/technology funding opportunities
+            - AI/technology intelligence feed
             - Africa-focused or inclusive programs
             - Active grants, scholarships, prizes
             - Clear application processes
@@ -904,7 +904,7 @@ class AdminPortal:
     def _render_method4_scheduled_scraping(self):
         """Render Method 4: RSS Feed Management interface"""
         st.header("⏰ Method 4: RSS Feed Management")
-        st.markdown("**Monitor RSS feeds and API endpoints for funding opportunities**")
+        st.markdown("**Monitor RSS feeds and API endpoints for intelligence feed**")
         
         # Sub-tabs for RSS management
         subtab1, subtab2, subtab3, subtab4 = st.tabs([
@@ -937,7 +937,7 @@ class AdminPortal:
                 url = st.text_input(
                     "Funding Source URL *", 
                     placeholder="https://example.com/funding-opportunities",
-                    help="Enter the URL of a funding opportunity or source page"
+                    help="Enter the URL of a intelligence item or source page"
                 )
                 
                 col_a, col_b = st.columns(2)
@@ -991,7 +991,7 @@ class AdminPortal:
     def _render_review_queue_interface(self):
         """Render the review queue interface"""
         st.header("📋 Review Queue")
-        st.markdown("**Human-in-the-loop review of extracted funding opportunities**")
+        st.markdown("**Human-in-the-loop review of extracted intelligence feed**")
         
         # Queue stats
         col1, col2, col3 = st.columns(3)
@@ -1641,7 +1641,7 @@ class AdminPortal:
                 "name": "UK Research Councils",
                 "url": "https://gtr.ukri.org/api/",
                 "status": "planned", 
-                "description": "UK research funding opportunities",
+                "description": "UK research intelligence feed",
                 "potential_hits": "20-40/week"
             },
             {

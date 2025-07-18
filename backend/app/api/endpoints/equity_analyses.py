@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from typing import List, Optional
 
 from app.core.database import get_db
-from app.models import Organization, FundingOpportunity, CommunityUser, GeographicScope, AIDomain
+from app.models import Organization, AfricaIntelligenceItem, CommunityUser, GeographicScope, AIDomain
 
 router = APIRouter()
 
@@ -16,10 +16,10 @@ async def get_geographical_distribution(db: Session = Depends(get_db)):
     results = db.query(
         GeographicScope.name,
         GeographicScope.scope_type,
-        func.count(distinct(FundingOpportunity.id)).label('opportunity_count'),
-        func.sum(cast(FundingOpportunity.funding_amount, Float)).label('total_funding')
+        func.count(distinct(AfricaIntelligenceItem.id)).label('opportunity_count'),
+        func.sum(cast(AfricaIntelligenceItem.funding_amount, Float)).label('total_funding')
     ).join(
-        FundingOpportunity.geographic_scopes
+        AfricaIntelligenceItem.geographic_scopes
     ).filter(
         GeographicScope.scope_type.in_(['country', 'region']),
         GeographicScope.name.in_([
@@ -183,7 +183,7 @@ async def get_featured_founders(db: Session = Depends(get_db)):
 @router.get("/funding-stages")
 async def get_funding_stages(db: Session = Depends(get_db)):
     """Get funding stage distribution and progression data"""
-    # This would normally query from funding opportunities with stage information
+    # This would normally query from intelligence feed with stage information
     # For demo purposes, we'll return representative data based on the statistic
     # that 69% of deals are stuck at seed stage
     
@@ -224,7 +224,7 @@ async def get_funding_stages(db: Session = Depends(get_db)):
 @router.get("/funding-distribution")
 async def get_funding_distribution(db: Session = Depends(get_db)):
     """Get detailed funding distribution across African countries"""
-    # This would normally query from funding opportunities with geographic data
+    # This would normally query from intelligence feed with geographic data
     # For demo purposes, we'll return representative data based on the 83% statistic
     
     # Mock data showing 83% of funding goes to top 4 countries

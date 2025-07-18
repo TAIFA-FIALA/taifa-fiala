@@ -21,7 +21,7 @@ def create_policies():
     # Tables to create policies for
     tables = [
         'health_check',
-        'funding_opportunities',
+        'africa_intelligence_feed',
         'organizations',
         'funding_types'
     ]
@@ -55,8 +55,8 @@ def create_policies():
             USING (true);
         """)
         
-        # Policy 4: Allow insert for authenticated users (for funding_opportunities)
-        if table == 'funding_opportunities':
+        # Policy 4: Allow insert for authenticated users (for africa_intelligence_feed)
+        if table == 'africa_intelligence_feed':
             policy_statements.append(f"""
                 CREATE POLICY "Enable insert for authenticated users" ON {table}
                 FOR INSERT
@@ -120,29 +120,29 @@ def test_policies():
     except Exception as e:
         print(f"❌ health_check table - read failed: {e}")
     
-    # Test reading from funding_opportunities
+    # Test reading from africa_intelligence_feed
     try:
-        result = client.table('funding_opportunities').select('*').limit(1).execute()
-        print("✅ funding_opportunities table - read access works")
+        result = client.table('africa_intelligence_feed').select('*').limit(1).execute()
+        print("✅ africa_intelligence_feed table - read access works")
     except Exception as e:
-        print(f"❌ funding_opportunities table - read failed: {e}")
+        print(f"❌ africa_intelligence_feed table - read failed: {e}")
     
-    # Test inserting into funding_opportunities
+    # Test inserting into africa_intelligence_feed
     try:
         test_record = {
             'title': 'Policy Test',
             'description': 'Testing RLS policies'
         }
-        result = client.table('funding_opportunities').insert(test_record).execute()
-        print("✅ funding_opportunities table - insert access works")
+        result = client.table('africa_intelligence_feed').insert(test_record).execute()
+        print("✅ africa_intelligence_feed table - insert access works")
         
         # Clean up test record
         if result.data:
-            client.table('funding_opportunities').delete().eq('title', 'Policy Test').execute()
+            client.table('africa_intelligence_feed').delete().eq('title', 'Policy Test').execute()
             print("✅ Test record cleaned up")
             
     except Exception as e:
-        print(f"❌ funding_opportunities table - insert failed: {e}")
+        print(f"❌ africa_intelligence_feed table - insert failed: {e}")
 
 if __name__ == "__main__":
     print("🔐 Creating RLS Policies for AI Africa Funding Tracker")
@@ -156,7 +156,7 @@ if __name__ == "__main__":
         print("\n🎉 Your database is now properly secured with RLS!")
         print("\nYour tables now have the following access:")
         print("- Service role: Full access (for your backend)")
-        print("- Authenticated users: Read access + Insert for funding_opportunities")
+        print("- Authenticated users: Read access + Insert for africa_intelligence_feed")
         print("- Anonymous users: Read access (for public data)")
         print("\nThe security warning should now disappear from your dashboard.")
     else:

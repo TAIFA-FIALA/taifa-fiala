@@ -26,7 +26,7 @@ const nextConfig: NextConfig = {
   
   // Image optimization
   images: {
-    domains: ['example.org', 'demo.fund'], // Add domains for funding opportunity images
+    domains: ['example.org', 'demo.fund'], // Add domains for intelligence item images
     remotePatterns: [
       {
         protocol: 'https',

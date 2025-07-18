@@ -215,14 +215,14 @@ opportunity_patterns = [
 ### Indexes
 ```sql
 -- Full-text search
-CREATE INDEX idx_opportunities_search ON funding_opportunities USING gin(search_vector);
+CREATE INDEX idx_opportunities_search ON africa_intelligence_feed USING gin(search_vector);
 
 -- Duplicate detection
-CREATE INDEX idx_opportunities_title_hash ON funding_opportunities(title_hash);
-CREATE INDEX idx_opportunities_org_amount ON funding_opportunities(organization_name, amount_usd);
+CREATE INDEX idx_opportunities_title_hash ON africa_intelligence_feed(title_hash);
+CREATE INDEX idx_opportunities_org_amount ON africa_intelligence_feed(organization_name, amount_usd);
 
 -- Temporal queries
-CREATE INDEX idx_opportunities_created_at ON funding_opportunities(created_at DESC);
+CREATE INDEX idx_opportunities_created_at ON africa_intelligence_feed(created_at DESC);
 ```
 
 ### Connection Pooling

@@ -1,14 +1,14 @@
-# Funding Opportunities Schema Analysis and Fix
+# Intelligence Feed Schema Analysis and Fix
 
 ## Issue Summary
-The data ingestion script was failing because it was trying to insert data with an `organization_name` column that doesn't exist in the `funding_opportunities` table.
+The data ingestion script was failing because it was trying to insert data with an `organization_name` column that doesn't exist in the `africa_intelligence_feed` table.
 
 ## Root Cause
 The script was using outdated field names that don't match the actual database schema.
 
 ## Database Schema Analysis
 
-### Actual Columns in funding_opportunities Table:
+### Actual Columns in africa_intelligence_feed Table:
 - `id` (Primary Key)
 - `title` (Required)
 - `description` (Required)

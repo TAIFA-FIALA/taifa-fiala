@@ -43,12 +43,12 @@ SessionLocal = sessionmaker(
 Base = declarative_base()
 
 # Import the model using the updated path
-from backend.app.models.funding import FundingOpportunity
+from backend.app.models.funding import AfricaIntelligenceItem
 from backend.app.models.organization import Organization
 
 
 def generate_content_hash(data: Dict[str, Any]) -> str:
-    """Generate a content hash from the funding opportunity data"""
+    """Generate a content hash from the intelligence item data"""
     # Create a string representation of key fields to hash
     hash_content = f"{data.get('title', '')}{data.get('description', '')}{data.get('source_url', '')}"
     # Generate MD5 hash (sufficient for deduplication purposes)
@@ -81,7 +81,7 @@ async def get_or_create_organization(db: AsyncSession, org_name: str) -> Optiona
         print(f"Created new organization: {org_name} (ID: {new_org.id})")
         return new_org
 
-async def insert_funding_opportunities(opportunities: List[Dict[str, Any]]):
+async def insert_africa_intelligence_feed(opportunities: List[Dict[str, Any]]):
     async with SessionLocal() as db: # Use async with for session
         try:
             inserted_count = 0
@@ -112,21 +112,21 @@ async def insert_funding_opportunities(opportunities: List[Dict[str, Any]]):
                 content_hash = generate_content_hash(opp_data)
                 
                 # Check if this content hash already exists to avoid duplicates
-                result = await db.execute(select(FundingOpportunity).where(
-                    FundingOpportunity.content_hash == content_hash
+                result = await db.execute(select(AfricaIntelligenceItem).where(
+                    AfricaIntelligenceItem.content_hash == content_hash
                 ))
                 existing_opp = result.scalars().first()
                 
                 if existing_opp:
-                    print(f"Skipping duplicate funding opportunity: {opp_data.get('title')}")
+                    print(f"Skipping duplicate intelligence item: {opp_data.get('title')}")
                     continue
                 
                 # Get or create the organization
                 org_name = opp_data.get("source_organization", "Unknown")
                 organization = await get_or_create_organization(db, org_name)
                 
-                # Create FundingOpportunity object with proper relationship
-                funding_opp = FundingOpportunity(
+                # Create AfricaIntelligenceItem object with proper relationship
+                funding_opp = AfricaIntelligenceItem(
                     title=opp_data.get("title"),
                     description=opp_data.get("description"),
                     funding_amount=opp_data.get("amount"),  # Store as text as per DB schema
@@ -164,13 +164,13 @@ async def insert_funding_opportunities(opportunities: List[Dict[str, Any]]):
                 print(f"✅ Prepared opportunity: {opp_data.get('title')[:50]}... -> Org: {org_name}")
                 
             await db.commit() # Await commit
-            print(f"🎉 Successfully inserted {inserted_count} funding opportunities with proper relationships!")
+            print(f"🎉 Successfully inserted {inserted_count} intelligence feed with proper relationships!")
             
             # Display relationship summary
             print("\n📊 Relationship Summary:")
             result = await db.execute(
-                select(FundingOpportunity.organization_id, FundingOpportunity.organization_name)
-                .where(FundingOpportunity.organization_id.isnot(None))
+                select(AfricaIntelligenceItem.organization_id, AfricaIntelligenceItem.organization_name)
+                .where(AfricaIntelligenceItem.organization_id.isnot(None))
             )
             linked_opportunities = result.fetchall()
             print(f"   - {len(linked_opportunities)} opportunities properly linked to organizations")
@@ -178,8 +178,8 @@ async def insert_funding_opportunities(opportunities: List[Dict[str, Any]]):
             # Show organization counts
             from sqlalchemy import func
             result = await db.execute(
-                select(Organization.name, func.count(FundingOpportunity.id))
-                .join(FundingOpportunity, Organization.id == FundingOpportunity.organization_id)
+                select(Organization.name, func.count(AfricaIntelligenceItem.id))
+                .join(AfricaIntelligenceItem, Organization.id == AfricaIntelligenceItem.organization_id)
                 .group_by(Organization.name)
             )
             org_counts = result.fetchall()
@@ -189,7 +189,7 @@ async def insert_funding_opportunities(opportunities: List[Dict[str, Any]]):
                 
         except Exception as e:
             await db.rollback() # Await rollback
-            print(f"❌ Error inserting funding opportunities: {e}")
+            print(f"❌ Error inserting intelligence feed: {e}")
             import traceback
             traceback.print_exc()
 
@@ -199,10 +199,10 @@ async def test_relationships():
     
     async with SessionLocal() as db:
         try:
-            # Test 1: Load organization with funding opportunities
+            # Test 1: Load organization with intelligence feed
             result = await db.execute(
                 select(Organization)
-                .where(Organization.funding_opportunities.any())
+                .where(Organization.africa_intelligence_feed.any())
                 .limit(1)
             )
             org = result.scalars().first()
@@ -210,18 +210,18 @@ async def test_relationships():
             if org:
                 print(f"✅ Found organization: {org.name}")
                 
-                # Test accessing related funding opportunities
-                await db.refresh(org, ['funding_opportunities'])
-                opportunities = org.funding_opportunities
+                # Test accessing related intelligence feed
+                await db.refresh(org, ['africa_intelligence_feed'])
+                opportunities = org.africa_intelligence_feed
                 print(f"✅ Related opportunities: {len(opportunities)} found")
                 
                 for opp in opportunities[:3]:  # Show first 3
                     print(f"   • {opp.title[:60]}...")
             
-            # Test 2: Load funding opportunity with organization
+            # Test 2: Load intelligence item with organization
             result = await db.execute(
-                select(FundingOpportunity)
-                .where(FundingOpportunity.organization_id.isnot(None))
+                select(AfricaIntelligenceItem)
+                .where(AfricaIntelligenceItem.organization_id.isnot(None))
                 .limit(1)
             )
             opp = result.scalars().first()
@@ -250,20 +250,20 @@ if __name__ == "__main__":
     print("=" * 60)
     
     try:
-        with open("funding_opportunities.json", "r", encoding="utf-8") as f:
+        with open("africa_intelligence_feed.json", "r", encoding="utf-8") as f:
             opportunities_data = json.load(f)
         
         print(f"📁 Loaded {len(opportunities_data)} opportunities from JSON")
         
         # Run insertion with new relationship support
-        asyncio.run(insert_funding_opportunities(opportunities_data))
+        asyncio.run(insert_africa_intelligence_feed(opportunities_data))
         
         # Test the relationships
         asyncio.run(test_relationships())
         
     except FileNotFoundError:
-        print("❌ Error: funding_opportunities.json not found. Please run the extractor first.")
+        print("❌ Error: africa_intelligence_feed.json not found. Please run the extractor first.")
     except Exception as e:
-        print(f"❌ Error loading or processing funding_opportunities.json: {e}")
+        print(f"❌ Error loading or processing africa_intelligence_feed.json: {e}")
         import traceback
         traceback.print_exc()

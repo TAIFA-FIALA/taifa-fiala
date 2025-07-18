@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Simple script to initialize funding opportunities table
+Simple script to initialize intelligence feed table
 """
 
 import asyncio
@@ -15,7 +15,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 async def init_funding_table():
-    """Initialize the funding opportunities table"""
+    """Initialize the intelligence feed table"""
     
     database_url = os.getenv("DATABASE_URL")
     if not database_url:
@@ -25,9 +25,9 @@ async def init_funding_table():
     try:
         conn = await asyncpg.connect(database_url)
         
-        # Create the funding opportunities table
+        # Create the intelligence feed table
         await conn.execute("""
-            CREATE TABLE IF NOT EXISTS funding_opportunities (
+            CREATE TABLE IF NOT EXISTS africa_intelligence_feed (
                 id SERIAL PRIMARY KEY,
                 title TEXT NOT NULL,
                 description TEXT,
@@ -62,15 +62,15 @@ async def init_funding_table():
         """)
         
         # Create indexes
-        await conn.execute("CREATE INDEX IF NOT EXISTS idx_content_hash ON funding_opportunities(content_hash);")
-        await conn.execute("CREATE INDEX IF NOT EXISTS idx_source_type ON funding_opportunities(source_type);")
-        await conn.execute("CREATE INDEX IF NOT EXISTS idx_relevance_score ON funding_opportunities(overall_relevance_score);")
-        await conn.execute("CREATE INDEX IF NOT EXISTS idx_discovered_date ON funding_opportunities(discovered_date);")
+        await conn.execute("CREATE INDEX IF NOT EXISTS idx_content_hash ON africa_intelligence_feed(content_hash);")
+        await conn.execute("CREATE INDEX IF NOT EXISTS idx_source_type ON africa_intelligence_feed(source_type);")
+        await conn.execute("CREATE INDEX IF NOT EXISTS idx_relevance_score ON africa_intelligence_feed(overall_relevance_score);")
+        await conn.execute("CREATE INDEX IF NOT EXISTS idx_discovered_date ON africa_intelligence_feed(discovered_date);")
         
         logger.info("✅ Funding opportunities table created successfully")
         
         # Test the table
-        result = await conn.fetchval("SELECT COUNT(*) FROM funding_opportunities")
+        result = await conn.fetchval("SELECT COUNT(*) FROM africa_intelligence_feed")
         logger.info(f"📊 Current opportunities in database: {result}")
         
         await conn.close()

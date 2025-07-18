@@ -30,7 +30,7 @@ class OpportunityType(Enum):
 
 @dataclass
 class OpportunityPrediction:
-    """Represents a predicted funding opportunity"""
+    """Represents a predicted intelligence item"""
     opportunity_type: OpportunityType
     title: str
     description: str
@@ -56,7 +56,7 @@ class OpportunityPrediction:
 
 class OpportunityPredictor:
     """
-    Predict future funding opportunities from current events
+    Predict future intelligence feed from current events
     """
     
     def __init__(self):
@@ -217,7 +217,7 @@ class OpportunityPredictor:
     
     async def predict_opportunities(self, recent_events: List[Dict[str, Any]]) -> List[OpportunityPrediction]:
         """
-        Predict future funding opportunities from current events
+        Predict future intelligence feed from current events
         """
         predictions = []
         
@@ -237,7 +237,7 @@ class OpportunityPredictor:
     
     async def _analyze_event_for_opportunities(self, event: Dict[str, Any]) -> List[OpportunityPrediction]:
         """
-        Analyze a single event for funding opportunities
+        Analyze a single event for intelligence feed
         """
         predictions = []
         event_type = event.get('signal_type', 'unknown')

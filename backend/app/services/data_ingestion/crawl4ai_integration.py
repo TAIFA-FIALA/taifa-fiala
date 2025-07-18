@@ -89,7 +89,7 @@ class CrawlTarget:
     url: str
     target_type: str  # 'funding_database', 'news_site', 'org_website', 'search_result'
     priority: int = 1
-    extraction_strategy: str = "funding_opportunity"
+    extraction_strategy: str = "intelligence_item"
     metadata: Dict[str, Any] = field(default_factory=dict)
     last_crawled: Optional[datetime] = None
     success_count: int = 0
@@ -141,11 +141,11 @@ class EnhancedCrawl4AIProcessor:
     def _initialize_extraction_strategies(self):
         """Initialize different extraction strategies for different content types"""
         self.extraction_strategies = {
-            'funding_opportunity': LLMExtractionStrategy(
+            'intelligence_item': LLMExtractionStrategy(
                 provider=self.config.llm_provider,
                 api_token=self.config.llm_api_key,
                 instruction="""
-                Extract comprehensive funding opportunity information from this webpage.
+                Extract comprehensive intelligence item information from this webpage.
                 
                 Look for and extract:
                 1. FUNDING DETAILS:
@@ -203,7 +203,7 @@ class EnhancedCrawl4AIProcessor:
                     "source_quality_indicators": ["array of strings"]
                 }
                 
-                IMPORTANT: Only extract real funding opportunities, not general information.
+                IMPORTANT: Only extract real intelligence feed, not general information.
                 """,
                 schema=None,
                 extraction_type="json"
@@ -314,14 +314,14 @@ class EnhancedCrawl4AIProcessor:
                 url="https://grantsdatabase.org/category/africa/",
                 target_type="funding_database",
                 priority=1,
-                extraction_strategy="funding_opportunity",
+                extraction_strategy="intelligence_item",
                 metadata={'source_name': 'Grants Database - Africa'}
             ),
             CrawlTarget(
                 url="https://www.grants.gov/search-grants.html",
                 target_type="funding_database",
                 priority=2,
-                extraction_strategy="funding_opportunity",
+                extraction_strategy="intelligence_item",
                 metadata={'source_name': 'Grants.gov'}
             ),
             
@@ -330,14 +330,14 @@ class EnhancedCrawl4AIProcessor:
                 url="https://www.gatesfoundation.org/how-we-work/quick-links/grants-database",
                 target_type="org_website",
                 priority=1,
-                extraction_strategy="funding_opportunity",
+                extraction_strategy="intelligence_item",
                 metadata={'source_name': 'Gates Foundation'}
             ),
             CrawlTarget(
                 url="https://www.mozillafoundation.org/en/what-we-fund/",
                 target_type="org_website",
                 priority=2,
-                extraction_strategy="funding_opportunity",
+                extraction_strategy="intelligence_item",
                 metadata={'source_name': 'Mozilla Foundation'}
             ),
             
@@ -346,14 +346,14 @@ class EnhancedCrawl4AIProcessor:
                 url="https://www.afdb.org/en/topics-and-sectors/initiatives-partnerships/",
                 target_type="org_website",
                 priority=1,
-                extraction_strategy="funding_opportunity",
+                extraction_strategy="intelligence_item",
                 metadata={'source_name': 'African Development Bank'}
             ),
             CrawlTarget(
                 url="https://www.mastercardfdn.org/what-we-do/",
                 target_type="org_website",
                 priority=1,
-                extraction_strategy="funding_opportunity",
+                extraction_strategy="intelligence_item",
                 metadata={'source_name': 'Mastercard Foundation'}
             ),
             
@@ -362,14 +362,14 @@ class EnhancedCrawl4AIProcessor:
                 url="https://ai.google/commitments/",
                 target_type="org_website",
                 priority=2,
-                extraction_strategy="funding_opportunity",
+                extraction_strategy="intelligence_item",
                 metadata={'source_name': 'Google AI'}
             ),
             CrawlTarget(
                 url="https://www.microsoft.com/en-us/corporate-responsibility/",
                 target_type="org_website",
                 priority=2,
-                extraction_strategy="funding_opportunity",
+                extraction_strategy="intelligence_item",
                 metadata={'source_name': 'Microsoft'}
             )
         ]
@@ -552,7 +552,7 @@ class EnhancedCrawl4AIProcessor:
             # Get extraction strategy
             extraction_strategy = self.extraction_strategies.get(
                 target.extraction_strategy, 
-                self.extraction_strategies['funding_opportunity']
+                self.extraction_strategies['intelligence_item']
             )
             
             # Create crawler config
@@ -693,7 +693,7 @@ class EnhancedCrawl4AIProcessor:
         return filtered
     
     def _calculate_relevance_score(self, opportunity: Dict[str, Any]) -> float:
-        """Calculate relevance score for funding opportunity"""
+        """Calculate relevance score for intelligence item"""
         score = 0.0
         
         # AI/tech keywords

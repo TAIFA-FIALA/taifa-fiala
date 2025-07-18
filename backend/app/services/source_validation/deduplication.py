@@ -119,7 +119,7 @@ class URLDeduplicator:
             # Check for exact URL match
             exact_match = await db.fetch_one(
                 """
-                SELECT id, url FROM funding_opportunities 
+                SELECT id, url FROM africa_intelligence_feed 
                 WHERE url = $1 OR url = $2
                 """,
                 opportunity_url, normalized_url
@@ -143,7 +143,7 @@ class URLDeduplicator:
                 # Look for URLs with same domain and similar path structure
                 similar_urls = await db.fetch_all(
                     """
-                    SELECT id, url FROM funding_opportunities 
+                    SELECT id, url FROM africa_intelligence_feed 
                     WHERE url ILIKE $1 AND url != $2
                     LIMIT 10
                     """,
@@ -221,7 +221,7 @@ class ContentDeduplicator:
             # Check for exact content hash match
             hash_match = await db.fetch_one(
                 """
-                SELECT id, title, url FROM funding_opportunities 
+                SELECT id, title, url FROM africa_intelligence_feed 
                 WHERE content_hash = $1
                 """,
                 content_hash
@@ -261,7 +261,7 @@ class ContentDeduplicator:
             recent_opportunities = await db.fetch_all(
                 """
                 SELECT id, title, description, url, embedding
-                FROM funding_opportunities 
+                FROM africa_intelligence_feed 
                 WHERE organization_name ILIKE $1 
                 AND created_at > $2
                 AND embedding IS NOT NULL
@@ -357,7 +357,7 @@ class MetadataDeduplicator:
             # Execute query
             query = f"""
                 SELECT id, title, organization_name, amount, deadline, url
-                FROM funding_opportunities 
+                FROM africa_intelligence_feed 
                 WHERE {' AND '.join(conditions)}
                 ORDER BY created_at DESC
                 LIMIT 10

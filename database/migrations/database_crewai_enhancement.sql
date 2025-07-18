@@ -9,7 +9,7 @@
 -- Agent processing logs for learning and performance monitoring
 CREATE TABLE IF NOT EXISTS agent_processing_logs (
     id SERIAL PRIMARY KEY,
-    opportunity_id INTEGER REFERENCES funding_opportunities(id),
+    opportunity_id INTEGER REFERENCES africa_intelligence_feed(id),
     agent_name VARCHAR(100) NOT NULL,
     input_data JSONB,
     output_data JSONB,
@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS rejected_opportunities (
 -- Track conflicts between agents and their resolutions
 CREATE TABLE IF NOT EXISTS conflict_resolutions (
     id SERIAL PRIMARY KEY,
-    opportunity_id INTEGER REFERENCES funding_opportunities(id),
+    opportunity_id INTEGER REFERENCES africa_intelligence_feed(id),
     batch_id VARCHAR(100), -- Group conflicts from same processing batch
     
     -- Conflict details
@@ -212,8 +212,8 @@ CREATE TABLE IF NOT EXISTS processing_batches (
 -- ENHANCED FUNDING OPPORTUNITIES
 -- =======================================================
 
--- Add CrewAI-specific fields to existing funding_opportunities table
-ALTER TABLE funding_opportunities 
+-- Add CrewAI-specific fields to existing africa_intelligence_feed table
+ALTER TABLE africa_intelligence_feed 
 ADD COLUMN IF NOT EXISTS processing_metadata JSONB DEFAULT '{}',
 ADD COLUMN IF NOT EXISTS agent_scores JSONB DEFAULT '{}',
 ADD COLUMN IF NOT EXISTS conflicts_detected JSONB DEFAULT '[]',
@@ -232,7 +232,7 @@ ADD COLUMN IF NOT EXISTS auto_publish_at TIMESTAMP;
 -- Community validation tracking
 CREATE TABLE IF NOT EXISTS community_validations (
     id SERIAL PRIMARY KEY,
-    opportunity_id INTEGER REFERENCES funding_opportunities(id),
+    opportunity_id INTEGER REFERENCES africa_intelligence_feed(id),
     validator_user_id VARCHAR(100) NOT NULL,
     
     -- Validation details
@@ -455,7 +455,7 @@ SELECT
     AVG(overall_confidence_score) as avg_confidence,
     AVG(JSONB_ARRAY_LENGTH(conflicts_detected)) as avg_conflicts_per_item,
     COUNT(DISTINCT processing_batch_id) as processing_batches
-FROM funding_opportunities
+FROM africa_intelligence_feed
 WHERE created_at >= CURRENT_DATE - INTERVAL '30 days'
 GROUP BY DATE(created_at)
 ORDER BY processing_date DESC;
@@ -495,10 +495,10 @@ ORDER BY rejection_count DESC;
 -- =======================================================
 
 -- Additional indexes for the new tables
-CREATE INDEX IF NOT EXISTS idx_funding_confidence ON funding_opportunities(overall_confidence_score);
-CREATE INDEX IF NOT EXISTS idx_funding_review_status ON funding_opportunities(review_status);
-CREATE INDEX IF NOT EXISTS idx_funding_batch ON funding_opportunities(processing_batch_id);
-CREATE INDEX IF NOT EXISTS idx_funding_community_deadline ON funding_opportunities(community_review_deadline);
+CREATE INDEX IF NOT EXISTS idx_funding_confidence ON africa_intelligence_feed(overall_confidence_score);
+CREATE INDEX IF NOT EXISTS idx_funding_review_status ON africa_intelligence_feed(review_status);
+CREATE INDEX IF NOT EXISTS idx_funding_batch ON africa_intelligence_feed(processing_batch_id);
+CREATE INDEX IF NOT EXISTS idx_funding_community_deadline ON africa_intelligence_feed(community_review_deadline);
 
 -- =======================================================
 -- FINAL SUCCESS MESSAGE

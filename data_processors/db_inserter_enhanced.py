@@ -46,11 +46,11 @@ SessionLocal = sessionmaker(
 )
 
 # Import the enhanced models
-from backend.app.models.funding import FundingOpportunity
+from backend.app.models.funding import AfricaIntelligenceItem
 from backend.app.models.organization import Organization
 
 def generate_content_hash(data: Dict[str, Any]) -> str:
-    """Generate a content hash from the funding opportunity data"""
+    """Generate a content hash from the intelligence item data"""
     hash_content = f"{data.get('title', '')}{data.get('description', '')}{data.get('source_url', '')}"
     return hashlib.md5(hash_content.encode('utf-8')).hexdigest()
 
@@ -154,8 +154,8 @@ async def calculate_deadline_urgency(deadline_date) -> str:
     else:
         return "low"
 
-async def insert_enhanced_funding_opportunities(opportunities: List[Dict[str, Any]]):
-    """Enhanced funding opportunity insertion with new schema features"""
+async def insert_enhanced_africa_intelligence_feed(opportunities: List[Dict[str, Any]]):
+    """Enhanced intelligence item insertion with new schema features"""
     async with SessionLocal() as db:
         try:
             inserted_count = 0
@@ -193,8 +193,8 @@ async def insert_enhanced_funding_opportunities(opportunities: List[Dict[str, An
                 content_hash = generate_content_hash(opp_data)
                 
                 # Check for duplicates
-                result = await db.execute(select(FundingOpportunity).where(
-                    FundingOpportunity.content_hash == content_hash
+                result = await db.execute(select(AfricaIntelligenceItem).where(
+                    AfricaIntelligenceItem.content_hash == content_hash
                 ))
                 existing_opp = result.scalars().first()
                 
@@ -222,8 +222,8 @@ async def insert_enhanced_funding_opportunities(opportunities: List[Dict[str, An
                 # Enhanced currency detection
                 detected_currency = detect_currency(opp_data.get("amount", ""))
                 
-                # Create enhanced FundingOpportunity with all new features
-                funding_opp = FundingOpportunity(
+                # Create enhanced AfricaIntelligenceItem with all new features
+                funding_opp = AfricaIntelligenceItem(
                     # Core fields
                     title=opp_data.get("title"),
                     description=opp_data.get("description"),
@@ -327,7 +327,7 @@ async def display_enhanced_analytics(db: AsyncSession):
     # Deadline urgency distribution
     urgency_stats = await db.execute("""
         SELECT deadline_urgency, COUNT(*) as count
-        FROM funding_opportunities
+        FROM africa_intelligence_feed
         WHERE deadline_urgency IS NOT NULL
         GROUP BY deadline_urgency
         ORDER BY count DESC
@@ -372,13 +372,13 @@ if __name__ == "__main__":
     print("=" * 80)
     
     try:
-        with open("funding_opportunities.json", "r", encoding="utf-8") as f:
+        with open("africa_intelligence_feed.json", "r", encoding="utf-8") as f:
             opportunities_data = json.load(f)
         
         print(f"📁 Loaded {len(opportunities_data)} opportunities from JSON")
         
         # Run enhanced insertion
-        asyncio.run(insert_enhanced_funding_opportunities(opportunities_data))
+        asyncio.run(insert_enhanced_africa_intelligence_feed(opportunities_data))
         
         print("\n💡 Next Steps for Maximum Competitor Advantage:")
         print("   1. 🚨 Implement deadline countdown widgets in frontend")
@@ -393,7 +393,7 @@ if __name__ == "__main__":
         print("\n🏆 TAIFA now significantly exceeds competitor capabilities!")
         
     except FileNotFoundError:
-        print("❌ Error: funding_opportunities.json not found. Please run the extractor first.")
+        print("❌ Error: africa_intelligence_feed.json not found. Please run the extractor first.")
     except Exception as e:
         print(f"❌ Error loading or processing data: {e}")
         import traceback

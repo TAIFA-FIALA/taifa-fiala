@@ -3,7 +3,7 @@ Priority African Data Sources Configuration
 ==========================================
 
 Configuration and management of high-priority African data sources
-for funding opportunity discovery, specifically targeting underserved
+for intelligence item discovery, specifically targeting underserved
 regions and priority sectors.
 
 Based on architecture review recommendations focusing on:

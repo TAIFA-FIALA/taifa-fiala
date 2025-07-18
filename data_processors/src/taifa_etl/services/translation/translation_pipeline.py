@@ -37,7 +37,7 @@ class TranslationStatus(Enum):
     REVIEWED = "reviewed"
 
 class ContentType(Enum):
-    FUNDING_OPPORTUNITY = "funding_opportunity"
+    FUNDING_OPPORTUNITY = "intelligence_item"
     ORGANIZATION_PROFILE = "organization_profile"
     USER_CONTENT = "user_content"
     MANUAL_SUBMISSION = "manual_submission"
@@ -298,7 +298,7 @@ class OpenAITranslationProvider(TranslationProvider):
         if content_type == ContentType.FUNDING_OPPORTUNITY.value:
             base_prompt += """
             
-            This is funding opportunity content. Please:
+            This is intelligence item content. Please:
             - Maintain all technical terms and proper nouns accurately
             - Keep funding amounts, dates, and contact information exactly as provided
             - Use formal, professional language appropriate for institutional communication
@@ -390,7 +390,7 @@ class ProviderSelector:
         self.providers = providers
         self.usage_stats = {}  # Track daily usage per provider
         self.quality_scores = {
-            "funding_opportunity": {
+            "intelligence_item": {
                 "deepl": 0.95,
                 "openai_gpt4": 0.97,
                 "azure_translator": 0.92,
@@ -564,11 +564,11 @@ class TranslationPipelineService:
         self.is_processing = False
     
     # Entry Point 1: ETL Pipeline
-    async def translate_funding_opportunity(self, opportunity_id: int, priority: TranslationPriority = TranslationPriority.MEDIUM) -> str:
-        """Entry point for funding opportunity translation"""
+    async def translate_intelligence_item(self, opportunity_id: int, priority: TranslationPriority = TranslationPriority.MEDIUM) -> str:
+        """Entry point for intelligence item translation"""
         
         # Get opportunity content from database
-        content = await self._get_funding_opportunity_content(opportunity_id)
+        content = await self._get_intelligence_item_content(opportunity_id)
         
         request = TranslationRequest(
             id="",  # Will be generated
@@ -738,18 +738,18 @@ class TranslationPipelineService:
             logging.error(f"Translation failed for {request.id}: {e}")
             self.queue.mark_failed(request.id, e)
     
-    async def _get_funding_opportunity_content(self, opportunity_id: int) -> Dict[str, str]:
-        """Get funding opportunity content for translation"""
+    async def _get_intelligence_item_content(self, opportunity_id: int) -> Dict[str, str]:
+        """Get intelligence item content for translation"""
         try:
             # This would query your database
             # For now, return mock data
             return {
-                "title": "Sample Funding Opportunity",
-                "description": "This is a sample funding opportunity for AI research in Africa.",
+                "title": "Sample Intelligence Item",
+                "description": "This is a sample intelligence item for AI research in Africa.",
                 "summary": "Brief summary of the opportunity."
             }
         except Exception as e:
-            logging.error(f"Failed to get funding opportunity content: {e}")
+            logging.error(f"Failed to get intelligence item content: {e}")
             return {}
     
     async def _get_organization_content(self, organization_id: int) -> Dict[str, str]:
@@ -793,7 +793,7 @@ class TranslationPipelineService:
     def _get_source_table(self, content_type: ContentType) -> str:
         """Map content type to database table"""
         mapping = {
-            ContentType.FUNDING_OPPORTUNITY: "funding_opportunities",
+            ContentType.FUNDING_OPPORTUNITY: "africa_intelligence_feed",
             ContentType.ORGANIZATION_PROFILE: "organizations",
             ContentType.USER_CONTENT: "user_content",
             ContentType.MANUAL_SUBMISSION: "manual_submissions",
@@ -835,11 +835,11 @@ async def create_translation_service() -> TranslationPipelineService:
     service = TranslationPipelineService(provider_configs)
     return service
 
-async def webhook_translate_funding_opportunity(opportunity_id: int) -> Dict[str, str]:
-    """Webhook endpoint for funding opportunity translation"""
+async def webhook_translate_intelligence_item(opportunity_id: int) -> Dict[str, str]:
+    """Webhook endpoint for intelligence item translation"""
     
     service = await create_translation_service()
-    request_id = await service.translate_funding_opportunity(opportunity_id)
+    request_id = await service.translate_intelligence_item(opportunity_id)
     
     return {
         "request_id": request_id,

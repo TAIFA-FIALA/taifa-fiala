@@ -180,7 +180,7 @@ CREATE TABLE IF NOT EXISTS user_submissions (
 -- Content Fingerprint table
 CREATE TABLE IF NOT EXISTS content_fingerprint (
     id SERIAL PRIMARY KEY,
-    opportunity_id INTEGER REFERENCES funding_opportunities(id) ON DELETE CASCADE,
+    opportunity_id INTEGER REFERENCES africa_intelligence_feed(id) ON DELETE CASCADE,
     title_hash VARCHAR(64),
     semantic_hash VARCHAR(64),
     url_hash VARCHAR(64),
@@ -192,7 +192,7 @@ CREATE TABLE IF NOT EXISTS content_fingerprint (
 -- Validation Result table
 CREATE TABLE IF NOT EXISTS validation_results (
     id SERIAL PRIMARY KEY,
-    opportunity_id INTEGER REFERENCES funding_opportunities(id) ON DELETE CASCADE,
+    opportunity_id INTEGER REFERENCES africa_intelligence_feed(id) ON DELETE CASCADE,
     validator_type VARCHAR(50),
     validation_result VARCHAR(20),
     confidence_score FLOAT,
@@ -201,7 +201,7 @@ CREATE TABLE IF NOT EXISTS validation_results (
 );
 
 -- Funding opportunities table with specialized properties
-CREATE TABLE IF NOT EXISTS funding_opportunities (
+CREATE TABLE IF NOT EXISTS africa_intelligence_feed (
     id SERIAL PRIMARY KEY,
     title TEXT NOT NULL,
     description TEXT,
@@ -281,7 +281,7 @@ CREATE TABLE IF NOT EXISTS funding_opportunities (
     url_hash VARCHAR(64),
     
     -- Content classification
-    content_type VARCHAR(50) DEFAULT 'funding_opportunity',
+    content_type VARCHAR(50) DEFAULT 'intelligence_item',
     content_classification_confidence FLOAT,
     classification_method VARCHAR(50),
     
@@ -316,36 +316,36 @@ CREATE TABLE IF NOT EXISTS funding_opportunities (
     geographic_scopes JSONB
 );
 
--- Indexes for funding opportunities
-CREATE INDEX IF NOT EXISTS idx_funding_opportunities_organization ON funding_opportunities(organization_id);
-CREATE INDEX IF NOT EXISTS idx_funding_opportunities_provider_org ON funding_opportunities(provider_organization_id);
-CREATE INDEX IF NOT EXISTS idx_funding_opportunities_recipient_org ON funding_opportunities(recipient_organization_id);
-CREATE INDEX IF NOT EXISTS idx_funding_opportunities_type ON funding_opportunities(type_id);
-CREATE INDEX IF NOT EXISTS idx_funding_opportunities_status ON funding_opportunities(status);
-CREATE INDEX IF NOT EXISTS idx_funding_opportunities_currency ON funding_opportunities(currency);
-CREATE INDEX IF NOT EXISTS idx_funding_opportunities_community_rating ON funding_opportunities(community_rating);
-CREATE INDEX IF NOT EXISTS idx_funding_opportunities_content_type ON funding_opportunities(content_type);
-CREATE INDEX IF NOT EXISTS idx_funding_opportunities_validation_status ON funding_opportunities(validation_status);
-CREATE INDEX IF NOT EXISTS idx_funding_opportunities_ingestion_module ON funding_opportunities(ingestion_module);
-CREATE INDEX IF NOT EXISTS idx_funding_opportunities_processing_id ON funding_opportunities(processing_id);
-CREATE INDEX IF NOT EXISTS idx_funding_opportunities_title_hash ON funding_opportunities(title_hash);
-CREATE INDEX IF NOT EXISTS idx_funding_opportunities_semantic_hash ON funding_opportunities(semantic_hash);
-CREATE INDEX IF NOT EXISTS idx_funding_opportunities_url_hash ON funding_opportunities(url_hash);
-CREATE INDEX IF NOT EXISTS idx_funding_opportunities_women_focus ON funding_opportunities(women_focus);
-CREATE INDEX IF NOT EXISTS idx_funding_opportunities_underserved_focus ON funding_opportunities(underserved_focus);
-CREATE INDEX IF NOT EXISTS idx_funding_opportunities_youth_focus ON funding_opportunities(youth_focus);
+-- Indexes for intelligence feed
+CREATE INDEX IF NOT EXISTS idx_africa_intelligence_feed_organization ON africa_intelligence_feed(organization_id);
+CREATE INDEX IF NOT EXISTS idx_africa_intelligence_feed_provider_org ON africa_intelligence_feed(provider_organization_id);
+CREATE INDEX IF NOT EXISTS idx_africa_intelligence_feed_recipient_org ON africa_intelligence_feed(recipient_organization_id);
+CREATE INDEX IF NOT EXISTS idx_africa_intelligence_feed_type ON africa_intelligence_feed(type_id);
+CREATE INDEX IF NOT EXISTS idx_africa_intelligence_feed_status ON africa_intelligence_feed(status);
+CREATE INDEX IF NOT EXISTS idx_africa_intelligence_feed_currency ON africa_intelligence_feed(currency);
+CREATE INDEX IF NOT EXISTS idx_africa_intelligence_feed_community_rating ON africa_intelligence_feed(community_rating);
+CREATE INDEX IF NOT EXISTS idx_africa_intelligence_feed_content_type ON africa_intelligence_feed(content_type);
+CREATE INDEX IF NOT EXISTS idx_africa_intelligence_feed_validation_status ON africa_intelligence_feed(validation_status);
+CREATE INDEX IF NOT EXISTS idx_africa_intelligence_feed_ingestion_module ON africa_intelligence_feed(ingestion_module);
+CREATE INDEX IF NOT EXISTS idx_africa_intelligence_feed_processing_id ON africa_intelligence_feed(processing_id);
+CREATE INDEX IF NOT EXISTS idx_africa_intelligence_feed_title_hash ON africa_intelligence_feed(title_hash);
+CREATE INDEX IF NOT EXISTS idx_africa_intelligence_feed_semantic_hash ON africa_intelligence_feed(semantic_hash);
+CREATE INDEX IF NOT EXISTS idx_africa_intelligence_feed_url_hash ON africa_intelligence_feed(url_hash);
+CREATE INDEX IF NOT EXISTS idx_africa_intelligence_feed_women_focus ON africa_intelligence_feed(women_focus);
+CREATE INDEX IF NOT EXISTS idx_africa_intelligence_feed_underserved_focus ON africa_intelligence_feed(underserved_focus);
+CREATE INDEX IF NOT EXISTS idx_africa_intelligence_feed_youth_focus ON africa_intelligence_feed(youth_focus);
 
 -- Junction tables for many-to-many relationships
-CREATE TABLE IF NOT EXISTS funding_opportunity_ai_domains (
-    funding_opportunity_id INTEGER REFERENCES funding_opportunities(id) ON DELETE CASCADE,
+CREATE TABLE IF NOT EXISTS intelligence_item_ai_domains (
+    intelligence_item_id INTEGER REFERENCES africa_intelligence_feed(id) ON DELETE CASCADE,
     ai_domain_id INTEGER REFERENCES ai_domains(id) ON DELETE CASCADE,
-    PRIMARY KEY (funding_opportunity_id, ai_domain_id)
+    PRIMARY KEY (intelligence_item_id, ai_domain_id)
 );
 
-CREATE TABLE IF NOT EXISTS funding_opportunity_geographic_scopes (
-    funding_opportunity_id INTEGER REFERENCES funding_opportunities(id) ON DELETE CASCADE,
+CREATE TABLE IF NOT EXISTS intelligence_item_geographic_scopes (
+    intelligence_item_id INTEGER REFERENCES africa_intelligence_feed(id) ON DELETE CASCADE,
     geographic_scope_id INTEGER REFERENCES geographic_scopes(id) ON DELETE CASCADE,
-    PRIMARY KEY (funding_opportunity_id, geographic_scope_id)
+    PRIMARY KEY (intelligence_item_id, geographic_scope_id)
 );
 
 -- Insert some initial data for testing

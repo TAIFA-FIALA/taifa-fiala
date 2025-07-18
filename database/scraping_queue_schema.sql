@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS scraping_queue (
     priority VARCHAR(20) DEFAULT 'medium', -- 'high', 'medium', 'low'
     scraping_instructions JSONB,
     requested_fields TEXT[], -- Array of fields needed
-    source_opportunity_id INTEGER, -- Links back to funding_opportunities if applicable
+    source_opportunity_id INTEGER, -- Links back to africa_intelligence_feed if applicable
     source_context TEXT, -- Additional context about why this needs scraping
     
     -- Queue management
@@ -106,7 +106,7 @@ CREATE INDEX IF NOT EXISTS idx_scraping_templates_domain ON scraping_templates(d
 
 -- Insert some initial scraping templates
 INSERT INTO scraping_templates (name, description, domain, selectors, extraction_rules, required_fields) VALUES
-('IDRC Funding Template', 'Template for IDRC funding opportunities', 'idrc-crdi.ca', 
+('IDRC Funding Template', 'Template for IDRC intelligence feed', 'idrc-crdi.ca', 
  '{"title": ".views-field-title a, .views-field-title", "description": ".views-field-body, .views-field-field-summary", "deadline": ".views-field-field-deadline, .deadline", "amount": ".amount, .funding-amount, .grant-amount"}',
  '{"title": {"clean": true, "max_length": 500}, "description": {"clean": true, "max_length": 5000}, "deadline": {"parse_date": true}, "amount": {"extract_numbers": true}}',
  ARRAY['title', 'description']),

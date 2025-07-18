@@ -7,23 +7,23 @@ from app.core.database import Base
 
 # Import junction table definitions
 from sqlalchemy import Table
-funding_opportunity_ai_domains = Table(
-    'funding_opportunity_ai_domains',
+intelligence_item_ai_domains = Table(
+    'intelligence_item_ai_domains',
     Base.metadata,
-    Column('funding_opportunity_id', Integer, ForeignKey('funding_opportunities.id', ondelete='CASCADE'), primary_key=True),
+    Column('intelligence_item_id', Integer, ForeignKey('africa_intelligence_feed.id', ondelete='CASCADE'), primary_key=True),
     Column('ai_domain_id', Integer, ForeignKey('ai_domains.id', ondelete='CASCADE'), primary_key=True)
 )
 
-funding_opportunity_geographic_scopes = Table(
-    'funding_opportunity_geographic_scopes', 
+intelligence_item_geographic_scopes = Table(
+    'intelligence_item_geographic_scopes', 
     Base.metadata,
-    Column('funding_opportunity_id', Integer, ForeignKey('funding_opportunities.id', ondelete='CASCADE'), primary_key=True),
+    Column('intelligence_item_id', Integer, ForeignKey('africa_intelligence_feed.id', ondelete='CASCADE'), primary_key=True),
     Column('geographic_scope_id', Integer, ForeignKey('geographic_scopes.id', ondelete='CASCADE'), primary_key=True)
 )
 
-class FundingOpportunity(Base):
-    """Enhanced funding opportunities table with competitor analysis insights"""
-    __tablename__ = "funding_opportunities"
+class AfricaIntelligenceItem(Base):
+    """Enhanced intelligence feed table with competitor analysis insights"""
+    __tablename__ = "africa_intelligence_feed"
     
     # Core identification
     id = Column(Integer, primary_key=True, index=True)
@@ -108,7 +108,7 @@ class FundingOpportunity(Base):
     url_hash = Column(String(64), index=True)
     
     # Content classification
-    content_type = Column(String(50), default='funding_opportunity', index=True)
+    content_type = Column(String(50), default='intelligence_item', index=True)
     content_classification_confidence = Column(Float)
     classification_method = Column(String(50))
     
@@ -132,7 +132,7 @@ class FundingOpportunity(Base):
     is_multilingual = Column(Boolean, default=False)
     
     # Relationships
-    organization = relationship("Organization", foreign_keys=[organization_id], back_populates="funding_opportunities")  # Legacy relationship
+    organization = relationship("Organization", foreign_keys=[organization_id], back_populates="africa_intelligence_feed")  # Legacy relationship
     type = relationship("FundingType")
     
     # New differentiated organization relationships
@@ -142,10 +142,10 @@ class FundingOpportunity(Base):
     
     # Many-to-many relationships
     ai_domains = relationship("AIDomain", 
-                             secondary=funding_opportunity_ai_domains,
+                             secondary=intelligence_item_ai_domains,
                              back_populates="opportunities")
     geographic_scopes = relationship("GeographicScope",
-                                   secondary=funding_opportunity_geographic_scopes, 
+                                   secondary=intelligence_item_geographic_scopes, 
                                    back_populates="opportunities")
     
     # ETL Pipeline relationships
@@ -155,12 +155,12 @@ class FundingOpportunity(Base):
     # Type-specific properties and methods
     @property
     def is_grant(self):
-        """Check if this funding opportunity is a grant"""
+        """Check if this intelligence item is a grant"""
         return self.type and self.type.is_grant
     
     @property
     def is_investment(self):
-        """Check if this funding opportunity is an investment"""
+        """Check if this intelligence item is an investment"""
         return self.type and self.type.is_investment
     
     @property
@@ -301,4 +301,4 @@ class FundingOpportunity(Base):
         return days is not None and 0 <= days <= 30
         
     def __repr__(self):
-        return f"<FundingOpportunity(id={self.id}, title='{self.title[:50]}...', status='{self.status}')>"
+        return f"<AfricaIntelligenceItem(id={self.id}, title='{self.title[:50]}...', status='{self.status}')>"

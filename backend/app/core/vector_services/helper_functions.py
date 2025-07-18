@@ -17,8 +17,8 @@ from .indexing_service import VectorIndexingService, vector_indexing_service
 logger = logging.getLogger(__name__)
 
 # Helper functions for direct use from other modules
-async def index_funding_opportunity(opportunity: Dict[str, Any], priority: Priority = Priority.NORMAL) -> ProcessingResult:
-    """Index a single funding opportunity directly
+async def index_intelligence_item(opportunity: Dict[str, Any], priority: Priority = Priority.NORMAL) -> ProcessingResult:
+    """Index a single intelligence item directly
     
     Args:
         opportunity: The opportunity data to index
@@ -35,8 +35,8 @@ async def index_funding_opportunity(opportunity: Dict[str, Any], priority: Prior
         priority=priority,
         created_at=datetime.now(),
         payload={
-            'data_type': 'funding_opportunity',
-            'funding_opportunity': opportunity
+            'data_type': 'intelligence_item',
+            'intelligence_item': opportunity
         }
     )
     

@@ -135,7 +135,7 @@ CREATE TABLE funding_predictions (
     entity_id INTEGER REFERENCES funding_entities(id),
     
     -- Prediction details
-    prediction_type VARCHAR(50) NOT NULL, -- 'funding_opportunity', 'partnership', 'expansion', 'acquisition'
+    prediction_type VARCHAR(50) NOT NULL, -- 'intelligence_item', 'partnership', 'expansion', 'acquisition'
     predicted_opportunity TEXT NOT NULL,
     expected_date DATE,
     confidence FLOAT DEFAULT 0.0,
@@ -464,13 +464,13 @@ INSERT INTO funding_patterns (pattern_name, pattern_type, description, confidenc
 ('Corporate Partnership to Funding', 'temporal', 'Corporate partnerships typically lead to funding announcements within 90 days', 0.8, 25, 0.75, 90),
 ('Government Strategy to Grant Program', 'temporal', 'Government AI strategies typically result in grant programs within 180 days', 0.85, 15, 0.8, 180),
 ('Pilot Success to Scale-up Funding', 'temporal', 'Successful pilot programs typically receive scale-up funding within 120 days', 0.7, 20, 0.65, 120),
-('Conference Announcement to Opportunity', 'temporal', 'Major conference announcements often lead to funding opportunities within 60 days', 0.6, 30, 0.55, 60);
+('Conference Announcement to Opportunity', 'temporal', 'Major conference announcements often lead to intelligence feed within 60 days', 0.6, 30, 0.55, 60);
 
 -- Comments for documentation
 COMMENT ON TABLE funding_signals IS 'Stores all funding-related content with AI analysis results';
 COMMENT ON TABLE funding_entities IS 'Organizations, people, programs, and locations in the funding ecosystem';
 COMMENT ON TABLE funding_relationships IS 'Relationships between entities (who funds whom, partnerships, etc.)';
-COMMENT ON TABLE funding_predictions IS 'AI predictions about future funding opportunities';
+COMMENT ON TABLE funding_predictions IS 'AI predictions about future intelligence feed';
 COMMENT ON TABLE funding_timelines IS 'Timeline of events for pattern recognition';
 COMMENT ON TABLE funding_patterns IS 'Identified patterns in funding behavior';
 COMMENT ON TABLE success_stories IS 'Analysis of successful funding cases';
@@ -494,11 +494,11 @@ COMMENT ON COLUMN funding_relationships.relationship_type IS 'Type of relationsh
 COMMENT ON COLUMN funding_relationships.evidence_strength IS 'Strength of evidence for this relationship: strong, medium, weak';
 COMMENT ON COLUMN funding_relationships.total_interactions IS 'Number of times this relationship has been observed';
 
-COMMENT ON COLUMN funding_predictions.prediction_type IS 'Type of prediction: funding_opportunity, partnership, expansion, acquisition';
+COMMENT ON COLUMN funding_predictions.prediction_type IS 'Type of prediction: intelligence_item, partnership, expansion, acquisition';
 COMMENT ON COLUMN funding_predictions.materialized IS 'Whether the prediction came true';
 COMMENT ON COLUMN funding_predictions.accuracy_score IS 'How accurate the prediction was (0-1)';
 
 COMMENT ON VIEW high_priority_signals IS 'High-priority funding signals requiring immediate investigation';
 COMMENT ON VIEW active_funding_relationships IS 'Currently active and high-confidence funding relationships';
-COMMENT ON VIEW upcoming_opportunities IS 'Predicted funding opportunities in the near future';
+COMMENT ON VIEW upcoming_opportunities IS 'Predicted intelligence feed in the near future';
 COMMENT ON VIEW recent_funding_activity IS 'Recent funding-related activity across all tables';

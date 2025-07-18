@@ -19,7 +19,7 @@ Your TAIFA (Tracking AI Funding for Africa) system now has a complete **3-Method
 - **Known Sources**: Predefined lists of major funding organizations
 
 ### ✅ **Method 3: Automated Discovery (Enhanced Serper)**
-- **Discovery Engine**: Automated funding opportunity discovery
+- **Discovery Engine**: Automated intelligence item discovery
 - **Scheduled Jobs**: Support for recurring discovery tasks
 - **Search Types**: Multiple search strategies (general, targeted, geographic)
 - **Analytics**: Discovery performance tracking and insights
@@ -94,7 +94,7 @@ python test_3_method_system.py
 
 **Method 1 - User Submissions:**
 1. Go to `http://localhost:3000/submit-opportunity`
-2. Fill out the funding opportunity form
+2. Fill out the intelligence item form
 3. Submit and verify processing
 
 **Method 2 - Admin Portal:**
@@ -144,7 +144,7 @@ python test_3_method_system.py
 4. **Invite community members** to submit opportunities
 
 ### **Data Sources to Test**
-- **User Submissions**: Have colleagues submit known funding opportunities
+- **User Submissions**: Have colleagues submit known intelligence feed
 - **Admin Scraping**: Process Gates Foundation, World Bank, AfDB pages
 - **Automated Discovery**: Run searches for "AI grants Africa", "tech funding"
 
@@ -203,7 +203,7 @@ frontend/
 ## 🎉 Congratulations!
 
 You now have a **fully functional 3-method data importation MVP** that:
-- Collects funding opportunities from multiple sources
+- Collects intelligence feed from multiple sources
 - Provides user-friendly interfaces for different use cases
 - Maintains data quality through validation
 - Feeds into a unified database for analysis and display
@@ -212,4 +212,4 @@ You now have a **fully functional 3-method data importation MVP** that:
 
 ---
 
-*Ready to start collecting funding opportunities and serving the African AI community!*
+*Ready to start collecting intelligence feed and serving the African AI community!*

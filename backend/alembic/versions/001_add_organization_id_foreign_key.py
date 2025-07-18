@@ -17,30 +17,30 @@ depends_on = None
 
 
 def upgrade() -> None:
-    """Add organization_id foreign key column to funding_opportunities table"""
+    """Add organization_id foreign key column to africa_intelligence_feed table"""
     # Add organization_id column
-    op.add_column('funding_opportunities', 
+    op.add_column('africa_intelligence_feed', 
                   sa.Column('organization_id', sa.Integer(), nullable=True))
     
     # Add foreign key constraint
-    op.create_foreign_key('fk_funding_opportunities_organization_id',
-                         'funding_opportunities', 'organizations',
+    op.create_foreign_key('fk_africa_intelligence_feed_organization_id',
+                         'africa_intelligence_feed', 'organizations',
                          ['organization_id'], ['id'])
     
     # Add index for performance
-    op.create_index('idx_funding_opportunities_organization_id',
-                   'funding_opportunities', ['organization_id'])
+    op.create_index('idx_africa_intelligence_feed_organization_id',
+                   'africa_intelligence_feed', ['organization_id'])
 
 
 def downgrade() -> None:
     """Remove organization_id foreign key column"""
     # Drop index
-    op.drop_index('idx_funding_opportunities_organization_id', 
-                  table_name='funding_opportunities')
+    op.drop_index('idx_africa_intelligence_feed_organization_id', 
+                  table_name='africa_intelligence_feed')
     
     # Drop foreign key constraint
-    op.drop_constraint('fk_funding_opportunities_organization_id',
-                       'funding_opportunities', type_='foreignkey')
+    op.drop_constraint('fk_africa_intelligence_feed_organization_id',
+                       'africa_intelligence_feed', type_='foreignkey')
     
     # Drop column
-    op.drop_column('funding_opportunities', 'organization_id')
+    op.drop_column('africa_intelligence_feed', 'organization_id')

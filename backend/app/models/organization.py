@@ -117,17 +117,17 @@ class Organization(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     
     # Relationships
-    funding_opportunities = relationship("FundingOpportunity", back_populates="organization")
+    africa_intelligence_feed = relationship("AfricaIntelligenceItem", back_populates="organization")
     user_submissions = relationship("UserSubmission", back_populates="organization", cascade="all, delete-orphan")
     monitoring_data = relationship("MonitoringData", back_populates="organization", cascade="all, delete-orphan")
     scraping_configurations = relationship("ScrapingConfiguration", back_populates="organization", cascade="all, delete-orphan")
     
     # New relationships for funding flows
-    provided_funding = relationship("FundingOpportunity", 
-                                  foreign_keys="[FundingOpportunity.provider_organization_id]",
+    provided_funding = relationship("AfricaIntelligenceItem", 
+                                  foreign_keys="[AfricaIntelligenceItem.provider_organization_id]",
                                   back_populates="provider_organization")
-    received_funding = relationship("FundingOpportunity", 
-                                   foreign_keys="[FundingOpportunity.recipient_organization_id]",
+    received_funding = relationship("AfricaIntelligenceItem", 
+                                   foreign_keys="[AfricaIntelligenceItem.recipient_organization_id]",
                                    back_populates="recipient_organization")
     geographic_focus = relationship("GeographicScope",
                                   secondary=organization_geographic_focus,
@@ -247,8 +247,8 @@ class Organization(Base):
     @property
     def last_activity(self):
         """Get timestamp of last opportunity added"""
-        if self.funding_opportunities:
-            return max(opp.discovered_date for opp in self.funding_opportunities)
+        if self.africa_intelligence_feed:
+            return max(opp.discovered_date for opp in self.africa_intelligence_feed)
         return None
     
     @property

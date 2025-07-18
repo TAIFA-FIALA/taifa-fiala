@@ -1,5 +1,5 @@
 """
-TAIFA CrewAI Funding Opportunity Processing Crew
+TAIFA CrewAI Intelligence Item Processing Crew
 Intelligent ETL pipeline using specialized AI agents
 """
 
@@ -10,8 +10,8 @@ from typing import Dict, List, Any
 import json
 from datetime import datetime
 
-class FundingOpportunityProcessor:
-    """Main coordinator for funding opportunity processing"""
+class AfricaIntelligenceItemProcessor:
+    """Main coordinator for intelligence item processing"""
     
     def __init__(self):
         self.llm = OpenAI(temperature=0.1)
@@ -46,7 +46,7 @@ class FundingOpportunityProcessor:
         """Create the Relevancy Assessor Agent"""
         return Agent(
             role='Africa AI Funding Relevancy Expert',
-            goal='Assess whether content is relevant to AI funding opportunities in Africa',
+            goal='Assess whether content is relevant to AI intelligence feed in Africa',
             backstory="""You are a leading expert on African AI ecosystem, funding landscapes, 
             and technology development across the continent. You deeply understand:
             - All 54 African countries and their tech ecosystems
@@ -65,7 +65,7 @@ class FundingOpportunityProcessor:
         """Create the Summarizer Agent"""
         return Agent(
             role='Technical Content Summarizer',
-            goal='Create clear, concise, and standardized descriptions of funding opportunities',
+            goal='Create clear, concise, and standardized descriptions of intelligence feed',
             backstory="""You are an expert technical writer specializing in funding and grant descriptions. 
             You excel at:
             - Creating clear, jargon-free summaries accessible to diverse audiences
@@ -82,7 +82,7 @@ class FundingOpportunityProcessor:
         """Create the Data Extractor Agent"""
         return Agent(
             role='Structured Data Extraction Expert',
-            goal='Extract specific database fields from funding opportunity content',
+            goal='Extract specific database fields from intelligence item content',
             backstory="""You are a data extraction specialist with expertise in:
             - Parsing monetary amounts in various currencies and formats
             - Extracting and standardizing dates across different formats
@@ -123,7 +123,7 @@ class FundingOpportunityProcessor:
             Assess three key dimensions:
             1. AI/Technology Relevance (0-1): Does this involve AI, ML, or relevant technology?
             2. Africa Relevance (0-1): Is this specifically for African organizations/projects?
-            3. Funding Relevance (0-1): Is this actually a funding opportunity (not just news)?
+            3. Funding Relevance (0-1): Is this actually a intelligence item (not just news)?
             
             Consider:
             - Geographic scope and eligibility
@@ -139,7 +139,7 @@ class FundingOpportunityProcessor:
         )
         
         summarize_task = Task(
-            description="""Create a clear, standardized summary of this funding opportunity.
+            description="""Create a clear, standardized summary of this intelligence item.
             
             Requirements:
             1. Write a concise 2-3 sentence summary highlighting key opportunity details
@@ -206,7 +206,7 @@ class FundingOpportunityProcessor:
         )
     
     def process_opportunity(self, raw_data: Dict[str, Any]) -> Dict[str, Any]:
-        """Process a single funding opportunity through the crew"""
+        """Process a single intelligence item through the crew"""
         
         # Prepare input for the crew
         input_data = {
@@ -296,7 +296,7 @@ class FundingOpportunityProcessor:
 def process_serper_results(search_results: List[Dict]) -> List[Dict]:
     """Process SERPER search results through CrewAI pipeline"""
     
-    processor = FundingOpportunityProcessor()
+    processor = AfricaIntelligenceItemProcessor()
     processed_opportunities = []
     
     for result in search_results:
@@ -332,7 +332,7 @@ def trigger_organization_enrichment_if_needed(org_name: str, org_type: str, org_
             "organization_name": org_name,
             "organization_type": org_type,
             "organization_country": org_country,
-            "trigger_source": "funding_opportunity_processing",
+            "trigger_source": "intelligence_item_processing",
             "triggered_at": datetime.utcnow().isoformat()
         }
         

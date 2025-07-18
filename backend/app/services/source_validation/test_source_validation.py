@@ -173,7 +173,7 @@ class TestSourceValidator:
             mock_response.text = AsyncMock(return_value="""
             <html>
             <body>
-                <h1>AI Research Funding Opportunities</h1>
+                <h1>AI Research Intelligence Feed</h1>
                 <p>We offer grants for artificial intelligence research in Africa, 
                    focusing on machine learning applications in healthcare.</p>
                 <p>Funding available for projects in Kenya, Nigeria, and South Africa.</p>
@@ -373,7 +373,7 @@ class TestCrewAIIntegration:
         """Test content quality assessment"""
         opportunity = {
             'title': 'AI Research Grant for Healthcare',
-            'description': 'This is a comprehensive funding opportunity for artificial intelligence research projects focusing on healthcare applications in African universities.',
+            'description': 'This is a comprehensive intelligence item for artificial intelligence research projects focusing on healthcare applications in African universities.',
             'organization': 'Health Research Foundation',
             'url': 'https://healthresearch.org/grants/ai-2025',
             'amount': 75000,
@@ -402,7 +402,7 @@ class TestCrewAIIntegration:
         # Low priority opportunity
         low_priority_opp = {
             'title': 'General Research Funding',
-            'description': 'Basic research funding opportunity',
+            'description': 'Basic research intelligence item',
             'amount': 5000
         }
         

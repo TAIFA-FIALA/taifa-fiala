@@ -111,8 +111,8 @@ def load_sample_data():
         
         db.commit()
         
-        # Sample funding opportunity
-        sample_funding = FundingOpportunity(
+        # Sample intelligence item
+        sample_funding = AfricaIntelligenceItem(
             title="AI for Health Innovation Grant",
             description="Supporting AI innovations to improve healthcare outcomes in Africa",
             amount=100000,

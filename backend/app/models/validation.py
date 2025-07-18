@@ -14,11 +14,11 @@ from sqlalchemy.sql import func
 from app.core.database import Base
 
 class ValidationResult(Base):
-    """Validation results for funding opportunities"""
+    """Validation results for intelligence feed"""
     __tablename__ = "validation_results"
     
     id = Column(String(50), primary_key=True, index=True)  # UUID
-    opportunity_id = Column(Integer, ForeignKey('funding_opportunities.id'), nullable=True, index=True)
+    opportunity_id = Column(Integer, ForeignKey('africa_intelligence_feed.id'), nullable=True, index=True)
     
     # Validation status and scoring
     status = Column(String(20), default='pending', index=True)  # pending, approved, rejected, needs_review
@@ -51,7 +51,7 @@ class ValidationResult(Base):
     validated_at = Column(DateTime(timezone=True))
     
     # Relationships
-    opportunity = relationship("FundingOpportunity", back_populates="validation_results")
+    opportunity = relationship("AfricaIntelligenceItem", back_populates="validation_results")
     validated_by_user = relationship("CommunityUser")
     
     def __repr__(self):
@@ -62,8 +62,8 @@ class DuplicateDetection(Base):
     __tablename__ = "duplicate_detections"
     
     id = Column(String(50), primary_key=True, index=True)  # UUID
-    original_opportunity_id = Column(Integer, ForeignKey('funding_opportunities.id'), index=True)
-    duplicate_opportunity_id = Column(Integer, ForeignKey('funding_opportunities.id'), index=True)
+    original_opportunity_id = Column(Integer, ForeignKey('africa_intelligence_feed.id'), index=True)
+    duplicate_opportunity_id = Column(Integer, ForeignKey('africa_intelligence_feed.id'), index=True)
     
     # Detection information
     duplicate_type = Column(String(30), index=True)  # exact_match, title_similarity, content_similarity, etc.
@@ -84,8 +84,8 @@ class DuplicateDetection(Base):
     resolved_at = Column(DateTime(timezone=True))
     
     # Relationships
-    original_opportunity = relationship("FundingOpportunity", foreign_keys=[original_opportunity_id])
-    duplicate_opportunity = relationship("FundingOpportunity", foreign_keys=[duplicate_opportunity_id])
+    original_opportunity = relationship("AfricaIntelligenceItem", foreign_keys=[original_opportunity_id])
+    duplicate_opportunity = relationship("AfricaIntelligenceItem", foreign_keys=[duplicate_opportunity_id])
     
     def __repr__(self):
         return f"<DuplicateDetection(id={self.id}, type='{self.duplicate_type}', confidence={self.confidence_score})>"
@@ -180,7 +180,7 @@ class ContentFingerprint(Base):
     __tablename__ = "content_fingerprints"
     
     id = Column(Integer, primary_key=True, index=True)
-    opportunity_id = Column(Integer, ForeignKey('funding_opportunities.id'), unique=True, index=True)
+    opportunity_id = Column(Integer, ForeignKey('africa_intelligence_feed.id'), unique=True, index=True)
     
     # Fingerprint hashes
     title_hash = Column(String(64), index=True)
@@ -206,7 +206,7 @@ class ContentFingerprint(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     
     # Relationships
-    opportunity = relationship("FundingOpportunity", back_populates="content_fingerprint")
+    opportunity = relationship("AfricaIntelligenceItem", back_populates="content_fingerprint")
     
     def __repr__(self):
         return f"<ContentFingerprint(id={self.id}, opportunity_id={self.opportunity_id})>"

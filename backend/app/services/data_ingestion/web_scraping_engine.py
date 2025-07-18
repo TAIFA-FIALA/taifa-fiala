@@ -66,7 +66,7 @@ class ScrapingStrategy(Enum):
 
 class ContentType(Enum):
     """Types of content to extract"""
-    FUNDING_OPPORTUNITY = "funding_opportunity"
+    FUNDING_OPPORTUNITY = "intelligence_item"
     GRANT_ANNOUNCEMENT = "grant_announcement"
     PARTNERSHIP_NEWS = "partnership_news"
     RESEARCH_CALL = "research_call"

@@ -64,14 +64,14 @@ class AIValidationConfig:
     
     # Validation Prompts
     OPPORTUNITY_VALIDATION_PROMPT = """
-    You are an AI assistant specializing in African AI funding opportunities. 
-    Analyze the following content and extract funding opportunity information.
+    You are an AI assistant specializing in African AI intelligence feed. 
+    Analyze the following content and extract intelligence item information.
     
     Content to analyze:
     {content}
     
     Please extract and validate:
-    1. Is this a legitimate funding opportunity? (Yes/No)
+    1. Is this a legitimate intelligence item? (Yes/No)
     2. Title of the opportunity
     3. Organization/Funder name
     4. Funding amount (if specified)
@@ -86,7 +86,7 @@ class AIValidationConfig:
     """
     
     RELEVANCE_SCORING_PROMPT = """
-    Rate the relevance of this funding opportunity for African AI development (0-1):
+    Rate the relevance of this intelligence item for African AI development (0-1):
     
     Content: {content}
     
@@ -389,7 +389,7 @@ async def process_crawl4ai_task(task: ETLTask) -> IngestionResult:
         payload = task.payload
         url = payload.get('url')
         context = payload.get('context', '')
-        extraction_type = payload.get('extraction_type', 'funding_opportunity')
+        extraction_type = payload.get('extraction_type', 'intelligence_item')
         
         if not url:
             return IngestionResult(
@@ -478,16 +478,16 @@ async def _check_ai_relevance(content: str, title: str) -> Dict[str, Any]:
         logger.error(f"AI relevance check failed: {e}")
         return {"relevance_score": 0.5, "reasoning": "AI check failed"}
 
-async def _extract_with_crawl4ai(url: str, context: str, extraction_type: str = 'funding_opportunity') -> Dict[str, Any]:
+async def _extract_with_crawl4ai(url: str, context: str, extraction_type: str = 'intelligence_item') -> Dict[str, Any]:
     """Extract content using Crawl4AI with AI processing"""
     try:
         async with AsyncWebCrawler(verbose=False) as crawler:
-            # Custom extraction strategy for funding opportunities
+            # Custom extraction strategy for intelligence feed
             extraction_strategy = LLMExtractionStrategy(
                 provider="openai/gpt-4o-mini",
                 api_token=None,  # Uses environment variable
                 instruction=f"""
-                Extract funding opportunity information from this webpage:
+                Extract intelligence item information from this webpage:
                 
                 Look for:
                 1. Funding opportunity title
@@ -564,7 +564,7 @@ async def _validate_user_submission(submission_data: Dict[str, Any]) -> Dict[str
         client = openai.AsyncOpenAI()
         
         prompt = f"""
-        Validate this user-submitted funding opportunity:
+        Validate this user-submitted intelligence item:
         
         Data: {json.dumps(submission_data, indent=2)}
         
@@ -597,7 +597,7 @@ async def _validate_extracted_content(extracted_data: Dict[str, Any]) -> Dict[st
         client = openai.AsyncOpenAI()
         
         prompt = f"""
-        Validate this extracted funding opportunity data:
+        Validate this extracted intelligence item data:
         
         Data: {json.dumps(extracted_data, indent=2)}
         

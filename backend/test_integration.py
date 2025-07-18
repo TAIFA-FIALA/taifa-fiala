@@ -61,7 +61,7 @@ async def test_supabase():
         logger.info(f"✅ Successfully connected to Supabase. Health check status: {results[0]['status'] if results else 'No data'}")
         
         # Check for our tables
-        tables_to_check = ["organizations", "funding_types", "funding_opportunities", "health_check"]
+        tables_to_check = ["organizations", "funding_types", "africa_intelligence_feed", "health_check"]
         for table in tables_to_check:
             try:
                 result = supabase_client.table(table).select("count()", count='exact').limit(1).execute()
@@ -165,7 +165,7 @@ async def main():
         logger.info("- Funding type categories (grant/investment/prize/other)")
         logger.info("- Grant-specific and investment-specific properties")
         logger.info("- Equity and inclusion tracking fields")
-        logger.info("- Vector search capabilities for funding opportunities")
+        logger.info("- Vector search capabilities for intelligence feed")
     else:
         logger.error("\n⚠️ Some integrations failed. Please review the logs and fix the issues.")
 

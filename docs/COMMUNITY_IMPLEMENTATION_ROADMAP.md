@@ -40,7 +40,7 @@ GET  /api/v1/users/badges      # User achievements
 #### **Day 5-7: Content Submission System**
 ```python
 # Community contribution endpoints:
-POST /api/v1/community/submit-opportunity   # Submit funding opportunity
+POST /api/v1/community/submit-opportunity   # Submit intelligence item
 GET  /api/v1/community/my-contributions     # User's submissions
 GET  /api/v1/community/pending-reviews      # Content needing review
 POST /api/v1/community/review/{id}          # Submit review
@@ -132,7 +132,7 @@ class ContributionReview:
 #### **Day 21-22: Discussion Platform**
 ```python
 # Community discussions:
-- Threaded discussions on funding opportunities
+- Threaded discussions on intelligence feed
 - General community forum
 - Q&A for funding applications
 - Regional discussion channels
@@ -203,8 +203,8 @@ class CommunityUser(BaseUser):
 ```python
 # backend/app/api/endpoints/community.py
 @router.post("/submit-opportunity")
-async def submit_funding_opportunity(
-    submission: FundingOpportunitySubmission,
+async def submit_intelligence_item(
+    submission: AfricaIntelligenceItemSubmission,
     current_user: CommunityUser = Depends(get_current_user)
 ):
     # Validate submission
@@ -251,7 +251,7 @@ def create_community_sidebar():
 ```python
 # frontend/streamlit_app/pages/submit_opportunity.py
 def show_opportunity_submission():
-    st.title("Submit Funding Opportunity")
+    st.title("Submit Intelligence Item")
     
     with st.form("opportunity_submission"):
         organization = st.text_input("Organization Name*")
@@ -306,7 +306,7 @@ def show_review_interface():
 
 **Beta Testers Tasks:**
 - Test user registration and profile creation
-- Submit 2-3 funding opportunities each
+- Submit 2-3 intelligence feed each
 - Review and validate other submissions
 - Provide feedback on user experience
 - Test bilingual functionality

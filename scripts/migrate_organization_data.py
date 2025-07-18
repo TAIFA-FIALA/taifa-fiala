@@ -19,7 +19,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import NullPool
 
 # Import models
-from backend.app.models.funding import FundingOpportunity
+from backend.app.models.funding import AfricaIntelligenceItem
 from backend.app.models.organization import Organization
 
 # Database setup
@@ -29,21 +29,21 @@ engine = create_async_engine(DATABASE_URL, poolclass=NullPool, echo=False)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine, class_=AsyncSession)
 
 async def migrate_existing_data():
-    """Migrate existing funding opportunities to use proper organization relationships"""
+    """Migrate existing intelligence feed to use proper organization relationships"""
     
     print("🚀 Starting data migration: raw_data -> organization_id relationships")
     print("=" * 70)
     
     async with SessionLocal() as db:
         try:
-            # Get all funding opportunities that don't have organization_id set
+            # Get all intelligence feed that don't have organization_id set
             result = await db.execute(
-                select(FundingOpportunity)
-                .where(FundingOpportunity.organization_id.is_(None))
+                select(AfricaIntelligenceItem)
+                .where(AfricaIntelligenceItem.organization_id.is_(None))
             )
             opportunities = result.scalars().all()
             
-            print(f"📊 Found {len(opportunities)} funding opportunities without organization_id")
+            print(f"📊 Found {len(opportunities)} intelligence feed without organization_id")
             
             if len(opportunities) == 0:
                 print("✅ No data migration needed - all opportunities already have proper relationships")
@@ -111,7 +111,7 @@ async def migrate_existing_data():
                                 created_orgs_count += 1
                                 print(f"🆕 Created org from content extraction: {org_name}")
                     
-                    # Update the funding opportunity with proper relationship
+                    # Update the intelligence item with proper relationship
                     if organization:
                         opp.organization_id = organization.id
                         opp.organization = organization
@@ -136,7 +136,7 @@ async def migrate_existing_data():
             
             print("\n" + "=" * 70)
             print("📊 Migration Summary:")
-            print(f"   ✅ Migrated: {migrated_count} funding opportunities")
+            print(f"   ✅ Migrated: {migrated_count} intelligence feed")
             print(f"   🆕 Created: {created_orgs_count} new organizations")
             print(f"   ⚠️  Skipped: {skipped_count} opportunities")
             print(f"   📊 Total processed: {len(opportunities)}")
@@ -150,7 +150,7 @@ async def migrate_existing_data():
             import traceback
             traceback.print_exc()
 
-async def extract_organization_from_content(opp: FundingOpportunity) -> str:
+async def extract_organization_from_content(opp: AfricaIntelligenceItem) -> str:
     """Extract organization name from title, description, or URL"""
     
     content = f"{opp.title or ''} {opp.description or ''} {opp.source_url or ''}".lower()
@@ -195,9 +195,9 @@ async def verify_migration_results(db: AsyncSession):
     
     result = await db.execute(
         select(
-            func.count(FundingOpportunity.id).label('total'),
-            func.count(FundingOpportunity.organization_id).label('with_org'),
-            func.count().filter(FundingOpportunity.organization_id.is_(None)).label('without_org')
+            func.count(AfricaIntelligenceItem.id).label('total'),
+            func.count(AfricaIntelligenceItem.organization_id).label('with_org'),
+            func.count().filter(AfricaIntelligenceItem.organization_id.is_(None)).label('without_org')
         )
     )
     stats = result.first()
@@ -209,14 +209,14 @@ async def verify_migration_results(db: AsyncSession):
     
     # Show organization distribution
     result = await db.execute(
-        select(Organization.name, func.count(FundingOpportunity.id))
-        .join(FundingOpportunity, Organization.id == FundingOpportunity.organization_id)
+        select(Organization.name, func.count(AfricaIntelligenceItem.id))
+        .join(AfricaIntelligenceItem, Organization.id == AfricaIntelligenceItem.organization_id)
         .group_by(Organization.name)
-        .order_by(func.count(FundingOpportunity.id).desc())
+        .order_by(func.count(AfricaIntelligenceItem.id).desc())
     )
     org_counts = result.fetchall()
     
-    print(f"\n🏢 Organizations with funding opportunities:")
+    print(f"\n🏢 Organizations with intelligence feed:")
     for org_name, count in org_counts:
         print(f"   • {org_name}: {count} opportunities")
     
@@ -231,10 +231,10 @@ async def test_relationships_after_migration():
     
     async with SessionLocal() as db:
         try:
-            # Test 1: Access organization through funding opportunity
+            # Test 1: Access organization through intelligence item
             result = await db.execute(
-                select(FundingOpportunity)
-                .where(FundingOpportunity.organization_id.isnot(None))
+                select(AfricaIntelligenceItem)
+                .where(AfricaIntelligenceItem.organization_id.isnot(None))
                 .limit(1)
             )
             opp = result.scalars().first()
@@ -246,17 +246,17 @@ async def test_relationships_after_migration():
                 else:
                     print("❌ Failed to load organization relationship")
             
-            # Test 2: Access funding opportunities through organization
+            # Test 2: Access intelligence feed through organization
             result = await db.execute(
                 select(Organization)
-                .where(Organization.funding_opportunities.any())
+                .where(Organization.africa_intelligence_feed.any())
                 .limit(1)
             )
             org = result.scalars().first()
             
             if org:
-                await db.refresh(org, ['funding_opportunities'])
-                print(f"✅ Organization -> Opportunities: '{org.name}' has {len(org.funding_opportunities)} opportunities")
+                await db.refresh(org, ['africa_intelligence_feed'])
+                print(f"✅ Organization -> Opportunities: '{org.name}' has {len(org.africa_intelligence_feed)} opportunities")
             
             print("✅ Relationship testing completed successfully!")
             

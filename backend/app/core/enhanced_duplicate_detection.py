@@ -4,7 +4,7 @@ Enhanced Duplicate Detection System
 
 Advanced duplicate detection specifically designed to handle:
 1. Multiple articles about the same funding announcement
-2. Press releases vs actual funding opportunities
+2. Press releases vs actual intelligence feed
 3. Temporal duplicate detection (same opportunity posted at different times)
 4. Source linking and original opportunity tracking
 5. Semantic similarity beyond simple text matching
@@ -397,7 +397,7 @@ class EnhancedDuplicateDetector:
                 
                 # Use AI to check semantic similarity
                 prompt = f"""
-                Compare these two funding-related texts and determine if they refer to the same funding opportunity:
+                Compare these two funding-related texts and determine if they refer to the same intelligence item:
                 
                 Text 1: {new_text}
                 Text 2: {existing_text}

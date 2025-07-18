@@ -2,7 +2,7 @@
 Multi-Language Source Discovery for African AI Funding
 ======================================================
 
-Enhanced search capabilities for discovering funding opportunities
+Enhanced search capabilities for discovering intelligence feed
 in multiple African languages, addressing the English-language bias
 in current funding discovery systems.
 
@@ -336,7 +336,7 @@ class MultilingualQueryBank:
 # =============================================================================
 
 class MultilingualSearchEngine:
-    """Engine for multilingual funding opportunity discovery"""
+    """Engine for multilingual intelligence item discovery"""
     
     def __init__(self, serper_api_key: str):
         self.serper_api_key = serper_api_key

@@ -34,7 +34,7 @@ class TaifaAPIClient:
             await self.session.close()
             self.session = None
     
-    async def get_funding_opportunities(
+    async def get_africa_intelligence_feed(
         self, 
         skip: int = 0, 
         limit: int = 100,
@@ -42,7 +42,7 @@ class TaifaAPIClient:
         min_amount: Optional[float] = None,
         max_amount: Optional[float] = None
     ) -> List[Dict[str, Any]]:
-        """Get funding opportunities with filters"""
+        """Get intelligence feed with filters"""
         try:
             session = await self._get_session()
             
@@ -65,8 +65,8 @@ class TaifaAPIClient:
             logger.error(f"Error fetching opportunities: {e}")
             return []
     
-    async def search_funding_opportunities(self, query: str, limit: int = 10) -> List[Dict[str, Any]]:
-        """Search funding opportunities"""
+    async def search_africa_intelligence_feed(self, query: str, limit: int = 10) -> List[Dict[str, Any]]:
+        """Search intelligence feed"""
         try:
             session = await self._get_session()
             
@@ -83,8 +83,8 @@ class TaifaAPIClient:
             logger.error(f"Error searching opportunities: {e}")
             return []
     
-    async def create_funding_opportunity(self, opportunity_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
-        """Create a new funding opportunity"""
+    async def create_intelligence_item(self, opportunity_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        """Create a new intelligence item"""
         try:
             session = await self._get_session()
             
@@ -138,7 +138,7 @@ def fetch_opportunities_sync(skip: int = 0, limit: int = 100, **filters):
     try:
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-        result = loop.run_until_complete(client.get_funding_opportunities(skip, limit, **filters))
+        result = loop.run_until_complete(client.get_africa_intelligence_feed(skip, limit, **filters))
         loop.run_until_complete(client.close())
         return result
     finally:
@@ -154,7 +154,7 @@ def search_opportunities_sync(query: str, limit: int = 10):
     try:
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-        result = loop.run_until_complete(client.search_funding_opportunities(query, limit))
+        result = loop.run_until_complete(client.search_africa_intelligence_feed(query, limit))
         loop.run_until_complete(client.close())
         return result
     finally:
@@ -166,7 +166,7 @@ def create_opportunity_sync(opportunity_data: Dict[str, Any]):
     try:
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-        result = loop.run_until_complete(client.create_funding_opportunity(opportunity_data))
+        result = loop.run_until_complete(client.create_intelligence_item(opportunity_data))
         loop.run_until_complete(client.close())
         return result
     finally:

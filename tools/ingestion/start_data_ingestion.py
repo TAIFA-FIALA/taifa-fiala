@@ -70,11 +70,11 @@ def setup_initial_data_sources():
     try:
         client = create_client(os.getenv('SUPABASE_PROJECT_URL'), os.getenv('SUPABASE_API_KEY'))
         
-        # Check if we have funding opportunities
-        result = client.table('funding_opportunities').select('*').limit(1).execute()
+        # Check if we have funding intelligence_items
+        result = client.table('africa_intelligence_feed').select('*').limit(1).execute()
         
         if len(result.data) == 0:
-            logger.info("No funding opportunities found. Setting up initial data sources...")
+            logger.info("No funding intelligence_items found. Setting up initial data sources...")
             
             # Initial RSS feeds for testing
             initial_feeds = [
@@ -157,7 +157,7 @@ async def start_basic_ingestion():
                     if any(keyword.lower() in content_text for keyword in keywords):
                         # This looks relevant, let's store it
                         # Use correct column names that exist in the database
-                        opportunity_data = {
+                        intelligence_data = {
                             'title': title,
                             'description': summary,
                             'source_url': entry.get('link', ''),
@@ -175,8 +175,8 @@ async def start_basic_ingestion():
                         }
                         
                         try:
-                            # Try to insert into funding_opportunities table
-                            result = client.table('funding_opportunities').insert(opportunity_data).execute()
+                            # Try to insert into intelligence_feed table
+                            result = client.table('africa_intelligence_feed').insert(intelligence_data).execute()
                             total_items += 1
                             logger.info(f"✅ Added: {title[:50]}...")
                             
@@ -222,7 +222,7 @@ async def main():
     if success:
         logger.info("🎉 Data ingestion startup completed successfully!")
         logger.info("\nNext steps:")
-        logger.info("- Check the funding_opportunities table for new data")
+        logger.info("- Check the intelligence_feed table for new data")
         logger.info("- Set up the full ingestion schema for high-volume processing")
         logger.info("- Configure additional RSS feeds and data sources")
         logger.info("- Set up scheduled ingestion jobs")

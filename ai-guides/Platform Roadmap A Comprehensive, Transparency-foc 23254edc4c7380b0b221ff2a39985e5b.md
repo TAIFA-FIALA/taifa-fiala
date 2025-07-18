@@ -64,7 +64,7 @@ Building on the pgvector implementation:
 
 ## 9. **Capacity Building Integration**
 
-- **Skills gap identification**: Link funding opportunities to required competencies
+- **Skills gap identification**: Link intelligence feed to required competencies
 - **Mentorship matching**: Connect first-time applicants with successful grant recipients
 - **Proposal writing assistance**: AI-powered tools to improve application quality while maintaining authenticity
 

@@ -133,7 +133,7 @@ async def main():
         logger.info("- Funding type categories (grant/investment)")
         logger.info("- Grant-specific and investment-specific properties")
         logger.info("\nYour Pinecone vector database is ready for:")
-        logger.info("- Semantic search across all funding opportunities")
+        logger.info("- Semantic search across all intelligence feed")
         logger.info("- Equity-aware filtering by organization role and funding type")
     else:
         logger.info("⚠️ Some connections failed. Please check your environment variables and try again.")

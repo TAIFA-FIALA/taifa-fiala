@@ -71,7 +71,7 @@ async def create_user_submission(
     db = Depends(get_db)
 ):
     """
-    Create a new funding opportunity submission from a user
+    Create a new intelligence item submission from a user
     
     This endpoint handles Method 1 of the data importation system:
     - Validates user input

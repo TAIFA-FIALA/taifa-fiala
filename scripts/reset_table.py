@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Check and reset funding opportunities table
+Check and reset intelligence feed table
 """
 
 import asyncio
@@ -15,7 +15,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 async def reset_funding_table():
-    """Drop and recreate the funding opportunities table"""
+    """Drop and recreate the intelligence feed table"""
     
     database_url = os.getenv("DATABASE_URL")
     if not database_url:
@@ -36,23 +36,23 @@ async def reset_funding_table():
         for table in tables:
             logger.info(f"  - {table['table_name']}")
         
-        # Check if funding_opportunities exists
+        # Check if africa_intelligence_feed exists
         existing = await conn.fetchval("""
             SELECT EXISTS (
                 SELECT FROM information_schema.tables 
                 WHERE table_schema = 'public' 
-                AND table_name = 'funding_opportunities'
+                AND table_name = 'africa_intelligence_feed'
             )
         """)
         
         if existing:
-            logger.info("🗑️  Dropping existing funding_opportunities table...")
-            await conn.execute("DROP TABLE funding_opportunities CASCADE")
+            logger.info("🗑️  Dropping existing africa_intelligence_feed table...")
+            await conn.execute("DROP TABLE africa_intelligence_feed CASCADE")
         
-        # Create the funding opportunities table fresh
-        logger.info("🏗️  Creating funding_opportunities table...")
+        # Create the intelligence feed table fresh
+        logger.info("🏗️  Creating africa_intelligence_feed table...")
         await conn.execute("""
-            CREATE TABLE funding_opportunities (
+            CREATE TABLE africa_intelligence_feed (
                 id SERIAL PRIMARY KEY,
                 title TEXT NOT NULL,
                 description TEXT,
@@ -87,10 +87,10 @@ async def reset_funding_table():
         """)
         
         # Create indexes
-        await conn.execute("CREATE INDEX idx_content_hash ON funding_opportunities(content_hash);")
-        await conn.execute("CREATE INDEX idx_source_type ON funding_opportunities(source_type);")
-        await conn.execute("CREATE INDEX idx_relevance_score ON funding_opportunities(overall_relevance_score);")
-        await conn.execute("CREATE INDEX idx_discovered_date ON funding_opportunities(discovered_date);")
+        await conn.execute("CREATE INDEX idx_content_hash ON africa_intelligence_feed(content_hash);")
+        await conn.execute("CREATE INDEX idx_source_type ON africa_intelligence_feed(source_type);")
+        await conn.execute("CREATE INDEX idx_relevance_score ON africa_intelligence_feed(overall_relevance_score);")
+        await conn.execute("CREATE INDEX idx_discovered_date ON africa_intelligence_feed(discovered_date);")
         
         logger.info("✅ Funding opportunities table created successfully")
         
@@ -98,7 +98,7 @@ async def reset_funding_table():
         columns = await conn.fetch("""
             SELECT column_name, data_type 
             FROM information_schema.columns 
-            WHERE table_name = 'funding_opportunities'
+            WHERE table_name = 'africa_intelligence_feed'
             ORDER BY ordinal_position
         """)
         

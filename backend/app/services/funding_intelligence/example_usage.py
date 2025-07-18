@@ -61,7 +61,7 @@ async def example_search_funding_intelligence():
     
     pipeline = create_funding_intelligence_pipeline()
     
-    # Search for AI funding opportunities
+    # Search for AI intelligence feed
     query = "AI startups Africa machine learning funding grants"
     results = await pipeline.search_funding_intelligence(query)
     

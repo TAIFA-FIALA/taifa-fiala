@@ -89,9 +89,9 @@ CREATE TABLE IF NOT EXISTS funding_types (
 CREATE INDEX IF NOT EXISTS idx_funding_types_category ON funding_types(category);
 """
 
-# Define the funding_opportunities table schema
-FUNDING_OPPORTUNITIES_SCHEMA = """
-CREATE TABLE IF NOT EXISTS funding_opportunities (
+# Define the africa_intelligence_feed table schema
+AFRICA_INTELLIGENCE_FEED_SCHEMA = """
+CREATE TABLE IF NOT EXISTS africa_intelligence_feed (
     id SERIAL PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     description TEXT NOT NULL,
@@ -131,12 +131,12 @@ CREATE TABLE IF NOT EXISTS funding_opportunities (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX IF NOT EXISTS idx_funding_opportunities_provider_org ON funding_opportunities(provider_organization_id);
-CREATE INDEX IF NOT EXISTS idx_funding_opportunities_recipient_org ON funding_opportunities(recipient_organization_id);
-CREATE INDEX IF NOT EXISTS idx_funding_opportunities_funding_type ON funding_opportunities(funding_type_id);
-CREATE INDEX IF NOT EXISTS idx_funding_opportunities_women_focus ON funding_opportunities(women_focus);
-CREATE INDEX IF NOT EXISTS idx_funding_opportunities_underserved_focus ON funding_opportunities(underserved_focus);
-CREATE INDEX IF NOT EXISTS idx_funding_opportunities_youth_focus ON funding_opportunities(youth_focus);
+CREATE INDEX IF NOT EXISTS idx_africa_intelligence_feed_provider_org ON africa_intelligence_feed(provider_organization_id);
+CREATE INDEX IF NOT EXISTS idx_africa_intelligence_feed_recipient_org ON africa_intelligence_feed(recipient_organization_id);
+CREATE INDEX IF NOT EXISTS idx_africa_intelligence_feed_funding_type ON africa_intelligence_feed(funding_type_id);
+CREATE INDEX IF NOT EXISTS idx_africa_intelligence_feed_women_focus ON africa_intelligence_feed(women_focus);
+CREATE INDEX IF NOT EXISTS idx_africa_intelligence_feed_underserved_focus ON africa_intelligence_feed(underserved_focus);
+CREATE INDEX IF NOT EXISTS idx_africa_intelligence_feed_youth_focus ON africa_intelligence_feed(youth_focus);
 """
 
 # Simple health check table for connection testing
@@ -187,9 +187,9 @@ async def apply_migrations():
             await conn.execute(text(FUNDING_TYPES_SCHEMA))
             logger.info("✅ Funding types table created")
             
-            # Create funding opportunities table
-            logger.info("Creating funding opportunities table...")
-            await conn.execute(text(FUNDING_OPPORTUNITIES_SCHEMA))
+            # Create intelligence feed table
+            logger.info("Creating intelligence feed table...")
+            await conn.execute(text(AFRICA_INTELLIGENCE_FEED_SCHEMA))
             logger.info("✅ Funding opportunities table created")
             
         logger.info("✅ All migrations applied successfully!")

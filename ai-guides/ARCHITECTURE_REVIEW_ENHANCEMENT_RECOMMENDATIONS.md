@@ -223,7 +223,7 @@ Given the need to track funding across 55 countries:
 ```python
 # Add geographic partitioning to your indexes
 CREATE INDEX idx_opportunities_country_partition 
-ON funding_opportunities(country, created_at DESC) 
+ON africa_intelligence_feed(country, created_at DESC) 
 WHERE active = true;
 
 # Implement smart caching for underserved regions

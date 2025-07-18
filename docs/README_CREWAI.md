@@ -1,10 +1,10 @@
 # 🤖 TAIFA CrewAI Enhanced ETL Pipeline
 
-An intelligent, multi-agent ETL system for discovering, processing, and validating AI funding opportunities across Africa using CrewAI framework with advanced learning capabilities.
+An intelligent, multi-agent ETL system for discovering, processing, and validating AI intelligence feed across Africa using CrewAI framework with advanced learning capabilities.
 
 ## 🌟 Overview
 
-The TAIFA CrewAI pipeline transforms funding opportunity discovery from a simple scraping operation into an intelligent, self-improving system that:
+The TAIFA CrewAI pipeline transforms intelligence item discovery from a simple scraping operation into an intelligent, self-improving system that:
 
 - **Processes content intelligently** using specialized AI agents
 - **Resolves conflicts** between agent outputs automatically
@@ -124,7 +124,7 @@ ai-africa-funding-tracker/
 │   ├── crews/
 │   │   ├── enhanced_funding_crew.py          # Main processing crew
 │   │   ├── organization_enrichment_crew.py   # Organization enrichment
-│   │   └── funding_opportunity_crew.py       # Original crew (reference)
+│   │   └── intelligence_item_crew.py       # Original crew (reference)
 │   ├── translation/
 │   │   └── translation_pipeline.py           # Independent translation service
 │   ├── community/
@@ -246,7 +246,7 @@ async def main():
     
     # Process manual submission
     manual_submission = {
-        "title": "New Funding Opportunity",
+        "title": "New Intelligence Item",
         "description": "Manual submission for validation"
     }
     
@@ -332,7 +332,7 @@ community_stats = validation_service.get_validation_statistics()
 {
   "translation": {
     "content_type_preferences": {
-      "funding_opportunity": ["deepl", "openai_gpt4", "azure_translator"],
+      "intelligence_item": ["deepl", "openai_gpt4", "azure_translator"],
       "organization_profile": ["openai_gpt4", "deepl"]
     },
     "quality_thresholds": {
@@ -428,7 +428,7 @@ python -c "from data_processors.translation.translation_pipeline import create_t
 **Database Connection Issues**
 ```bash
 # Test database connection
-psql $POSTGRES_CONNECTION_STRING -c "SELECT COUNT(*) FROM funding_opportunities;"
+psql $POSTGRES_CONNECTION_STRING -c "SELECT COUNT(*) FROM africa_intelligence_feed;"
 
 # Check schema
 psql $POSTGRES_CONNECTION_STRING -c "\dt"

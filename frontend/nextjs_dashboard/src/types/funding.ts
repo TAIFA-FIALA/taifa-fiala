@@ -1,4 +1,4 @@
-export interface FundingOpportunity {
+export interface AfricaIntelligenceItem {
   id: number;
   title: string;
   description: string;

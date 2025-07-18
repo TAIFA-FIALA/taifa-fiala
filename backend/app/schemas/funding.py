@@ -3,8 +3,8 @@ from typing import Optional, List
 from datetime import datetime
 from decimal import Decimal
 
-class FundingOpportunityBase(BaseModel):
-    """Base schema for funding opportunities"""
+class AfricaIntelligenceItemBase(BaseModel):
+    """Base schema for intelligence feed"""
     title: str
     description: Optional[str] = None
     # Funding amount fields
@@ -48,8 +48,8 @@ class InvestmentFundingSpecific(BaseModel):
     post_investment_support: Optional[str] = None
     expected_roi: Optional[float] = None
 
-class FundingOpportunityCreate(FundingOpportunityBase):
-    """Schema for creating funding opportunities"""
+class AfricaIntelligenceItemCreate(AfricaIntelligenceItemBase):
+    """Schema for creating intelligence feed"""
     # Legacy organization relationship
     source_organization_id: Optional[int] = None 
     data_source_id: Optional[int] = None
@@ -79,8 +79,8 @@ class FundingOpportunityCreate(FundingOpportunityBase):
         # Here we're just setting up the validation structure
         return v
 
-class FundingOpportunityUpdate(BaseModel):
-    """Schema for updating funding opportunities"""
+class AfricaIntelligenceItemUpdate(BaseModel):
+    """Schema for updating intelligence feed"""
     title: Optional[str] = None
     description: Optional[str] = None
     amount_min: Optional[Decimal] = None
@@ -155,8 +155,8 @@ class FundingTypeBase(BaseModel):
     requires_repayment: bool = False
     typical_amount_range: Optional[str] = None
 
-class FundingOpportunityResponse(FundingOpportunityBase):
-    """Schema for funding opportunity responses"""
+class AfricaIntelligenceItemResponse(AfricaIntelligenceItemBase):
+    """Schema for intelligence item responses"""
     id: int
     created_at: datetime
     updated_at: Optional[datetime] = None
@@ -190,9 +190,9 @@ class FundingOpportunityResponse(FundingOpportunityBase):
         "from_attributes": True
     }
 
-class FundingOpportunityList(BaseModel):
-    """Schema for paginated funding opportunity lists"""
-    items: List[FundingOpportunityResponse]
+class AfricaIntelligenceItemList(BaseModel):
+    """Schema for paginated intelligence item lists"""
+    items: List[AfricaIntelligenceItemResponse]
     total: int
     page: int
     per_page: int

@@ -45,7 +45,7 @@ class TaifaI18n:
             translations = {
                 # Navigation
                 "nav.dashboard": "Dashboard",
-                "nav.opportunities": "Funding Opportunities",
+                "nav.opportunities": "Intelligence Feed",
                 "nav.organizations": "Organizations",
                 "nav.analytics": "Analytics",
                 "nav.submit": "Submit Opportunity",
@@ -55,10 +55,10 @@ class TaifaI18n:
                 "brand.fiala": "FIALA",
                 "brand.tagline.en": "Tracking AI Funding for Africa",
                 "brand.tagline.fr": "Financement pour l'Intelligence Artificielle en Afrique",
-                "brand.description": "The comprehensive platform for AI funding opportunities across Africa",
+                "brand.description": "The comprehensive platform for AI intelligence feed across Africa",
                 
                 # Dashboard
-                "dashboard.title": "AI Funding Opportunities Dashboard",
+                "dashboard.title": "AI Intelligence Feed Dashboard",
                 "dashboard.total_opportunities": "Total Opportunities",
                 "dashboard.recent_additions": "Recent Additions",
                 "dashboard.active_funders": "Active Funders",
@@ -66,7 +66,7 @@ class TaifaI18n:
                 "dashboard.welcome": "Welcome to TAIFA - Your gateway to AI funding in Africa",
                 
                 # Opportunities
-                "opportunities.title": "Funding Opportunities",
+                "opportunities.title": "Intelligence Feed",
                 "opportunities.search_placeholder": "Search opportunities...",
                 "opportunities.filter_by": "Filter by",
                 "opportunities.amount": "Amount",

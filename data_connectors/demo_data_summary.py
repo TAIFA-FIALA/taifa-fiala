@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Demo Data Summary Script
-Shows current funding opportunities data for stakeholder demo
+Shows current intelligence feed data for stakeholder demo
 """
 
 import asyncio
@@ -55,14 +55,14 @@ class DemoDataSummary:
             
             # Total opportunities count
             total_count = await conn.fetchval(
-                "SELECT COUNT(*) FROM funding_opportunities"
+                "SELECT COUNT(*) FROM africa_intelligence_feed"
             )
             stats["total_opportunities"] = total_count
             
             # Opportunities by source
             source_stats = await conn.fetch("""
                 SELECT source_name, COUNT(*) as count 
-                FROM funding_opportunities 
+                FROM africa_intelligence_feed 
                 GROUP BY source_name 
                 ORDER BY count DESC
             """)
@@ -70,7 +70,7 @@ class DemoDataSummary:
             
             # Recent opportunities (last 7 days)
             recent_count = await conn.fetchval("""
-                SELECT COUNT(*) FROM funding_opportunities 
+                SELECT COUNT(*) FROM africa_intelligence_feed 
                 WHERE discovered_date >= NOW() - INTERVAL '7 days'
             """)
             stats["recent_opportunities"] = recent_count
@@ -87,7 +87,7 @@ class DemoDataSummary:
                         ELSE 'Other'
                     END as category,
                     COUNT(*) as count
-                FROM funding_opportunities
+                FROM africa_intelligence_feed
                 GROUP BY category
                 ORDER BY count DESC
             """)
@@ -95,7 +95,7 @@ class DemoDataSummary:
             
             # AI-related opportunities
             ai_count = await conn.fetchval("""
-                SELECT COUNT(*) FROM funding_opportunities 
+                SELECT COUNT(*) FROM africa_intelligence_feed 
                 WHERE LOWER(title) LIKE '%ai%' OR LOWER(title) LIKE '%artificial intelligence%' 
                 OR LOWER(description) LIKE '%ai%' OR LOWER(description) LIKE '%artificial intelligence%'
             """)
@@ -103,7 +103,7 @@ class DemoDataSummary:
             
             # Africa-related opportunities
             africa_count = await conn.fetchval("""
-                SELECT COUNT(*) FROM funding_opportunities 
+                SELECT COUNT(*) FROM africa_intelligence_feed 
                 WHERE LOWER(title) LIKE '%africa%' OR LOWER(title) LIKE '%african%' 
                 OR LOWER(description) LIKE '%africa%' OR LOWER(description) LIKE '%african%'
             """)
@@ -114,7 +114,7 @@ class DemoDataSummary:
                 SELECT 
                     search_query,
                     COUNT(*) as count
-                FROM funding_opportunities 
+                FROM africa_intelligence_feed 
                 WHERE search_query IS NOT NULL
                 GROUP BY search_query
                 ORDER BY count DESC
@@ -136,7 +136,7 @@ class DemoDataSummary:
                     discovered_date,
                     search_query,
                     application_url
-                FROM funding_opportunities 
+                FROM africa_intelligence_feed 
                 ORDER BY discovered_date DESC 
                 LIMIT $1
             """, limit)
@@ -165,7 +165,7 @@ class DemoDataSummary:
                     discovered_date,
                     search_query,
                     application_url
-                FROM funding_opportunities 
+                FROM africa_intelligence_feed 
                 WHERE 
                     (LOWER(title) LIKE '%ai%' OR LOWER(title) LIKE '%artificial intelligence%')
                     AND (LOWER(title) LIKE '%africa%' OR LOWER(title) LIKE '%african%' OR LOWER(description) LIKE '%africa%')
@@ -230,7 +230,7 @@ class DemoDataSummary:
         
         # Key metrics
         print("\\n📊 KEY METRICS:")
-        print(f"   • Total Funding Opportunities: {report['summary']['total_opportunities']:,}")
+        print(f"   • Total Intelligence Feed: {report['summary']['total_opportunities']:,}")
         print(f"   • AI-Related Opportunities: {report['summary']['ai_related']:,}")
         print(f"   • Africa-Related Opportunities: {report['summary']['africa_related']:,}")
         print(f"   • Recent Opportunities (7 days): {report['summary']['recent_count']:,}")

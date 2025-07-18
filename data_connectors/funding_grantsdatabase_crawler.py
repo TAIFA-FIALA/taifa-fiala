@@ -11,18 +11,18 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Define the Pydantic model for the extracted data, based on the database schema
-class FundingOpportunity(BaseModel):
-    title: str = Field(..., description="The title of the funding opportunity.")
-    description: Optional[str] = Field(None, description="A brief description of the funding opportunity.")
+class AfricaIntelligenceItem(BaseModel):
+    title: str = Field(..., description="The title of the intelligence item.")
+    description: Optional[str] = Field(None, description="A brief description of the intelligence item.")
     amount: Optional[str] = Field(None, description="The amount of funding available.")
     currency: Optional[str] = Field(None, description="The currency of the funding amount.")
     deadline: Optional[str] = Field(None, description="The application deadline.")
-    source_url: Optional[str] = Field(None, description="The URL to the original funding opportunity page.")
-    geographical_scope: Optional[str] = Field(None, description="The geographical scope of the funding opportunity.")
+    source_url: Optional[str] = Field(None, description="The URL to the original intelligence item page.")
+    geographical_scope: Optional[str] = Field(None, description="The geographical scope of the intelligence item.")
     eligibility_criteria: Optional[str] = Field(None, description="The eligibility criteria for applicants.")
 
 class FundingData(BaseModel):
-    data: List[FundingOpportunity] = Field(..., description="A list of funding opportunities.")
+    data: List[AfricaIntelligenceItem] = Field(..., description="A list of intelligence feed.")
 
 async def main():
     # URL to crawl

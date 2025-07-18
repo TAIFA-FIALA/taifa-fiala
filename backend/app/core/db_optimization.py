@@ -25,7 +25,7 @@ from sqlalchemy.orm import selectinload
 from sqlalchemy import Index, func, and_, or_
 import redis.asyncio as redis
 
-from app.models.funding import FundingOpportunity, FundingType
+from app.models.funding import AfricaIntelligenceItem, FundingType
 from app.models.organization import Organization
 from app.models.validation import ValidationResult as ValidationResultModel
 from app.core.data_validation import ValidationResult, ValidationStatus
@@ -201,7 +201,7 @@ class OptimizedCRUD:
         self.logger = logging.getLogger(__name__)
     
     async def bulk_insert_opportunities(self, opportunities: List[Dict[str, Any]]) -> List[int]:
-        """Bulk insert funding opportunities with optimization"""
+        """Bulk insert intelligence feed with optimization"""
         try:
             inserted_ids = []
             
@@ -219,7 +219,7 @@ class OptimizedCRUD:
                         batch_data.append(opp)
                     
                     # Use PostgreSQL's INSERT ... ON CONFLICT for upsert
-                    stmt = insert(FundingOpportunity).values(batch_data)
+                    stmt = insert(AfricaIntelligenceItem).values(batch_data)
                     stmt = stmt.on_conflict_do_update(
                         index_elements=['title', 'organization_id'],
                         set_=dict(
@@ -228,7 +228,7 @@ class OptimizedCRUD:
                             deadline=stmt.excluded.deadline,
                             updated_at=stmt.excluded.updated_at
                         )
-                    ).returning(FundingOpportunity.id)
+                    ).returning(AfricaIntelligenceItem.id)
                     
                     result = await session.execute(stmt)
                     batch_ids = [row[0] for row in result.fetchall()]
@@ -317,7 +317,7 @@ class OptimizedCRUD:
                         vr.status as validation_status,
                         vr.confidence_score,
                         vr.validation_notes
-                    FROM funding_opportunities fo
+                    FROM africa_intelligence_feed fo
                     LEFT JOIN organizations o ON fo.organization_id = o.id
                     LEFT JOIN validation_results vr ON vr.opportunity_id = fo.id
                     WHERE vr.status = 'needs_review'
@@ -373,7 +373,7 @@ class OptimizedCRUD:
                         o.country,
                         ft.name as funding_type,
                         ts_rank(search_vector, plainto_tsquery(:search_text)) as relevance
-                    FROM funding_opportunities fo
+                    FROM africa_intelligence_feed fo
                     LEFT JOIN organizations o ON fo.organization_id = o.id
                     LEFT JOIN funding_types ft ON fo.funding_type_id = ft.id
                     WHERE 1=1
@@ -485,7 +485,7 @@ class OptimizedCRUD:
                         AVG(fo.amount_usd) as avg_amount,
                         COUNT(DISTINCT fo.organization_id) as unique_organizations,
                         COUNT(DISTINCT o.country) as countries_covered
-                    FROM funding_opportunities fo
+                    FROM africa_intelligence_feed fo
                     LEFT JOIN organizations o ON fo.organization_id = o.id
                     WHERE fo.created_at >= NOW() - INTERVAL '%s days'
                 """ % (date_range, date_range))
@@ -525,12 +525,12 @@ class DatabaseOptimizer:
                 # Index definitions
                 indexes = [
                     # Full-text search index
-                    "CREATE INDEX IF NOT EXISTS idx_funding_opportunities_search ON funding_opportunities USING gin(search_vector)",
+                    "CREATE INDEX IF NOT EXISTS idx_africa_intelligence_feed_search ON africa_intelligence_feed USING gin(search_vector)",
                     
                     # Composite indexes for common queries
-                    "CREATE INDEX IF NOT EXISTS idx_funding_opportunities_status_deadline ON funding_opportunities(status, deadline)",
-                    "CREATE INDEX IF NOT EXISTS idx_funding_opportunities_amount_status ON funding_opportunities(amount_usd, status)",
-                    "CREATE INDEX IF NOT EXISTS idx_funding_opportunities_org_created ON funding_opportunities(organization_id, created_at DESC)",
+                    "CREATE INDEX IF NOT EXISTS idx_africa_intelligence_feed_status_deadline ON africa_intelligence_feed(status, deadline)",
+                    "CREATE INDEX IF NOT EXISTS idx_africa_intelligence_feed_amount_status ON africa_intelligence_feed(amount_usd, status)",
+                    "CREATE INDEX IF NOT EXISTS idx_africa_intelligence_feed_org_created ON africa_intelligence_feed(organization_id, created_at DESC)",
                     
                     # Validation indexes
                     "CREATE INDEX IF NOT EXISTS idx_validation_results_status ON validation_results(status)",
@@ -541,8 +541,8 @@ class DatabaseOptimizer:
                     "CREATE INDEX IF NOT EXISTS idx_organizations_type ON organizations(type)",
                     
                     # Partial indexes for common filters
-                    "CREATE INDEX IF NOT EXISTS idx_funding_opportunities_open ON funding_opportunities(deadline) WHERE status = 'open'",
-                    "CREATE INDEX IF NOT EXISTS idx_funding_opportunities_high_amount ON funding_opportunities(amount_usd DESC) WHERE amount_usd > 10000",
+                    "CREATE INDEX IF NOT EXISTS idx_africa_intelligence_feed_open ON africa_intelligence_feed(deadline) WHERE status = 'open'",
+                    "CREATE INDEX IF NOT EXISTS idx_africa_intelligence_feed_high_amount ON africa_intelligence_feed(amount_usd DESC) WHERE amount_usd > 10000",
                 ]
                 
                 for index_sql in indexes:
@@ -570,7 +570,7 @@ class DatabaseOptimizer:
                         AVG(fo.amount_usd) as avg_amount,
                         COUNT(DISTINCT fo.organization_id) as unique_organizations,
                         COUNT(DISTINCT o.country) as countries
-                    FROM funding_opportunities fo
+                    FROM africa_intelligence_feed fo
                     LEFT JOIN organizations o ON fo.organization_id = o.id
                     WHERE fo.created_at >= NOW() - INTERVAL '90 days'
                     GROUP BY DATE_TRUNC('day', fo.created_at)
@@ -596,7 +596,7 @@ class DatabaseOptimizer:
         """Update table statistics for query optimization"""
         try:
             async with self.db_manager.get_session() as session:
-                await session.execute(text("ANALYZE funding_opportunities"))
+                await session.execute(text("ANALYZE africa_intelligence_feed"))
                 await session.execute(text("ANALYZE organizations"))
                 await session.execute(text("ANALYZE validation_results"))
                 await session.commit()

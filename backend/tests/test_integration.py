@@ -71,7 +71,7 @@ async def test_serper_with_location_rotation():
             "priority": "high"
         }
         
-        opportunities = await collector._search_funding_opportunities(test_query)
+        opportunities = await collector._search_africa_intelligence_feed(test_query)
         
         # Close the session
         await collector.session.close()
@@ -99,7 +99,7 @@ async def test_end_to_end_pipeline():
     # Create a test opportunity to save
     test_opportunity = {
         "title": "Test AI Research Grant for African Universities",
-        "description": "A test funding opportunity for AI research in Africa. Amount: $50,000. Deadline: Apply by December 31, 2025.",
+        "description": "A test intelligence item for AI research in Africa. Amount: $50,000. Deadline: Apply by December 31, 2025.",
         "source_url": f"https://test-funding.example.com/test-{datetime.now().timestamp()}",
         "search_query": "Test Query",
         "priority": "high",
