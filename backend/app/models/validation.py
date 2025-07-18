@@ -105,7 +105,7 @@ class ProcessingJob(Base):
     # Processing metadata
     source_data = Column(JSONB)  # Input data
     result_data = Column(JSONB)  # Output data
-    metadata = Column(JSONB)  # Additional job metadata (organization_id, enrichment_type, etc.)
+    job_metadata = Column(JSONB)  # Additional job metadata (organization_id, enrichment_type, etc.)
     error_message = Column(Text)
     retry_count = Column(Integer, default=0)
     max_retries = Column(Integer, default=3)

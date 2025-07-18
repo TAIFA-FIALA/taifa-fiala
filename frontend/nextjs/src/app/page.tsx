@@ -40,39 +40,82 @@ export default async function HomePage() {
 
   return (
     <div className="min-h-screen">
-      {/* Header Section - Academic Style */}
-      <section className="bg-white pt-12 pb-8 px-4 sm:px-6 lg:px-8 border-b border-gray-200">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-4xl font-serif text-gray-900 mb-3">TAIFA-FIALA</h1>
-          <p className="text-xl text-gray-600 font-serif mb-6">
+      {/* Modern Hero Section with Africa Outline */}
+      <section className="relative overflow-hidden py-16 sm:py-24 border-b border-gray-200">
+        {/* Background Africa Outline */}
+        <div className="absolute inset-0 flex justify-center items-center z-0 opacity-10">
+          <Image 
+            src="/Africa-outline-yellow.png" 
+            alt="Africa Outline" 
+            width={800} 
+            height={800} 
+            className="object-contain"
+          />
+        </div>
+        
+        <div className="max-w-7xl mx-auto text-center px-4 sm:px-6 lg:px-8 relative z-10">
+          {/* Logo and Branding */}
+          <div className="flex justify-center mb-6">
+            <Image 
+              src="/TAIFA-FIALA-logo.png" 
+              alt="TAIFA-FIALA Logo" 
+              width={120} 
+              height={120} 
+              className="object-contain"
+            />
+          </div>
+          
+          <h1 className="text-5xl font-display font-bold text-taifa-primary mb-3">
+            TAIFA-FIALA
+          </h1>
+          
+          <p className="text-2xl text-taifa-primary font-display mb-6">
             Tracking AI Funding for Africa | Financements IA en Afrique
           </p>
-          <p className="text-lg text-gray-700 max-w-4xl leading-relaxed">
-            An independent research initiative documenting and analyzing artificial intelligence 
-            funding flows across the African continent. Our work aims to promote transparency, 
-            inform evidence-based policy, and support equitable development of AI capabilities 
-            across all African nations.
+          
+          <p className="text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed mb-10 font-body">
+            An independent initiative promoting transparency and equitable development 
+            of AI capabilities across all African nations.
           </p>
           
-          {/* Navigation - Research-focused */}
-          <nav className="mt-8 flex flex-wrap gap-4 text-base">
-            <Link href="#findings" className="text-blue-700 hover:text-blue-900 hover:underline">
+          {/* Search Bar - Centered */}
+          <div className="max-w-2xl mx-auto mb-12">
+            <form 
+              action={(formData) => {
+                const searchParams = new URLSearchParams();
+                searchParams.set('query', formData.get('query') as string);
+                window.location.href = `/funding?${searchParams.toString()}`;
+              }}
+              className="relative flex shadow-md rounded-lg overflow-hidden"
+            >
+              <input
+                type="text"
+                name="query"
+                placeholder="Search for funds by funder, recipient, or project"
+                className="pl-6 pr-4 py-4 w-full rounded-l-lg border-0 focus:ring-2 focus:ring-taifa-secondary text-lg"
+              />
+              <button 
+                type="submit" 
+                className="bg-taifa-secondary hover:bg-yellow-400 text-taifa-primary px-6 py-4 font-medium text-lg transition-colors duration-200 flex items-center"
+              >
+                Search
+                <ChevronRight className="ml-2 h-5 w-5" />
+              </button>
+            </form>
+          </div>
+          
+          {/* Quick Navigation Links */}
+          <nav className="flex flex-wrap justify-center gap-6 text-base font-medium">
+            <Link href="#findings" className="text-taifa-primary hover:text-taifa-secondary transition-colors">
               Research Findings
             </Link>
-            <span className="text-gray-400">•</span>
-            <Link href="/methodology" className="text-blue-700 hover:text-blue-900 hover:underline">
+            <Link href="/methodology" className="text-taifa-primary hover:text-taifa-secondary transition-colors">
               Methodology
             </Link>
-            <span className="text-gray-400">•</span>
-            <Link href="#data" className="text-blue-700 hover:text-blue-900 hover:underline">
+            <Link href="#data" className="text-taifa-primary hover:text-taifa-secondary transition-colors">
               Data & Analysis
             </Link>
-            <span className="text-gray-400">•</span>
-            <Link href="/publications" className="text-blue-700 hover:text-blue-900 hover:underline">
-              Publications
-            </Link>
-            <span className="text-gray-400">•</span>
-            <Link href="/about" className="text-blue-700 hover:text-blue-900 hover:underline">
+            <Link href="/about" className="text-taifa-primary hover:text-taifa-secondary transition-colors">
               Research Team
             </Link>
           </nav>

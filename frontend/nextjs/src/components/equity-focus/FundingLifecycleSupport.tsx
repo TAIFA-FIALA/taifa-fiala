@@ -1,34 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
-// Dynamically import Chart.js to avoid SSR issues
-const Chart = dynamic(() => import('react-chartjs-2').then((mod) => mod.Bar), {
+// Use dynamic import only if needed for specific SSR issues
+const ChartContainer = dynamic(() => Promise.resolve(({ children }: { children: React.ReactNode }) => (
+  <div className="h-64">{children}</div>
+)), {
   ssr: false,
   loading: () => <div className="h-64 bg-gray-50 rounded-lg flex items-center justify-center">Loading chart...</div>,
 });
-
-// We'll need to register Chart.js components
-const registerChartComponents = async () => {
-  const { 
-    Chart, 
-    CategoryScale, 
-    LinearScale, 
-    BarElement, 
-    Title, 
-    Tooltip, 
-    Legend 
-  } = await import('chart.js');
-  
-  Chart.register(
-    CategoryScale,
-    LinearScale,
-    BarElement,
-    Title,
-    Tooltip,
-    Legend
-  );
-};
 
 interface FundingStage {
   stage: string;
@@ -69,8 +50,6 @@ export default function FundingLifecycleSupport({ className = '' }: FundingLifec
   const [error, setError] = useState<string | null>(null);
   
   useEffect(() => {
-    registerChartComponents();
-    
     const fetchLifecycleData = async () => {
       try {
         setLoading(true);
@@ -197,22 +176,11 @@ export default function FundingLifecycleSupport({ className = '' }: FundingLifec
   }, [selectedStage]);
 
   // Prepare chart data
-  const chartData = {
-    labels: fundingStages.map(item => item.stage.toUpperCase()),
-    datasets: [
-      {
-        label: 'Projects (%)',
-        data: fundingStages.map(item => item.percentage),
-        backgroundColor: fundingStages.map(item => 
-          item.stage === 'seed' ? 'rgba(239, 68, 68, 0.8)' : 'rgba(59, 130, 246, 0.5)'
-        ),
-        borderColor: fundingStages.map(item => 
-          item.stage === 'seed' ? 'rgba(239, 68, 68, 1)' : 'rgba(59, 130, 246, 1)'
-        ),
-        borderWidth: 1,
-      }
-    ]
-  };
+  const chartData = fundingStages.map(stage => ({
+    stage: stage.stage.toUpperCase(),
+    percentage: stage.percentage,
+    fill: stage.stage === 'seed' ? 'rgba(239, 68, 68, 0.8)' : 'rgba(59, 130, 246, 0.5)'
+  }));
 
   // Chart options
   const chartOptions = {
@@ -275,7 +243,28 @@ export default function FundingLifecycleSupport({ className = '' }: FundingLifec
         {/* Left Column: Chart and Stage selector */}
         <div className="lg:col-span-1">
           <div className="bg-gray-50 p-4 rounded-lg border border-gray-100 h-64 mb-4">
-            <Chart data={chartData} options={chartOptions} />
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 10 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                <XAxis dataKey="stage" />
+                <YAxis domain={[0, 'auto']} />
+                <Tooltip
+                  content={({ active, payload }) => {
+                    if (active && payload && payload.length) {
+                      const data = payload[0].payload;
+                      return (
+                        <div className="bg-white p-2 border border-gray-200 rounded-md shadow-sm">
+                          <div className="text-sm font-medium">{data.stage}</div>
+                          <div className="text-xs">{data.percentage}% of projects</div>
+                        </div>
+                      );
+                    }
+                    return null;
+                  }}
+                />
+                <Bar dataKey="percentage" fill="#4285F4" />
+              </BarChart>
+            </ResponsiveContainer>
           </div>
           
           <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">

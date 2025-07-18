@@ -1,11 +1,9 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, ReactNode } from 'react';
 import Link from 'next/link';
-import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
-import type { LatLngExpression } from 'leaflet';
-import type { ControlPosition } from 'leaflet';
+import { Map, ZoomControl } from 'pigeon-maps';
 
 // Import the GeoJSON data
 import africanCountriesGeoJSON from '@/data/african_countries_geo.json';
@@ -53,46 +51,93 @@ interface GeographicEquityMapProps {
   className?: string;
 }
 
-// Dynamically import Leaflet components to avoid SSR issues
-interface MapContainerProps {
-  center: LatLngExpression;
-  zoom: number;
-  style?: React.CSSProperties;
-  children?: React.ReactNode;
-  className?: string;
-  [key: string]: any;
+interface CountryPolygonProps {
+  feature: GeoJSONFeature;
+  color: string;
+  onClick: (countryCode: string | undefined) => void;
+  onMouseEnter: (feature: GeoJSONFeature) => void;
+  onMouseLeave: () => void;
 }
 
-interface TileLayerProps {
-  attribution?: string;
-  url: string;
-  [key: string]: any;
-}
+const coordsToLatLng = (coords: [number, number]): [number, number] => {
+  // GeoJSON uses [longitude, latitude] while pigeon-maps uses [latitude, longitude]
+  return [coords[1], coords[0]];
+};
 
-interface ZoomControlProps {
-  position?: ControlPosition;
-  [key: string]: any;
-}
+// Helper function to convert GeoJSON polygon coordinates to pigeon-maps format
+const processPolygon = (coordinates: number[][][]): [number, number][][] => {
+  return coordinates.map(ring => ring.map(coord => coordsToLatLng(coord as [number, number])));
+};
 
-const MapContainer = dynamic<MapContainerProps>(
-  () => import('react-leaflet').then((mod) => mod.MapContainer),
-  { ssr: false }
-);
+// Helper function to extract all polygons from a MultiPolygon
+const processMultiPolygon = (coordinates: number[][][][]): [number, number][][][] => {
+  return coordinates.map(polygon => processPolygon(polygon));
+};
 
-const TileLayer = dynamic<TileLayerProps>(
-  () => import('react-leaflet').then((mod) => mod.TileLayer),
-  { ssr: false }
-);
+// Component to render a country polygon on the map
+const CountryPolygon: React.FC<CountryPolygonProps> = ({ feature, color, onClick, onMouseEnter, onMouseLeave }) => {
+  // Extract country code for click handler
+  const countryCode = feature.properties.ISO_A2 || feature.properties.iso_a2;
+  const geometry = feature.geometry;
 
-const GeoJSON = dynamic<any>(
-  () => import('react-leaflet').then((mod) => mod.GeoJSON),
-  { ssr: false }
-);
+  // SVG path for the country
+  let paths: React.ReactElement[] = [];
+  
+  if (geometry.type === 'Polygon') {
+    const coordinates = geometry.coordinates as number[][][];
+    const polygons = processPolygon(coordinates);
+    
+    paths = polygons.map((polygon, i) => {
+      const pathData = polygon.map((coord, j) => {
+        return `${j === 0 ? 'M' : 'L'}${coord[1]},${coord[0]}`;
+      }).join(' ') + ' Z';
+      
+      return (
+        <path 
+          key={`polygon-${i}`}
+          d={pathData} 
+          fill={color} 
+          stroke="white" 
+          strokeWidth="0.5"
+          fillOpacity="0.7"
+        />
+      );
+    });
+  } 
+  else if (geometry.type === 'MultiPolygon') {
+    const coordinates = geometry.coordinates as number[][][][];
+    const multiPolygons = processMultiPolygon(coordinates);
+    
+    multiPolygons.forEach((polygons, polyIndex) => {
+      polygons.forEach((polygon, i) => {
+        const pathData = polygon.map((coord, j) => {
+          return `${j === 0 ? 'M' : 'L'}${coord[1]},${coord[0]}`;
+        }).join(' ') + ' Z';
+        
+        paths.push(
+          <path 
+            key={`multipolygon-${polyIndex}-${i}`}
+            d={pathData} 
+            fill={color} 
+            stroke="white" 
+            strokeWidth="0.5"
+            fillOpacity="0.7"
+          />
+        );
+      });
+    });
+  }
 
-const ZoomControl = dynamic<ZoomControlProps>(
-  () => import('react-leaflet').then((mod) => mod.ZoomControl),
-  { ssr: false }
-);
+  return (
+    <g 
+      onClick={() => onClick(countryCode)}
+      onMouseEnter={() => onMouseEnter(feature)}
+      onMouseLeave={onMouseLeave}
+    >
+      {paths}
+    </g>
+  );
+};
 
 // Sample data to use when API is not available
 const demoCountryData: CountryData[] = [
@@ -120,6 +165,8 @@ const GeographicEquityMap: React.FC<GeographicEquityMapProps> = ({ className = '
   const [selectedFilter, setSelectedFilter] = useState<string>('total_funding');
   const [underservedHighlight, setUnderservedHighlight] = useState<boolean>(false);
   const [selectedCountry, setSelectedCountry] = useState<FundingDistribution | null>(null);
+  const [tooltipContent, setTooltipContent] = useState<React.ReactNode | null>(null);
+  const [tooltipPosition, setTooltipPosition] = useState<[number, number] | null>(null);
   
   useEffect(() => {
     const fetchFundingDistribution = async () => {
@@ -159,14 +206,16 @@ const GeographicEquityMap: React.FC<GeographicEquityMapProps> = ({ className = '
     fetchFundingDistribution();
   }, []);
 
-  const getCountryColor = (countryCode: string) => {
+  const getCountryColor = (countryCode: string): string => {
     const countryData = fundingData.find(item => item.country_code === countryCode);
     
-    if (!countryData) return '#e5e7eb'; // Default gray for countries without data
+    if (!countryData) {
+      return '#E5E7EB'; // Light gray for countries with no data
+    }
     
     if (underservedHighlight && countryData.percentage_of_total < 2) {
-      // Highlight underserved regions in red
-      return '#ef4444';
+      // Highlight underserved regions in TAIFA yellow
+      return '#FFD100';
     }
     
     let value = 0;
@@ -184,17 +233,18 @@ const GeographicEquityMap: React.FC<GeographicEquityMapProps> = ({ className = '
         value = countryData.total_funding;
     }
     
-    // Color scale from light blue to dark blue based on value
-    if (value <= 0) return '#e5e7eb';
-    if (value < 100000) return '#dbeafe';
-    if (value < 500000) return '#bfdbfe';
-    if (value < 1000000) return '#93c5fd';
-    if (value < 3000000) return '#60a5fa';
-    if (value < 5000000) return '#3b82f6';
-    return '#1d4ed8';
+    // Color scale using TAIFA colors
+    if (value <= 0) return '#A2AAAD';   // TAIFA grey
+    if (value < 100000) return '#D4E4F7'; // Lightest blue
+    if (value < 500000) return '#8BB8E8'; // TAIFA light blue
+    if (value < 1000000) return '#4B9CD3'; // TAIFA accent blue
+    if (value < 5000000) return '#1B365D'; // Medium navy
+    return '#0C2340';  // TAIFA navy (primary) for highest funding
   };
 
-  const onCountryClick = (countryCode: string) => {
+  const onCountryClick = (countryCode: string | undefined) => {
+    if (!countryCode) return;
+    
     const countryData = fundingData.find(item => item.country_code === countryCode);
     if (countryData) {
       setSelectedCountry(countryData);
@@ -213,25 +263,33 @@ const GeographicEquityMap: React.FC<GeographicEquityMapProps> = ({ className = '
     };
   };
 
-  const onEachCountry = (feature: any, layer: any) => {
-    const countryCode = feature.properties.ISO_A2 || feature.properties.iso_a2;
+  const handleCountryMouseEnter = (feature: GeoJSONFeature) => {
+    const countryCode = feature.properties.ISO_A2 || feature.properties.iso_a2 || '';
     const countryData = fundingData.find(item => item.country_code === countryCode);
     
     if (countryData) {
-      layer.bindTooltip(`
-        <strong>${countryData.country_name}</strong><br />
-        Total Funding: $${countryData.total_funding.toLocaleString()}<br />
-        Opportunities: ${countryData.opportunity_count}<br />
-        % of Total: ${countryData.percentage_of_total.toFixed(1)}%
-      `);
-      
-      layer.on({
-        click: () => onCountryClick(countryCode)
-      });
+      setTooltipContent(
+        <div className="bg-white p-2 rounded shadow-lg border border-gray-200 text-sm">
+          <strong>{countryData.country_name}</strong><br />
+          Total Funding: ${countryData.total_funding.toLocaleString()}<br />
+          Opportunities: {countryData.opportunity_count}<br />
+          % of Total: {countryData.percentage_of_total.toFixed(1)}%
+        </div>
+      );
     } else {
-      const name = feature.properties.name || feature.properties.NAME;
-      layer.bindTooltip(`<strong>${name}</strong><br />No funding data available`);
+      const name = feature.properties.name || feature.properties.NAME || 'Unknown';
+      setTooltipContent(
+        <div className="bg-white p-2 rounded shadow-lg border border-gray-200 text-sm">
+          <strong>{name}</strong><br />
+          No funding data available
+        </div>
+      );
     }
+  };
+  
+  const handleCountryMouseLeave = () => {
+    setTooltipContent(null);
+    setTooltipPosition(null);
   };
 
   if (loading) {
@@ -276,23 +334,48 @@ const GeographicEquityMap: React.FC<GeographicEquityMapProps> = ({ className = '
         </div>
       </div>
 
-      <div className="h-96 rounded-lg overflow-hidden border border-gray-200">
-        <MapContainer
-          center={[0, 20]} // Center on Africa
-          zoom={2}
-          style={{ height: "100%", width: "100%" }}
+      <div className="h-96 rounded-lg overflow-hidden border border-gray-200 relative">
+        <Map 
+          height={384} 
+          defaultCenter={[0, 20]} // Center on Africa
+          defaultZoom={2}
         >
-          <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          />
-          <GeoJSON
-            data={africanCountriesGeoJSON as any}
-            style={countryStyle}
-            onEachFeature={onEachCountry}
-          />
-          <ZoomControl position="bottomright" />
-        </MapContainer>
+          {/* Render country polygons from GeoJSON */}
+          <svg style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
+            {(africanCountriesGeoJSON as unknown as GeoJSONCollection).features.map((feature, index) => {
+              const countryCode = feature.properties.ISO_A2 || feature.properties.iso_a2 || '';
+              return (
+                <CountryPolygon
+                  key={`country-${countryCode || index}`}
+                  feature={feature}
+                  color={getCountryColor(countryCode)}
+                  onClick={onCountryClick}
+                  onMouseEnter={(feature) => {
+                    handleCountryMouseEnter(feature);
+                  }}
+                  onMouseLeave={handleCountryMouseLeave}
+                />
+              );
+            })}
+          </svg>
+          <ZoomControl />
+          
+          {/* Custom Tooltip */}
+          {tooltipContent && tooltipPosition && (
+            <div 
+              style={{
+                position: 'absolute',
+                left: `${tooltipPosition[0]}px`,
+                top: `${tooltipPosition[1]}px`,
+                zIndex: 1000,
+                transform: 'translate(-50%, -100%)',
+                marginTop: '-10px'
+              }}
+            >
+              {tooltipContent}
+            </div>
+          )}
+        </Map>
       </div>
 
       {selectedCountry && (

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Party, Rocket, BarChart3, Plus, Search, CheckCircle, ClipboardList } from 'lucide-react'
+import { PartyPopper, Rocket, BarChart3, Plus, Search, CheckCircle, ClipboardList } from 'lucide-react'
 
 interface SubmissionFormData {
   title: string
@@ -150,7 +150,7 @@ export default function SubmitOpportunity() {
                   </svg>
                 </div>
                 <h1 className="text-2xl font-bold text-gray-800 mb-2">
-                  <Party className="w-6 h-6 inline mr-2" />
+                  <PartyPopper className="w-6 h-6 inline mr-2" />
                 Submission Successful!
                 </h1>
                 <p className="text-gray-600">

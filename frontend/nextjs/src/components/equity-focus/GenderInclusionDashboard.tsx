@@ -1,46 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import dynamic from 'next/dynamic';
 import { FileText, Target, Users } from 'lucide-react';
+import { 
+  PieChart, Pie, Cell, ResponsiveContainer,
+  LineChart, Line, XAxis, YAxis, CartesianGrid, 
+  Tooltip, Legend
+} from 'recharts';
 
-// Dynamically import Chart.js to avoid SSR issues
-const PieChart = dynamic(() => import('react-chartjs-2').then((mod) => mod.Pie), {
-  ssr: false,
-  loading: () => <div className="h-64 bg-gray-50 rounded-lg flex items-center justify-center">Loading chart...</div>,
-});
-
-const LineChart = dynamic(() => import('react-chartjs-2').then((mod) => mod.Line), {
-  ssr: false,
-  loading: () => <div className="h-64 bg-gray-50 rounded-lg flex items-center justify-center">Loading chart...</div>,
-});
-
-// Register Chart.js components
-const registerChartComponents = async () => {
-  const { 
-    Chart, 
-    ArcElement,
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
-    Title, 
-    Tooltip, 
-    Legend,
-    Filler
-  } = await import('chart.js');
-  
-  Chart.register(
-    ArcElement,
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
-    Title,
-    Tooltip,
-    Legend,
-    Filler
-  );
+// Custom tooltip component for the pie chart
+const CustomPieTooltip = ({ active, payload }: any) => {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    return (
+      <div className="bg-white p-2 border border-gray-200 shadow-sm rounded">
+        <p className="font-medium">{data.gender}</p>
+        <p className="text-sm">{data.funding_percentage}% of funding</p>
+        <p className="text-sm">{data.project_count} projects</p>
+      </div>
+    );
+  }
+  return null;
 };
+
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 
 interface GenderData {
   gender: string;
@@ -78,8 +60,6 @@ export default function GenderInclusionDashboard({ className = '' }: GenderInclu
   const [error, setError] = useState<string | null>(null);
   
   useEffect(() => {
-    registerChartComponents();
-    
     const fetchData = async () => {
       try {
         setLoading(true);
@@ -160,85 +140,6 @@ export default function GenderInclusionDashboard({ className = '' }: GenderInclu
     fetchData();
   }, []);
 
-  // Pie chart data
-  const genderPieData = {
-    labels: genderData.map(item => item.gender),
-    datasets: [
-      {
-        data: genderData.map(item => item.funding_percentage),
-        backgroundColor: ['#1F2A44', '#4B9CD3', '#F0E68C'],
-        borderWidth: 0,
-      },
-    ],
-  };
-
-  // Line chart data for trends
-  const trendLineData = {
-    labels: trendData.map(item => item.year),
-    datasets: [
-      {
-        label: 'Female-led Projects',
-        data: trendData.map(item => item.female_led_percentage),
-        borderColor: '#4B9CD3',
-        backgroundColor: 'rgba(75, 156, 211, 0.1)',
-        fill: true,
-        tension: 0.4
-      },
-      {
-        label: 'Youth-led Projects',
-        data: trendData.map(item => item.youth_led_percentage),
-        borderColor: '#F0E68C',
-        backgroundColor: 'rgba(240, 230, 140, 0.1)',
-        fill: true,
-        tension: 0.4
-      },
-      {
-        label: 'Rural Projects',
-        data: trendData.map(item => item.rural_percentage),
-        borderColor: '#1F2A44',
-        backgroundColor: 'rgba(31, 42, 68, 0.1)',
-        fill: true,
-        tension: 0.4
-      }
-    ],
-  };
-
-  // Chart options
-  const pieOptions = {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: 'right' as const,
-      },
-      title: {
-        display: true,
-        text: 'Funding Distribution by Gender',
-      },
-    },
-  };
-
-  const lineOptions = {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: 'top' as const,
-      },
-      title: {
-        display: true,
-        text: 'Inclusion Trends (2020-2024)',
-      },
-    },
-    scales: {
-      y: {
-        beginAtZero: true,
-        title: {
-          display: true,
-          text: 'Percentage of Total Funding (%)'
-        }
-      }
-    }
-  };
-
   if (loading) {
     return <div className="flex justify-center items-center h-64 bg-[#F0E68C] bg-opacity-10 rounded-lg text-[#1F2A44]">Loading inclusion data...</div>;
   }
@@ -307,14 +208,79 @@ export default function GenderInclusionDashboard({ className = '' }: GenderInclu
             </div>
           </div>
 
-          {/* Pie Chart */}
+          {/* Gender distribution pie chart */}
           <div className="bg-gray-50 p-4 rounded-lg border border-gray-100 h-64">
-            <PieChart data={genderPieData} options={pieOptions} />
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={genderData.map((item, index) => ({
+                    ...item,
+                    name: item.gender,
+                    value: item.funding_percentage,
+                    fill: COLORS[index % COLORS.length]
+                  }))}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={({ name, percent }) => `${name}: ${percent ? (percent * 100).toFixed(0) : 0}%`}
+                  outerRadius={80}
+                  dataKey="value"
+                >
+                  {genderData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip content={<CustomPieTooltip />} />
+                <Legend layout="horizontal" verticalAlign="bottom" align="center" />
+              </PieChart>
+            </ResponsiveContainer>
           </div>
           
-          {/* Line Chart */}
+          {/* Inclusion trends line chart */}
           <div className="bg-gray-50 p-4 rounded-lg border border-gray-100 h-64">
-            <LineChart data={trendLineData} options={lineOptions} />
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart
+                data={trendData.map(item => ({
+                  year: item.year,
+                  'Female-led Projects': item.female_led_percentage,
+                  'Youth-led Projects': item.youth_led_percentage,
+                  'Rural Projects': item.rural_percentage
+                }))}
+                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                <XAxis dataKey="year" />
+                <YAxis 
+                  domain={[0, 'auto']}
+                  tickFormatter={(value) => `${value}%`}
+                  label={{ value: 'Percentage of Funding', angle: -90, position: 'insideLeft', offset: -5 }}
+                />
+                <Tooltip 
+                  formatter={(value) => [`${value}%`, '']}
+                  labelFormatter={(label) => `Year: ${label}`}
+                />
+                <Legend verticalAlign="bottom" height={36} />
+                <Line 
+                  type="monotone" 
+                  dataKey="Female-led Projects" 
+                  stroke="rgba(255, 99, 132, 1)" 
+                  activeDot={{ r: 8 }} 
+                  strokeWidth={2}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="Youth-led Projects" 
+                  stroke="rgba(54, 162, 235, 1)" 
+                  strokeWidth={2}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="Rural Projects" 
+                  stroke="rgba(75, 192, 192, 1)" 
+                  strokeWidth={2}
+                />
+              </LineChart>
+            </ResponsiveContainer>
           </div>
         </div>
         

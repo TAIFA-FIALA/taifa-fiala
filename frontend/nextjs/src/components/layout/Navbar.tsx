@@ -1,33 +1,50 @@
+'use client';
+
 import Link from 'next/link';
 import Image from 'next/image';
+import { useState } from 'react';
 
 const Navbar = () => {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
   return (
-    <nav className="bg-scholarly-light border-b border-gray-200">
+    <nav className="bg-taifa-light border-b border-gray-200 sticky top-0 z-50 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo and Title */}
           <div className="flex items-center">
             <Link href="/" className="flex items-center">
-              <span className="text-2xl font-serif text-scholarly-primary">TAIFA-FIALA</span>
+              <Image
+                src="/TAIFA-FIALA-logo-transparent.png"
+                width={40}
+                height={40}
+                alt="TAIFA-FIALA"
+                className="mr-2"
+              />
+              <span className="text-2xl font-display font-semibold text-taifa-primary">TAIFA-FIALA</span>
             </Link>
           </div>
           
+          {/* Search Bar */}
+          <div className="hidden md:flex items-center space-x-4 ml-4">
+            {/* Search moved to Hero component */}
+          </div>
+          
           {/* Navigation Links */}
-          <div className="hidden md:flex items-center space-x-8">
-            <Link href="/methodology" className="text-scholarly-primary hover:text-scholarly-secondary text-sm font-medium nav-pill">
+          <div className="hidden md:flex items-center space-x-6">
+            <Link href="/methodology" className="text-taifa-primary hover:text-taifa-accent text-sm font-medium nav-pill">
               Methodology
             </Link>
-            <Link href="/analytics" className="text-scholarly-primary hover:text-scholarly-secondary text-sm font-medium nav-pill">
+            <Link href="/analytics" className="text-taifa-primary hover:text-taifa-accent text-sm font-medium nav-pill">
               Data & Analysis
             </Link>
-            <Link href="/publications" className="text-scholarly-primary hover:text-scholarly-secondary text-sm font-medium nav-pill">
+            <Link href="/publications" className="text-taifa-primary hover:text-taifa-accent text-sm font-medium nav-pill">
               Publications
             </Link>
-            <Link href="/funding" className="text-scholarly-primary hover:text-scholarly-secondary text-sm font-medium nav-pill">
-              Funding Database
+            <Link href="/funding" className="text-taifa-primary hover:text-taifa-accent text-sm font-medium nav-pill">
+              Funding
             </Link>
-            <Link href="/about" className="text-scholarly-primary hover:text-scholarly-secondary text-sm font-medium nav-pill">
+            <Link href="/about" className="text-taifa-primary hover:text-taifa-accent text-sm font-medium nav-pill">
               About
             </Link>
           </div>
@@ -35,14 +52,17 @@ const Navbar = () => {
           {/* Language Toggle */}
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2 text-sm">
-              <button className="text-scholarly-primary hover:text-scholarly-secondary font-medium">EN</button>
+              <button className="text-taifa-primary hover:text-taifa-secondary font-medium">EN</button>
               <span className="text-gray-400">|</span>
-              <button className="text-scholarly-primary hover:text-scholarly-secondary">FR</button>
+              <button className="text-taifa-primary hover:text-taifa-secondary">FR</button>
             </div>
             
             {/* Mobile menu button */}
             <div className="md:hidden">
-              <button className="text-scholarly-primary hover:text-scholarly-secondary">
+              <button 
+                className="text-taifa-primary hover:text-taifa-secondary"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
@@ -51,6 +71,31 @@ const Navbar = () => {
           </div>
         </div>
       </div>
+      
+      {/* Mobile menu, show/hide based on menu state */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-taifa-light border-b border-gray-200">
+          {/* Mobile search moved to Hero component */}
+          <div className="mt-4">
+            {/* Search functionality moved to Hero component */}
+          </div>
+          <Link href="/methodology" className="block px-3 py-2 rounded-md text-base font-medium text-taifa-primary hover:text-taifa-secondary">
+            Methodology
+          </Link>
+          <Link href="/analytics" className="block px-3 py-2 rounded-md text-base font-medium text-taifa-primary hover:text-taifa-secondary">
+            Data & Analysis
+          </Link>
+          <Link href="/publications" className="block px-3 py-2 rounded-md text-base font-medium text-taifa-primary hover:text-taifa-secondary">
+            Publications
+          </Link>
+          <Link href="/funding" className="block px-3 py-2 rounded-md text-base font-medium text-taifa-primary hover:text-taifa-secondary">
+            Funding Database
+          </Link>
+          <Link href="/about" className="block px-3 py-2 rounded-md text-base font-medium text-taifa-primary hover:text-taifa-secondary">
+            About
+          </Link>
+        </div>
+      )}
     </nav>
   );
 };

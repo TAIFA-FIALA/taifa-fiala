@@ -3,6 +3,9 @@ import { FileText, Book, Shield } from 'lucide-react';
 
 import React from 'react';
 
+// Toggle this flag to true when ready to display publications
+const PUBLICATIONS_ENABLED = false;
+
 interface Link {
   text: string;
   href: string;
@@ -90,20 +93,28 @@ export default function PublicationsPage() {
       <main className="py-8">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           
-          <section id="papers">
-            <h2 className="text-2xl font-serif text-gray-900 mb-6 border-b pb-2">Peer-Reviewed Papers</h2>
-            {publications.papers.map(pub => <PublicationCard key={pub.title} {...pub} />)}
-          </section>
+          {PUBLICATIONS_ENABLED ? (
+            <>
+              <section id="papers">
+                <h2 className="text-2xl font-serif text-gray-900 mb-6 border-b pb-2">Peer-Reviewed Papers</h2>
+                {publications.papers.map(pub => <PublicationCard key={pub.title} {...pub as PublicationCardProps} />)}
+              </section>
 
-          <section id="briefs" className="mt-12">
-            <h2 className="text-2xl font-serif text-gray-900 mb-6 border-b pb-2">Policy Briefs</h2>
-            {publications.briefs.map(pub => <PublicationCard key={pub.title} {...pub} />)}
-          </section>
+              <section id="briefs" className="mt-12">
+                <h2 className="text-2xl font-serif text-gray-900 mb-6 border-b pb-2">Policy Briefs</h2>
+                {publications.briefs.map(pub => <PublicationCard key={pub.title} {...pub as PublicationCardProps} />)}
+              </section>
 
-          <section id="reports" className="mt-12">
-            <h2 className="text-2xl font-serif text-gray-900 mb-6 border-b pb-2">Technical Reports</h2>
-            {publications.reports.map(pub => <PublicationCard key={pub.title} {...pub} />)}
-          </section>
+              <section id="reports" className="mt-12">
+                <h2 className="text-2xl font-serif text-gray-900 mb-6 border-b pb-2">Technical Reports</h2>
+                {publications.reports.map(pub => <PublicationCard key={pub.title} {...pub as PublicationCardProps} />)}
+              </section>
+            </>
+          ) : (
+            <div className="py-12 text-center">
+              <p className="text-lg text-gray-600">Research publications coming soon.</p>
+            </div>
+          )}
 
         </div>
       </main>

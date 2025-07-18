@@ -1,6 +1,5 @@
-import { GetServerSideProps } from 'next';
 import Link from 'next/link';
-import { ShieldCheck, BarChart, UploadCloud } from 'lucide-react';
+import { UploadCloud } from 'lucide-react';
 
 // Placeholder for data fetching logic
 async function getEquityData() {

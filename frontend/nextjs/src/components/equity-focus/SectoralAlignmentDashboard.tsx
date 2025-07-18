@@ -1,33 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import dynamic from 'next/dynamic';
+import { 
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, 
+  Legend, ResponsiveContainer, Cell, ReferenceLine, Label 
+} from 'recharts';
 
-// Dynamically import Chart.js to avoid SSR issues
-const Chart = dynamic(() => import('react-chartjs-2').then((mod) => mod.Bar), {
-  ssr: false,
-  loading: () => <div className="h-64 bg-gray-50 rounded-lg flex items-center justify-center">Loading chart...</div>,
-});
-
-// We'll need to register Chart.js components
-const registerChartComponents = async () => {
-  const { 
-    Chart, 
-    CategoryScale, 
-    LinearScale, 
-    BarElement, 
-    Title, 
-    Tooltip, 
-    Legend 
-  } = await import('chart.js');
-  
-  Chart.register(
-    CategoryScale,
-    LinearScale,
-    BarElement,
-    Title,
-    Tooltip,
-    Legend
-  );
+// Custom tooltip component
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-white p-2 border border-gray-200 shadow-sm rounded">
+        <p className="font-medium">{label}</p>
+        {payload.map((item: any, index: number) => (
+          <p key={index} className="text-sm" style={{ color: item.color }}>
+            {item.name}: {item.value}{item.name.includes('Percentage') || item.name.includes('Priority') ? '%' : ''}
+          </p>
+        ))}
+      </div>
+    );
+  }
+  return null;
 };
 
 interface SectorData {
@@ -50,8 +42,6 @@ export default function SectoralAlignmentDashboard({ className = '' }: SectoralA
   const [showDevelopmentPriorities, setShowDevelopmentPriorities] = useState<boolean>(false);
   
   useEffect(() => {
-    registerChartComponents();
-    
     const fetchSectorData = async () => {
       try {
         setLoading(true);
@@ -173,70 +163,43 @@ export default function SectoralAlignmentDashboard({ className = '' }: SectoralA
 
   const sortedData = getSortedData();
   
-  // Prepare chart data
-  const chartData = {
-    labels: sortedData.map(item => item.sector),
-    datasets: showDevelopmentPriorities ? [
-      {
-        label: 'Development Priority Score (%)',
-        data: sortedData.map(item => (item.development_priority_score / 10) * 100),
-        backgroundColor: 'rgba(75, 192, 192, 0.5)',
-        borderColor: 'rgba(75, 192, 192, 1)',
-        borderWidth: 1,
-      },
-      {
-        label: 'Current Funding (%)',
-        data: sortedData.map(item => item.funding_percentage),
-        backgroundColor: 'rgba(54, 162, 235, 0.5)',
-        borderColor: 'rgba(54, 162, 235, 1)',
-        borderWidth: 1,
-      }
-    ] : [
-      {
-        label: selectedFilter === 'funding_percentage' ? 'Funding Percentage (%)' : 
-               selectedFilter === 'opportunity_count' ? 'Opportunity Count' : 
-               'Impact Potential Score',
-        data: sortedData.map(item => 
-          selectedFilter === 'funding_percentage' ? item.funding_percentage : 
-          selectedFilter === 'opportunity_count' ? item.opportunity_count : 
-          item.impact_potential
-        ),
-        backgroundColor: 'rgba(54, 162, 235, 0.5)',
-        borderColor: 'rgba(54, 162, 235, 1)',
-        borderWidth: 1,
-      }
-    ]
-  };
-
-  // Chart options
-  const chartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        position: 'top' as const,
-      },
-      title: {
-        display: true,
-        text: showDevelopmentPriorities ? 
-          'Development Priority vs. Current Funding by Sector' : 
-          selectedFilter === 'funding_percentage' ? 'Funding Distribution by Sector' : 
-          selectedFilter === 'opportunity_count' ? 'Opportunities by Sector' : 
-          'Impact Potential by Sector',
-      },
-    },
-    scales: {
-      y: {
-        beginAtZero: true,
-        title: {
-          display: true,
-          text: selectedFilter === 'opportunity_count' ? 'Number of Opportunities' : 
-                showDevelopmentPriorities ? 'Percentage (%)' : 
-                selectedFilter === 'funding_percentage' ? 'Funding Percentage (%)' : 'Score (1-10)',
-        }
-      }
+  // Transform data for Recharts format
+  const chartData = sortedData.map(item => {
+    if (showDevelopmentPriorities) {
+      return {
+        sector: item.sector,
+        'Development Priority Score (%)': (item.development_priority_score / 10) * 100,
+        'Current Funding (%)': item.funding_percentage
+      };
+    } else {
+      return {
+        sector: item.sector,
+        [selectedFilter === 'funding_percentage' ? 'Funding Percentage (%)' : 
+         selectedFilter === 'opportunity_count' ? 'Opportunity Count' : 
+         'Impact Potential Score']: 
+         selectedFilter === 'funding_percentage' ? item.funding_percentage : 
+         selectedFilter === 'opportunity_count' ? item.opportunity_count : 
+         item.impact_potential
+      };
     }
-  };
+  });
+  
+  // Define chart colors
+  const priorityScoreColor = 'rgba(75, 192, 192, 1)';
+  const fundingColor = 'rgba(54, 162, 235, 1)';
+  const barColor = fundingColor;
+  
+  // Chart title
+  const chartTitle = showDevelopmentPriorities ? 
+    'Development Priority vs. Current Funding by Sector' : 
+    selectedFilter === 'funding_percentage' ? 'Funding Distribution by Sector' : 
+    selectedFilter === 'opportunity_count' ? 'Opportunities by Sector' : 
+    'Impact Potential by Sector';
+    
+  // Y-axis label
+  const yAxisLabel = selectedFilter === 'opportunity_count' ? 'Number of Opportunities' : 
+    showDevelopmentPriorities ? 'Percentage (%)' : 
+    selectedFilter === 'funding_percentage' ? 'Funding Percentage (%)' : 'Score (1-10)';
 
   if (loading) {
     return <div className="flex justify-center items-center h-64 bg-gray-50 rounded-lg">Loading sector alignment data...</div>;
@@ -291,7 +254,59 @@ export default function SectoralAlignmentDashboard({ className = '' }: SectoralA
 
       {/* Chart */}
       <div className="h-80 mt-4">
-        <Chart data={chartData} options={chartOptions} />
+        <div className="text-center text-lg font-medium text-gray-700 mb-2">{chartTitle}</div>
+        <ResponsiveContainer width="100%" height="90%">
+          <BarChart
+            data={chartData}
+            margin={{ top: 20, right: 30, left: 20, bottom: 50 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" vertical={false} />
+            <XAxis 
+              dataKey="sector" 
+              tick={{ fontSize: 12 }} 
+              interval={0} 
+              angle={-45} 
+              textAnchor="end"
+            />
+            <YAxis
+              domain={[0, 'auto']}
+              tickFormatter={(value) => selectedFilter === 'opportunity_count' ? value : `${value}${selectedFilter !== 'impact_potential' ? '%' : ''}`}
+            >
+              <Label 
+                value={yAxisLabel} 
+                angle={-90} 
+                position="insideLeft" 
+                style={{ textAnchor: 'middle' }} 
+              />
+            </YAxis>
+            <Tooltip content={<CustomTooltip />} />
+            <Legend verticalAlign="top" />
+            
+            {showDevelopmentPriorities ? (
+              <>
+                <Bar 
+                  dataKey="Development Priority Score (%)" 
+                  fill={priorityScoreColor} 
+                  name="Development Priority Score (%)" 
+                />
+                <Bar 
+                  dataKey="Current Funding (%)" 
+                  fill={fundingColor} 
+                  name="Current Funding (%)" 
+                />
+              </>
+            ) : (
+              <Bar 
+                dataKey={Object.keys(chartData[0]).filter(key => key !== 'sector')[0]} 
+                fill={barColor} 
+              >
+                {chartData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={barColor} />
+                ))}
+              </Bar>
+            )}
+          </BarChart>
+        </ResponsiveContainer>
       </div>
 
       {/* Critical Gap Alert */}

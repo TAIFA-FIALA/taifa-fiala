@@ -133,3 +133,7 @@ alembic.ini
 
 # Local development overrides
 docker-compose.override.yml
+
+# Environment variables
+.env
+backend/.env

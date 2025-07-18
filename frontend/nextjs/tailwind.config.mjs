@@ -8,17 +8,20 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        serif: ['var(--font-lora)', 'Georgia', 'serif'],
-        sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
+        display: ['var(--font-montserrat)', 'Montserrat', 'system-ui', 'sans-serif'], // More modern headline font
+        sans: ['var(--font-nunito)', 'Nunito', 'system-ui', 'sans-serif'],           // Clean, friendly body font
+        serif: ['var(--font-lora)', 'Georgia', 'serif'],                              // Keep serif as fallback
       },
       colors: {
-        // Academic color palette
-        'scholarly': {
-          primary: '#1B365D',    // Deep navy blue
-          secondary: '#7B1F1D',  // Burgundy
-          accent: '#8B7355',     // Warm brown
-          light: '#F5F5F5',      // Light gray
+        // TAIFA-FIALA official color palette
+        'taifa': {
+          primary: '#0C2340',    // Navy blue (from TAIFA-colour-palette.png)
+          secondary: '#FFD100',  // Bright yellow (from TAIFA-colour-palette.png)
+          accent: '#4B9CD3',     // Light blue (from Africa-outline-blue.png)
+          light: '#F9F7F0',      // Warm light background
           dark: '#2C3E50',       // Dark slate
+          lightblue: '#8BB8E8',  // Lighter blue accent (from Africa-outline-blue.png)
+          grey: '#A2AAAD',       // Grey (from Africa-outline-grey.png)
         },
         'chart': {
           blue: '#3498DB',
