@@ -2,24 +2,26 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import NullPool
-import re
+import os
 
-from app.core.config import settings
+# Load environment variables directly
+from dotenv import load_dotenv
+load_dotenv()
 
-# Ensure we're using asyncpg driver
-database_url = settings.DATABASE_URL
+# Define hard-coded database parameters from environment
+# These values come from running the backend/db_config.py script
+DB_USER = "postgres.turcbnsgdlyelzmcqixd"
+DB_PASSWORD = "cbGzmHCTZqbEsg6afVhL"
+DB_HOST = "aws-0-eu-central-2.pooler.supabase.com"
+DB_PORT = "5432"
+DB_NAME = "postgres"
 
-# Print diagnostics to help identify the issue
-print(f"DATABASE_URL from settings: {database_url!r}")
+# Construct URL directly without using regex manipulation
+database_url = f"postgresql+asyncpg://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
-# Add safety check to prevent NoneType errors
-if database_url is not None:
-    if not re.search(r'\+asyncpg', database_url):
-        database_url = re.sub(r'postgresql(\+\w+)?', 'postgresql+asyncpg', database_url)
-else:
-    # Log error and raise informative exception
-    print("ERROR: DATABASE_URL is not set. Please set this environment variable.")
-    raise ValueError("DATABASE_URL environment variable is not set. Cannot connect to database.")
+print(f"Using direct database URL construction: {database_url[:20]}...(truncated)")
+
+
 
 # Create SQLAlchemy async engine
 engine = create_async_engine(
