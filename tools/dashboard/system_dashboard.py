@@ -154,84 +154,54 @@ class SystemDashboard:
         try:
             if not self.supabase:
                 return {'status': 'error', 'details': 'Database not connected'}
-            
-            # Get total opportunities first
-            total_opportunities = self.supabase.table('africa_intelligence_feed').select(
+
+            # Get total opportunities count
+            st.info("Querying for total item count...") # DEBUG
+            total_opportunities_response = self.supabase.table('africa_intelligence_feed').select(
                 'id', count='exact'
             ).execute()
             
-            total_count = total_opportunities.count if total_opportunities.count is not None else 0
+            st.write("Supabase count response:", total_opportunities_response) # DEBUG
             
-            # Get recent data collection stats
-            today = datetime.now().date()
-            week_ago = today - timedelta(days=7)
-            
-            # Count opportunities by source
-            opportunities = self.supabase.table('africa_intelligence_feed').select(
-                'source_type,created_at,status'
+            total_count = total_opportunities_response.count if total_opportunities_response.count is not None else 0
+            st.info(f"Total count from Supabase: {total_count}")# DEBUG
+
+            # Get data from the last 7 days for trend analysis
+            week_ago = datetime.now().date() - timedelta(days=7)
+            recent_opportunities_response = self.supabase.table('africa_intelligence_feed').select(
+                'source_type, created_at, status'
             ).gte('created_at', week_ago.isoformat()).execute()
-            
-            # If no recent data but we have total data, show system as active
-            if not opportunities.data and total_count > 0:
-                # Get all opportunities for demonstration
-                all_opportunities = self.supabase.table('africa_intelligence_feed').select(
-                    'source_type,created_at,status'
-                ).limit(100).execute()
-                
-                if all_opportunities.data:
-                    df = pd.DataFrame(all_opportunities.data)
-                    df['created_at'] = pd.to_datetime(df['created_at'])
-                    
-                    # Create mock daily stats for demo
-                    daily_stats = {str(today): total_count}
-                    
-                    # Source breakdown
-                    source_stats = df['source_type'].value_counts().to_dict()
-                    
-                    return {
-                        'status': 'active',
-                        'total_week': total_count,
-                        'daily_stats': daily_stats,
-                        'source_breakdown': source_stats,
-                        'avg_daily': total_count / 7
-                    }
-            
-            if opportunities.data:
-                df = pd.DataFrame(opportunities.data)
+
+            if recent_opportunities_response.data:
+                df = pd.DataFrame(recent_opportunities_response.data)
                 df['created_at'] = pd.to_datetime(df['created_at'])
                 
-                # Daily collection stats
+                # Daily collection stats for the last week
                 daily_stats = df.groupby(df['created_at'].dt.date).size().to_dict()
                 
-                # Source breakdown
+                # Source breakdown for the last week
                 source_stats = df['source_type'].value_counts().to_dict()
                 
                 return {
                     'status': 'active',
+                    'total_all_time': total_count,
                     'total_week': len(df),
                     'daily_stats': daily_stats,
                     'source_breakdown': source_stats,
                     'avg_daily': len(df) / 7
                 }
             else:
-                # Check if we have any data at all
-                if total_count > 0:
-                    return {
-                        'status': 'active',
-                        'total_week': total_count,
-                        'daily_stats': {str(today): total_count},
-                        'source_breakdown': {'rss': total_count},
-                        'avg_daily': total_count / 7
-                    }
-                else:
-                    return {
-                        'status': 'inactive',
-                        'total_week': 0,
-                        'daily_stats': {},
-                        'source_breakdown': {},
-                        'avg_daily': 0
-                    }
+                # If no recent data, still show the total count
+                return {
+                    'status': 'active' if total_count > 0 else 'inactive',
+                    'total_all_time': total_count,
+                    'total_week': 0,
+                    'daily_stats': {},
+                    'source_breakdown': {},
+                    'avg_daily': 0
+                }
         except Exception as e:
+            st.error(f"Error in check_collection_status: {e}") # DEBUG
             return {'status': 'error', 'details': str(e)}
     
     def check_search_status(self) -> Dict[str, str]:
@@ -394,17 +364,17 @@ def render_collection_metrics(dashboard: SystemDashboard):
         col1, col2, col3, col4 = st.columns(4)
         
         with col1:
-            st.metric("📈 Total This Week", collection_status['total_week'])
+            st.metric("📈 Total All Time", collection_status.get('total_all_time', 0))
         with col2:
-            st.metric("📅 Daily Average", f"{collection_status['avg_daily']:.1f}")
+            st.metric("📅 Total This Week", collection_status.get('total_week', 0))
         with col3:
             st.metric("🔄 Collection Status", "🟢 ACTIVE")
         with col4:
-            st.metric("📡 Data Sources", len(collection_status['source_breakdown']) if collection_status['source_breakdown'] else 5)
+            st.metric("📡 Data Sources", len(collection_status['source_breakdown']) if collection_status.get('source_breakdown') else 0)
         
         # Daily collection chart
-        if collection_status['daily_stats']:
-            st.subheader("📈 Daily Collection Trend")
+        if collection_status.get('daily_stats'):
+            st.subheader("📈 Daily Collection Trend (Last 7 Days)")
             
             dates = list(collection_status['daily_stats'].keys())
             counts = list(collection_status['daily_stats'].values())
@@ -414,33 +384,17 @@ def render_collection_metrics(dashboard: SystemDashboard):
             st.plotly_chart(fig, use_container_width=True)
         
         # Source breakdown
-        if collection_status['source_breakdown']:
-            st.subheader("📡 Collection Sources")
+        if collection_status.get('source_breakdown'):
+            st.subheader("📡 Collection Sources (Last 7 Days)")
             
             sources = list(collection_status['source_breakdown'].keys())
             counts = list(collection_status['source_breakdown'].values())
             
             fig = px.pie(values=counts, names=sources, title="Opportunities by Source")
             st.plotly_chart(fig, use_container_width=True)
-        
-        # Smart collection features
-        st.subheader("🧠 Smart Collection Features")
-        
-        col1, col2 = st.columns(2)
-        with col1:
-            st.markdown("**🎯 Intelligent Serper Search**")
-            st.markdown("- Targeted searches for missing data")
-            st.markdown("- 97% reduction in API calls")
-            st.markdown("- Context-aware queries")
-            
-        with col2:
-            st.markdown("**🕷️ Queue-based Scraping**")
-            st.markdown("- Crawl4AI for detailed extraction")
-            st.markdown("- Only scrapes when needed")
-            st.markdown("- Automatic field completion")
             
     elif collection_status['status'] == 'error':
-        st.error(f"❌ Error: {collection_status['details']}")
+        st.error(f"❌ Error: {collection_status.get('details', 'Unknown error')}")
     else:
         st.info("🔄 Data collection system ready - run ingestion to collect data")
 

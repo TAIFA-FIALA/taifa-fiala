@@ -35,7 +35,7 @@ def main():
     i18n = get_i18n()
 
     # Detect language from URL or default
-    query_params = st.experimental_get_query_params()
+    query_params = st.query_params
     if 'lang' in query_params:
         i18n.set_language(query_params['lang'][0])
 
@@ -117,6 +117,8 @@ def show_dashboard():
         # Fetch real data from API (only published opportunities)
         with st.spinner("Loading opportunities..."):
             opportunities = handle_api_error(fetch_opportunities_sync, limit=1000, status='published')
+        
+        st.write("API Response:", opportunities) # Original API Response
         
         if opportunities:
             # Calculate real metrics

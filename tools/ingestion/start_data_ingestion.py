@@ -65,46 +65,33 @@ def check_connections():
     return True
 
 def setup_initial_data_sources():
-    """Set up initial data sources if they don't exist"""
+    """Set up initial data sources and default funding types if they don't exist"""
     
     try:
         client = create_client(os.getenv('SUPABASE_PROJECT_URL'), os.getenv('SUPABASE_API_KEY'))
         
+        # Ensure default funding types exist
+        logger.info("Checking for default funding types...")
+        default_funding_types = [
+            {"name": "Grant", "category": "grant", "description": "Non-repayable funds given by one party (grantor) to a recipient, often a nonprofit entity, educational institution, business, or individual.", "requires_equity": False, "requires_repayment": False},
+            {"name": "Investment", "category": "investment", "description": "Capital provided to a business in exchange for equity or a share in future profits, typically with an expectation of return.", "requires_equity": True, "requires_repayment": False},
+            {"name": "Prize", "category": "prize", "description": "A reward given for winning a competition or for achieving a certain level of excellence.", "requires_equity": False, "requires_repayment": False},
+            {"name": "Other", "category": "other", "description": "Miscellaneous funding opportunities not falling into other categories.", "requires_equity": False, "requires_repayment": False}
+        ]
+
+        for ft_data in default_funding_types:
+            existing_ft = client.table('funding_types').select('id').eq('name', ft_data['name']).execute()
+            if not existing_ft.data:
+                logger.info(f"Adding default funding type: {ft_data['name']}")
+                client.table('funding_types').insert(ft_data).execute()
+            else:
+                logger.info(f"Funding type {ft_data['name']} already exists.")
+
         # Check if we have funding intelligence_items
         result = client.table('africa_intelligence_feed').select('*').limit(1).execute()
         
         if len(result.data) == 0:
-            logger.info("No funding intelligence_items found. Setting up initial data sources...")
-            
-            # Initial RSS feeds for testing
-            initial_feeds = [
-                {
-                    'name': 'AllAfrica Technology News',
-                    'url': 'https://allafrica.com/tools/headlines/rdf/technology/headlines.rdf',
-                    'source_type': 'rss',
-                    'keywords': '["AI", "artificial intelligence", "technology", "innovation", "funding"]',
-                    'check_interval_minutes': 60,
-                    'enabled': True
-                },
-                {
-                    'name': 'African Business Tech',
-                    'url': 'https://african.business/technology/feed',
-                    'source_type': 'rss',
-                    'keywords': '["startup", "investment", "funding", "AI", "technology"]',
-                    'check_interval_minutes': 120,
-                    'enabled': True
-                }
-            ]
-            
-            # Try to add to data_sources table if it exists
-            try:
-                for feed in initial_feeds:
-                    # For now, let's just log what we would add
-                    logger.info(f"Would add data source: {feed['name']}")
-                    
-            except Exception as e:
-                logger.warning(f"Could not add initial data sources: {e}")
-                logger.info("You'll need to add data sources manually or create the data_sources table")
+            logger.info("No funding intelligence_items found. Initial data sources will be set up by ingestion.")
         
         return True
         
@@ -115,23 +102,36 @@ def setup_initial_data_sources():
 async def start_basic_ingestion():
     """Start basic data ingestion using existing RSS feeds"""
     
-    logger.info("🚀 Starting basic data ingestion...")
+    logger.info("🚀 Starting basic data ingestion with aggregate feed...")
+    logger.info("🔍 Using Inoreader aggregate RSS feed for AI-Africa content")
     
-    # Import RSS feed reader
+    # Import RSS feed reader and API client
     try:
         import feedparser
         import requests
         from datetime import datetime
+        from frontend.streamlit_app.api_client import TaifaAPIClient
         
-        # Sample RSS feeds for AI and funding news in Africa
+        # Use the aggregate RSS feed provided by the user
+        logger.info("Using Inoreader aggregate RSS feed for AI-Africa news")
         rss_feeds = [
-            'https://allafrica.com/tools/headlines/rdf/latest/headlines.rdf',
-            'https://techcentral.co.za/feed/',
-            'https://ventureburn.com/feed/',
+            'https://www.inoreader.com/stream/user/1005214099/tag/Ai-Africa'
         ]
         
-        client = create_client(os.getenv('SUPABASE_PROJECT_URL'), os.getenv('SUPABASE_API_KEY'))
+        logger.info(f"Using RSS feed: {rss_feeds[0]}")
         
+        # Initialize API client
+        api_client = TaifaAPIClient()
+        
+        # Get the funding_type_id for 'Other'
+        client = create_client(os.getenv('SUPABASE_PROJECT_URL'), os.getenv('SUPABASE_API_KEY'))
+        other_funding_type_response = client.table('funding_types').select('id').eq('name', 'Other').execute()
+        other_funding_type_id = other_funding_type_response.data[0]['id'] if other_funding_type_response.data else None
+
+        if not other_funding_type_id:
+            logger.error("❌ Could not find 'Other' funding type ID. Please ensure default funding types are set up.")
+            return False
+
         total_items = 0
         
         for feed_url in rss_feeds:
@@ -155,40 +155,40 @@ async def start_basic_ingestion():
                     content_text = (title + ' ' + summary).lower()
                     
                     if any(keyword.lower() in content_text for keyword in keywords):
-                        # This looks relevant, let's store it
-                        # Use correct column names that exist in the database
-                        intelligence_data = {
+                        # Prepare data for FastAPI endpoint
+                        opportunity_data = {
                             'title': title,
                             'description': summary,
                             'source_url': entry.get('link', ''),
                             'application_url': entry.get('link', ''),
-                            'funding_type': 'opportunity',  # Maps to funding_type column
+                            'funding_type_id': other_funding_type_id, # Use the ID for 'Other'
+                            'status': 'active',
+                            'geographical_scope': 'Africa',
+                            'eligibility_criteria': 'N/A',
+                            'contact_info': entry.get('link', ''),
                             'application_deadline': None,
-                            'funding_amount': None,
-                            'eligibility_criteria': None,
-                            'application_process': None,
-                            'contact_information': entry.get('link', ''),
-                            'additional_notes': f'Collected from RSS feed: {feed_url}. Source: {feed.feed.get("title", "Unknown")}',
-                            'source_type': 'rss',
-                            'keywords': '[]',  # Empty JSON array as string
-                            'status': 'active'
+                            'amount': None,
+                            'currency': 'USD'
                         }
                         
                         try:
-                            # Try to insert into intelligence_feed table
-                            result = client.table('africa_intelligence_feed').insert(intelligence_data).execute()
-                            total_items += 1
-                            logger.info(f"✅ Added: {title[:50]}...")
+                            # Call FastAPI endpoint to create intelligence item
+                            created_item = await api_client.create_intelligence_item(opportunity_data)
+                            if created_item:
+                                total_items += 1
+                                logger.info(f"✅ Added via API: {title[:50]}...")
+                            else:
+                                logger.warning(f"Could not add item via API: {title[:50]}...")
                             
                         except Exception as e:
-                            logger.warning(f"Could not insert item: {e}")
+                            logger.warning(f"Error calling API for item {title[:50]}...: {e}")
                             continue
                 
             except Exception as e:
                 logger.error(f"Error processing feed {feed_url}: {e}")
                 continue
         
-        logger.info(f"🎉 Basic ingestion completed! Added {total_items} items to database")
+        logger.info(f"🎉 Basic ingestion completed! Added {total_items} items to database via API")
         return True
         
     except ImportError:

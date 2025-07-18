@@ -185,6 +185,19 @@ def check_api_health():
     finally:
         loop.close()
 
+@st.cache_data(ttl=10) # Cache for 10 seconds
+def fetch_raw_opportunities_sync():
+    """Synchronous wrapper to fetch raw opportunities for debugging"""
+    client = TaifaAPIClient()
+    try:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        result = loop.run_until_complete(client.get_raw_opportunities())
+        loop.run_until_complete(client.close())
+        return result
+    finally:
+        loop.close()
+
 # Demo-specific functions
 def demo_add_serper_opportunity(opportunity_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     """Demo function to add a SERPER-discovered opportunity"""
@@ -205,7 +218,7 @@ def demo_add_serper_opportunity(opportunity_data: Dict[str, Any]) -> Optional[Di
         amount_str = opportunity_data["estimated_amount"]
         try:
             import re
-            amount_match = re.search(r'[\d,]+', amount_str.replace('$', '').replace(',', ''))
+            amount_match = re.search(r'[\d,]+', amount_str.replace('\n', '').replace(',', ''))
             if amount_match:
                 api_data["amount"] = float(amount_match.group())
                 api_data["currency"] = "USD"

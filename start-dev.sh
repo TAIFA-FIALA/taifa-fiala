@@ -118,16 +118,16 @@ start_streamlit() {
         exit 1
     fi
     
-    # Install streamlit dependencies
-    echo -e "${YELLOW}📦 Installing Streamlit dependencies...${NC}"
-    pip3 install -r requirements.txt
+    # Install streamlit dependencies with UV
+    echo -e "${YELLOW}📦 Installing Streamlit dependencies with UV...${NC}"
+    uv pip install -r requirements.txt
     
     # Kill any existing process on port 8501
     kill_port 8501
     
-    # Start Streamlit
+    # Start Streamlit with UV
     echo -e "${GREEN}🚀 Starting Streamlit server on http://localhost:8501${NC}"
-    streamlit run app.py --server.port 8501 --server.address 0.0.0.0 &
+    uv run streamlit run app.py --server.port 8501 --server.address 0.0.0.0 &
     STREAMLIT_PID=$!
     
     echo -e "${GREEN}✅ Streamlit started (PID: $STREAMLIT_PID)${NC}"

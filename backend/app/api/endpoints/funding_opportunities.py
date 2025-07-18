@@ -34,81 +34,110 @@ async def get_africa_intelligence_feed(
 ):
     """Get intelligence feed with optional filtering"""
     # Check if db is a Supabase client or SQLAlchemy session
-    if hasattr(db, 'table'):  # Supabase client
-        query = db.table('africa_intelligence_feed').select('*, funding_types!fk_africa_intelligence_feed_funding_type_id(*)')
+    query = db.table('africa_intelligence_feed').select('*, funding_types!fk_africa_intelligence_feed_funding_type_id(*)')
 
-        # Apply filters
-        if status:
-            query = query.filter('status', 'eq', status)
-        if min_amount:
-            query = query.or_(f'amount_exact.gte.{min_amount},amount_min.gte.{min_amount}')
-        if max_amount:
-            query = query.or_(f'amount_exact.lte.{max_amount},amount_max.lte.{max_amount}')
-        if deadline_after:
-            query = query.filter('deadline', 'gte', deadline_after.isoformat())
-        if deadline_before:
-            query = query.filter('deadline', 'lte', deadline_before.isoformat())
-        if organization_id:
-            query = query.filter('organization_id', 'eq', organization_id)
-        if funding_type:
-            query = query.filter('funding_types.category', 'eq', funding_type)
-        if requires_equity is not None:
-            query = query.filter('funding_types.requires_equity', 'eq', requires_equity)
+    # Apply filters
+    if status:
+        query = query.filter('status', 'eq', status)
+    if min_amount:
+        query = query.or_(f'amount_exact.gte.{min_amount},amount_min.gte.{min_amount}')
+    if max_amount:
+        query = query.or_(f'amount_exact.lte.{max_amount},amount_max.lte.{max_amount}')
+    if deadline_after:
+        query = query.filter('deadline', 'gte', deadline_after.isoformat())
+    if deadline_before:
+        query = query.filter('deadline', 'lte', deadline_before.isoformat())
+    if organization_id:
+        query = query.filter('organization_id', 'eq', organization_id)
+    if funding_type:
+        query = query.filter('funding_types.category', 'eq', funding_type)
+    if requires_equity is not None:
+        query = query.filter('funding_types.requires_equity', 'eq', requires_equity)
 
-        # Execute query with pagination
-        response = query.range(skip, skip + limit - 1).execute()
-        opportunities = response.data
-    else:  # SQLAlchemy session
-        query = db.query(AfricaIntelligenceItem).join(AfricaIntelligenceItem.type)
-    
-        # Apply filters
-        if status:
-            query = query.filter(AfricaIntelligenceItem.status == status)
-        if min_amount:
-            # Use the new numeric amount fields
-            query = query.filter(
-                (AfricaIntelligenceItem.amount_exact >= min_amount) |
-                (AfricaIntelligenceItem.amount_min >= min_amount)
-            )
-        if max_amount:
-            # Use the new numeric amount fields
-            query = query.filter(
-                (AfricaIntelligenceItem.amount_exact <= max_amount) |
-                (AfricaIntelligenceItem.amount_max <= max_amount) |
-                (AfricaIntelligenceItem.amount_max == None, AfricaIntelligenceItem.amount_exact <= max_amount)
-            )
-        if deadline_after:
-            query = query.filter(AfricaIntelligenceItem.deadline >= deadline_after)
-        if deadline_before:
-            query = query.filter(AfricaIntelligenceItem.deadline <= deadline_before)
-        if organization_id:
-            query = query.filter(AfricaIntelligenceItem.organization_id == organization_id)
-        if funding_type:
-            # Filter by the funding type category
-            query = query.filter(FundingType.category == funding_type)
-        if requires_equity is not None:
-            query = query.filter(FundingType.requires_equity == requires_equity)
-    
-        # Execute query with pagination
-        opportunities = query.offset(skip).limit(limit).all()
+    # Execute query with pagination
+    response = query.range(skip, skip + limit - 1).execute()
+    opportunities = response.data
     
     # Prepare responses with type-specific data
     results = []
     for opp in opportunities:
-        response = AfricaIntelligenceItemResponse.from_orm(opp)
-        
-        # Add type-specific data
-        response.is_grant = opp.is_grant
-        response.is_investment = opp.is_investment
-        response.funding_category = opp.funding_category
-        
-        if opp.is_grant and opp.grant_properties:
-            response.grant_specific = GrantFundingSpecific(**opp.grant_properties)
-        
-        if opp.is_investment and opp.investment_properties:
-            response.investment_specific = InvestmentFundingSpecific(**opp.investment_properties)
-        
-        results.append(response)
+        # Extract funding_type details
+        funding_type_data = opp.get('funding_types')
+        funding_category = funding_type_data.get('category', 'other') if funding_type_data else 'other'
+        is_grant = funding_category == 'grant'
+        is_investment = funding_category == 'investment'
+
+        # Prepare base data for response
+        response_data = {
+            "id": opp.get("id"),
+            "title": opp.get("title"),
+            "description": opp.get("description"),
+            "amount": opp.get("amount"),
+            "amount_min": opp.get("amount_min"),
+            "amount_max": opp.get("amount_max"),
+            "amount_exact": opp.get("amount_exact"),
+            "currency": opp.get("currency"),
+            "amount_usd": opp.get("amount_usd"),
+            "deadline": opp.get("deadline"),
+            "announcement_date": opp.get("announcement_date"),
+            "start_date": opp.get("start_date"),
+            "status": opp.get("status"),
+            "source_url": opp.get("source_url"),
+            "application_url": opp.get("application_url"),
+            "contact_info": opp.get("contact_info"),
+            "geographical_scope": opp.get("geographical_scope"),
+            "eligibility_criteria": opp.get("eligibility_criteria"),
+            "application_deadline": opp.get("application_deadline"),
+            "max_funding_period_months": opp.get("max_funding_period_months"),
+            "created_at": opp.get("created_at"),
+            "updated_at": opp.get("updated_at"),
+            "last_checked": opp.get("last_checked"),
+            "source_organization": opp.get("source_organization"), # Assuming this is already a dict if joined
+            "provider_organization": opp.get("provider_organization"),
+            "recipient_organization": opp.get("recipient_organization"),
+            "ai_domains": opp.get("ai_domains", []),
+            "funding_type": funding_type_data,
+            "is_grant": is_grant,
+            "is_investment": is_investment,
+            "funding_category": funding_category
+        }
+
+        # Add type-specific data if available
+        grant_specific = {}
+        if is_grant:
+            if opp.get("reporting_requirements"):
+                grant_specific["reporting_requirements"] = opp["reporting_requirements"]
+            if opp.get("grant_duration_months"):
+                grant_specific["grant_duration_months"] = opp["grant_duration_months"]
+            if opp.get("renewable") is not None:
+                grant_specific["renewable"] = opp["renewable"]
+            if opp.get("no_strings_attached") is not None:
+                grant_specific["no_strings_attached"] = opp["no_strings_attached"]
+            if opp.get("project_based") is not None:
+                grant_specific["project_based"] = opp["project_based"]
+            if grant_specific:
+                response_data["grant_specific"] = GrantFundingSpecific(**grant_specific)
+
+        investment_specific = {}
+        if is_investment:
+            if opp.get("equity_percentage"):
+                investment_specific["equity_percentage"] = opp["equity_percentage"]
+            if opp.get("valuation_cap"):
+                investment_specific["valuation_cap"] = opp["valuation_cap"]
+            if opp.get("interest_rate"):
+                investment_specific["interest_rate"] = opp["interest_rate"]
+            if opp.get("repayment_terms"):
+                investment_specific["repayment_terms"] = opp["repayment_terms"]
+            if opp.get("investor_rights"):
+                investment_specific["investor_rights"] = opp["investor_rights"]
+            if opp.get("post_investment_support"):
+                investment_specific["post_investment_support"] = opp["post_investment_support"]
+            if opp.get("expected_roi"):
+                investment_specific["expected_roi"] = opp["expected_roi"]
+            if investment_specific:
+                response_data["investment_specific"] = InvestmentFundingSpecific(**investment_specific)
+
+        results.append(AfricaIntelligenceItemResponse(**response_data))
     
     return results
 
@@ -123,19 +152,98 @@ async def get_intelligence_item(
     if not opportunity:
         raise HTTPException(status_code=404, detail="Funding opportunity not found")
     
-    # Create response with type-specific data
-    response = AfricaIntelligenceItemResponse.from_orm(opportunity)
-    
-    # Add type-specific data
-    response.is_grant = opportunity.is_grant
-    response.is_investment = opportunity.is_investment
-    response.funding_category = opportunity.funding_category
-    
-    if opportunity.is_grant and opportunity.grant_properties:
-        response.grant_specific = GrantFundingSpecific(**opportunity.grant_properties)
-    
-    if opportunity.is_investment and opportunity.investment_properties:
-        response.investment_specific = InvestmentFundingSpecific(**opportunity.investment_properties)
+    # Prepare response with type-specific data
+    if hasattr(db, 'table'): # Supabase client
+        # Extract funding_type details
+        funding_type_data = opportunity.get('funding_types')
+        funding_category = funding_type_data.get('category', 'other') if funding_type_data else 'other'
+        is_grant = funding_category == 'grant'
+        is_investment = funding_category == 'investment'
+
+        # Prepare base data for response
+        response_data = {
+            "id": opportunity.get("id"),
+            "title": opportunity.get("title"),
+            "description": opportunity.get("description"),
+            "amount": opportunity.get("amount"),
+            "amount_min": opportunity.get("amount_min"),
+            "amount_max": opportunity.get("amount_max"),
+            "amount_exact": opportunity.get("amount_exact"),
+            "currency": opportunity.get("currency"),
+            "amount_usd": opportunity.get("amount_usd"),
+            "deadline": opportunity.get("deadline"),
+            "announcement_date": opportunity.get("announcement_date"),
+            "start_date": opportunity.get("start_date"),
+            "status": opportunity.get("status"),
+            "source_url": opportunity.get("source_url"),
+            "application_url": opportunity.get("application_url"),
+            "contact_info": opportunity.get("contact_info"),
+            "geographical_scope": opportunity.get("geographical_scope"),
+            "eligibility_criteria": opportunity.get("eligibility_criteria"),
+            "application_deadline": opportunity.get("application_deadline"),
+            "max_funding_period_months": opportunity.get("max_funding_period_months"),
+            "created_at": opportunity.get("created_at"),
+            "updated_at": opportunity.get("updated_at"),
+            "last_checked": opportunity.get("last_checked"),
+            "source_organization": opportunity.get("source_organization"),
+            "provider_organization": opportunity.get("provider_organization"),
+            "recipient_organization": opportunity.get("recipient_organization"),
+            "ai_domains": opportunity.get("ai_domains", []),
+            "funding_type": funding_type_data,
+            "is_grant": is_grant,
+            "is_investment": is_investment,
+            "funding_category": funding_category
+        }
+
+        # Add type-specific data if available
+        grant_specific = {}
+        if is_grant:
+            if opportunity.get("reporting_requirements"):
+                grant_specific["reporting_requirements"] = opportunity["reporting_requirements"]
+            if opportunity.get("grant_duration_months"):
+                grant_specific["grant_duration_months"] = opportunity["grant_duration_months"]
+            if opportunity.get("renewable") is not None:
+                grant_specific["renewable"] = opportunity["renewable"]
+            if opportunity.get("no_strings_attached") is not None:
+                grant_specific["no_strings_attached"] = opportunity["no_strings_attached"]
+            if opportunity.get("project_based") is not None:
+                grant_specific["project_based"] = opportunity["project_based"]
+            if grant_specific:
+                response_data["grant_specific"] = GrantFundingSpecific(**grant_specific)
+
+        investment_specific = {}
+        if is_investment:
+            if opportunity.get("equity_percentage"):
+                investment_specific["equity_percentage"] = opportunity["equity_percentage"]
+            if opportunity.get("valuation_cap"):
+                investment_specific["valuation_cap"] = opportunity["valuation_cap"]
+            if opportunity.get("interest_rate"):
+                investment_specific["interest_rate"] = opportunity["interest_rate"]
+            if opportunity.get("repayment_terms"):
+                investment_specific["repayment_terms"] = opportunity["repayment_terms"]
+            if opportunity.get("investor_rights"):
+                investment_specific["investor_rights"] = opportunity["investor_rights"]
+            if opportunity.get("post_investment_support"):
+                investment_specific["post_investment_support"] = opportunity["post_investment_support"]
+            if opportunity.get("expected_roi"):
+                investment_specific["expected_roi"] = opportunity["expected_roi"]
+            if investment_specific:
+                response_data["investment_specific"] = InvestmentFundingSpecific(**investment_specific)
+
+        response = AfricaIntelligenceItemResponse(**response_data)
+    else: # SQLAlchemy session
+        response = AfricaIntelligenceItemResponse.from_orm(opportunity)
+        
+        # Add type-specific data
+        response.is_grant = opportunity.is_grant
+        response.is_investment = opportunity.is_investment
+        response.funding_category = opportunity.funding_category
+        
+        if opportunity.is_grant and opportunity.grant_properties:
+            response.grant_specific = GrantFundingSpecific(**opportunity.grant_properties)
+        
+        if opportunity.is_investment and opportunity.investment_properties:
+            response.investment_specific = InvestmentFundingSpecific(**opportunity.investment_properties)
     
     return response
 
@@ -146,45 +254,93 @@ async def create_intelligence_item(
     db: AsyncSession = Depends(get_db)
 ):
     """Create a new intelligence item"""
-    # Validate the funding type exists and get its category
-    funding_type = db.query(FundingType).filter(FundingType.id == opportunity.funding_type_id).first()
-    if not funding_type:
-        raise HTTPException(status_code=404, detail="Funding type not found")
-    
-    # Prepare base opportunity data
-    opportunity_data = opportunity.dict(exclude={"grant_specific", "investment_specific"})
-    db_opportunity = AfricaIntelligenceItem(**opportunity_data)
-    
-    # Add type-specific fields based on funding type category
-    if funding_type.category == 'grant' and opportunity.grant_specific:
-        grant_data = opportunity.grant_specific.dict()
-        for key, value in grant_data.items():
-            if value is not None:  # Only set non-None values
-                setattr(db_opportunity, key, value)
-    
-    if funding_type.category == 'investment' and opportunity.investment_specific:
-        investment_data = opportunity.investment_specific.dict()
-        for key, value in investment_data.items():
-            if value is not None:  # Only set non-None values
-                setattr(db_opportunity, key, value)
-    
-    db.add(db_opportunity)
-    db.commit()
-    db.refresh(db_opportunity)
-    
-    # Create response with type-specific data
-    response = AfricaIntelligenceItemResponse.from_orm(db_opportunity)
-    response.is_grant = db_opportunity.is_grant
-    response.is_investment = db_opportunity.is_investment
-    response.funding_category = db_opportunity.funding_category
-    
-    if db_opportunity.is_grant and db_opportunity.grant_properties:
-        response.grant_specific = GrantFundingSpecific(**db_opportunity.grant_properties)
-    
-    if db_opportunity.is_investment and db_opportunity.investment_properties:
-        response.investment_specific = InvestmentFundingSpecific(**db_opportunity.investment_properties)
-    
-    return response
+    if hasattr(db, 'table'): # Supabase client
+        # Validate the funding type exists and get its category
+        funding_type_response = db.table('funding_types').select('*').eq('id', opportunity.funding_type_id).execute()
+        funding_type_data = funding_type_response.data[0] if funding_type_response.data else None
+        if not funding_type_data:
+            raise HTTPException(status_code=404, detail="Funding type not found")
+        
+        # Prepare base opportunity data
+        opportunity_dict = opportunity.dict(exclude_unset=True, exclude={"grant_specific", "investment_specific"})
+        opportunity_dict['funding_type_id'] = opportunity.funding_type_id # Ensure funding_type_id is included
+
+        # Add type-specific fields based on funding type category
+        if funding_type_data['category'] == 'grant' and opportunity.grant_specific:
+            grant_data = opportunity.grant_specific.dict(exclude_unset=True)
+            opportunity_dict.update(grant_data)
+        
+        if funding_type_data['category'] == 'investment' and opportunity.investment_specific:
+            investment_data = opportunity.investment_specific.dict(exclude_unset=True)
+            opportunity_dict.update(investment_data)
+        
+        # Insert into Supabase
+        response = db.table('africa_intelligence_feed').insert(opportunity_dict).execute()
+        if not response.data:
+            raise HTTPException(status_code=500, detail="Failed to create opportunity in Supabase")
+        
+        db_opportunity = response.data[0]
+
+        # Prepare response with type-specific data
+        funding_category = funding_type_data.get('category', 'other')
+        is_grant = funding_category == 'grant'
+        is_investment = funding_category == 'investment'
+
+        response_data = {
+            **db_opportunity,
+            "funding_type": funding_type_data,
+            "is_grant": is_grant,
+            "is_investment": is_investment,
+            "funding_category": funding_category
+        }
+
+        if is_grant and opportunity.grant_specific:
+            response_data["grant_specific"] = opportunity.grant_specific
+        if is_investment and opportunity.investment_specific:
+            response_data["investment_specific"] = opportunity.investment_specific
+
+        return AfricaIntelligenceItemResponse(**response_data)
+
+    else: # SQLAlchemy session
+        # Validate the funding type exists and get its category
+        funding_type = db.query(FundingType).filter(FundingType.id == opportunity.funding_type_id).first()
+        if not funding_type:
+            raise HTTPException(status_code=404, detail="Funding type not found")
+        
+        # Prepare base opportunity data
+        opportunity_data = opportunity.dict(exclude={"grant_specific", "investment_specific"})
+        db_opportunity = AfricaIntelligenceItem(**opportunity_data)
+        
+        # Add type-specific fields based on funding type category
+        if funding_type.category == 'grant' and opportunity.grant_specific:
+            grant_data = opportunity.grant_specific.dict()
+            for key, value in grant_data.items():
+                if value is not None:  # Only set non-None values
+                    setattr(db_opportunity, key, value)
+        
+        if funding_type.category == 'investment' and opportunity.investment_specific:
+            investment_data = opportunity.investment_specific.dict()
+            for key, value in investment_data.items():
+                if value is not None:  # Only set non-None values
+                    setattr(db_opportunity, key, value)
+        
+        db.add(db_opportunity)
+        db.commit()
+        db.refresh(db_opportunity)
+        
+        # Create response with type-specific data
+        response = AfricaIntelligenceItemResponse.from_orm(db_opportunity)
+        response.is_grant = db_opportunity.is_grant
+        response.is_investment = db_opportunity.is_investment
+        response.funding_category = db_opportunity.funding_category
+        
+        if db_opportunity.is_grant and db_opportunity.grant_properties:
+            response.grant_specific = GrantFundingSpecific(**db_opportunity.grant_properties)
+        
+        if db_opportunity.is_investment and db_opportunity.investment_properties:
+            response.investment_specific = InvestmentFundingSpecific(**db_opportunity.investment_properties)
+        
+        return response
 
 
 @router.get("/grants/", response_model=List[AfricaIntelligenceItemResponse])
@@ -197,36 +353,88 @@ async def get_grants(
     db: AsyncSession = Depends(get_db)
 ):
     """Get grant intelligence feed with specialized filters"""
-    query = db.query(AfricaIntelligenceItem).join(AfricaIntelligenceItem.type)
-    
-    # Filter by grant type
-    query = query.filter(FundingType.category == 'grant')
-    
-    # Apply specialized grant filters
-    if renewable is not None:
-        query = query.filter(AfricaIntelligenceItem.renewable == renewable)
-    if project_based is not None:
-        query = query.filter(AfricaIntelligenceItem.project_based == project_based)
-    if min_duration is not None:
-        query = query.filter(AfricaIntelligenceItem.grant_duration_months >= min_duration)
-    
-    # Execute query with pagination
-    grants = query.offset(skip).limit(limit).all()
-    
-    # Prepare responses with type-specific data
-    results = []
-    for grant in grants:
-        response = AfricaIntelligenceItemResponse.from_orm(grant)
-        response.is_grant = True
-        response.is_investment = False
-        response.funding_category = 'grant'
+    if hasattr(db, 'table'): # Supabase client
+        query = db.table('africa_intelligence_feed').select('*, funding_types!fk_africa_intelligence_feed_funding_type_id(*)')
         
-        if grant.grant_properties:
-            response.grant_specific = GrantFundingSpecific(**grant.grant_properties)
+        # Filter by grant type
+        query = query.filter('funding_types.category', 'eq', 'grant')
         
-        results.append(response)
-    
-    return results
+        # Apply specialized grant filters
+        if renewable is not None:
+            query = query.filter('renewable', 'eq', renewable)
+        if project_based is not None:
+            query = query.filter('project_based', 'eq', project_based)
+        if min_duration is not None:
+            query = query.filter('grant_duration_months', 'gte', min_duration)
+        
+        # Execute query with pagination
+        response = query.range(skip, skip + limit - 1).execute()
+        grants = response.data
+        
+        # Prepare responses with type-specific data
+        results = []
+        for grant in grants:
+            funding_type_data = grant.get('funding_types')
+            funding_category = funding_type_data.get('category', 'other') if funding_type_data else 'other'
+            is_grant = funding_category == 'grant'
+            is_investment = funding_category == 'investment'
+
+            response_data = {
+                **grant,
+                "funding_type": funding_type_data,
+                "is_grant": is_grant,
+                "is_investment": is_investment,
+                "funding_category": funding_category
+            }
+            if is_grant:
+                grant_specific = {}
+                if grant.get("reporting_requirements"):
+                    grant_specific["reporting_requirements"] = grant["reporting_requirements"]
+                if grant.get("grant_duration_months"):
+                    grant_specific["grant_duration_months"] = grant["grant_duration_months"]
+                if grant.get("renewable") is not None:
+                    grant_specific["renewable"] = grant["renewable"]
+                if grant.get("no_strings_attached") is not None:
+                    grant_specific["no_strings_attached"] = grant["no_strings_attached"]
+                if grant.get("project_based") is not None:
+                    grant_specific["project_based"] = grant["project_based"]
+                if grant_specific:
+                    response_data["grant_specific"] = GrantFundingSpecific(**grant_specific)
+            results.append(AfricaIntelligenceItemResponse(**response_data))
+        
+        return results
+
+    else: # SQLAlchemy session
+        query = db.query(AfricaIntelligenceItem).join(AfricaIntelligenceItem.type)
+        
+        # Filter by grant type
+        query = query.filter(FundingType.category == 'grant')
+        
+        # Apply specialized grant filters
+        if renewable is not None:
+            query = query.filter(AfricaIntelligenceItem.renewable == renewable)
+        if project_based is not None:
+            query = query.filter(AfricaIntelligenceItem.project_based == project_based)
+        if min_duration is not None:
+            query = query.filter(AfricaIntelligenceItem.grant_duration_months >= min_duration)
+        
+        # Execute query with pagination
+        grants = query.offset(skip).limit(limit).all()
+        
+        # Prepare responses with type-specific data
+        results = []
+        for grant in grants:
+            response = AfricaIntelligenceItemResponse.from_orm(grant)
+            response.is_grant = True
+            response.is_investment = False
+            response.funding_category = 'grant'
+            
+            if grant.grant_properties:
+                response.grant_specific = GrantFundingSpecific(**grant.grant_properties)
+            
+            results.append(response)
+        
+        return results
 
 
 @router.get("/investments/", response_model=List[AfricaIntelligenceItemResponse])
@@ -238,34 +446,88 @@ async def get_investments(
     db: AsyncSession = Depends(get_db)
 ):
     """Get investment intelligence feed with specialized filters"""
-    query = db.query(AfricaIntelligenceItem).join(AfricaIntelligenceItem.type)
-    
-    # Filter by investment type
-    query = query.filter(FundingType.category == 'investment')
-    
-    # Apply specialized investment filters
-    if max_equity is not None:
-        query = query.filter(AfricaIntelligenceItem.equity_percentage <= max_equity)
-    if min_valuation_cap is not None:
-        query = query.filter(AfricaIntelligenceItem.valuation_cap >= min_valuation_cap)
-    
-    # Execute query with pagination
-    investments = query.offset(skip).limit(limit).all()
-    
-    # Prepare responses with type-specific data
-    results = []
-    for investment in investments:
-        response = AfricaIntelligenceItemResponse.from_orm(investment)
-        response.is_grant = False
-        response.is_investment = True
-        response.funding_category = 'investment'
+    if hasattr(db, 'table'): # Supabase client
+        query = db.table('africa_intelligence_feed').select('*, funding_types!fk_africa_intelligence_feed_funding_type_id(*)')
         
-        if investment.investment_properties:
-            response.investment_specific = InvestmentFundingSpecific(**investment.investment_properties)
+        # Filter by investment type
+        query = query.filter('funding_types.category', 'eq', 'investment')
         
-        results.append(response)
-    
-    return results
+        # Apply specialized investment filters
+        if max_equity is not None:
+            query = query.filter('equity_percentage', 'lte', max_equity)
+        if min_valuation_cap is not None:
+            query = query.filter('valuation_cap', 'gte', min_valuation_cap)
+        
+        # Execute query with pagination
+        response = query.range(skip, skip + limit - 1).execute()
+        investments = response.data
+        
+        # Prepare responses with type-specific data
+        results = []
+        for investment in investments:
+            funding_type_data = investment.get('funding_types')
+            funding_category = funding_type_data.get('category', 'other') if funding_type_data else 'other'
+            is_grant = funding_category == 'grant'
+            is_investment = funding_category == 'investment'
+
+            response_data = {
+                **investment,
+                "funding_type": funding_type_data,
+                "is_grant": is_grant,
+                "is_investment": is_investment,
+                "funding_category": funding_category
+            }
+            if is_investment:
+                investment_specific = {}
+                if investment.get("equity_percentage"):
+                    investment_specific["equity_percentage"] = investment["equity_percentage"]
+                if investment.get("valuation_cap"):
+                    investment_specific["valuation_cap"] = investment["valuation_cap"]
+                if investment.get("interest_rate"):
+                    investment_specific["interest_rate"] = investment["interest_rate"]
+                if investment.get("repayment_terms"):
+                    investment_specific["repayment_terms"] = investment["repayment_terms"]
+                if investment.get("investor_rights"):
+                    investment_specific["investor_rights"] = investment["investor_rights"]
+                if investment.get("post_investment_support"):
+                    investment_specific["post_investment_support"] = investment["post_investment_support"]
+                if investment.get("expected_roi"):
+                    investment_specific["expected_roi"] = investment["expected_roi"]
+                if investment_specific:
+                    response_data["investment_specific"] = InvestmentFundingSpecific(**investment_specific)
+            results.append(AfricaIntelligenceItemResponse(**response_data))
+        
+        return results
+
+    else: # SQLAlchemy session
+        query = db.query(AfricaIntelligenceItem).join(AfricaIntelligenceItem.type)
+        
+        # Filter by investment type
+        query = query.filter(FundingType.category == 'investment')
+        
+        # Apply specialized investment filters
+        if max_equity is not None:
+            query = query.filter(AfricaIntelligenceItem.equity_percentage <= max_equity)
+        if min_valuation_cap is not None:
+            query = query.filter(AfricaIntelligenceItem.valuation_cap >= min_valuation_cap)
+        
+        # Execute query with pagination
+        investments = query.offset(skip).limit(limit).all()
+        
+        # Prepare responses with type-specific data
+        results = []
+        for investment in investments:
+            response = AfricaIntelligenceItemResponse.from_orm(investment)
+            response.is_grant = False
+            response.is_investment = True
+            response.funding_category = 'investment'
+            
+            if investment.investment_properties:
+                response.investment_specific = InvestmentFundingSpecific(**investment.investment_properties)
+            
+            results.append(response)
+        
+        return results
 
 
 @router.get("/search/", response_model=List[AfricaIntelligenceItemResponse])
@@ -276,38 +538,116 @@ async def search_africa_intelligence_feed(
     db: AsyncSession = Depends(get_db)
 ):
     """Search intelligence feed by title or description"""
-    search_term = f"%{q}%"
-    query = db.query(AfricaIntelligenceItem)
-    
-    # Apply search filter
-    query = query.filter(
-        AfricaIntelligenceItem.title.ilike(search_term) | 
-        AfricaIntelligenceItem.description.ilike(search_term)
-    )
-    
-    # Apply funding type filter if specified
-    if funding_type:
-        query = query.join(AfricaIntelligenceItem.type)
-        query = query.filter(FundingType.category == funding_type)
-    
-    opportunities = query.limit(limit).all()
+    if hasattr(db, 'table'):  # Supabase client
+        query = db.table('africa_intelligence_feed').select('*, funding_types!fk_africa_intelligence_feed_funding_type_id(*)')
+        
+        # Apply search filter
+        search_term = f"%{q}%"
+        query = query.or_(f'title.ilike.{search_term},description.ilike.{search_term}')
+
+        # Apply funding type filter if specified
+        if funding_type:
+            query = query.filter('funding_types.category', 'eq', funding_type)
+
+        response = query.limit(limit).execute()
+        opportunities = response.data
+    else:  # SQLAlchemy session
+        search_term = f"%{q}%"
+        query = db.query(AfricaIntelligenceItem)
+        
+        # Apply search filter
+        query = query.filter(
+            AfricaIntelligenceItem.title.ilike(search_term) | 
+            AfricaIntelligenceItem.description.ilike(search_term)
+        )
+        
+        # Apply funding type filter if specified
+        if funding_type:
+            query = query.join(AfricaIntelligenceItem.type)
+            query = query.filter(FundingType.category == funding_type)
+        
+        opportunities = query.limit(limit).all()
     
     # Prepare responses with type-specific data
     results = []
     for opp in opportunities:
-        response = AfricaIntelligenceItemResponse.from_orm(opp)
-        
-        response.is_grant = opp.is_grant
-        response.is_investment = opp.is_investment
-        response.funding_category = opp.funding_category
-        
-        if opp.is_grant and opp.grant_properties:
-            response.grant_specific = GrantFundingSpecific(**opp.grant_properties)
-        
-        if opp.is_investment and opp.investment_properties:
-            response.investment_specific = InvestmentFundingSpecific(**opp.investment_properties)
-        
-        results.append(response)
+        # Extract funding_type details
+        funding_type_data = opp.get('funding_types')
+        funding_category = funding_type_data.get('category', 'other') if funding_type_data else 'other'
+        is_grant = funding_category == 'grant'
+        is_investment = funding_category == 'investment'
+
+        # Prepare base data for response
+        response_data = {
+            "id": opp.get("id"),
+            "title": opp.get("title"),
+            "description": opp.get("description"),
+            "amount": opp.get("amount"),
+            "amount_min": opp.get("amount_min"),
+            "amount_max": opp.get("amount_max"),
+            "amount_exact": opp.get("amount_exact"),
+            "currency": opp.get("currency"),
+            "amount_usd": opp.get("amount_usd"),
+            "deadline": opp.get("deadline"),
+            "announcement_date": opp.get("announcement_date"),
+            "start_date": opp.get("start_date"),
+            "status": opp.get("status"),
+            "source_url": opp.get("source_url"),
+            "application_url": opp.get("application_url"),
+            "contact_info": opp.get("contact_info"),
+            "geographical_scope": opp.get("geographical_scope"),
+            "eligibility_criteria": opp.get("eligibility_criteria"),
+            "application_deadline": opp.get("application_deadline"),
+            "max_funding_period_months": opp.get("max_funding_period_months"),
+            "created_at": opp.get("created_at"),
+            "updated_at": opp.get("updated_at"),
+            "last_checked": opp.get("last_checked"),
+            "source_organization": opp.get("source_organization"), # Assuming this is already a dict if joined
+            "provider_organization": opp.get("provider_organization"),
+            "recipient_organization": opp.get("recipient_organization"),
+            "ai_domains": opp.get("ai_domains", []),
+            "funding_type": funding_type_data,
+            "is_grant": is_grant,
+            "is_investment": is_investment,
+            "funding_category": funding_category
+        }
+
+        # Add type-specific data if available
+        grant_specific = {}
+        if is_grant:
+            if opp.get("reporting_requirements"):
+                grant_specific["reporting_requirements"] = opp["reporting_requirements"]
+            if opp.get("grant_duration_months"):
+                grant_specific["grant_duration_months"] = opp["grant_duration_months"]
+            if opp.get("renewable") is not None:
+                grant_specific["renewable"] = opp["renewable"]
+            if opp.get("no_strings_attached") is not None:
+                grant_specific["no_strings_attached"] = opp["no_strings_attached"]
+            if opp.get("project_based") is not None:
+                grant_specific["project_based"] = opp["project_based"]
+            if grant_specific:
+                response_data["grant_specific"] = GrantFundingSpecific(**grant_specific)
+
+        investment_specific = {}
+        if is_investment:
+            if opp.get("equity_percentage"):
+                investment_specific["equity_percentage"] = opp["equity_percentage"]
+            if opp.get("valuation_cap"):
+                investment_specific["valuation_cap"] = opp["valuation_cap"]
+            if opp.get("interest_rate"):
+                investment_specific["interest_rate"] = opp["interest_rate"]
+            if opp.get("repayment_terms"):
+                investment_specific["repayment_terms"] = opp["repayment_terms"]
+            if opp.get("investor_rights"):
+                investment_specific["investor_rights"] = opp["investor_rights"]
+            if opp.get("post_investment_support"):
+                investment_specific["post_investment_support"] = opp["post_investment_support"]
+            if opp.get("expected_roi"):
+                investment_specific["expected_roi"] = opp["expected_roi"]
+            if investment_specific:
+                response_data["investment_specific"] = InvestmentFundingSpecific(**investment_specific)
+
+        results.append(AfricaIntelligenceItemResponse(**response_data))
     
     return results
 
