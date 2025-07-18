@@ -2,7 +2,7 @@ from fastapi import APIRouter
 
 from app.api.endpoints import (
     funding_opportunities, organizations, domains, sources, analytics, search, rfp, source_validation,
-    user_submissions, admin_scraping, automated_discovery, equity_analyses
+    user_submissions, admin_scraping, automated_discovery, equity_analyses, stakeholder_reports
 )
 
 # Create main API router
@@ -82,4 +82,11 @@ api_router.include_router(
     equity_analyses.router,
     prefix="/equity-analyses",
     tags=["equity-analyses"]
+)
+
+# Stakeholder reports for executive insights
+api_router.include_router(
+    stakeholder_reports.router,
+    prefix="/reports",
+    tags=["stakeholder-reports"]
 )
