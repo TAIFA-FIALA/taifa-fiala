@@ -81,12 +81,14 @@ export default async function HomePage() {
           {/* Search Bar - Centered */}
           <div className="max-w-2xl mx-auto mb-12">
             <form 
-              action={(formData) => {
+              className="relative flex shadow-md rounded-lg overflow-hidden"
+              onSubmit={(e) => {
+                e.preventDefault();
+                const formData = new FormData(e.currentTarget);
                 const searchParams = new URLSearchParams();
                 searchParams.set('query', formData.get('query') as string);
                 window.location.href = `/funding?${searchParams.toString()}`;
               }}
-              className="relative flex shadow-md rounded-lg overflow-hidden"
             >
               <input
                 type="text"

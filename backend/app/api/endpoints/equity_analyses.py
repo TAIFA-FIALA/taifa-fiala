@@ -1,10 +1,11 @@
 from fastapi import APIRouter, Depends, Query
-from sqlalchemy.orm import Session
-from sqlalchemy import func, distinct, desc, cast, Float
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import func, distinct, desc, cast, Float, select
 from datetime import datetime, timedelta
 from typing import List, Optional
 
 from app.core.database import get_db
+from app.core.data_access import get_data_access, DataAccess
 from app.models import Organization, AfricaIntelligenceItem, CommunityUser, GeographicScope, AIDomain
 
 router = APIRouter()

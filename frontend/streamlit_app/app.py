@@ -63,7 +63,8 @@ def main():
             "🇷🇼 Rwanda Demo",  # Add demo page
             t("nav.submit"),
             "🛠️ Admin Portal"  # Add admin portal
-        ]
+        ],
+        key="main_navigation"
     )
     
     # Page routing
@@ -257,7 +258,7 @@ def show_africa_intelligence_feed():
     col1, col2, col3 = st.columns(3)
     
     with col1:
-        status_filter = st.selectbox("Status", ["All", "Active", "Closed", "Upcoming"])
+        status_filter = st.selectbox("Status", ["All", "Active", "Closed", "Upcoming"], key="opportunities_status_filter")
     
     with col2:
         min_amount = st.number_input("Min Amount (USD)", min_value=0, value=0)
@@ -380,7 +381,7 @@ def show_organizations():
     col1, col2 = st.columns(2)
     
     with col1:
-        org_type = st.selectbox("Type", ["All", "Funder", "Implementer", "Both"])
+        org_type = st.selectbox("Type", ["All", "Funder", "Implementer", "Both"], key="organizations_type_filter")
     
     with col2:
         country = st.text_input("Country")
@@ -447,7 +448,8 @@ def show_rwanda_demo():
                 "⚡ User Search Experience (Instant)",
                 "🌅 Daily Collection Process (Background)", 
                 "🔄 Complete Architecture Demo"
-            ]
+            ],
+            key="rwanda_demo_type"
         )
     
     with col2:
@@ -690,12 +692,12 @@ def show_submit_opportunity():
         with col1:
             title = st.text_input("Opportunity Title*", placeholder="e.g., Rwanda AI Health Innovation Grant")
             amount = st.number_input("Funding Amount (USD)", min_value=0, value=0)
-            currency = st.selectbox("Currency", ["USD", "EUR", "GBP", "Other"])
+            currency = st.selectbox("Currency", ["USD", "EUR", "GBP", "Other"], key="submit_currency")
         
         with col2:
             organization = st.text_input("Organization", placeholder="e.g., Gates Foundation")
             deadline = st.date_input("Application Deadline")
-            status = st.selectbox("Status", ["Active", "Opening Soon", "Closed"])
+            status = st.selectbox("Status", ["Active", "Opening Soon", "Closed"], key="submit_status")
         
         description = st.text_area(
             "Description*", 
