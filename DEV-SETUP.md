@@ -89,8 +89,19 @@ cd backend
 rm -rf venv
 python3 -m venv venv
 source venv/bin/activate
+pip install --upgrade pip
 pip install -r requirements.txt
 ```
+
+### Updated Dependencies
+
+The requirements.txt has been updated to fix deprecated packages and conflicts:
+- `pinecone-client` → `pinecone==5.0.0`
+- `supabase==2.0.4` → `supabase>=2.10.0,<3.0.0`
+- `crawl4ai==0.2.75` → `crawl4ai==0.7.1`
+- Updated FastAPI, SQLAlchemy, and other core dependencies
+- Removed unused `emails` package
+- Used version ranges for better compatibility
 
 ### Node.js Module Issues
 
