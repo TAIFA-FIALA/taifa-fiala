@@ -8,8 +8,18 @@ from app.core.config import settings
 
 # Ensure we're using asyncpg driver
 database_url = settings.DATABASE_URL
-if not re.search(r'\+asyncpg', database_url):
-    database_url = re.sub(r'postgresql(\+\w+)?', 'postgresql+asyncpg', database_url)
+
+# Print diagnostics to help identify the issue
+print(f"DATABASE_URL from settings: {database_url!r}")
+
+# Add safety check to prevent NoneType errors
+if database_url is not None:
+    if not re.search(r'\+asyncpg', database_url):
+        database_url = re.sub(r'postgresql(\+\w+)?', 'postgresql+asyncpg', database_url)
+else:
+    # Log error and raise informative exception
+    print("ERROR: DATABASE_URL is not set. Please set this environment variable.")
+    raise ValueError("DATABASE_URL environment variable is not set. Cannot connect to database.")
 
 # Create SQLAlchemy async engine
 engine = create_async_engine(

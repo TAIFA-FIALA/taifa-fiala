@@ -24,17 +24,106 @@ import hashlib
 import uuid
 from concurrent.futures import ThreadPoolExecutor
 
-from app.core.etl_architecture import ETLTask, PipelineStage, ProcessingResult
-from app.core.equity_aware_classifier import EquityAwareContentClassifier, ClassificationResult
-from app.core.vector_database import VectorDatabaseManager, VectorETLProcessor
-from app.core.bias_monitoring import BiasMonitoringEngine
-from app.core.multilingual_search import MultilingualSearchEngine
-from app.core.priority_data_sources import PriorityDataSourceRegistry
-from app.core.source_quality_scoring import SourceQualityScorer
-from app.core.enhanced_duplicate_detection import EnhancedDuplicateDetector
-from app.models.funding import AfricaIntelligenceItem
-from app.models.validation import ValidationResult, ContentFingerprint
-from app.core.database import get_db
+# Handle both relative and absolute imports
+try:
+    from app.core.etl_architecture import ETLTask, PipelineStage, ProcessingResult
+except ImportError:
+    try:
+        from backend.app.core.etl_architecture import ETLTask, PipelineStage, ProcessingResult
+    except ImportError:
+        # For relative imports within the same package
+        from .etl_architecture import ETLTask, PipelineStage, ProcessingResult
+# Handle both relative and absolute imports for equity classifier
+try:
+    from app.core.equity_aware_classifier import EquityAwareContentClassifier, ClassificationResult
+except ImportError:
+    try:
+        from backend.app.core.equity_aware_classifier import EquityAwareContentClassifier, ClassificationResult
+    except ImportError:
+        from .equity_aware_classifier import EquityAwareContentClassifier, ClassificationResult
+
+# Handle both relative and absolute imports for vector database
+try:
+    from app.core.vector_database import VectorDatabaseManager, VectorETLProcessor
+except ImportError:
+    try:
+        from backend.app.core.vector_database import VectorDatabaseManager, VectorETLProcessor
+    except ImportError:
+        from .vector_database import VectorDatabaseManager, VectorETLProcessor
+
+# Handle both relative and absolute imports for bias monitoring
+try:
+    from app.core.bias_monitoring import BiasMonitoringEngine
+except ImportError:
+    try:
+        from backend.app.core.bias_monitoring import BiasMonitoringEngine
+    except ImportError:
+        from .bias_monitoring import BiasMonitoringEngine
+
+# Handle both relative and absolute imports for multilingual search
+try:
+    from app.core.multilingual_search import MultilingualSearchEngine
+except ImportError:
+    try:
+        from backend.app.core.multilingual_search import MultilingualSearchEngine
+    except ImportError:
+        from .multilingual_search import MultilingualSearchEngine
+
+# Handle both relative and absolute imports for priority data sources
+try:
+    from app.core.priority_data_sources import PriorityDataSourceRegistry
+except ImportError:
+    try:
+        from backend.app.core.priority_data_sources import PriorityDataSourceRegistry
+    except ImportError:
+        from .priority_data_sources import PriorityDataSourceRegistry
+
+# Handle both relative and absolute imports for source quality scoring
+try:
+    from app.core.source_quality_scoring import SourceQualityScorer
+except ImportError:
+    try:
+        from backend.app.core.source_quality_scoring import SourceQualityScorer
+    except ImportError:
+        from .source_quality_scoring import SourceQualityScorer
+
+# Handle both relative and absolute imports for duplicate detection
+try:
+    from app.core.enhanced_duplicate_detection import EnhancedDuplicateDetector
+except ImportError:
+    try:
+        from backend.app.core.enhanced_duplicate_detection import EnhancedDuplicateDetector
+    except ImportError:
+        from .enhanced_duplicate_detection import EnhancedDuplicateDetector
+
+# Handle both relative and absolute imports for funding models
+try:
+    from app.models.funding import AfricaIntelligenceItem
+except ImportError:
+    try:
+        from backend.app.models.funding import AfricaIntelligenceItem
+    except ImportError:
+        try:
+            from ..models.funding import AfricaIntelligenceItem
+        except ImportError:
+            # If we can't import, provide a placeholder to allow module to load
+            class AfricaIntelligenceItem:
+                pass
+try:
+    from app.models.validation import ValidationResult, ContentFingerprint
+except ImportError:
+    try:
+        from backend.app.models.validation import ValidationResult, ContentFingerprint
+    except ImportError:
+        from .validation import ValidationResult, ContentFingerprint
+
+try:
+    from app.core.database import get_db
+except ImportError:
+    try:
+        from backend.app.core.database import get_db
+    except ImportError:
+        from .database import get_db
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -75,12 +164,14 @@ class ProcessedContent:
     validation: ValidationResult
     fingerprint: ContentFingerprint
     
+    # Integration metadata
+    ingestion_context: IngestionContext
+    
     # Vector processing
     vector_indexed: bool = False
     vector_id: Optional[str] = None
     
-    # Integration metadata
-    ingestion_context: IngestionContext
+    # Integration timestamp metadata
     processing_timestamp: datetime = field(default_factory=datetime.now)
     processing_time: float = 0.0
     
