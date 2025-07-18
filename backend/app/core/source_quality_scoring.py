@@ -20,7 +20,7 @@ from statistics import mean, median, stdev
 
 from app.models.validation import SourceQuality, ValidationResult
 from app.models.funding import AfricaIntelligenceItem
-from app.core.database import get_db_session
+from app.core.database import get_db
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -318,7 +318,7 @@ class SourceQualityScorer:
     async def get_source_ranking(self, limit: int = 20) -> List[Dict[str, Any]]:
         """Get ranking of sources by quality"""
         try:
-            async with get_db_session() as session:
+            async with get_db() as session:
                 # Get all sources with their quality scores
                 sources = await session.execute(
                     """
@@ -369,7 +369,7 @@ class SourceQualityScorer:
     async def identify_problem_sources(self) -> Dict[str, List[str]]:
         """Identify sources with quality problems including equity issues"""
         try:
-            async with get_db_session() as session:
+            async with get_db() as session:
                 # Get sources with various quality issues
                 problem_sources = {
                     'high_duplicate_rate': [],
@@ -479,7 +479,7 @@ class SourceQualityScorer:
     async def _get_recent_source_data(self, source_name: str, source_type: Optional[SourceType]) -> List[Dict[str, Any]]:
         """Get recent data for a source"""
         try:
-            async with get_db_session() as session:
+            async with get_db() as session:
                 # Get recent opportunities from this source
                 query = """
                     SELECT fo.*, vr.status as validation_status, vr.confidence_score,
@@ -572,7 +572,7 @@ class SourceQualityScorer:
     async def _get_item_counts(self, source_name: str) -> Dict[str, int]:
         """Get item counts for a source"""
         try:
-            async with get_db_session() as session:
+            async with get_db() as session:
                 result = await session.execute(
                     """
                     SELECT 
@@ -642,7 +642,7 @@ class SourceQualityScorer:
     async def _update_source_quality_db(self, snapshot: SourcePerformanceSnapshot):
         """Update source quality in database"""
         try:
-            async with get_db_session() as session:
+            async with get_db() as session:
                 # Update or create source quality record
                 existing = await session.execute(
                     "SELECT id FROM source_quality WHERE source_name = :name",
@@ -713,7 +713,7 @@ class SourceQualityScorer:
     async def _get_all_sources(self) -> List[Tuple[str, SourceType]]:
         """Get all unique sources"""
         try:
-            async with get_db_session() as session:
+            async with get_db() as session:
                 # Extract unique source names from intelligence feed
                 result = await session.execute(
                     """

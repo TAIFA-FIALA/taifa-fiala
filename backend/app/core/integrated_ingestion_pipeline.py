@@ -34,7 +34,7 @@ from app.core.source_quality_scoring import SourceQualityScorer
 from app.core.enhanced_duplicate_detection import EnhancedDuplicateDetector
 from app.models.funding import AfricaIntelligenceItem
 from app.models.validation import ValidationResult, ContentFingerprint
-from app.core.database import get_db_session
+from app.core.database import get_db
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -133,4 +133,742 @@ class IntegratedIngestionPipeline:
         self.executor = ThreadPoolExecutor(max_workers=self.max_workers)
         
         # Performance tracking
-        self.processing_stats = {\n            'total_processed': 0,\n            'successful_classifications': 0,\n            'successful_indexing': 0,\n            'duplicates_detected': 0,\n            'bias_alerts_generated': 0\n        }\n    \n    async def process_content_batch(self, content_batch: List[Dict[str, Any]], \n                                  ingestion_context: IngestionContext) -> List[ProcessedContent]:\n        \"\"\"Process a batch of content through the complete pipeline\"\"\"\n        try:\n            start_time = datetime.now()\n            processed_items = []\n            \n            # Step 1: Classify content with equity awareness\n            self.logger.info(f\"Starting equity classification for {len(content_batch)} items\")\n            classification_tasks = [\n                self.equity_classifier.classify_content(content) \n                for content in content_batch\n            ]\n            classifications = await asyncio.gather(*classification_tasks, return_exceptions=True)\n            \n            # Step 2: Filter out failed classifications\n            valid_items = []\n            for i, (content, classification) in enumerate(zip(content_batch, classifications)):\n                if isinstance(classification, Exception):\n                    self.logger.error(f\"Classification failed for item {i}: {classification}\")\n                    continue\n                \n                valid_items.append((content, classification))\n                self.processing_stats['successful_classifications'] += 1\n            \n            # Step 3: Check for duplicates\n            self.logger.info(f\"Checking duplicates for {len(valid_items)} items\")\n            for content, classification in valid_items:\n                # Get existing content for duplicate detection\n                existing_content = await self._get_existing_content_for_duplicate_check()\n                \n                # Check for duplicates\n                duplicate_matches = await self.duplicate_detector.detect_duplicates(\n                    new_content=content,\n                    existing_content=existing_content\n                )\n                \n                # Skip if high-confidence duplicate\n                if self._is_high_confidence_duplicate(duplicate_matches):\n                    self.logger.info(f\"Skipping duplicate: {content.get('title', 'No title')}\")\n                    self.processing_stats['duplicates_detected'] += 1\n                    continue\n                \n                # Step 4: Create validation result\n                validation_result = await self._create_validation_result(\n                    content, classification, duplicate_matches\n                )\n                \n                # Step 5: Create content fingerprint\n                fingerprint = await self._create_content_fingerprint(\n                    content, classification\n                )\n                \n                # Step 6: Create processed content object\n                processed_content = ProcessedContent(\n                    raw_content=content,\n                    classification=classification,\n                    validation=validation_result,\n                    fingerprint=fingerprint,\n                    ingestion_context=ingestion_context,\n                    duplicate_score=self._calculate_duplicate_score(duplicate_matches),\n                    source_quality_score=await self._get_source_quality_score(ingestion_context.source_id)\n                )\n                \n                processed_items.append(processed_content)\n            \n            # Step 7: Vector indexing for approved items\n            self.logger.info(f\"Vector indexing for {len(processed_items)} items\")\n            await self._batch_vector_index(processed_items)\n            \n            # Step 8: Store in database\n            self.logger.info(f\"Storing {len(processed_items)} items in database\")\n            await self._batch_store_processed_content(processed_items)\n            \n            # Step 9: Update bias monitoring\n            await self._update_bias_monitoring(processed_items)\n            \n            # Step 10: Update source quality scores\n            await self._update_source_quality_scores(ingestion_context, processed_items)\n            \n            # Calculate processing time\n            processing_time = (datetime.now() - start_time).total_seconds()\n            \n            # Update processing stats\n            self.processing_stats['total_processed'] += len(processed_items)\n            \n            self.logger.info(f\"Batch processing completed: {len(processed_items)} items in {processing_time:.2f}s\")\n            \n            return processed_items\n            \n        except Exception as e:\n            self.logger.error(f\"Batch processing failed: {e}\")\n            return []\n    \n    async def process_rss_feed(self, feed_url: str, source_config: Dict[str, Any]) -> List[ProcessedContent]:\n        \"\"\"Process RSS feed with full integration\"\"\"\n        try:\n            # Create ingestion context\n            context = IngestionContext(\n                method=IngestionMethod.RSS_FEED,\n                source_id=source_config.get('source_id', 'unknown'),\n                source_name=source_config.get('source_name', 'RSS Feed'),\n                source_url=feed_url,\n                source_language=source_config.get('language', 'en'),\n                source_priority=source_config.get('priority', 1.0),\n                processing_metadata={'feed_url': feed_url}\n            )\n            \n            # Fetch RSS content\n            rss_content = await self._fetch_rss_content(feed_url)\n            \n            # Process through pipeline\n            return await self.process_content_batch(rss_content, context)\n            \n        except Exception as e:\n            self.logger.error(f\"RSS processing failed for {feed_url}: {e}\")\n            return []\n    \n    async def process_serper_search(self, query: str, search_config: Dict[str, Any]) -> List[ProcessedContent]:\n        \"\"\"Process Serper search results with full integration\"\"\"\n        try:\n            # Create ingestion context\n            context = IngestionContext(\n                method=IngestionMethod.SERPER_SEARCH,\n                source_id=f\"serper_{hashlib.md5(query.encode()).hexdigest()[:8]}\",\n                source_name=f\"Serper Search: {query}\",\n                source_url=\"https://google.serper.dev/search\",\n                source_language=search_config.get('language', 'en'),\n                source_priority=search_config.get('priority', 1.0),\n                processing_metadata={'query': query, 'search_config': search_config}\n            )\n            \n            # Execute search\n            search_results = await self._execute_serper_search(query, search_config)\n            \n            # Process through pipeline\n            return await self.process_content_batch(search_results, context)\n            \n        except Exception as e:\n            self.logger.error(f\"Serper search processing failed for '{query}': {e}\")\n            return []\n    \n    async def process_multilingual_search(self, base_query: str, \n                                        target_languages: List[str]) -> List[ProcessedContent]:\n        \"\"\"Process multilingual search with full integration\"\"\"\n        try:\n            all_processed = []\n            \n            # Execute multilingual search\n            from app.core.multilingual_search import SupportedLanguage\n            languages = [SupportedLanguage(lang) for lang in target_languages]\n            \n            multilingual_results = await self.multilingual_engine.search_multilingual(\n                base_query=base_query,\n                target_languages=languages\n            )\n            \n            # Process each language result\n            for result in multilingual_results:\n                context = IngestionContext(\n                    method=IngestionMethod.MULTILINGUAL_SEARCH,\n                    source_id=f\"multilingual_{result.query.language.value}\",\n                    source_name=f\"Multilingual Search ({result.query.language.value})\",\n                    source_url=\"multilingual_search\",\n                    source_language=result.query.language.value,\n                    source_priority=1.5,  # Higher priority for multilingual\n                    processing_metadata={\n                        'base_query': base_query,\n                        'translated_query': result.query.translated_query,\n                        'confidence_score': result.confidence_score\n                    }\n                )\n                \n                processed = await self.process_content_batch(result.results, context)\n                all_processed.extend(processed)\n            \n            return all_processed\n            \n        except Exception as e:\n            self.logger.error(f\"Multilingual search processing failed: {e}\")\n            return []\n    \n    async def process_priority_sources(self, max_sources: int = 10) -> List[ProcessedContent]:\n        \"\"\"Process content from priority African data sources\"\"\"\n        try:\n            all_processed = []\n            \n            # Get high-priority sources\n            priority_sources = self.source_registry.get_high_priority_sources()\n            \n            # Process each source\n            for source in priority_sources[:max_sources]:\n                self.logger.info(f\"Processing priority source: {source.name}\")\n                \n                # Create ingestion context\n                context = IngestionContext(\n                    method=IngestionMethod.PRIORITY_SOURCE_SCAN,\n                    source_id=source.source_id,\n                    source_name=source.name,\n                    source_url=source.base_url,\n                    source_language=source.primary_language.value,\n                    source_priority=source.priority_weight,\n                    processing_metadata={\n                        'source_config': source.to_dict()\n                    }\n                )\n                \n                # Process RSS feeds\n                for feed_url in source.rss_feeds:\n                    try:\n                        rss_content = await self._fetch_rss_content(feed_url)\n                        processed = await self.process_content_batch(rss_content, context)\n                        all_processed.extend(processed)\n                    except Exception as e:\n                        self.logger.error(f\"RSS processing failed for {feed_url}: {e}\")\n                \n                # Process search pages with multilingual queries\n                if source.search_pages:\n                    try:\n                        search_results = await self._process_search_pages(\n                            source.search_pages, \n                            source.primary_language.value\n                        )\n                        processed = await self.process_content_batch(search_results, context)\n                        all_processed.extend(processed)\n                    except Exception as e:\n                        self.logger.error(f\"Search page processing failed: {e}\")\n            \n            return all_processed\n            \n        except Exception as e:\n            self.logger.error(f\"Priority source processing failed: {e}\")\n            return []\n    \n    async def process_user_submission(self, submission_data: Dict[str, Any]) -> ProcessedContent:\n        \"\"\"Process user-submitted content with full integration\"\"\"\n        try:\n            # Create ingestion context\n            context = IngestionContext(\n                method=IngestionMethod.USER_SUBMISSION,\n                source_id=f\"user_{submission_data.get('user_id', 'anonymous')}\",\n                source_name=\"User Submission\",\n                source_url=submission_data.get('url', 'user_submission'),\n                source_language=submission_data.get('language', 'en'),\n                source_priority=0.8,  # Lower priority for user submissions\n                processing_metadata={\n                    'user_id': submission_data.get('user_id'),\n                    'submission_type': submission_data.get('type', 'manual')\n                }\n            )\n            \n            # Process single item\n            processed_batch = await self.process_content_batch([submission_data], context)\n            \n            return processed_batch[0] if processed_batch else None\n            \n        except Exception as e:\n            self.logger.error(f\"User submission processing failed: {e}\")\n            return None\n    \n    # =============================================================================\n    # PRIVATE HELPER METHODS\n    # =============================================================================\n    \n    async def _fetch_rss_content(self, feed_url: str) -> List[Dict[str, Any]]:\n        \"\"\"Fetch and parse RSS content\"\"\"\n        try:\n            import feedparser\n            import aiohttp\n            \n            async with aiohttp.ClientSession() as session:\n                async with session.get(feed_url) as response:\n                    if response.status == 200:\n                        feed_data = await response.text()\n                        feed = feedparser.parse(feed_data)\n                        \n                        content_items = []\n                        for entry in feed.entries:\n                            content_items.append({\n                                'title': entry.get('title', ''),\n                                'description': entry.get('description', ''),\n                                'url': entry.get('link', ''),\n                                'published_date': entry.get('published', ''),\n                                'author': entry.get('author', ''),\n                                'source': feed_url,\n                                'raw_entry': entry\n                            })\n                        \n                        return content_items\n                    else:\n                        self.logger.error(f\"RSS fetch failed: {response.status}\")\n                        return []\n                        \n        except Exception as e:\n            self.logger.error(f\"RSS content fetch failed: {e}\")\n            return []\n    \n    async def _execute_serper_search(self, query: str, config: Dict[str, Any]) -> List[Dict[str, Any]]:\n        \"\"\"Execute Serper search with configuration\"\"\"\n        try:\n            import aiohttp\n            \n            # Prepare search parameters\n            params = {\n                'q': query,\n                'num': config.get('num_results', 20),\n                'hl': config.get('language', 'en'),\n                'gl': config.get('country', 'za'),  # Default to South Africa\n                'type': 'search'\n            }\n            \n            headers = {\n                'X-API-KEY': config.get('api_key', ''),\n                'Content-Type': 'application/json'\n            }\n            \n            async with aiohttp.ClientSession() as session:\n                async with session.post(\n                    'https://google.serper.dev/search',\n                    json=params,\n                    headers=headers\n                ) as response:\n                    if response.status == 200:\n                        data = await response.json()\n                        \n                        search_results = []\n                        for result in data.get('organic', []):\n                            search_results.append({\n                                'title': result.get('title', ''),\n                                'description': result.get('snippet', ''),\n                                'url': result.get('link', ''),\n                                'source': result.get('source', ''),\n                                'date': result.get('date', ''),\n                                'position': result.get('position', 0),\n                                'raw_result': result\n                            })\n                        \n                        return search_results\n                    else:\n                        self.logger.error(f\"Serper search failed: {response.status}\")\n                        return []\n                        \n        except Exception as e:\n            self.logger.error(f\"Serper search execution failed: {e}\")\n            return []\n    \n    async def _process_search_pages(self, search_pages: List[str], language: str) -> List[Dict[str, Any]]:\n        \"\"\"Process search pages with web scraping\"\"\"\n        try:\n            # This would use Crawl4AI or similar for web scraping\n            # For now, return empty list\n            return []\n            \n        except Exception as e:\n            self.logger.error(f\"Search page processing failed: {e}\")\n            return []\n    \n    async def _get_existing_content_for_duplicate_check(self) -> List[Dict[str, Any]]:\n        \"\"\"Get existing content for duplicate detection\"\"\"\n        try:\n            async with get_db_session() as session:\n                # Get recent opportunities for duplicate checking\n                query = \"\"\"\n                    SELECT id, title, description, url, organization_name, funding_amount\n                    FROM africa_intelligence_feed\n                    WHERE discovered_date >= (NOW() - INTERVAL '30 days')\n                    ORDER BY discovered_date DESC\n                    LIMIT 1000\n                \"\"\"\n                \n                result = await session.execute(query)\n                return [dict(row) for row in result.fetchall()]\n                \n        except Exception as e:\n            self.logger.error(f\"Getting existing content failed: {e}\")\n            return []\n    \n    def _is_high_confidence_duplicate(self, duplicate_matches: List[Any]) -> bool:\n        \"\"\"Check if content is a high-confidence duplicate\"\"\"\n        if not duplicate_matches:\n            return False\n        \n        # Check for high-confidence exact matches\n        for match in duplicate_matches:\n            if match.confidence_score > 0.9 and match.action.value == 'reject':\n                return True\n        \n        return False\n    \n    async def _create_validation_result(self, content: Dict[str, Any], \n                                      classification: ClassificationResult,\n                                      duplicate_matches: List[Any]) -> ValidationResult:\n        \"\"\"Create validation result from processing\"\"\"\n        try:\n            # Calculate confidence based on classification and duplicates\n            base_confidence = classification.confidence_score\n            \n            # Adjust for duplicates\n            if duplicate_matches:\n                duplicate_penalty = min(0.3, len(duplicate_matches) * 0.1)\n                base_confidence = max(0.0, base_confidence - duplicate_penalty)\n            \n            # Determine status\n            if base_confidence >= 0.85:\n                status = 'auto_approved'\n                requires_review = False\n            elif base_confidence >= 0.65:\n                status = 'pending'\n                requires_review = True\n            else:\n                status = 'rejected'\n                requires_review = False\n            \n            return ValidationResult(\n                id=str(uuid.uuid4()),\n                status=status,\n                confidence_score=base_confidence,\n                confidence_level=self._get_confidence_level(base_confidence),\n                completeness_score=self._calculate_completeness_score(content),\n                relevance_score=classification.equity_score.sectoral_score,\n                legitimacy_score=classification.equity_score.transparency_score,\n                validation_notes=f\"Equity score: {classification.equity_score.calculate_overall_score():.3f}\",\n                requires_human_review=requires_review,\n                validator='integrated_pipeline',\n                processing_time=0.0,  # Will be updated later\n                validated_data=classification.to_dict(),\n                created_at=datetime.now()\n            )\n            \n        except Exception as e:\n            self.logger.error(f\"Creating validation result failed: {e}\")\n            return ValidationResult(\n                id=str(uuid.uuid4()),\n                status='error',\n                confidence_score=0.0,\n                created_at=datetime.now()\n            )\n    \n    async def _create_content_fingerprint(self, content: Dict[str, Any], \n                                        classification: ClassificationResult) -> ContentFingerprint:\n        \"\"\"Create content fingerprint for duplicate detection\"\"\"\n        try:\n            title = content.get('title', '')\n            description = content.get('description', '')\n            url = content.get('url', '')\n            \n            # Generate hashes\n            title_hash = hashlib.md5(title.lower().encode()).hexdigest()\n            content_hash = hashlib.md5(f\"{title} {description}\".lower().encode()).hexdigest()\n            url_hash = hashlib.md5(url.encode()).hexdigest() if url else ''\n            \n            # Create signature hash\n            signature_parts = [\n                title_hash,\n                classification.detected_countries[0] if classification.detected_countries else '',\n                classification.detected_sectors[0] if classification.detected_sectors else '',\n                str(content.get('funding_amount', ''))\n            ]\n            signature_hash = hashlib.md5('|'.join(signature_parts).encode()).hexdigest()\n            \n            return ContentFingerprint(\n                title_hash=title_hash,\n                content_hash=content_hash,\n                url_hash=url_hash,\n                signature_hash=signature_hash,\n                organization_name=content.get('organization_name', ''),\n                funding_amount=content.get('funding_amount'),\n                funding_currency=content.get('currency', 'USD'),\n                url_domain=content.get('url', '').split('/')[2] if content.get('url') else None,\n                key_phrases=classification.detected_sectors + classification.detected_countries,\n                created_at=datetime.now()\n            )\n            \n        except Exception as e:\n            self.logger.error(f\"Creating content fingerprint failed: {e}\")\n            return ContentFingerprint(\n                title_hash='',\n                content_hash='',\n                url_hash='',\n                signature_hash='',\n                created_at=datetime.now()\n            )\n    \n    def _calculate_duplicate_score(self, duplicate_matches: List[Any]) -> float:\n        \"\"\"Calculate duplicate score from matches\"\"\"\n        if not duplicate_matches:\n            return 0.0\n        \n        # Get highest confidence match\n        max_confidence = max(match.confidence_score for match in duplicate_matches)\n        return max_confidence\n    \n    async def _get_source_quality_score(self, source_id: str) -> float:\n        \"\"\"Get source quality score\"\"\"\n        try:\n            # This would integrate with the source quality scorer\n            # For now, return default score\n            return 0.8\n            \n        except Exception as e:\n            self.logger.error(f\"Getting source quality score failed: {e}\")\n            return 0.5\n    \n    async def _batch_vector_index(self, processed_items: List[ProcessedContent]):\n        \"\"\"Batch index processed items in vector database\"\"\"\n        try:\n            # Filter approved items for vector indexing\n            approved_items = [\n                item for item in processed_items\n                if item.validation.status in ['approved', 'auto_approved']\n            ]\n            \n            if not approved_items:\n                return\n            \n            # Create intelligence feed for vector indexing\n            opportunities = []\n            for item in approved_items:\n                opportunity = self._create_intelligence_item_from_processed(item)\n                if opportunity:\n                    opportunities.append(opportunity)\n            \n            # Batch index in vector database\n            if opportunities:\n                result = await self.vector_processor.batch_process_opportunities(opportunities)\n                \n                # Update vector indexing status\n                for i, item in enumerate(approved_items):\n                    if i < len(opportunities):\n                        item.vector_indexed = result.success\n                        item.vector_id = f\"opportunity_{opportunities[i].id}\"\n                        self.processing_stats['successful_indexing'] += 1\n                        \n        except Exception as e:\n            self.logger.error(f\"Batch vector indexing failed: {e}\")\n    \n    def _create_intelligence_item_from_processed(self, item: ProcessedContent) -> Optional[AfricaIntelligenceItem]:\n        \"\"\"Create AfricaIntelligenceItem from processed content\"\"\"\n        try:\n            # This would create a proper AfricaIntelligenceItem object\n            # For now, return None to indicate this needs implementation\n            return None\n            \n        except Exception as e:\n            self.logger.error(f\"Creating intelligence item failed: {e}\")\n            return None\n    \n    async def _batch_store_processed_content(self, processed_items: List[ProcessedContent]):\n        \"\"\"Store processed content in database\"\"\"\n        try:\n            # This would store all the processed content with metadata\n            # For now, just log the storage\n            self.logger.info(f\"Storing {len(processed_items)} processed items\")\n            \n        except Exception as e:\n            self.logger.error(f\"Batch storage failed: {e}\")\n    \n    async def _update_bias_monitoring(self, processed_items: List[ProcessedContent]):\n        \"\"\"Update bias monitoring with processed items\"\"\"\n        try:\n            # Extract bias-relevant data\n            bias_data = []\n            for item in processed_items:\n                bias_data.append({\n                    'countries': item.classification.detected_countries,\n                    'sectors': item.classification.detected_sectors,\n                    'inclusion_indicators': [cat.value for cat in item.classification.inclusion_indicators],\n                    'equity_score': item.classification.equity_score.calculate_overall_score(),\n                    'source_language': item.ingestion_context.source_language,\n                    'funding_stage': item.classification.funding_stage\n                })\n            \n            # Analyze current bias (this would trigger monitoring)\n            snapshot = await self.bias_monitor.analyze_current_bias()\n            \n            # Check for alerts\n            if snapshot.active_alerts:\n                self.processing_stats['bias_alerts_generated'] += len(snapshot.active_alerts)\n                \n                # Log alerts\n                for alert in snapshot.active_alerts:\n                    self.logger.warning(f\"Bias alert: {alert.message}\")\n                    \n                    # Trigger mitigation if critical\n                    if alert.severity.value == 'critical':\n                        await self.bias_monitor.trigger_bias_mitigation(\n                            alert.bias_type, alert.severity\n                        )\n                        \n        except Exception as e:\n            self.logger.error(f\"Bias monitoring update failed: {e}\")\n    \n    async def _update_source_quality_scores(self, context: IngestionContext, \n                                          processed_items: List[ProcessedContent]):\n        \"\"\"Update source quality scores based on processing results\"\"\"\n        try:\n            # Calculate source performance metrics\n            total_items = len(processed_items)\n            if total_items == 0:\n                return\n            \n            successful_items = sum(1 for item in processed_items \n                                 if item.validation.status in ['approved', 'auto_approved'])\n            \n            duplicate_items = sum(1 for item in processed_items \n                                if item.duplicate_score > 0.8)\n            \n            # Update source quality score\n            from app.core.source_quality_scoring import SourceType\n            \n            # Map ingestion method to source type\n            source_type_map = {\n                IngestionMethod.RSS_FEED: SourceType.RSS_FEED,\n                IngestionMethod.SERPER_SEARCH: SourceType.API,\n                IngestionMethod.USER_SUBMISSION: SourceType.USER_SUBMISSION,\n                IngestionMethod.MULTILINGUAL_SEARCH: SourceType.API,\n                IngestionMethod.PRIORITY_SOURCE_SCAN: SourceType.WEBSITE\n            }\n            \n            source_type = source_type_map.get(context.method, SourceType.WEBSITE)\n            \n            # Score the source\n            snapshot = await self.source_scorer.score_source(\n                source_name=context.source_name,\n                source_type=source_type\n            )\n            \n            self.logger.info(f\"Source quality updated: {context.source_name} - {snapshot.metrics.calculate_overall_score():.3f}\")\n            \n        except Exception as e:\n            self.logger.error(f\"Source quality update failed: {e}\")\n    \n    def _get_confidence_level(self, score: float) -> str:\n        \"\"\"Get confidence level from score\"\"\"\n        if score >= 0.9:\n            return 'very_high'\n        elif score >= 0.8:\n            return 'high'\n        elif score >= 0.6:\n            return 'medium'\n        elif score >= 0.4:\n            return 'low'\n        else:\n            return 'very_low'\n    \n    def _calculate_completeness_score(self, content: Dict[str, Any]) -> float:\n        \"\"\"Calculate completeness score for content\"\"\"\n        required_fields = ['title', 'description', 'url']\n        optional_fields = ['organization_name', 'funding_amount', 'deadline', 'application_url']\n        \n        required_score = sum(1 for field in required_fields if content.get(field))\n        optional_score = sum(1 for field in optional_fields if content.get(field))\n        \n        # Weight required fields more heavily\n        total_score = (required_score / len(required_fields)) * 0.7 + (optional_score / len(optional_fields)) * 0.3\n        \n        return total_score\n    \n    def get_processing_stats(self) -> Dict[str, Any]:\n        \"\"\"Get current processing statistics\"\"\"\n        return {\n            **self.processing_stats,\n            'timestamp': datetime.now().isoformat(),\n            'pipeline_status': 'active'\n        }\n    \n    def reset_processing_stats(self):\n        \"\"\"Reset processing statistics\"\"\"\n        self.processing_stats = {\n            'total_processed': 0,\n            'successful_classifications': 0,\n            'successful_indexing': 0,\n            'duplicates_detected': 0,\n            'bias_alerts_generated': 0\n        }\n\n# =============================================================================\n# USAGE EXAMPLE\n# =============================================================================\n\nasync def example_usage():\n    \"\"\"Example usage of integrated ingestion pipeline\"\"\"\n    from app.core.vector_database import VectorConfig, VectorDatabaseManager\n    from app.core.multilingual_search import MultilingualSearchEngine\n    \n    # Initialize components\n    vector_config = VectorConfig(pinecone_api_key=\"your-key\")\n    vector_manager = VectorDatabaseManager(vector_config)\n    await vector_manager.initialize()\n    \n    multilingual_engine = MultilingualSearchEngine(serper_api_key=\"your-key\")\n    \n    # Create integrated pipeline\n    pipeline = IntegratedIngestionPipeline(\n        vector_manager=vector_manager,\n        multilingual_engine=multilingual_engine,\n        serper_api_key=\"your-key\"\n    )\n    \n    # Process RSS feed\n    rss_results = await pipeline.process_rss_feed(\n        feed_url=\"https://www.afdb.org/en/news-and-events/feed\",\n        source_config={\n            'source_id': 'afdb',\n            'source_name': 'African Development Bank',\n            'language': 'en',\n            'priority': 2.0\n        }\n    )\n    \n    print(f\"RSS processing: {len(rss_results)} items\")\n    \n    # Process multilingual search\n    multilingual_results = await pipeline.process_multilingual_search(\n        base_query=\"AI healthcare funding Africa\",\n        target_languages=['en', 'fr', 'ar']\n    )\n    \n    print(f\"Multilingual search: {len(multilingual_results)} items\")\n    \n    # Process priority sources\n    priority_results = await pipeline.process_priority_sources(max_sources=5)\n    \n    print(f\"Priority sources: {len(priority_results)} items\")\n    \n    # Get processing statistics\n    stats = pipeline.get_processing_stats()\n    print(f\"Processing stats: {stats}\")\n\nif __name__ == \"__main__\":\n    asyncio.run(example_usage())"
+        self.processing_stats = {
+            'total_processed': 0,
+            'successful_classifications': 0,
+            'successful_indexing': 0,
+            'duplicates_detected': 0,
+            'bias_alerts_generated': 0
+        }
+
+    async def process_content_batch(self, content_batch: List[Dict[str, Any]], 
+                                  ingestion_context: IngestionContext) -> List[ProcessedContent]:
+        """Process a batch of content through the complete pipeline"""
+        try:
+            start_time = datetime.now()
+            processed_items = []
+            
+            # Step 1: Classify content with equity awareness
+            self.logger.info(f"Starting equity classification for {len(content_batch)} items")
+            classification_tasks = [
+                self.equity_classifier.classify_content(content) 
+                for content in content_batch
+            ]
+            classifications = await asyncio.gather(*classification_tasks, return_exceptions=True)
+            
+            # Step 2: Filter out failed classifications
+            valid_items = []
+            for i, (content, classification) in enumerate(zip(content_batch, classifications)):
+                if isinstance(classification, Exception):
+                    self.logger.error(f"Classification failed for item {i}: {classification}")
+                    continue
+                
+                valid_items.append((content, classification))
+                self.processing_stats['successful_classifications'] += 1
+            
+            # Step 3: Check for duplicates
+            self.logger.info(f"Checking duplicates for {len(valid_items)} items")
+            for content, classification in valid_items:
+                # Get existing content for duplicate detection
+                existing_content = await self._get_existing_content_for_duplicate_check()
+                
+                # Check for duplicates
+                duplicate_matches = await self.duplicate_detector.detect_duplicates(
+                    new_content=content,
+                    existing_content=existing_content
+                )
+                
+                # Skip if high-confidence duplicate
+                if self._is_high_confidence_duplicate(duplicate_matches):
+                    self.logger.info(f"Skipping duplicate: {content.get('title', 'No title')}")
+                    self.processing_stats['duplicates_detected'] += 1
+                    continue
+                
+                # Step 4: Create validation result
+                validation_result = await self._create_validation_result(
+                    content, classification, duplicate_matches
+                )
+                
+                # Step 5: Create content fingerprint
+                fingerprint = await self._create_content_fingerprint(
+                    content, classification
+                )
+                
+                # Step 6: Create processed content object
+                processed_content = ProcessedContent(
+                    raw_content=content,
+                    classification=classification,
+                    validation=validation_result,
+                    fingerprint=fingerprint,
+                    ingestion_context=ingestion_context,
+                    duplicate_score=self._calculate_duplicate_score(duplicate_matches),
+                    source_quality_score=await self._get_source_quality_score(ingestion_context.source_id)
+                )
+                
+                processed_items.append(processed_content)
+            
+            # Step 7: Vector indexing for approved items
+            self.logger.info(f"Vector indexing for {len(processed_items)} items")
+            await self._batch_vector_index(processed_items)
+            
+            # Step 8: Store in database
+            self.logger.info(f"Storing {len(processed_items)} items in database")
+            await self._batch_store_processed_content(processed_items)
+            
+            # Step 9: Update bias monitoring
+            await self._update_bias_monitoring(processed_items)
+            
+            # Step 10: Update source quality scores
+            await self._update_source_quality_scores(ingestion_context, processed_items)
+            
+            # Calculate processing time
+            processing_time = (datetime.now() - start_time).total_seconds()
+            
+            # Update processing stats
+            self.processing_stats['total_processed'] += len(processed_items)
+            
+            self.logger.info(f"Batch processing completed: {len(processed_items)} items in {processing_time:.2f}s")
+            
+            return processed_items
+            
+        except Exception as e:
+            self.logger.error(f"Batch processing failed: {e}")
+            return []
+    
+    async def process_rss_feed(self, feed_url: str, source_config: Dict[str, Any]) -> List[ProcessedContent]:
+        """Process RSS feed with full integration"""
+        try:
+            # Create ingestion context
+            context = IngestionContext(
+                method=IngestionMethod.RSS_FEED,
+                source_id=source_config.get('source_id', 'unknown'),
+                source_name=source_config.get('source_name', 'RSS Feed'),
+                source_url=feed_url,
+                source_language=source_config.get('language', 'en'),
+                source_priority=source_config.get('priority', 1.0),
+                processing_metadata={'feed_url': feed_url}
+            )
+            
+            # Fetch RSS content
+            rss_content = await self._fetch_rss_content(feed_url)
+            
+            # Process through pipeline
+            return await self.process_content_batch(rss_content, context)
+            
+        except Exception as e:
+            self.logger.error(f"RSS processing failed for {feed_url}: {e}")
+            return []
+    
+    async def process_serper_search(self, query: str, search_config: Dict[str, Any]) -> List[ProcessedContent]:
+        """Process Serper search results with full integration"""
+        try:
+            # Create ingestion context
+            context = IngestionContext(
+                method=IngestionMethod.SERPER_SEARCH,
+                source_id=f"serper_{hashlib.md5(query.encode()).hexdigest()[:8]}",
+                source_name=f"Serper Search: {query}",
+                source_url="https://google.serper.dev/search",
+                source_language=search_config.get('language', 'en'),
+                source_priority=search_config.get('priority', 1.0),
+                processing_metadata={'query': query, 'search_config': search_config}
+            )
+            
+            # Execute search
+            search_results = await self._execute_serper_search(query, search_config)
+            
+            # Process through pipeline
+            return await self.process_content_batch(search_results, context)
+            
+        except Exception as e:
+            self.logger.error(f"Serper search processing failed for '{query}': {e}")
+            return []
+    
+    async def process_multilingual_search(self, base_query: str, 
+                                        target_languages: List[str]) -> List[ProcessedContent]:
+        """Process multilingual search with full integration"""
+        try:
+            all_processed = []
+            
+            # Execute multilingual search
+            from app.core.multilingual_search import SupportedLanguage
+            languages = [SupportedLanguage(lang) for lang in target_languages]
+            
+            multilingual_results = await self.multilingual_engine.search_multilingual(
+                base_query=base_query,
+                target_languages=languages
+            )
+            
+            # Process each language result
+            for result in multilingual_results:
+                context = IngestionContext(
+                    method=IngestionMethod.MULTILINGUAL_SEARCH,
+                    source_id=f"multilingual_{result.query.language.value}",
+                    source_name=f"Multilingual Search ({result.query.language.value})",
+                    source_url="multilingual_search",
+                    source_language=result.query.language.value,
+                    source_priority=1.5,  # Higher priority for multilingual
+                    processing_metadata={
+                        'base_query': base_query,
+                        'translated_query': result.query.translated_query,
+                        'confidence_score': result.confidence_score
+                    }
+                )
+                
+                processed = await self.process_content_batch(result.results, context)
+                all_processed.extend(processed)
+            
+            return all_processed
+            
+        except Exception as e:
+            self.logger.error(f"Multilingual search processing failed: {e}")
+            return []
+    
+    async def process_priority_sources(self, max_sources: int = 10) -> List[ProcessedContent]:
+        """Process content from priority African data sources"""
+        try:
+            all_processed = []
+            
+            # Get high-priority sources
+            priority_sources = self.source_registry.get_high_priority_sources()
+            
+            # Process each source
+            for source in priority_sources[:max_sources]:
+                self.logger.info(f"Processing priority source: {source.name}")
+                
+                # Create ingestion context
+                context = IngestionContext(
+                    method=IngestionMethod.PRIORITY_SOURCE_SCAN,
+                    source_id=source.source_id,
+                    source_name=source.name,
+                    source_url=source.base_url,
+                    source_language=source.primary_language.value,
+                    source_priority=source.priority_weight,
+                    processing_metadata={
+                        'source_config': source.to_dict()
+                    }
+                )
+                
+                # Process RSS feeds
+                for feed_url in source.rss_feeds:
+                    try:
+                        rss_content = await self._fetch_rss_content(feed_url)
+                        processed = await self.process_content_batch(rss_content, context)
+                        all_processed.extend(processed)
+                    except Exception as e:
+                        self.logger.error(f"RSS processing failed for {feed_url}: {e}")
+                
+                # Process search pages with multilingual queries
+                if source.search_pages:
+                    try:
+                        search_results = await self._process_search_pages(
+                            source.search_pages, 
+                            source.primary_language.value
+                        )
+                        processed = await self.process_content_batch(search_results, context)
+                        all_processed.extend(processed)
+                    except Exception as e:
+                        self.logger.error(f"Search page processing failed: {e}")
+            
+            return all_processed
+            
+        except Exception as e:
+            self.logger.error(f"Priority source processing failed: {e}")
+            return []
+    
+    async def process_user_submission(self, submission_data: Dict[str, Any]) -> ProcessedContent:
+        """Process user-submitted content with full integration"""
+        try:
+            # Create ingestion context
+            context = IngestionContext(
+                method=IngestionMethod.USER_SUBMISSION,
+                source_id=f"user_{submission_data.get('user_id', 'anonymous')}",
+                source_name="User Submission",
+                source_url=submission_data.get('url', 'user_submission'),
+                source_language=submission_data.get('language', 'en'),
+                source_priority=0.8,  # Lower priority for user submissions
+                processing_metadata={
+                    'user_id': submission_data.get('user_id'),
+                    'submission_type': submission_data.get('type', 'manual')
+                }
+            )
+            
+            # Process single item
+            processed_batch = await self.process_content_batch([submission_data], context)
+            
+            return processed_batch[0] if processed_batch else None
+            
+        except Exception as e:
+            self.logger.error(f"User submission processing failed: {e}")
+            return None
+    
+    # =============================================================================
+    # PRIVATE HELPER METHODS
+    # =============================================================================
+    
+    async def _fetch_rss_content(self, feed_url: str) -> List[Dict[str, Any]]:
+        """Fetch and parse RSS content"""
+        try:
+            import feedparser
+            import aiohttp
+            
+            async with aiohttp.ClientSession() as session:
+                async with session.get(feed_url) as response:
+                    if response.status == 200:
+                        feed_data = await response.text()
+                        feed = feedparser.parse(feed_data)
+                        
+                        content_items = []
+                        for entry in feed.entries:
+                            content_items.append({
+                                'title': entry.get('title', ''),
+                                'description': entry.get('description', ''),
+                                'url': entry.get('link', ''),
+                                'published_date': entry.get('published', ''),
+                                'author': entry.get('author', ''),
+                                'source': feed_url,
+                                'raw_entry': entry
+                            })
+                        
+                        return content_items
+                    else:
+                        self.logger.error(f"RSS fetch failed: {response.status}")
+                        return []
+                        
+        except Exception as e:
+            self.logger.error(f"RSS content fetch failed: {e}")
+            return []
+    
+    async def _execute_serper_search(self, query: str, config: Dict[str, Any]) -> List[Dict[str, Any]]:
+        """Execute Serper search with configuration"""
+        try:
+            import aiohttp
+            
+            # Prepare search parameters
+            params = {
+                'q': query,
+                'num': config.get('num_results', 20),
+                'hl': config.get('language', 'en'),
+                'gl': config.get('country', 'za'),  # Default to South Africa
+                'type': 'search'
+            }
+            
+            headers = {
+                'X-API-KEY': config.get('api_key', ''),
+                'Content-Type': 'application/json'
+            }
+            
+            async with aiohttp.ClientSession() as session:
+                async with session.post(
+                    'https://google.serper.dev/search',
+                    json=params,
+                    headers=headers
+                ) as response:
+                    if response.status == 200:
+                        data = await response.json()
+                        
+                        search_results = []
+                        for result in data.get('organic', []):
+                            search_results.append({
+                                'title': result.get('title', ''),
+                                'description': result.get('snippet', ''),
+                                'url': result.get('link', ''),
+                                'source': result.get('source', ''),
+                                'date': result.get('date', ''),
+                                'position': result.get('position', 0),
+                                'raw_result': result
+                            })
+                        
+                        return search_results
+                    else:
+                        self.logger.error(f"Serper search failed: {response.status}")
+                        return []
+                        
+        except Exception as e:
+            self.logger.error(f"Serper search execution failed: {e}")
+            return []
+    
+    async def _process_search_pages(self, search_pages: List[str], language: str) -> List[Dict[str, Any]]:
+        """Process search pages with web scraping"""
+        try:
+            # This would use Crawl4AI or similar for web scraping
+            # For now, return empty list
+            return []
+            
+        except Exception as e:
+            self.logger.error(f"Search page processing failed: {e}")
+            return []
+    
+    async def _get_existing_content_for_duplicate_check(self) -> List[Dict[str, Any]]:
+        """Get existing content for duplicate detection"""
+        try:
+            async with get_db() as session:
+                # Get recent opportunities for duplicate checking
+                query = """
+                    SELECT id, title, description, url, organization_name, funding_amount
+                    FROM africa_intelligence_feed
+                    WHERE discovered_date >= (NOW() - INTERVAL '30 days')
+                    ORDER BY discovered_date DESC
+                    LIMIT 1000
+                """
+                
+                result = await session.execute(query)
+                return [dict(row) for row in result.fetchall()]
+                
+        except Exception as e:
+            self.logger.error(f"Getting existing content failed: {e}")
+            return []
+    
+    def _is_high_confidence_duplicate(self, duplicate_matches: List[Any]) -> bool:
+        """Check if content is a high-confidence duplicate"""
+        if not duplicate_matches:
+            return False
+        
+        # Check for high-confidence exact matches
+        for match in duplicate_matches:
+            if match.confidence_score > 0.9 and match.action.value == 'reject':
+                return True
+        
+        return False
+    
+    async def _create_validation_result(self, content: Dict[str, Any], 
+                                      classification: ClassificationResult,
+                                      duplicate_matches: List[Any]) -> ValidationResult:
+        """Create validation result from processing"""
+        try:
+            # Calculate confidence based on classification and duplicates
+            base_confidence = classification.confidence_score
+            
+            # Adjust for duplicates
+            if duplicate_matches:
+                duplicate_penalty = min(0.3, len(duplicate_matches) * 0.1)
+                base_confidence = max(0.0, base_confidence - duplicate_penalty)
+            
+            # Determine status
+            if base_confidence >= 0.85:
+                status = 'auto_approved'
+                requires_review = False
+            elif base_confidence >= 0.65:
+                status = 'pending'
+                requires_review = True
+            else:
+                status = 'rejected'
+                requires_review = False
+            
+            return ValidationResult(
+                id=str(uuid.uuid4()),
+                status=status,
+                confidence_score=base_confidence,
+                confidence_level=self._get_confidence_level(base_confidence),
+                completeness_score=self._calculate_completeness_score(content),
+                relevance_score=classification.equity_score.sectoral_score,
+                legitimacy_score=classification.equity_score.transparency_score,
+                validation_notes=f"Equity score: {classification.equity_score.calculate_overall_score():.3f}",
+                requires_human_review=requires_review,
+                validator='integrated_pipeline',
+                processing_time=0.0,  # Will be updated later
+                validated_data=classification.to_dict(),
+                created_at=datetime.now()
+            )
+            
+        except Exception as e:
+            self.logger.error(f"Creating validation result failed: {e}")
+            return ValidationResult(
+                id=str(uuid.uuid4()),
+                status='error',
+                confidence_score=0.0,
+                created_at=datetime.now()
+            )
+    
+    async def _create_content_fingerprint(self, content: Dict[str, Any], 
+                                        classification: ClassificationResult) -> ContentFingerprint:
+        """Create content fingerprint for duplicate detection"""
+        try:
+            title = content.get('title', '')
+            description = content.get('description', '')
+            url = content.get('url', '')
+            
+            # Generate hashes
+            title_hash = hashlib.md5(title.lower().encode()).hexdigest()
+            content_hash = hashlib.md5(f"{title} {description}".lower().encode()).hexdigest()
+            url_hash = hashlib.md5(url.encode()).hexdigest() if url else ''
+            
+            # Create signature hash
+            signature_parts = [
+                title_hash,
+                classification.detected_countries[0] if classification.detected_countries else '',
+                classification.detected_sectors[0] if classification.detected_sectors else '',
+                str(content.get('funding_amount', ''))
+            ]
+            signature_hash = hashlib.md5('|'.join(signature_parts).encode()).hexdigest()
+            
+            return ContentFingerprint(
+                title_hash=title_hash,
+                content_hash=content_hash,
+                url_hash=url_hash,
+                signature_hash=signature_hash,
+                organization_name=content.get('organization_name', ''),
+                funding_amount=content.get('funding_amount'),
+                funding_currency=content.get('currency', 'USD'),
+                url_domain=content.get('url', '').split('/')[2] if content.get('url') else None,
+                key_phrases=classification.detected_sectors + classification.detected_countries,
+                created_at=datetime.now()
+            )
+            
+        except Exception as e:
+            self.logger.error(f"Creating content fingerprint failed: {e}")
+            return ContentFingerprint(
+                title_hash='',
+                content_hash='',
+                url_hash='',
+                signature_hash='',
+                created_at=datetime.now()
+            )
+    
+    def _calculate_duplicate_score(self, duplicate_matches: List[Any]) -> float:
+        """Calculate duplicate score from matches"""
+        if not duplicate_matches:
+            return 0.0
+        
+        # Get highest confidence match
+        max_confidence = max(match.confidence_score for match in duplicate_matches)
+        return max_confidence
+    
+    async def _get_source_quality_score(self, source_id: str) -> float:
+        """Get source quality score"""
+        try:
+            # This would integrate with the source quality scorer
+            # For now, return default score
+            return 0.8
+            
+        except Exception as e:
+            self.logger.error(f"Getting source quality score failed: {e}")
+            return 0.5
+    
+    async def _batch_vector_index(self, processed_items: List[ProcessedContent]):
+        """Batch index processed items in vector database"""
+        try:
+            # Filter approved items for vector indexing
+            approved_items = [
+                item for item in processed_items
+                if item.validation.status in ['approved', 'auto_approved']
+            ]
+            
+            if not approved_items:
+                return
+            
+            # Create intelligence feed for vector indexing
+            opportunities = []
+            for item in approved_items:
+                opportunity = self._create_intelligence_item_from_processed(item)
+                if opportunity:
+                    opportunities.append(opportunity)
+            
+            # Batch index in vector database
+            if opportunities:
+                result = await self.vector_processor.batch_process_opportunities(opportunities)
+                
+                # Update vector indexing status
+                for i, item in enumerate(approved_items):
+                    if i < len(opportunities):
+                        item.vector_indexed = result.success
+                        item.vector_id = f"opportunity_{opportunities[i].id}"
+                        self.processing_stats['successful_indexing'] += 1
+                        
+        except Exception as e:
+            self.logger.error(f"Batch vector indexing failed: {e}")
+    
+    def _create_intelligence_item_from_processed(self, item: ProcessedContent) -> Optional[AfricaIntelligenceItem]:
+        """Create AfricaIntelligenceItem from processed content"""
+        try:
+            # This would create a proper AfricaIntelligenceItem object
+            # For now, return None to indicate this needs implementation
+            return None
+            
+        except Exception as e:
+            self.logger.error(f"Creating intelligence item failed: {e}")
+            return None
+    
+    async def _batch_store_processed_content(self, processed_items: List[ProcessedContent]):
+        """Store processed content in database"""
+        try:
+            # This would store all the processed content with metadata
+            # For now, just log the storage
+            self.logger.info(f"Storing {len(processed_items)} processed items")
+            
+        except Exception as e:
+            self.logger.error(f"Batch storage failed: {e}")
+    
+    async def _update_bias_monitoring(self, processed_items: List[ProcessedContent]):
+        """Update bias monitoring with processed items"""
+        try:
+            # Extract bias-relevant data
+            bias_data = []
+            for item in processed_items:
+                bias_data.append({
+                    'countries': item.classification.detected_countries,
+                    'sectors': item.classification.detected_sectors,
+                    'inclusion_indicators': [cat.value for cat in item.classification.inclusion_indicators],
+                    'equity_score': item.classification.equity_score.calculate_overall_score(),
+                    'source_language': item.ingestion_context.source_language,
+                    'funding_stage': item.classification.funding_stage
+                })
+            
+            # Analyze current bias (this would trigger monitoring)
+            snapshot = await self.bias_monitor.analyze_current_bias()
+            
+            # Check for alerts
+            if snapshot.active_alerts:
+                self.processing_stats['bias_alerts_generated'] += len(snapshot.active_alerts)
+                
+                # Log alerts
+                for alert in snapshot.active_alerts:
+                    self.logger.warning(f"Bias alert: {alert.message}")
+                    
+                    # Trigger mitigation if critical
+                    if alert.severity.value == 'critical':
+                        await self.bias_monitor.trigger_bias_mitigation(
+                            alert.bias_type, alert.severity
+                        )
+                        
+        except Exception as e:
+            self.logger.error(f"Bias monitoring update failed: {e}")
+    
+    async def _update_source_quality_scores(self, context: IngestionContext, 
+                                          processed_items: List[ProcessedContent]):
+        """Update source quality scores based on processing results"""
+        try:
+            # Calculate source performance metrics
+            total_items = len(processed_items)
+            if total_items == 0:
+                return
+            
+            successful_items = sum(1 for item in processed_items 
+                                 if item.validation.status in ['approved', 'auto_approved'])
+            
+            duplicate_items = sum(1 for item in processed_items 
+                                if item.duplicate_score > 0.8)
+            
+            # Update source quality score
+            from app.core.source_quality_scoring import SourceType
+            
+            # Map ingestion method to source type
+            source_type_map = {
+                IngestionMethod.RSS_FEED: SourceType.RSS_FEED,
+                IngestionMethod.SERPER_SEARCH: SourceType.API,
+                IngestionMethod.USER_SUBMISSION: SourceType.USER_SUBMISSION,
+                IngestionMethod.MULTILINGUAL_SEARCH: SourceType.API,
+                IngestionMethod.PRIORITY_SOURCE_SCAN: SourceType.WEBSITE
+            }
+            
+            source_type = source_type_map.get(context.method, SourceType.WEBSITE)
+            
+            # Score the source
+            snapshot = await self.source_scorer.score_source(
+                source_name=context.source_name,
+                source_type=source_type
+            )
+            
+            self.logger.info(f"Source quality updated: {context.source_name} - {snapshot.metrics.calculate_overall_score():.3f}")
+            
+        except Exception as e:
+            self.logger.error(f"Source quality update failed: {e}")
+    
+    def _get_confidence_level(self, score: float) -> str:
+        """Get confidence level from score"""
+        if score >= 0.9:
+            return 'very_high'
+        elif score >= 0.8:
+            return 'high'
+        elif score >= 0.6:
+            return 'medium'
+        elif score >= 0.4:
+            return 'low'
+        else:
+            return 'very_low'
+    
+    def _calculate_completeness_score(self, content: Dict[str, Any]) -> float:
+        """Calculate completeness score for content"""
+        required_fields = ['title', 'description', 'url']
+        optional_fields = ['organization_name', 'funding_amount', 'deadline', 'application_url']
+        
+        required_score = sum(1 for field in required_fields if content.get(field))
+        optional_score = sum(1 for field in optional_fields if content.get(field))
+        
+        # Weight required fields more heavily
+        total_score = (required_score / len(required_fields)) * 0.7 + (optional_score / len(optional_fields)) * 0.3
+        
+        return total_score
+    
+    def get_processing_stats(self) -> Dict[str, Any]:
+        """Get current processing statistics"""
+        return {
+            **self.processing_stats,
+            'timestamp': datetime.now().isoformat(),
+            'pipeline_status': 'active'
+        }
+    
+    def reset_processing_stats(self):
+        """Reset processing statistics"""
+        self.processing_stats = {
+            'total_processed': 0,
+            'successful_classifications': 0,
+            'successful_indexing': 0,
+            'duplicates_detected': 0,
+            'bias_alerts_generated': 0
+        }
+
+# =============================================================================
+# USAGE EXAMPLE
+# =============================================================================
+
+async def example_usage():
+    """Example usage of integrated ingestion pipeline"""
+    from app.core.vector_database import VectorConfig, VectorDatabaseManager
+    from app.core.multilingual_search import MultilingualSearchEngine
+    
+    # Initialize components
+    vector_config = VectorConfig(pinecone_api_key="your-key")
+    vector_manager = VectorDatabaseManager(vector_config)
+    await vector_manager.initialize()
+    
+    multilingual_engine = MultilingualSearchEngine(serper_api_key="your-key")
+    
+    # Create integrated pipeline
+    pipeline = IntegratedIngestionPipeline(
+        vector_manager=vector_manager,
+        multilingual_engine=multilingual_engine,
+        serper_api_key="your-key"
+    )
+    
+    # Process RSS feed
+    rss_results = await pipeline.process_rss_feed(
+        feed_url="https://www.afdb.org/en/news-and-events/feed",
+        source_config={
+            'source_id': 'afdb',
+            'source_name': 'African Development Bank',
+            'language': 'en',
+            'priority': 2.0
+        }
+    )
+    
+    print(f"RSS processing: {len(rss_results)} items")
+    
+    # Process multilingual search
+    multilingual_results = await pipeline.process_multilingual_search(
+        base_query="AI healthcare funding Africa",
+        target_languages=['en', 'fr', 'ar']
+    )
+    
+    print(f"Multilingual search: {len(multilingual_results)} items")
+    
+    # Process priority sources
+    priority_results = await pipeline.process_priority_sources(max_sources=5)
+    
+    print(f"Priority sources: {len(priority_results)} items")
+    
+    # Get processing statistics
+    stats = pipeline.get_processing_stats()
+    print(f"Processing stats: {stats}")
+
+if __name__ == "__main__":
+    asyncio.run(example_usage())

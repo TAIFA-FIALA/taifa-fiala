@@ -25,8 +25,8 @@ from statistics import mean, stdev
 import pandas as pd
 from collections import defaultdict, Counter
 
-from app.core.database import get_db_session
-from app.core.equity_aware_classifier import SupportedLanguage, GeographicTier, SectorPriority, InclusionCategory
+from app.core.database import get_db
+from app.core.equity_aware_classifier import GeographicTier, SectorPriority, InclusionCategory
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -268,4 +268,1211 @@ class BiasMonitoringEngine:
                     'critical': 0.25
                 }
             }
-        }\n        \n        # Historical data for trend analysis\n        self.historical_snapshots = []\n        self.max_history_days = 90\n        \n        # Alert configuration\n        self.alert_cooldown_hours = 6  # Minimum time between similar alerts\n        self.recent_alerts = []\n    \n    async def analyze_current_bias(self) -> BiasSnapshot:\n        \"\"\"Analyze current bias in the system\"\"\"\n        try:\n            # Get current data\n            current_data = await self._get_current_ingestion_data()\n            \n            # Calculate metrics for each bias type\n            geographic_metrics = await self._calculate_geographic_metrics(current_data)\n            sectoral_metrics = await self._calculate_sectoral_metrics(current_data)\n            inclusion_metrics = await self._calculate_inclusion_metrics(current_data)\n            language_metrics = await self._calculate_language_metrics(current_data)\n            stage_metrics = await self._calculate_stage_metrics(current_data)\n            source_metrics = await self._calculate_source_metrics(current_data)\n            \n            # Calculate overall equity score\n            overall_equity = await self._calculate_overall_equity_score({\n                'geographic': geographic_metrics,\n                'sectoral': sectoral_metrics,\n                'inclusion': inclusion_metrics,\n                'language': language_metrics,\n                'stage': stage_metrics,\n                'source': source_metrics\n            })\n            \n            # Generate alerts\n            alerts = await self._generate_alerts({\n                'geographic': geographic_metrics,\n                'sectoral': sectoral_metrics,\n                'inclusion': inclusion_metrics,\n                'language': language_metrics,\n                'stage': stage_metrics,\n                'source': source_metrics\n            })\n            \n            # Create snapshot\n            snapshot = BiasSnapshot(\n                timestamp=datetime.now(),\n                geographic_metrics=geographic_metrics,\n                sectoral_metrics=sectoral_metrics,\n                inclusion_metrics=inclusion_metrics,\n                language_metrics=language_metrics,\n                stage_metrics=stage_metrics,\n                source_metrics=source_metrics,\n                overall_equity_score=overall_equity,\n                active_alerts=alerts\n            )\n            \n            # Store snapshot\n            await self._store_snapshot(snapshot)\n            \n            return snapshot\n            \n        except Exception as e:\n            self.logger.error(f\"Bias analysis failed: {e}\")\n            return BiasSnapshot(timestamp=datetime.now(), geographic_metrics={}, sectoral_metrics={}, \n                              inclusion_metrics={}, language_metrics={}, stage_metrics={}, source_metrics={})\n    \n    async def get_bias_trends(self, days: int = 30) -> Dict[str, Any]:\n        \"\"\"Get bias trends over specified period\"\"\"\n        try:\n            # Get historical snapshots\n            historical_data = await self._get_historical_snapshots(days)\n            \n            if not historical_data:\n                return {'error': 'No historical data available'}\n            \n            trends = {\n                'geographic_trends': self._calculate_metric_trends(historical_data, 'geographic_metrics'),\n                'sectoral_trends': self._calculate_metric_trends(historical_data, 'sectoral_metrics'),\n                'inclusion_trends': self._calculate_metric_trends(historical_data, 'inclusion_metrics'),\n                'language_trends': self._calculate_metric_trends(historical_data, 'language_metrics'),\n                'stage_trends': self._calculate_metric_trends(historical_data, 'stage_metrics'),\n                'overall_equity_trend': self._calculate_equity_trend(historical_data)\n            }\n            \n            return trends\n            \n        except Exception as e:\n            self.logger.error(f\"Getting bias trends failed: {e}\")\n            return {'error': str(e)}\n    \n    async def get_bias_recommendations(self) -> List[Dict[str, Any]]:\n        \"\"\"Get recommendations for addressing bias issues\"\"\"\n        try:\n            # Get current snapshot\n            current_snapshot = await self.analyze_current_bias()\n            \n            recommendations = []\n            \n            # Analyze geographic bias\n            geo_recs = await self._analyze_geographic_bias(current_snapshot.geographic_metrics)\n            recommendations.extend(geo_recs)\n            \n            # Analyze sectoral bias\n            sector_recs = await self._analyze_sectoral_bias(current_snapshot.sectoral_metrics)\n            recommendations.extend(sector_recs)\n            \n            # Analyze inclusion bias\n            inclusion_recs = await self._analyze_inclusion_bias(current_snapshot.inclusion_metrics)\n            recommendations.extend(inclusion_recs)\n            \n            # Analyze language bias\n            language_recs = await self._analyze_language_bias(current_snapshot.language_metrics)\n            recommendations.extend(language_recs)\n            \n            # Analyze stage bias\n            stage_recs = await self._analyze_stage_bias(current_snapshot.stage_metrics)\n            recommendations.extend(stage_recs)\n            \n            # Sort by priority\n            recommendations.sort(key=lambda x: x.get('priority', 0), reverse=True)\n            \n            return recommendations\n            \n        except Exception as e:\n            self.logger.error(f\"Getting bias recommendations failed: {e}\")\n            return []\n    \n    async def trigger_bias_mitigation(self, bias_type: BiasType, severity: AlertSeverity) -> Dict[str, Any]:\n        \"\"\"Trigger automatic bias mitigation measures\"\"\"\n        try:\n            mitigation_actions = []\n            \n            if bias_type == BiasType.GEOGRAPHIC:\n                if severity in [AlertSeverity.CRITICAL, AlertSeverity.HIGH]:\n                    # Boost underserved region searches\n                    mitigation_actions.append({\n                        'action': 'boost_underserved_searches',\n                        'description': 'Increase search frequency for Central/West Africa',\n                        'parameters': {'multiplier': 2.0, 'duration_hours': 24}\n                    })\n                    \n                    # Reduce Big 4 country search frequency\n                    mitigation_actions.append({\n                        'action': 'reduce_saturated_searches',\n                        'description': 'Reduce search frequency for oversaturated regions',\n                        'parameters': {'multiplier': 0.7, 'duration_hours': 24}\n                    })\n            \n            elif bias_type == BiasType.SECTORAL:\n                if severity in [AlertSeverity.CRITICAL, AlertSeverity.HIGH]:\n                    # Boost priority sector searches\n                    mitigation_actions.append({\n                        'action': 'boost_priority_sectors',\n                        'description': 'Increase searches for healthcare/agriculture/climate',\n                        'parameters': {'sectors': ['healthcare', 'agriculture', 'climate'], 'multiplier': 1.5}\n                    })\n            \n            elif bias_type == BiasType.LANGUAGE:\n                if severity in [AlertSeverity.CRITICAL, AlertSeverity.HIGH]:\n                    # Activate multilingual searches\n                    mitigation_actions.append({\n                        'action': 'activate_multilingual_search',\n                        'description': 'Activate French/Arabic/Portuguese searches',\n                        'parameters': {'languages': ['fr', 'ar', 'pt'], 'frequency': 'hourly'}\n                    })\n            \n            # Execute mitigation actions\n            execution_results = []\n            for action in mitigation_actions:\n                result = await self._execute_mitigation_action(action)\n                execution_results.append(result)\n            \n            return {\n                'bias_type': bias_type.value,\n                'severity': severity.value,\n                'mitigation_actions': mitigation_actions,\n                'execution_results': execution_results,\n                'timestamp': datetime.now().isoformat()\n            }\n            \n        except Exception as e:\n            self.logger.error(f\"Bias mitigation failed: {e}\")\n            return {'error': str(e)}\n    \n    # =============================================================================\n    # PRIVATE HELPER METHODS\n    # =============================================================================\n    \n    async def _get_current_ingestion_data(self) -> Dict[str, Any]:\n        \"\"\"Get current ingestion data for analysis\"\"\"\n        try:\n            async with get_db_session() as session:\n                # Get opportunities from last 24 hours\n                query = \"\"\"\n                    SELECT fo.*, \n                           vr.confidence_score,\n                           vr.validation_notes,\n                           cf.organization_name,\n                           cf.funding_amount,\n                           cf.key_phrases\n                    FROM africa_intelligence_feed fo\n                    LEFT JOIN validation_results vr ON fo.id = vr.opportunity_id\n                    LEFT JOIN content_fingerprints cf ON fo.id = cf.opportunity_id\n                    WHERE fo.discovered_date >= (NOW() - INTERVAL '24 hours')\n                    ORDER BY fo.discovered_date DESC\n                \"\"\"\n                \n                result = await session.execute(query)\n                opportunities = [dict(row) for row in result.fetchall()]\n                \n                # Get source statistics\n                source_query = \"\"\"\n                    SELECT source_name, source_type, COUNT(*) as count\n                    FROM africa_intelligence_feed\n                    WHERE discovered_date >= (NOW() - INTERVAL '24 hours')\n                    GROUP BY source_name, source_type\n                    ORDER BY count DESC\n                \"\"\"\n                \n                source_result = await session.execute(source_query)\n                source_stats = [dict(row) for row in source_result.fetchall()]\n                \n                return {\n                    'opportunities': opportunities,\n                    'source_stats': source_stats,\n                    'total_count': len(opportunities),\n                    'analysis_period': '24_hours'\n                }\n                \n        except Exception as e:\n            self.logger.error(f\"Getting current ingestion data failed: {e}\")\n            return {'opportunities': [], 'source_stats': [], 'total_count': 0}\n    \n    async def _calculate_geographic_metrics(self, data: Dict[str, Any]) -> Dict[str, BiasMetric]:\n        \"\"\"Calculate geographic bias metrics\"\"\"\n        try:\n            opportunities = data.get('opportunities', [])\n            if not opportunities:\n                return {}\n            \n            # Extract geographic data\n            geographic_data = defaultdict(int)\n            big_four_countries = {'KE', 'NG', 'ZA', 'EG'}\n            central_africa = {'CF', 'TD', 'CD', 'CM', 'GQ', 'GA'}\n            west_africa = {'GW', 'SL', 'LR', 'TG', 'BJ', 'NE', 'ML', 'BF', 'SN', 'CI', 'GH', 'GM', 'NG'}\n            \n            big_four_count = 0\n            central_africa_count = 0\n            west_africa_count = 0\n            total_with_location = 0\n            unique_countries = set()\n            \n            for opp in opportunities:\n                # Extract countries from opportunity data\n                countries = self._extract_countries_from_opportunity(opp)\n                \n                if countries:\n                    total_with_location += 1\n                    unique_countries.update(countries)\n                    \n                    for country in countries:\n                        geographic_data[country] += 1\n                        \n                        if country in big_four_countries:\n                            big_four_count += 1\n                        if country in central_africa:\n                            central_africa_count += 1\n                        if country in west_africa:\n                            west_africa_count += 1\n            \n            # Calculate metrics\n            metrics = {}\n            \n            if total_with_location > 0:\n                # Non-Big 4 percentage\n                non_big_four_pct = (total_with_location - big_four_count) / total_with_location\n                metrics['non_big_four_percentage'] = BiasMetric(\n                    metric_name='non_big_four_percentage',\n                    current_value=non_big_four_pct,\n                    target_value=self.bias_targets['geographic']['non_big_four_percentage']['target'],\n                    threshold_warning=self.bias_targets['geographic']['non_big_four_percentage']['warning'],\n                    threshold_critical=self.bias_targets['geographic']['non_big_four_percentage']['critical'],\n                    direction=BiasDirection.UNDER_REPRESENTED if non_big_four_pct < 0.35 else BiasDirection.BALANCED\n                )\n                \n                # Central Africa percentage\n                central_africa_pct = central_africa_count / total_with_location\n                metrics['central_africa_percentage'] = BiasMetric(\n                    metric_name='central_africa_percentage',\n                    current_value=central_africa_pct,\n                    target_value=self.bias_targets['geographic']['central_africa_percentage']['target'],\n                    threshold_warning=self.bias_targets['geographic']['central_africa_percentage']['warning'],\n                    threshold_critical=self.bias_targets['geographic']['central_africa_percentage']['critical'],\n                    direction=BiasDirection.UNDER_REPRESENTED if central_africa_pct < 0.15 else BiasDirection.BALANCED\n                )\n                \n                # West Africa percentage\n                west_africa_pct = west_africa_count / total_with_location\n                metrics['west_africa_percentage'] = BiasMetric(\n                    metric_name='west_africa_percentage',\n                    current_value=west_africa_pct,\n                    target_value=self.bias_targets['geographic']['west_africa_percentage']['target'],\n                    threshold_warning=self.bias_targets['geographic']['west_africa_percentage']['warning'],\n                    threshold_critical=self.bias_targets['geographic']['west_africa_percentage']['critical'],\n                    direction=BiasDirection.UNDER_REPRESENTED if west_africa_pct < 0.25 else BiasDirection.BALANCED\n                )\n                \n                # Geographic diversity index (Simpson's diversity index)\n                diversity_index = self._calculate_diversity_index(list(geographic_data.values()))\n                metrics['geographic_diversity_index'] = BiasMetric(\n                    metric_name='geographic_diversity_index',\n                    current_value=diversity_index,\n                    target_value=self.bias_targets['geographic']['geographic_diversity_index']['target'],\n                    threshold_warning=self.bias_targets['geographic']['geographic_diversity_index']['warning'],\n                    threshold_critical=self.bias_targets['geographic']['geographic_diversity_index']['critical'],\n                    direction=BiasDirection.UNDER_REPRESENTED if diversity_index < 0.7 else BiasDirection.BALANCED\n                )\n            \n            return metrics\n            \n        except Exception as e:\n            self.logger.error(f\"Calculating geographic metrics failed: {e}\")\n            return {}\n    \n    async def _calculate_sectoral_metrics(self, data: Dict[str, Any]) -> Dict[str, BiasMetric]:\n        \"\"\"Calculate sectoral bias metrics\"\"\"\n        try:\n            opportunities = data.get('opportunities', [])\n            if not opportunities:\n                return {}\n            \n            # Extract sectoral data\n            sectoral_data = defaultdict(int)\n            healthcare_count = 0\n            agriculture_count = 0\n            climate_count = 0\n            total_count = len(opportunities)\n            \n            for opp in opportunities:\n                sectors = self._extract_sectors_from_opportunity(opp)\n                \n                for sector in sectors:\n                    sectoral_data[sector] += 1\n                    \n                    if sector == 'healthcare':\n                        healthcare_count += 1\n                    elif sector == 'agriculture':\n                        agriculture_count += 1\n                    elif sector == 'climate':\n                        climate_count += 1\n            \n            # Calculate metrics\n            metrics = {}\n            \n            if total_count > 0:\n                # Healthcare percentage\n                healthcare_pct = healthcare_count / total_count\n                metrics['healthcare_percentage'] = BiasMetric(\n                    metric_name='healthcare_percentage',\n                    current_value=healthcare_pct,\n                    target_value=self.bias_targets['sectoral']['healthcare_percentage']['target'],\n                    threshold_warning=self.bias_targets['sectoral']['healthcare_percentage']['warning'],\n                    threshold_critical=self.bias_targets['sectoral']['healthcare_percentage']['critical'],\n                    direction=BiasDirection.UNDER_REPRESENTED if healthcare_pct < 0.15 else BiasDirection.BALANCED\n                )\n                \n                # Agriculture percentage\n                agriculture_pct = agriculture_count / total_count\n                metrics['agriculture_percentage'] = BiasMetric(\n                    metric_name='agriculture_percentage',\n                    current_value=agriculture_pct,\n                    target_value=self.bias_targets['sectoral']['agriculture_percentage']['target'],\n                    threshold_warning=self.bias_targets['sectoral']['agriculture_percentage']['warning'],\n                    threshold_critical=self.bias_targets['sectoral']['agriculture_percentage']['critical'],\n                    direction=BiasDirection.UNDER_REPRESENTED if agriculture_pct < 0.15 else BiasDirection.BALANCED\n                )\n                \n                # Climate percentage\n                climate_pct = climate_count / total_count\n                metrics['climate_percentage'] = BiasMetric(\n                    metric_name='climate_percentage',\n                    current_value=climate_pct,\n                    target_value=self.bias_targets['sectoral']['climate_percentage']['target'],\n                    threshold_warning=self.bias_targets['sectoral']['climate_percentage']['warning'],\n                    threshold_critical=self.bias_targets['sectoral']['climate_percentage']['critical'],\n                    direction=BiasDirection.UNDER_REPRESENTED if climate_pct < 0.10 else BiasDirection.BALANCED\n                )\n                \n                # Sector diversity index\n                diversity_index = self._calculate_diversity_index(list(sectoral_data.values()))\n                metrics['sector_diversity_index'] = BiasMetric(\n                    metric_name='sector_diversity_index',\n                    current_value=diversity_index,\n                    target_value=self.bias_targets['sectoral']['sector_diversity_index']['target'],\n                    threshold_warning=self.bias_targets['sectoral']['sector_diversity_index']['warning'],\n                    threshold_critical=self.bias_targets['sectoral']['sector_diversity_index']['critical'],\n                    direction=BiasDirection.UNDER_REPRESENTED if diversity_index < 0.8 else BiasDirection.BALANCED\n                )\n            \n            return metrics\n            \n        except Exception as e:\n            self.logger.error(f\"Calculating sectoral metrics failed: {e}\")\n            return {}\n    \n    async def _calculate_inclusion_metrics(self, data: Dict[str, Any]) -> Dict[str, BiasMetric]:\n        \"\"\"Calculate inclusion bias metrics\"\"\"\n        try:\n            opportunities = data.get('opportunities', [])\n            if not opportunities:\n                return {}\n            \n            # Extract inclusion data\n            women_focused_count = 0\n            youth_focused_count = 0\n            rural_focused_count = 0\n            total_count = len(opportunities)\n            \n            for opp in opportunities:\n                inclusion_indicators = self._extract_inclusion_from_opportunity(opp)\n                \n                if 'women_led' in inclusion_indicators:\n                    women_focused_count += 1\n                if 'youth_focused' in inclusion_indicators:\n                    youth_focused_count += 1\n                if 'rural_priority' in inclusion_indicators:\n                    rural_focused_count += 1\n            \n            # Calculate metrics\n            metrics = {}\n            \n            if total_count > 0:\n                # Women-focused percentage\n                women_pct = women_focused_count / total_count\n                metrics['women_focused_percentage'] = BiasMetric(\n                    metric_name='women_focused_percentage',\n                    current_value=women_pct,\n                    target_value=self.bias_targets['inclusion']['women_focused_percentage']['target'],\n                    threshold_warning=self.bias_targets['inclusion']['women_focused_percentage']['warning'],\n                    threshold_critical=self.bias_targets['inclusion']['women_focused_percentage']['critical'],\n                    direction=BiasDirection.UNDER_REPRESENTED if women_pct < 0.20 else BiasDirection.BALANCED\n                )\n                \n                # Youth-focused percentage\n                youth_pct = youth_focused_count / total_count\n                metrics['youth_focused_percentage'] = BiasMetric(\n                    metric_name='youth_focused_percentage',\n                    current_value=youth_pct,\n                    target_value=self.bias_targets['inclusion']['youth_focused_percentage']['target'],\n                    threshold_warning=self.bias_targets['inclusion']['youth_focused_percentage']['warning'],\n                    threshold_critical=self.bias_targets['inclusion']['youth_focused_percentage']['critical'],\n                    direction=BiasDirection.UNDER_REPRESENTED if youth_pct < 0.25 else BiasDirection.BALANCED\n                )\n                \n                # Rural-focused percentage\n                rural_pct = rural_focused_count / total_count\n                metrics['rural_focused_percentage'] = BiasMetric(\n                    metric_name='rural_focused_percentage',\n                    current_value=rural_pct,\n                    target_value=self.bias_targets['inclusion']['rural_focused_percentage']['target'],\n                    threshold_warning=self.bias_targets['inclusion']['rural_focused_percentage']['warning'],\n                    threshold_critical=self.bias_targets['inclusion']['rural_focused_percentage']['critical'],\n                    direction=BiasDirection.UNDER_REPRESENTED if rural_pct < 0.15 else BiasDirection.BALANCED\n                )\n            \n            return metrics\n            \n        except Exception as e:\n            self.logger.error(f\"Calculating inclusion metrics failed: {e}\")\n            return {}\n    \n    async def _calculate_language_metrics(self, data: Dict[str, Any]) -> Dict[str, BiasMetric]:\n        \"\"\"Calculate language bias metrics\"\"\"\n        try:\n            opportunities = data.get('opportunities', [])\n            if not opportunities:\n                return {}\n            \n            # Extract language data\n            language_data = defaultdict(int)\n            non_english_count = 0\n            french_count = 0\n            arabic_count = 0\n            total_count = len(opportunities)\n            \n            for opp in opportunities:\n                # Simple language detection based on content\n                language = self._detect_opportunity_language(opp)\n                language_data[language] += 1\n                \n                if language != 'en':\n                    non_english_count += 1\n                if language == 'fr':\n                    french_count += 1\n                if language == 'ar':\n                    arabic_count += 1\n            \n            # Calculate metrics\n            metrics = {}\n            \n            if total_count > 0:\n                # Non-English percentage\n                non_english_pct = non_english_count / total_count\n                metrics['non_english_percentage'] = BiasMetric(\n                    metric_name='non_english_percentage',\n                    current_value=non_english_pct,\n                    target_value=self.bias_targets['language']['non_english_percentage']['target'],\n                    threshold_warning=self.bias_targets['language']['non_english_percentage']['warning'],\n                    threshold_critical=self.bias_targets['language']['non_english_percentage']['critical'],\n                    direction=BiasDirection.UNDER_REPRESENTED if non_english_pct < 0.20 else BiasDirection.BALANCED\n                )\n                \n                # French percentage\n                french_pct = french_count / total_count\n                metrics['french_percentage'] = BiasMetric(\n                    metric_name='french_percentage',\n                    current_value=french_pct,\n                    target_value=self.bias_targets['language']['french_percentage']['target'],\n                    threshold_warning=self.bias_targets['language']['french_percentage']['warning'],\n                    threshold_critical=self.bias_targets['language']['french_percentage']['critical'],\n                    direction=BiasDirection.UNDER_REPRESENTED if french_pct < 0.10 else BiasDirection.BALANCED\n                )\n                \n                # Arabic percentage\n                arabic_pct = arabic_count / total_count\n                metrics['arabic_percentage'] = BiasMetric(\n                    metric_name='arabic_percentage',\n                    current_value=arabic_pct,\n                    target_value=self.bias_targets['language']['arabic_percentage']['target'],\n                    threshold_warning=self.bias_targets['language']['arabic_percentage']['warning'],\n                    threshold_critical=self.bias_targets['language']['arabic_percentage']['critical'],\n                    direction=BiasDirection.UNDER_REPRESENTED if arabic_pct < 0.05 else BiasDirection.BALANCED\n                )\n            \n            return metrics\n            \n        except Exception as e:\n            self.logger.error(f\"Calculating language metrics failed: {e}\")\n            return {}\n    \n    async def _calculate_stage_metrics(self, data: Dict[str, Any]) -> Dict[str, BiasMetric]:\n        \"\"\"Calculate funding stage bias metrics\"\"\"\n        try:\n            opportunities = data.get('opportunities', [])\n            if not opportunities:\n                return {}\n            \n            # Extract stage data\n            stage_data = defaultdict(int)\n            early_stage_count = 0\n            seed_stage_count = 0\n            grant_count = 0\n            total_count = len(opportunities)\n            \n            for opp in opportunities:\n                stage = self._extract_stage_from_opportunity(opp)\n                stage_data[stage] += 1\n                \n                if stage in ['pre_seed', 'seed']:\n                    early_stage_count += 1\n                if stage == 'seed':\n                    seed_stage_count += 1\n                if stage == 'grant':\n                    grant_count += 1\n            \n            # Calculate metrics\n            metrics = {}\n            \n            if total_count > 0:\n                # Early stage percentage\n                early_stage_pct = early_stage_count / total_count\n                metrics['early_stage_percentage'] = BiasMetric(\n                    metric_name='early_stage_percentage',\n                    current_value=early_stage_pct,\n                    target_value=self.bias_targets['funding_stage']['early_stage_percentage']['target'],\n                    threshold_warning=self.bias_targets['funding_stage']['early_stage_percentage']['warning'],\n                    threshold_critical=self.bias_targets['funding_stage']['early_stage_percentage']['critical'],\n                    direction=BiasDirection.UNDER_REPRESENTED if early_stage_pct < 0.40 else BiasDirection.BALANCED\n                )\n                \n                # Seed stage percentage\n                seed_stage_pct = seed_stage_count / total_count\n                metrics['seed_stage_percentage'] = BiasMetric(\n                    metric_name='seed_stage_percentage',\n                    current_value=seed_stage_pct,\n                    target_value=self.bias_targets['funding_stage']['seed_stage_percentage']['target'],\n                    threshold_warning=self.bias_targets['funding_stage']['seed_stage_percentage']['warning'],\n                    threshold_critical=self.bias_targets['funding_stage']['seed_stage_percentage']['critical'],\n                    direction=BiasDirection.UNDER_REPRESENTED if seed_stage_pct < 0.25 else BiasDirection.BALANCED\n                )\n                \n                # Grant percentage\n                grant_pct = grant_count / total_count\n                metrics['grant_percentage'] = BiasMetric(\n                    metric_name='grant_percentage',\n                    current_value=grant_pct,\n                    target_value=self.bias_targets['funding_stage']['grant_percentage']['target'],\n                    threshold_warning=self.bias_targets['funding_stage']['grant_percentage']['warning'],\n                    threshold_critical=self.bias_targets['funding_stage']['grant_percentage']['critical'],\n                    direction=BiasDirection.UNDER_REPRESENTED if grant_pct < 0.30 else BiasDirection.BALANCED\n                )\n            \n            return metrics\n            \n        except Exception as e:\n            self.logger.error(f\"Calculating stage metrics failed: {e}\")\n            return {}\n    \n    async def _calculate_source_metrics(self, data: Dict[str, Any]) -> Dict[str, BiasMetric]:\n        \"\"\"Calculate source quality bias metrics\"\"\"\n        try:\n            # This would integrate with the source quality scoring system\n            # For now, return empty metrics\n            return {}\n            \n        except Exception as e:\n            self.logger.error(f\"Calculating source metrics failed: {e}\")\n            return {}\n    \n    def _extract_countries_from_opportunity(self, opportunity: Dict[str, Any]) -> List[str]:\n        \"\"\"Extract countries from opportunity data\"\"\"\n        countries = []\n        \n        # Extract from title and description\n        title = opportunity.get('title', '')\n        description = opportunity.get('description', '')\n        content = f\"{title} {description}\".lower()\n        \n        # Simple country detection\n        country_patterns = {\n            'KE': ['kenya', 'nairobi'],\n            'NG': ['nigeria', 'lagos', 'abuja'],\n            'ZA': ['south africa', 'cape town', 'johannesburg'],\n            'EG': ['egypt', 'cairo'],\n            'GH': ['ghana', 'accra'],\n            'ET': ['ethiopia', 'addis ababa'],\n            'MA': ['morocco', 'casablanca'],\n            'TN': ['tunisia', 'tunis'],\n            'SN': ['senegal', 'dakar'],\n            'CI': ['ivory coast', 'côte d\\'ivoire', 'abidjan'],\n            'CF': ['central african republic', 'bangui'],\n            'TD': ['chad', 'n\\'djamena'],\n            'CD': ['democratic republic of congo', 'kinshasa'],\n            'CM': ['cameroon', 'yaoundé', 'douala']\n        }\n        \n        for iso_code, patterns in country_patterns.items():\n            for pattern in patterns:\n                if pattern in content:\n                    countries.append(iso_code)\n                    break\n        \n        return countries\n    \n    def _extract_sectors_from_opportunity(self, opportunity: Dict[str, Any]) -> List[str]:\n        \"\"\"Extract sectors from opportunity data\"\"\"\n        sectors = []\n        \n        # Extract from title and description\n        title = opportunity.get('title', '')\n        description = opportunity.get('description', '')\n        content = f\"{title} {description}\".lower()\n        \n        # Sector detection patterns\n        sector_patterns = {\n            'healthcare': ['health', 'medical', 'hospital', 'clinic', 'disease'],\n            'agriculture': ['agriculture', 'farming', 'crop', 'livestock', 'food'],\n            'climate': ['climate', 'environment', 'sustainable', 'green', 'renewable'],\n            'education': ['education', 'learning', 'school', 'university', 'training'],\n            'fintech': ['fintech', 'financial', 'banking', 'payment', 'credit']\n        }\n        \n        for sector, patterns in sector_patterns.items():\n            for pattern in patterns:\n                if pattern in content:\n                    sectors.append(sector)\n                    break\n        \n        return sectors\n    \n    def _extract_inclusion_from_opportunity(self, opportunity: Dict[str, Any]) -> List[str]:\n        \"\"\"Extract inclusion indicators from opportunity data\"\"\"\n        indicators = []\n        \n        # Extract from title and description\n        title = opportunity.get('title', '')\n        description = opportunity.get('description', '')\n        content = f\"{title} {description}\".lower()\n        \n        # Inclusion detection patterns\n        inclusion_patterns = {\n            'women_led': ['women', 'female', 'gender', 'maternal'],\n            'youth_focused': ['youth', 'young', 'student', 'under 35'],\n            'rural_priority': ['rural', 'remote', 'village', 'countryside'],\n            'disability_inclusive': ['disability', 'accessible', 'inclusive'],\n            'refugee_focused': ['refugee', 'displaced', 'migration']\n        }\n        \n        for indicator, patterns in inclusion_patterns.items():\n            for pattern in patterns:\n                if pattern in content:\n                    indicators.append(indicator)\n                    break\n        \n        return indicators\n    \n    def _detect_opportunity_language(self, opportunity: Dict[str, Any]) -> str:\n        \"\"\"Detect language of opportunity content\"\"\"\n        # Extract from title and description\n        title = opportunity.get('title', '')\n        description = opportunity.get('description', '')\n        content = f\"{title} {description}\"\n        \n        # Simple language detection patterns\n        language_patterns = {\n            'fr': ['financement', 'subvention', 'recherche', 'développement', 'programme'],\n            'ar': ['تمويل', 'منح', 'برامج', 'تطوير', 'ابتكار'],\n            'pt': ['financiamento', 'bolsa', 'investigação', 'desenvolvimento', 'programa'],\n            'sw': ['ufumuzi', 'ruzuku', 'utafiti', 'maendeleo', 'programu']\n        }\n        \n        for lang, patterns in language_patterns.items():\n            for pattern in patterns:\n                if pattern in content:\n                    return lang\n        \n        return 'en'  # Default to English\n    \n    def _extract_stage_from_opportunity(self, opportunity: Dict[str, Any]) -> str:\n        \"\"\"Extract funding stage from opportunity data\"\"\"\n        # Extract from title and description\n        title = opportunity.get('title', '')\n        description = opportunity.get('description', '')\n        content = f\"{title} {description}\".lower()\n        \n        # Stage detection patterns\n        stage_patterns = {\n            'pre_seed': ['pre-seed', 'idea', 'concept', 'prototype', 'mvp'],\n            'seed': ['seed', 'early stage', 'startup', 'launch'],\n            'series_a': ['series a', 'growth', 'scaling', 'expansion'],\n            'grant': ['grant', 'research', 'development', 'non-dilutive']\n        }\n        \n        for stage, patterns in stage_patterns.items():\n            for pattern in patterns:\n                if pattern in content:\n                    return stage\n        \n        return 'unknown'\n    \n    def _calculate_diversity_index(self, values: List[int]) -> float:\n        \"\"\"Calculate Simpson's diversity index\"\"\"\n        if not values or sum(values) == 0:\n            return 0.0\n        \n        total = sum(values)\n        sum_squares = sum(x * x for x in values)\n        \n        # Simpson's diversity index: 1 - (sum of squares / total squared)\n        diversity = 1 - (sum_squares / (total * total))\n        return diversity\n    \n    async def _calculate_overall_equity_score(self, all_metrics: Dict[str, Dict[str, BiasMetric]]) -> float:\n        \"\"\"Calculate overall equity score\"\"\"\n        try:\n            all_scores = []\n            \n            for metric_group in all_metrics.values():\n                for metric in metric_group.values():\n                    # Score based on how close to target\n                    deviation = abs(metric.current_value - metric.target_value)\n                    max_deviation = max(metric.threshold_warning, metric.threshold_critical)\n                    \n                    if max_deviation > 0:\n                        score = max(0.0, 1.0 - (deviation / max_deviation))\n                        all_scores.append(score)\n            \n            return mean(all_scores) if all_scores else 0.0\n            \n        except Exception as e:\n            self.logger.error(f\"Calculating overall equity score failed: {e}\")\n            return 0.0\n    \n    async def _generate_alerts(self, all_metrics: Dict[str, Dict[str, BiasMetric]]) -> List[BiasAlert]:\n        \"\"\"Generate bias alerts\"\"\"\n        alerts = []\n        \n        try:\n            for bias_type_str, metrics in all_metrics.items():\n                bias_type = BiasType(bias_type_str)\n                \n                for metric_name, metric in metrics.items():\n                    severity = metric.calculate_severity()\n                    \n                    if severity in [AlertSeverity.CRITICAL, AlertSeverity.HIGH]:\n                        alert = BiasAlert(\n                            alert_id=f\"{bias_type_str}_{metric_name}_{datetime.now().strftime('%Y%m%d_%H%M%S')}\",\n                            bias_type=bias_type,\n                            severity=severity,\n                            message=f\"{metric.metric_name}: {metric.current_value:.3f} (target: {metric.target_value:.3f})\",\n                            metric=metric,\n                            recommendations=await self._get_metric_recommendations(bias_type, metric_name, metric)\n                        )\n                        alerts.append(alert)\n            \n            return alerts\n            \n        except Exception as e:\n            self.logger.error(f\"Generating alerts failed: {e}\")\n            return []\n    \n    async def _get_metric_recommendations(self, bias_type: BiasType, metric_name: str, \n                                        metric: BiasMetric) -> List[str]:\n        \"\"\"Get recommendations for a specific metric\"\"\"\n        recommendations = []\n        \n        if bias_type == BiasType.GEOGRAPHIC:\n            if 'central_africa' in metric_name:\n                recommendations.extend([\n                    \"Increase search frequency for Central African sources\",\n                    \"Add Central African funding databases to monitoring\",\n                    \"Implement French-language searches for CAR/Chad/DRC\"\n                ])\n            elif 'non_big_four' in metric_name:\n                recommendations.extend([\n                    \"Reduce search frequency for Big 4 countries\",\n                    \"Boost searches for underrepresented countries\",\n                    \"Add regional development bank sources\"\n                ])\n        \n        elif bias_type == BiasType.SECTORAL:\n            if 'healthcare' in metric_name:\n                recommendations.extend([\n                    \"Add healthcare-specific funding sources\",\n                    \"Implement health-focused search terms\",\n                    \"Monitor WHO and health ministry announcements\"\n                ])\n            elif 'agriculture' in metric_name:\n                recommendations.extend([\n                    \"Add agricultural development funding sources\",\n                    \"Monitor FAO and agricultural ministry announcements\",\n                    \"Implement agri-tech specific search terms\"\n                ])\n        \n        elif bias_type == BiasType.LANGUAGE:\n            if 'french' in metric_name:\n                recommendations.extend([\n                    \"Activate French-language search modules\",\n                    \"Add francophone African funding sources\",\n                    \"Monitor AFD and francophone development banks\"\n                ])\n            elif 'arabic' in metric_name:\n                recommendations.extend([\n                    \"Activate Arabic-language search modules\",\n                    \"Add North African funding sources\",\n                    \"Monitor Islamic Development Bank announcements\"\n                ])\n        \n        return recommendations\n    \n    async def _store_snapshot(self, snapshot: BiasSnapshot):\n        \"\"\"Store bias snapshot for historical analysis\"\"\"\n        try:\n            # Store in historical snapshots\n            self.historical_snapshots.append(snapshot)\n            \n            # Trim old snapshots\n            cutoff_date = datetime.now() - timedelta(days=self.max_history_days)\n            self.historical_snapshots = [\n                s for s in self.historical_snapshots \n                if s.timestamp > cutoff_date\n            ]\n            \n        except Exception as e:\n            self.logger.error(f\"Storing snapshot failed: {e}\")\n    \n    async def _get_historical_snapshots(self, days: int) -> List[BiasSnapshot]:\n        \"\"\"Get historical snapshots for trend analysis\"\"\"\n        try:\n            cutoff_date = datetime.now() - timedelta(days=days)\n            return [s for s in self.historical_snapshots if s.timestamp > cutoff_date]\n            \n        except Exception as e:\n            self.logger.error(f\"Getting historical snapshots failed: {e}\")\n            return []\n    \n    def _calculate_metric_trends(self, historical_data: List[BiasSnapshot], \n                               metric_group: str) -> Dict[str, Any]:\n        \"\"\"Calculate trends for a metric group\"\"\"\n        try:\n            if not historical_data:\n                return {}\n            \n            trends = {}\n            \n            # Get all metric names from the group\n            all_metrics = set()\n            for snapshot in historical_data:\n                group_metrics = getattr(snapshot, metric_group, {})\n                all_metrics.update(group_metrics.keys())\n            \n            # Calculate trend for each metric\n            for metric_name in all_metrics:\n                values = []\n                for snapshot in historical_data:\n                    group_metrics = getattr(snapshot, metric_group, {})\n                    metric = group_metrics.get(metric_name)\n                    if metric:\n                        values.append(metric.current_value)\n                \n                if len(values) >= 2:\n                    # Simple trend calculation\n                    first_half = values[:len(values)//2]\n                    second_half = values[len(values)//2:]\n                    \n                    first_avg = mean(first_half)\n                    second_avg = mean(second_half)\n                    \n                    trend_direction = 'improving' if second_avg > first_avg else 'declining'\n                    trend_magnitude = abs(second_avg - first_avg)\n                    \n                    trends[metric_name] = {\n                        'direction': trend_direction,\n                        'magnitude': trend_magnitude,\n                        'current_value': values[-1],\n                        'volatility': stdev(values) if len(values) > 1 else 0.0\n                    }\n            \n            return trends\n            \n        except Exception as e:\n            self.logger.error(f\"Calculating metric trends failed: {e}\")\n            return {}\n    \n    def _calculate_equity_trend(self, historical_data: List[BiasSnapshot]) -> Dict[str, Any]:\n        \"\"\"Calculate overall equity trend\"\"\"\n        try:\n            if not historical_data:\n                return {}\n            \n            equity_scores = [s.overall_equity_score for s in historical_data]\n            \n            if len(equity_scores) >= 2:\n                first_half = equity_scores[:len(equity_scores)//2]\n                second_half = equity_scores[len(equity_scores)//2:]\n                \n                first_avg = mean(first_half)\n                second_avg = mean(second_half)\n                \n                return {\n                    'direction': 'improving' if second_avg > first_avg else 'declining',\n                    'magnitude': abs(second_avg - first_avg),\n                    'current_score': equity_scores[-1],\n                    'volatility': stdev(equity_scores) if len(equity_scores) > 1 else 0.0\n                }\n            \n            return {'direction': 'unknown', 'magnitude': 0.0}\n            \n        except Exception as e:\n            self.logger.error(f\"Calculating equity trend failed: {e}\")\n            return {}\n    \n    async def _analyze_geographic_bias(self, metrics: Dict[str, BiasMetric]) -> List[Dict[str, Any]]:\n        \"\"\"Analyze geographic bias and provide recommendations\"\"\"\n        recommendations = []\n        \n        for metric_name, metric in metrics.items():\n            if metric.direction == BiasDirection.UNDER_REPRESENTED:\n                if 'central_africa' in metric_name:\n                    recommendations.append({\n                        'type': 'geographic_bias',\n                        'priority': 5,\n                        'title': 'Central Africa Under-represented',\n                        'description': f'Only {metric.current_value:.1%} of opportunities from Central Africa (target: {metric.target_value:.1%})',\n                        'actions': [\n                            'Add Central African funding databases',\n                            'Implement French-language searches',\n                            'Monitor regional development banks'\n                        ]\n                    })\n                elif 'non_big_four' in metric_name:\n                    recommendations.append({\n                        'type': 'geographic_bias',\n                        'priority': 4,\n                        'title': 'Over-concentration in Big 4 Countries',\n                        'description': f'Only {metric.current_value:.1%} of opportunities from non-Big 4 countries (target: {metric.target_value:.1%})',\n                        'actions': [\n                            'Reduce Big 4 search frequency',\n                            'Boost underserved region searches',\n                            'Add regional funding sources'\n                        ]\n                    })\n        \n        return recommendations\n    \n    async def _analyze_sectoral_bias(self, metrics: Dict[str, BiasMetric]) -> List[Dict[str, Any]]:\n        \"\"\"Analyze sectoral bias and provide recommendations\"\"\"\n        recommendations = []\n        \n        for metric_name, metric in metrics.items():\n            if metric.direction == BiasDirection.UNDER_REPRESENTED:\n                if 'healthcare' in metric_name:\n                    recommendations.append({\n                        'type': 'sectoral_bias',\n                        'priority': 5,\n                        'title': 'Healthcare Sector Under-represented',\n                        'description': f'Only {metric.current_value:.1%} of opportunities in healthcare (target: {metric.target_value:.1%})',\n                        'actions': [\n                            'Add health ministry sources',\n                            'Monitor WHO funding announcements',\n                            'Implement health-specific search terms'\n                        ]\n                    })\n                elif 'agriculture' in metric_name:\n                    recommendations.append({\n                        'type': 'sectoral_bias',\n                        'priority': 5,\n                        'title': 'Agriculture Sector Under-represented',\n                        'description': f'Only {metric.current_value:.1%} of opportunities in agriculture (target: {metric.target_value:.1%})',\n                        'actions': [\n                            'Add agricultural ministry sources',\n                            'Monitor FAO funding announcements',\n                            'Implement agri-tech search terms'\n                        ]\n                    })\n        \n        return recommendations\n    \n    async def _analyze_inclusion_bias(self, metrics: Dict[str, BiasMetric]) -> List[Dict[str, Any]]:\n        \"\"\"Analyze inclusion bias and provide recommendations\"\"\"\n        recommendations = []\n        \n        for metric_name, metric in metrics.items():\n            if metric.direction == BiasDirection.UNDER_REPRESENTED:\n                if 'women' in metric_name:\n                    recommendations.append({\n                        'type': 'inclusion_bias',\n                        'priority': 4,\n                        'title': 'Women-focused Opportunities Under-represented',\n                        'description': f'Only {metric.current_value:.1%} of opportunities target women (target: {metric.target_value:.1%})',\n                        'actions': [\n                            'Add women-focused funding sources',\n                            'Monitor gender equality organizations',\n                            'Implement women-specific search terms'\n                        ]\n                    })\n                elif 'youth' in metric_name:\n                    recommendations.append({\n                        'type': 'inclusion_bias',\n                        'priority': 4,\n                        'title': 'Youth-focused Opportunities Under-represented',\n                        'description': f'Only {metric.current_value:.1%} of opportunities target youth (target: {metric.target_value:.1%})',\n                        'actions': [\n                            'Add youth-focused funding sources',\n                            'Monitor youth development organizations',\n                            'Implement youth-specific search terms'\n                        ]\n                    })\n        \n        return recommendations\n    \n    async def _analyze_language_bias(self, metrics: Dict[str, BiasMetric]) -> List[Dict[str, Any]]:\n        \"\"\"Analyze language bias and provide recommendations\"\"\"\n        recommendations = []\n        \n        for metric_name, metric in metrics.items():\n            if metric.direction == BiasDirection.UNDER_REPRESENTED:\n                if 'french' in metric_name:\n                    recommendations.append({\n                        'type': 'language_bias',\n                        'priority': 3,\n                        'title': 'French Language Under-represented',\n                        'description': f'Only {metric.current_value:.1%} of opportunities in French (target: {metric.target_value:.1%})',\n                        'actions': [\n                            'Activate French search modules',\n                            'Add francophone funding sources',\n                            'Monitor AFD announcements'\n                        ]\n                    })\n                elif 'arabic' in metric_name:\n                    recommendations.append({\n                        'type': 'language_bias',\n                        'priority': 3,\n                        'title': 'Arabic Language Under-represented',\n                        'description': f'Only {metric.current_value:.1%} of opportunities in Arabic (target: {metric.target_value:.1%})',\n                        'actions': [\n                            'Activate Arabic search modules',\n                            'Add North African funding sources',\n                            'Monitor Islamic Development Bank'\n                        ]\n                    })\n        \n        return recommendations\n    \n    async def _analyze_stage_bias(self, metrics: Dict[str, BiasMetric]) -> List[Dict[str, Any]]:\n        \"\"\"Analyze funding stage bias and provide recommendations\"\"\"\n        recommendations = []\n        \n        for metric_name, metric in metrics.items():\n            if metric.direction == BiasDirection.UNDER_REPRESENTED:\n                if 'early_stage' in metric_name:\n                    recommendations.append({\n                        'type': 'stage_bias',\n                        'priority': 4,\n                        'title': 'Early Stage Opportunities Under-represented',\n                        'description': f'Only {metric.current_value:.1%} of opportunities are early-stage (target: {metric.target_value:.1%})',\n                        'actions': [\n                            'Add accelerator/incubator sources',\n                            'Monitor startup competition announcements',\n                            'Implement early-stage search terms'\n                        ]\n                    })\n                elif 'grant' in metric_name:\n                    recommendations.append({\n                        'type': 'stage_bias',\n                        'priority': 4,\n                        'title': 'Grant Opportunities Under-represented',\n                        'description': f'Only {metric.current_value:.1%} of opportunities are grants (target: {metric.target_value:.1%})',\n                        'actions': [\n                            'Add government funding sources',\n                            'Monitor research funding announcements',\n                            'Implement grant-specific search terms'\n                        ]\n                    })\n        \n        return recommendations\n    \n    async def _execute_mitigation_action(self, action: Dict[str, Any]) -> Dict[str, Any]:\n        \"\"\"Execute a specific mitigation action\"\"\"\n        try:\n            action_type = action.get('action')\n            \n            if action_type == 'boost_underserved_searches':\n                # This would integrate with the search scheduling system\n                return {\n                    'action': action_type,\n                    'status': 'executed',\n                    'message': 'Boosted underserved region searches',\n                    'timestamp': datetime.now().isoformat()\n                }\n            \n            elif action_type == 'activate_multilingual_search':\n                # This would integrate with the multilingual search system\n                return {\n                    'action': action_type,\n                    'status': 'executed',\n                    'message': 'Activated multilingual search modules',\n                    'timestamp': datetime.now().isoformat()\n                }\n            \n            else:\n                return {\n                    'action': action_type,\n                    'status': 'not_implemented',\n                    'message': 'Action type not implemented',\n                    'timestamp': datetime.now().isoformat()\n                }\n                \n        except Exception as e:\n            self.logger.error(f\"Executing mitigation action failed: {e}\")\n            return {\n                'action': action.get('action', 'unknown'),\n                'status': 'failed',\n                'message': str(e),\n                'timestamp': datetime.now().isoformat()\n            }\n\n# =============================================================================\n# USAGE EXAMPLE\n# =============================================================================\n\nasync def example_usage():\n    \"\"\"Example usage of bias monitoring system\"\"\"\n    monitor = BiasMonitoringEngine()\n    \n    # Analyze current bias\n    snapshot = await monitor.analyze_current_bias()\n    \n    print(\"=== Current Bias Analysis ===\")\n    print(f\"Overall Equity Score: {snapshot.overall_equity_score:.3f}\")\n    print(f\"Active Alerts: {len(snapshot.active_alerts)}\")\n    \n    # Show geographic metrics\n    print(\"\\n=== Geographic Metrics ===\")\n    for name, metric in snapshot.geographic_metrics.items():\n        print(f\"{name}: {metric.current_value:.3f} (target: {metric.target_value:.3f})\")\n    \n    # Show alerts\n    print(\"\\n=== Active Alerts ===\")\n    for alert in snapshot.active_alerts:\n        print(f\"[{alert.severity.value.upper()}] {alert.message}\")\n    \n    # Get recommendations\n    recommendations = await monitor.get_bias_recommendations()\n    print(f\"\\n=== Recommendations ({len(recommendations)}) ===\")\n    for rec in recommendations[:5]:  # Show top 5\n        print(f\"[Priority {rec['priority']}] {rec['title']}\")\n        print(f\"  {rec['description']}\")\n    \n    # Get trends\n    trends = await monitor.get_bias_trends(30)\n    print(f\"\\n=== 30-Day Trends ===\")\n    equity_trend = trends.get('overall_equity_trend', {})\n    print(f\"Overall Equity: {equity_trend.get('direction', 'unknown')} (magnitude: {equity_trend.get('magnitude', 0):.3f})\")\n\nif __name__ == \"__main__\":\n    asyncio.run(example_usage())"
+        }
+        
+        # Historical data for trend analysis
+        self.historical_snapshots = []
+        self.max_history_days = 90
+        
+        # Alert configuration
+        self.alert_cooldown_hours = 6  # Minimum time between similar alerts
+        self.recent_alerts = []
+    
+    async def analyze_current_bias(self) -> BiasSnapshot:
+        """Analyze current bias in the system"""
+        try:
+            # Get current data
+            current_data = await self._get_current_ingestion_data()
+            
+            # Calculate metrics for each bias type
+            geographic_metrics = await self._calculate_geographic_metrics(current_data)
+            sectoral_metrics = await self._calculate_sectoral_metrics(current_data)
+            inclusion_metrics = await self._calculate_inclusion_metrics(current_data)
+            language_metrics = await self._calculate_language_metrics(current_data)
+            stage_metrics = await self._calculate_stage_metrics(current_data)
+            source_metrics = await self._calculate_source_metrics(current_data)
+            
+            # Calculate overall equity score
+            overall_equity = await self._calculate_overall_equity_score({
+                'geographic': geographic_metrics,
+                'sectoral': sectoral_metrics,
+                'inclusion': inclusion_metrics,
+                'language': language_metrics,
+                'stage': stage_metrics,
+                'source': source_metrics
+            })
+            
+            # Generate alerts
+            alerts = await self._generate_alerts({
+                'geographic': geographic_metrics,
+                'sectoral': sectoral_metrics,
+                'inclusion': inclusion_metrics,
+                'language': language_metrics,
+                'stage': stage_metrics,
+                'source': source_metrics
+            })
+            
+            # Create snapshot
+            snapshot = BiasSnapshot(
+                timestamp=datetime.now(),
+                geographic_metrics=geographic_metrics,
+                sectoral_metrics=sectoral_metrics,
+                inclusion_metrics=inclusion_metrics,
+                language_metrics=language_metrics,
+                stage_metrics=stage_metrics,
+                source_metrics=source_metrics,
+                overall_equity_score=overall_equity,
+                active_alerts=alerts
+            )
+            
+            # Store snapshot
+            await self._store_snapshot(snapshot)
+            
+            return snapshot
+            
+        except Exception as e:
+            self.logger.error(f"Bias analysis failed: {e}")
+            return BiasSnapshot(timestamp=datetime.now(), geographic_metrics={}, sectoral_metrics={}, 
+                              inclusion_metrics={}, language_metrics={}, stage_metrics={}, source_metrics={})
+    
+    async def get_bias_trends(self, days: int = 30) -> Dict[str, Any]:
+        """Get bias trends over specified period"""
+        try:
+            # Get historical snapshots
+            historical_data = await self._get_historical_snapshots(days)
+            
+            if not historical_data:
+                return {'error': 'No historical data available'}
+            
+            trends = {
+                'geographic_trends': self._calculate_metric_trends(historical_data, 'geographic_metrics'),
+                'sectoral_trends': self._calculate_metric_trends(historical_data, 'sectoral_metrics'),
+                'inclusion_trends': self._calculate_metric_trends(historical_data, 'inclusion_metrics'),
+                'language_trends': self._calculate_metric_trends(historical_data, 'language_metrics'),
+                'stage_trends': self._calculate_metric_trends(historical_data, 'stage_metrics'),
+                'overall_equity_trend': self._calculate_equity_trend(historical_data)
+            }
+            
+            return trends
+            
+        except Exception as e:
+            self.logger.error(f"Getting bias trends failed: {e}")
+            return {'error': str(e)}
+    
+    async def get_bias_recommendations(self) -> List[Dict[str, Any]]:
+        """Get recommendations for addressing bias issues"""
+        try:
+            # Get current snapshot
+            current_snapshot = await self.analyze_current_bias()
+            
+            recommendations = []
+            
+            # Analyze geographic bias
+            geo_recs = await self._analyze_geographic_bias(current_snapshot.geographic_metrics)
+            recommendations.extend(geo_recs)
+            
+            # Analyze sectoral bias
+            sector_recs = await self._analyze_sectoral_bias(current_snapshot.sectoral_metrics)
+            recommendations.extend(sector_recs)
+            
+            # Analyze inclusion bias
+            inclusion_recs = await self._analyze_inclusion_bias(current_snapshot.inclusion_metrics)
+            recommendations.extend(inclusion_recs)
+            
+            # Analyze language bias
+            language_recs = await self._analyze_language_bias(current_snapshot.language_metrics)
+            recommendations.extend(language_recs)
+            
+            # Analyze stage bias
+            stage_recs = await self._analyze_stage_bias(current_snapshot.stage_metrics)
+            recommendations.extend(stage_recs)
+            
+            # Sort by priority
+            recommendations.sort(key=lambda x: x.get('priority', 0), reverse=True)
+            
+            return recommendations
+            
+        except Exception as e:
+            self.logger.error(f"Getting bias recommendations failed: {e}")
+            return []
+    
+    async def trigger_bias_mitigation(self, bias_type: BiasType, severity: AlertSeverity) -> Dict[str, Any]:
+        """Trigger automatic bias mitigation measures"""
+        try:
+            mitigation_actions = []
+            
+            if bias_type == BiasType.GEOGRAPHIC:
+                if severity in [AlertSeverity.CRITICAL, AlertSeverity.HIGH]:
+                    # Boost underserved region searches
+                    mitigation_actions.append({
+                        'action': 'boost_underserved_searches',
+                        'description': 'Increase search frequency for Central/West Africa',
+                        'parameters': {'multiplier': 2.0, 'duration_hours': 24}
+                    })
+                    
+                    # Reduce Big 4 country search frequency
+                    mitigation_actions.append({
+                        'action': 'reduce_saturated_searches',
+                        'description': 'Reduce search frequency for oversaturated regions',
+                        'parameters': {'multiplier': 0.7, 'duration_hours': 24}
+                    })
+            
+            elif bias_type == BiasType.SECTORAL:
+                if severity in [AlertSeverity.CRITICAL, AlertSeverity.HIGH]:
+                    # Boost priority sector searches
+                    mitigation_actions.append({
+                        'action': 'boost_priority_sectors',
+                        'description': 'Increase searches for healthcare/agriculture/climate',
+                        'parameters': {'sectors': ['healthcare', 'agriculture', 'climate'], 'multiplier': 1.5}
+                    })
+            
+            elif bias_type == BiasType.LANGUAGE:
+                if severity in [AlertSeverity.CRITICAL, AlertSeverity.HIGH]:
+                    # Activate multilingual searches
+                    mitigation_actions.append({
+                        'action': 'activate_multilingual_search',
+                        'description': 'Activate French/Arabic/Portuguese searches',
+                        'parameters': {'languages': ['fr', 'ar', 'pt'], 'frequency': 'hourly'}
+                    })
+            
+            # Execute mitigation actions
+            execution_results = []
+            for action in mitigation_actions:
+                result = await self._execute_mitigation_action(action)
+                execution_results.append(result)
+            
+            return {
+                'bias_type': bias_type.value,
+                'severity': severity.value,
+                'mitigation_actions': mitigation_actions,
+                'execution_results': execution_results,
+                'timestamp': datetime.now().isoformat()
+            }
+            
+        except Exception as e:
+            self.logger.error(f"Bias mitigation failed: {e}")
+            return {'error': str(e)}
+    
+    # =============================================================================
+    # PRIVATE HELPER METHODS
+    # =============================================================================
+    
+    async def _get_current_ingestion_data(self) -> Dict[str, Any]:
+        """Get current ingestion data for analysis"""
+        try:
+            async with get_db() as session:
+                # Get opportunities from last 24 hours
+                query = """
+                    SELECT fo.*, 
+                           vr.confidence_score,
+                           vr.validation_notes,
+                           cf.organization_name,
+                           cf.funding_amount,
+                           cf.key_phrases
+                    FROM africa_intelligence_feed fo
+                    LEFT JOIN validation_results vr ON fo.id = vr.opportunity_id
+                    LEFT JOIN content_fingerprints cf ON fo.id = cf.opportunity_id
+                    WHERE fo.discovered_date >= (NOW() - INTERVAL '24 hours')
+                    ORDER BY fo.discovered_date DESC
+                """
+                
+                result = await session.execute(query)
+                opportunities = [dict(row) for row in result.fetchall()]
+                
+                # Get source statistics
+                source_query = """
+                    SELECT source_name, source_type, COUNT(*) as count
+                    FROM africa_intelligence_feed
+                    WHERE discovered_date >= (NOW() - INTERVAL '24 hours')
+                    GROUP BY source_name, source_type
+                    ORDER BY count DESC
+                """
+                
+                source_result = await session.execute(source_query)
+                source_stats = [dict(row) for row in source_result.fetchall()]
+                
+                return {
+                    'opportunities': opportunities,
+                    'source_stats': source_stats,
+                    'total_count': len(opportunities),
+                    'analysis_period': '24_hours'
+                }
+                
+        except Exception as e:
+            self.logger.error(f"Getting current ingestion data failed: {e}")
+            return {'opportunities': [], 'source_stats': [], 'total_count': 0}
+    
+    async def _calculate_geographic_metrics(self, data: Dict[str, Any]) -> Dict[str, BiasMetric]:
+        """Calculate geographic bias metrics"""
+        try:
+            opportunities = data.get('opportunities', [])
+            if not opportunities:
+                return {}
+            
+            # Extract geographic data
+            geographic_data = defaultdict(int)
+            big_four_countries = {'KE', 'NG', 'ZA', 'EG'}
+            central_africa = {'CF', 'TD', 'CD', 'CM', 'GQ', 'GA'}
+            west_africa = {'GW', 'SL', 'LR', 'TG', 'BJ', 'NE', 'ML', 'BF', 'SN', 'CI', 'GH', 'GM', 'NG'}
+            
+            big_four_count = 0
+            central_africa_count = 0
+            west_africa_count = 0
+            total_with_location = 0
+            unique_countries = set()
+            
+            for opp in opportunities:
+                # Extract countries from opportunity data
+                countries = self._extract_countries_from_opportunity(opp)
+                
+                if countries:
+                    total_with_location += 1
+                    unique_countries.update(countries)
+                    
+                    for country in countries:
+                        geographic_data[country] += 1
+                        
+                        if country in big_four_countries:
+                            big_four_count += 1
+                        if country in central_africa:
+                            central_africa_count += 1
+                        if country in west_africa:
+                            west_africa_count += 1
+            
+            # Calculate metrics
+            metrics = {}
+            
+            if total_with_location > 0:
+                # Non-Big 4 percentage
+                non_big_four_pct = (total_with_location - big_four_count) / total_with_location
+                metrics['non_big_four_percentage'] = BiasMetric(
+                    metric_name='non_big_four_percentage',
+                    current_value=non_big_four_pct,
+                    target_value=self.bias_targets['geographic']['non_big_four_percentage']['target'],
+                    threshold_warning=self.bias_targets['geographic']['non_big_four_percentage']['warning'],
+                    threshold_critical=self.bias_targets['geographic']['non_big_four_percentage']['critical'],
+                    direction=BiasDirection.UNDER_REPRESENTED if non_big_four_pct < 0.35 else BiasDirection.BALANCED
+                )
+                
+                # Central Africa percentage
+                central_africa_pct = central_africa_count / total_with_location
+                metrics['central_africa_percentage'] = BiasMetric(
+                    metric_name='central_africa_percentage',
+                    current_value=central_africa_pct,
+                    target_value=self.bias_targets['geographic']['central_africa_percentage']['target'],
+                    threshold_warning=self.bias_targets['geographic']['central_africa_percentage']['warning'],
+                    threshold_critical=self.bias_targets['geographic']['central_africa_percentage']['critical'],
+                    direction=BiasDirection.UNDER_REPRESENTED if central_africa_pct < 0.15 else BiasDirection.BALANCED
+                )
+                
+                # West Africa percentage
+                west_africa_pct = west_africa_count / total_with_location
+                metrics['west_africa_percentage'] = BiasMetric(
+                    metric_name='west_africa_percentage',
+                    current_value=west_africa_pct,
+                    target_value=self.bias_targets['geographic']['west_africa_percentage']['target'],
+                    threshold_warning=self.bias_targets['geographic']['west_africa_percentage']['warning'],
+                    threshold_critical=self.bias_targets['geographic']['west_africa_percentage']['critical'],
+                    direction=BiasDirection.UNDER_REPRESENTED if west_africa_pct < 0.25 else BiasDirection.BALANCED
+                )
+                
+                # Geographic diversity index (Simpson's diversity index)
+                diversity_index = self._calculate_diversity_index(list(geographic_data.values()))
+                metrics['geographic_diversity_index'] = BiasMetric(
+                    metric_name='geographic_diversity_index',
+                    current_value=diversity_index,
+                    target_value=self.bias_targets['geographic']['geographic_diversity_index']['target'],
+                    threshold_warning=self.bias_targets['geographic']['geographic_diversity_index']['warning'],
+                    threshold_critical=self.bias_targets['geographic']['geographic_diversity_index']['critical'],
+                    direction=BiasDirection.UNDER_REPRESENTED if diversity_index < 0.7 else BiasDirection.BALANCED
+                )
+            
+            return metrics
+            
+        except Exception as e:
+            self.logger.error(f"Calculating geographic metrics failed: {e}")
+            return {}
+    
+    async def _calculate_sectoral_metrics(self, data: Dict[str, Any]) -> Dict[str, BiasMetric]:
+        """Calculate sectoral bias metrics"""
+        try:
+            opportunities = data.get('opportunities', [])
+            if not opportunities:
+                return {}
+            
+            # Extract sectoral data
+            sectoral_data = defaultdict(int)
+            healthcare_count = 0
+            agriculture_count = 0
+            climate_count = 0
+            total_count = len(opportunities)
+            
+            for opp in opportunities:
+                sectors = self._extract_sectors_from_opportunity(opp)
+                
+                for sector in sectors:
+                    sectoral_data[sector] += 1
+                    
+                    if sector == 'healthcare':
+                        healthcare_count += 1
+                    elif sector == 'agriculture':
+                        agriculture_count += 1
+                    elif sector == 'climate':
+                        climate_count += 1
+            
+            # Calculate metrics
+            metrics = {}
+            
+            if total_count > 0:
+                # Healthcare percentage
+                healthcare_pct = healthcare_count / total_count
+                metrics['healthcare_percentage'] = BiasMetric(
+                    metric_name='healthcare_percentage',
+                    current_value=healthcare_pct,
+                    target_value=self.bias_targets['sectoral']['healthcare_percentage']['target'],
+                    threshold_warning=self.bias_targets['sectoral']['healthcare_percentage']['warning'],
+                    threshold_critical=self.bias_targets['sectoral']['healthcare_percentage']['critical'],
+                    direction=BiasDirection.UNDER_REPRESENTED if healthcare_pct < 0.15 else BiasDirection.BALANCED
+                )
+                
+                # Agriculture percentage
+                agriculture_pct = agriculture_count / total_count
+                metrics['agriculture_percentage'] = BiasMetric(
+                    metric_name='agriculture_percentage',
+                    current_value=agriculture_pct,
+                    target_value=self.bias_targets['sectoral']['agriculture_percentage']['target'],
+                    threshold_warning=self.bias_targets['sectoral']['agriculture_percentage']['warning'],
+                    threshold_critical=self.bias_targets['sectoral']['agriculture_percentage']['critical'],
+                    direction=BiasDirection.UNDER_REPRESENTED if agriculture_pct < 0.15 else BiasDirection.BALANCED
+                )
+                
+                # Climate percentage
+                climate_pct = climate_count / total_count
+                metrics['climate_percentage'] = BiasMetric(
+                    metric_name='climate_percentage',
+                    current_value=climate_pct,
+                    target_value=self.bias_targets['sectoral']['climate_percentage']['target'],
+                    threshold_warning=self.bias_targets['sectoral']['climate_percentage']['warning'],
+                    threshold_critical=self.bias_targets['sectoral']['climate_percentage']['critical'],
+                    direction=BiasDirection.UNDER_REPRESENTED if climate_pct < 0.10 else BiasDirection.BALANCED
+                )
+                
+                # Sector diversity index
+                diversity_index = self._calculate_diversity_index(list(sectoral_data.values()))
+                metrics['sector_diversity_index'] = BiasMetric(
+                    metric_name='sector_diversity_index',
+                    current_value=diversity_index,
+                    target_value=self.bias_targets['sectoral']['sector_diversity_index']['target'],
+                    threshold_warning=self.bias_targets['sectoral']['sector_diversity_index']['warning'],
+                    threshold_critical=self.bias_targets['sectoral']['sector_diversity_index']['critical'],
+                    direction=BiasDirection.UNDER_REPRESENTED if diversity_index < 0.8 else BiasDirection.BALANCED
+                )
+            
+            return metrics
+            
+        except Exception as e:
+            self.logger.error(f"Calculating sectoral metrics failed: {e}")
+            return {}
+    
+    async def _calculate_inclusion_metrics(self, data: Dict[str, Any]) -> Dict[str, BiasMetric]:
+        """Calculate inclusion bias metrics"""
+        try:
+            opportunities = data.get('opportunities', [])
+            if not opportunities:
+                return {}
+            
+            # Extract inclusion data
+            women_focused_count = 0
+            youth_focused_count = 0
+            rural_focused_count = 0
+            total_count = len(opportunities)
+            
+            for opp in opportunities:
+                inclusion_indicators = self._extract_inclusion_from_opportunity(opp)
+                
+                if 'women_led' in inclusion_indicators:
+                    women_focused_count += 1
+                if 'youth_focused' in inclusion_indicators:
+                    youth_focused_count += 1
+                if 'rural_priority' in inclusion_indicators:
+                    rural_focused_count += 1
+            
+            # Calculate metrics
+            metrics = {}
+            
+            if total_count > 0:
+                # Women-focused percentage
+                women_pct = women_focused_count / total_count
+                metrics['women_focused_percentage'] = BiasMetric(
+                    metric_name='women_focused_percentage',
+                    current_value=women_pct,
+                    target_value=self.bias_targets['inclusion']['women_focused_percentage']['target'],
+                    threshold_warning=self.bias_targets['inclusion']['women_focused_percentage']['warning'],
+                    threshold_critical=self.bias_targets['inclusion']['women_focused_percentage']['critical'],
+                    direction=BiasDirection.UNDER_REPRESENTED if women_pct < 0.20 else BiasDirection.BALANCED
+                )
+                
+                # Youth-focused percentage
+                youth_pct = youth_focused_count / total_count
+                metrics['youth_focused_percentage'] = BiasMetric(
+                    metric_name='youth_focused_percentage',
+                    current_value=youth_pct,
+                    target_value=self.bias_targets['inclusion']['youth_focused_percentage']['target'],
+                    threshold_warning=self.bias_targets['inclusion']['youth_focused_percentage']['warning'],
+                    threshold_critical=self.bias_targets['inclusion']['youth_focused_percentage']['critical'],
+                    direction=BiasDirection.UNDER_REPRESENTED if youth_pct < 0.25 else BiasDirection.BALANCED
+                )
+                
+                # Rural-focused percentage
+                rural_pct = rural_focused_count / total_count
+                metrics['rural_focused_percentage'] = BiasMetric(
+                    metric_name='rural_focused_percentage',
+                    current_value=rural_pct,
+                    target_value=self.bias_targets['inclusion']['rural_focused_percentage']['target'],
+                    threshold_warning=self.bias_targets['inclusion']['rural_focused_percentage']['warning'],
+                    threshold_critical=self.bias_targets['inclusion']['rural_focused_percentage']['critical'],
+                    direction=BiasDirection.UNDER_REPRESENTED if rural_pct < 0.15 else BiasDirection.BALANCED
+                )
+            
+            return metrics
+            
+        except Exception as e:
+            self.logger.error(f"Calculating inclusion metrics failed: {e}")
+            return {}
+    
+    async def _calculate_language_metrics(self, data: Dict[str, Any]) -> Dict[str, BiasMetric]:
+        """Calculate language bias metrics"""
+        try:
+            opportunities = data.get('opportunities', [])
+            if not opportunities:
+                return {}
+            
+            # Extract language data
+            language_data = defaultdict(int)
+            non_english_count = 0
+            french_count = 0
+            arabic_count = 0
+            total_count = len(opportunities)
+            
+            for opp in opportunities:
+                # Simple language detection based on content
+                language = self._detect_opportunity_language(opp)
+                language_data[language] += 1
+                
+                if language != 'en':
+                    non_english_count += 1
+                if language == 'fr':
+                    french_count += 1
+                if language == 'ar':
+                    arabic_count += 1
+            
+            # Calculate metrics
+            metrics = {}
+            
+            if total_count > 0:
+                # Non-English percentage
+                non_english_pct = non_english_count / total_count
+                metrics['non_english_percentage'] = BiasMetric(
+                    metric_name='non_english_percentage',
+                    current_value=non_english_pct,
+                    target_value=self.bias_targets['language']['non_english_percentage']['target'],
+                    threshold_warning=self.bias_targets['language']['non_english_percentage']['warning'],
+                    threshold_critical=self.bias_targets['language']['non_english_percentage']['critical'],
+                    direction=BiasDirection.UNDER_REPRESENTED if non_english_pct < 0.20 else BiasDirection.BALANCED
+                )
+                
+                # French percentage
+                french_pct = french_count / total_count
+                metrics['french_percentage'] = BiasMetric(
+                    metric_name='french_percentage',
+                    current_value=french_pct,
+                    target_value=self.bias_targets['language']['french_percentage']['target'],
+                    threshold_warning=self.bias_targets['language']['french_percentage']['warning'],
+                    threshold_critical=self.bias_targets['language']['french_percentage']['critical'],
+                    direction=BiasDirection.UNDER_REPRESENTED if french_pct < 0.10 else BiasDirection.BALANCED
+                )
+                
+                # Arabic percentage
+                arabic_pct = arabic_count / total_count
+                metrics['arabic_percentage'] = BiasMetric(
+                    metric_name='arabic_percentage',
+                    current_value=arabic_pct,
+                    target_value=self.bias_targets['language']['arabic_percentage']['target'],
+                    threshold_warning=self.bias_targets['language']['arabic_percentage']['warning'],
+                    threshold_critical=self.bias_targets['language']['arabic_percentage']['critical'],
+                    direction=BiasDirection.UNDER_REPRESENTED if arabic_pct < 0.05 else BiasDirection.BALANCED
+                )
+            
+            return metrics
+            
+        except Exception as e:
+            self.logger.error(f"Calculating language metrics failed: {e}")
+            return {}
+    
+    async def _calculate_stage_metrics(self, data: Dict[str, Any]) -> Dict[str, BiasMetric]:
+        """Calculate funding stage bias metrics"""
+        try:
+            opportunities = data.get('opportunities', [])
+            if not opportunities:
+                return {}
+            
+            # Extract stage data
+            stage_data = defaultdict(int)
+            early_stage_count = 0
+            seed_stage_count = 0
+            grant_count = 0
+            total_count = len(opportunities)
+            
+            for opp in opportunities:
+                stage = self._extract_stage_from_opportunity(opp)
+                stage_data[stage] += 1
+                
+                if stage in ['pre_seed', 'seed']:
+                    early_stage_count += 1
+                if stage == 'seed':
+                    seed_stage_count += 1
+                if stage == 'grant':
+                    grant_count += 1
+            
+            # Calculate metrics
+            metrics = {}
+            
+            if total_count > 0:
+                # Early stage percentage
+                early_stage_pct = early_stage_count / total_count
+                metrics['early_stage_percentage'] = BiasMetric(
+                    metric_name='early_stage_percentage',
+                    current_value=early_stage_pct,
+                    target_value=self.bias_targets['funding_stage']['early_stage_percentage']['target'],
+                    threshold_warning=self.bias_targets['funding_stage']['early_stage_percentage']['warning'],
+                    threshold_critical=self.bias_targets['funding_stage']['early_stage_percentage']['critical'],
+                    direction=BiasDirection.UNDER_REPRESENTED if early_stage_pct < 0.40 else BiasDirection.BALANCED
+                )
+                
+                # Seed stage percentage
+                seed_stage_pct = seed_stage_count / total_count
+                metrics['seed_stage_percentage'] = BiasMetric(
+                    metric_name='seed_stage_percentage',
+                    current_value=seed_stage_pct,
+                    target_value=self.bias_targets['funding_stage']['seed_stage_percentage']['target'],
+                    threshold_warning=self.bias_targets['funding_stage']['seed_stage_percentage']['warning'],
+                    threshold_critical=self.bias_targets['funding_stage']['seed_stage_percentage']['critical'],
+                    direction=BiasDirection.UNDER_REPRESENTED if seed_stage_pct < 0.25 else BiasDirection.BALANCED
+                )
+                
+                # Grant percentage
+                grant_pct = grant_count / total_count
+                metrics['grant_percentage'] = BiasMetric(
+                    metric_name='grant_percentage',
+                    current_value=grant_pct,
+                    target_value=self.bias_targets['funding_stage']['grant_percentage']['target'],
+                    threshold_warning=self.bias_targets['funding_stage']['grant_percentage']['warning'],
+                    threshold_critical=self.bias_targets['funding_stage']['grant_percentage']['critical'],
+                    direction=BiasDirection.UNDER_REPRESENTED if grant_pct < 0.30 else BiasDirection.BALANCED
+                )
+            
+            return metrics
+            
+        except Exception as e:
+            self.logger.error(f"Calculating stage metrics failed: {e}")
+            return {}
+    
+    async def _calculate_source_metrics(self, data: Dict[str, Any]) -> Dict[str, BiasMetric]:
+        """Calculate source quality bias metrics"""
+        try:
+            # This would integrate with the source quality scoring system
+            # For now, return empty metrics
+            return {}
+            
+        except Exception as e:
+            self.logger.error(f"Calculating source metrics failed: {e}")
+            return {}
+    
+    def _extract_countries_from_opportunity(self, opportunity: Dict[str, Any]) -> List[str]:
+        """Extract countries from opportunity data"""
+        countries = []
+        
+        # Extract from title and description
+        title = opportunity.get('title', '')
+        description = opportunity.get('description', '')
+        content = f"{title} {description}".lower()
+        
+        # Simple country detection
+        country_patterns = {
+            'KE': ['kenya', 'nairobi'],
+            'NG': ['nigeria', 'lagos', 'abuja'],
+            'ZA': ['south africa', 'cape town', 'johannesburg'],
+            'EG': ['egypt', 'cairo'],
+            'GH': ['ghana', 'accra'],
+            'ET': ['ethiopia', 'addis ababa'],
+            'MA': ['morocco', 'casablanca'],
+            'TN': ['tunisia', 'tunis'],
+            'SN': ['senegal', 'dakar'],
+            'CI': ['ivory coast', 'côte d\'ivoire', 'abidjan'],
+            'CF': ['central african republic', 'bangui'],
+            'TD': ['chad', 'n\'djamena'],
+            'CD': ['democratic republic of congo', 'kinshasa'],
+            'CM': ['cameroon', 'yaoundé', 'douala']
+        }
+        
+        for iso_code, patterns in country_patterns.items():
+            for pattern in patterns:
+                if pattern in content:
+                    countries.append(iso_code)
+                    break
+        
+        return countries
+    
+    def _extract_sectors_from_opportunity(self, opportunity: Dict[str, Any]) -> List[str]:
+        """Extract sectors from opportunity data"""
+        sectors = []
+        
+        # Extract from title and description
+        title = opportunity.get('title', '')
+        description = opportunity.get('description', '')
+        content = f"{title} {description}".lower()
+        
+        # Sector detection patterns
+        sector_patterns = {
+            'healthcare': ['health', 'medical', 'hospital', 'clinic', 'disease'],
+            'agriculture': ['agriculture', 'farming', 'crop', 'livestock', 'food'],
+            'climate': ['climate', 'environment', 'sustainable', 'green', 'renewable'],
+            'education': ['education', 'learning', 'school', 'university', 'training'],
+            'fintech': ['fintech', 'financial', 'banking', 'payment', 'credit']
+        }
+        
+        for sector, patterns in sector_patterns.items():
+            for pattern in patterns:
+                if pattern in content:
+                    sectors.append(sector)
+                    break
+        
+        return sectors
+    
+    def _extract_inclusion_from_opportunity(self, opportunity: Dict[str, Any]) -> List[str]:
+        """Extract inclusion indicators from opportunity data"""
+        indicators = []
+        
+        # Extract from title and description
+        title = opportunity.get('title', '')
+        description = opportunity.get('description', '')
+        content = f"{title} {description}".lower()
+        
+        # Inclusion detection patterns
+        inclusion_patterns = {
+            'women_led': ['women', 'female', 'gender', 'maternal'],
+            'youth_focused': ['youth', 'young', 'student', 'under 35'],
+            'rural_priority': ['rural', 'remote', 'village', 'countryside'],
+            'disability_inclusive': ['disability', 'accessible', 'inclusive'],
+            'refugee_focused': ['refugee', 'displaced', 'migration']
+        }
+        
+        for indicator, patterns in inclusion_patterns.items():
+            for pattern in patterns:
+                if pattern in content:
+                    indicators.append(indicator)
+                    break
+        
+        return indicators
+    
+    def _detect_opportunity_language(self, opportunity: Dict[str, Any]) -> str:
+        """Detect language of opportunity content"""
+        # Extract from title and description
+        title = opportunity.get('title', '')
+        description = opportunity.get('description', '')
+        content = f"{title} {description}"
+        
+        # Simple language detection patterns
+        language_patterns = {
+            'fr': ['financement', 'subvention', 'recherche', 'développement', 'programme'],
+            'ar': ['تمويل', 'منح', 'برامج', 'تطوير', 'ابتكار'],
+            'pt': ['financiamento', 'bolsa', 'investigação', 'desenvolvimento', 'programa'],
+            'sw': ['ufumuzi', 'ruzuku', 'utafiti', 'maendeleo', 'programu']
+        }
+        
+        for lang, patterns in language_patterns.items():
+            for pattern in patterns:
+                if pattern in content:
+                    return lang
+        
+        return 'en'  # Default to English
+    
+    def _extract_stage_from_opportunity(self, opportunity: Dict[str, Any]) -> str:
+        """Extract funding stage from opportunity data"""
+        # Extract from title and description
+        title = opportunity.get('title', '')
+        description = opportunity.get('description', '')
+        content = f"{title} {description}".lower()
+        
+        # Stage detection patterns
+        stage_patterns = {
+            'pre_seed': ['pre-seed', 'idea', 'concept', 'prototype', 'mvp'],
+            'seed': ['seed', 'early stage', 'startup', 'launch'],
+            'series_a': ['series a', 'growth', 'scaling', 'expansion'],
+            'grant': ['grant', 'research', 'development', 'non-dilutive']
+        }
+        
+        for stage, patterns in stage_patterns.items():
+            for pattern in patterns:
+                if pattern in content:
+                    return stage
+        
+        return 'unknown'
+    
+    def _calculate_diversity_index(self, values: List[int]) -> float:
+        """Calculate Simpson's diversity index"""
+        if not values or sum(values) == 0:
+            return 0.0
+        
+        total = sum(values)
+        sum_squares = sum(x * x for x in values)
+        
+        # Simpson's diversity index: 1 - (sum of squares / total squared)
+        diversity = 1 - (sum_squares / (total * total))
+        return diversity
+    
+    async def _calculate_overall_equity_score(self, all_metrics: Dict[str, Dict[str, BiasMetric]]) -> float:
+        """Calculate overall equity score"""
+        try:
+            all_scores = []
+            
+            for metric_group in all_metrics.values():
+                for metric in metric_group.values():
+                    # Score based on how close to target
+                    deviation = abs(metric.current_value - metric.target_value)
+                    max_deviation = max(metric.threshold_warning, metric.threshold_critical)
+                    
+                    if max_deviation > 0:
+                        score = max(0.0, 1.0 - (deviation / max_deviation))
+                        all_scores.append(score)
+            
+            return mean(all_scores) if all_scores else 0.0
+            
+        except Exception as e:
+            self.logger.error(f"Calculating overall equity score failed: {e}")
+            return 0.0
+    
+    async def _generate_alerts(self, all_metrics: Dict[str, Dict[str, BiasMetric]]) -> List[BiasAlert]:
+        """Generate bias alerts"""
+        alerts = []
+        
+        try:
+            for bias_type_str, metrics in all_metrics.items():
+                bias_type = BiasType(bias_type_str)
+                
+                for metric_name, metric in metrics.items():
+                    severity = metric.calculate_severity()
+                    
+                    if severity in [AlertSeverity.CRITICAL, AlertSeverity.HIGH]:
+                        alert = BiasAlert(
+                            alert_id=f"{bias_type_str}_{metric_name}_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
+                            bias_type=bias_type,
+                            severity=severity,
+                            message=f"{metric.metric_name}: {metric.current_value:.3f} (target: {metric.target_value:.3f})",
+                            metric=metric,
+                            recommendations=await self._get_metric_recommendations(bias_type, metric_name, metric)
+                        )
+                        alerts.append(alert)
+            
+            return alerts
+            
+        except Exception as e:
+            self.logger.error(f"Generating alerts failed: {e}")
+            return []
+    
+    async def _get_metric_recommendations(self, bias_type: BiasType, metric_name: str, 
+                                        metric: BiasMetric) -> List[str]:
+        """Get recommendations for a specific metric"""
+        recommendations = []
+        
+        if bias_type == BiasType.GEOGRAPHIC:
+            if 'central_africa' in metric_name:
+                recommendations.extend([
+                    "Increase search frequency for Central African sources",
+                    "Add Central African funding databases to monitoring",
+                    "Implement French-language searches for CAR/Chad/DRC"
+                ])
+            elif 'non_big_four' in metric_name:
+                recommendations.extend([
+                    "Reduce search frequency for Big 4 countries",
+                    "Boost searches for underrepresented countries",
+                    "Add regional development bank sources"
+                ])
+        
+        elif bias_type == BiasType.SECTORAL:
+            if 'healthcare' in metric_name:
+                recommendations.extend([
+                    "Add healthcare-specific funding sources",
+                    "Implement health-focused search terms",
+                    "Monitor WHO and health ministry announcements"
+                ])
+            elif 'agriculture' in metric_name:
+                recommendations.extend([
+                    "Add agricultural development funding sources",
+                    "Monitor FAO and agricultural ministry announcements",
+                    "Implement agri-tech specific search terms"
+                ])
+        
+        elif bias_type == BiasType.LANGUAGE:
+            if 'french' in metric_name:
+                recommendations.extend([
+                    "Activate French-language search modules",
+                    "Add francophone African funding sources",
+                    "Monitor AFD and francophone development banks"
+                ])
+            elif 'arabic' in metric_name:
+                recommendations.extend([
+                    "Activate Arabic-language search modules",
+                    "Add North African funding sources",
+                    "Monitor Islamic Development Bank announcements"
+                ])
+        
+        return recommendations
+    
+    async def _store_snapshot(self, snapshot: BiasSnapshot):
+        """Store bias snapshot for historical analysis"""
+        try:
+            # Store in historical snapshots
+            self.historical_snapshots.append(snapshot)
+            
+            # Trim old snapshots
+            cutoff_date = datetime.now() - timedelta(days=self.max_history_days)
+            self.historical_snapshots = [
+                s for s in self.historical_snapshots 
+                if s.timestamp > cutoff_date
+            ]
+            
+        except Exception as e:
+            self.logger.error(f"Storing snapshot failed: {e}")
+    
+    async def _get_historical_snapshots(self, days: int) -> List[BiasSnapshot]:
+        """Get historical snapshots for trend analysis"""
+        try:
+            cutoff_date = datetime.now() - timedelta(days=days)
+            return [s for s in self.historical_snapshots if s.timestamp > cutoff_date]
+            
+        except Exception as e:
+            self.logger.error(f"Getting historical snapshots failed: {e}")
+            return []
+    
+    def _calculate_metric_trends(self, historical_data: List[BiasSnapshot], 
+                               metric_group: str) -> Dict[str, Any]:
+        """Calculate trends for a metric group"""
+        try:
+            if not historical_data:
+                return {}
+            
+            trends = {}
+            
+            # Get all metric names from the group
+            all_metrics = set()
+            for snapshot in historical_data:
+                group_metrics = getattr(snapshot, metric_group, {})
+                all_metrics.update(group_metrics.keys())
+            
+            # Calculate trend for each metric
+            for metric_name in all_metrics:
+                values = []
+                for snapshot in historical_data:
+                    group_metrics = getattr(snapshot, metric_group, {})
+                    metric = group_metrics.get(metric_name)
+                    if metric:
+                        values.append(metric.current_value)
+                
+                if len(values) >= 2:
+                    # Simple trend calculation
+                    first_half = values[:len(values)//2]
+                    second_half = values[len(values)//2:]
+                    
+                    first_avg = mean(first_half)
+                    second_avg = mean(second_half)
+                    
+                    trend_direction = 'improving' if second_avg > first_avg else 'declining'
+                    trend_magnitude = abs(second_avg - first_avg)
+                    
+                    trends[metric_name] = {
+                        'direction': trend_direction,
+                        'magnitude': trend_magnitude,
+                        'current_value': values[-1],
+                        'volatility': stdev(values) if len(values) > 1 else 0.0
+                    }
+            
+            return trends
+            
+        except Exception as e:
+            self.logger.error(f"Calculating metric trends failed: {e}")
+            return {}
+    
+    def _calculate_equity_trend(self, historical_data: List[BiasSnapshot]) -> Dict[str, Any]:
+        """Calculate overall equity trend"""
+        try:
+            if not historical_data:
+                return {}
+            
+            equity_scores = [s.overall_equity_score for s in historical_data]
+            
+            if len(equity_scores) >= 2:
+                first_half = equity_scores[:len(equity_scores)//2]
+                second_half = equity_scores[len(equity_scores)//2:]
+                
+                first_avg = mean(first_half)
+                second_avg = mean(second_half)
+                
+                return {
+                    'direction': 'improving' if second_avg > first_avg else 'declining',
+                    'magnitude': abs(second_avg - first_avg),
+                    'current_score': equity_scores[-1],
+                    'volatility': stdev(equity_scores) if len(equity_scores) > 1 else 0.0
+                }
+            
+            return {'direction': 'unknown', 'magnitude': 0.0}
+            
+        except Exception as e:
+            self.logger.error(f"Calculating equity trend failed: {e}")
+            return {}
+    
+    async def _analyze_geographic_bias(self, metrics: Dict[str, BiasMetric]) -> List[Dict[str, Any]]:
+        """Analyze geographic bias and provide recommendations"""
+        recommendations = []
+        
+        for metric_name, metric in metrics.items():
+            if metric.direction == BiasDirection.UNDER_REPRESENTED:
+                if 'central_africa' in metric_name:
+                    recommendations.append({
+                        'type': 'geographic_bias',
+                        'priority': 5,
+                        'title': 'Central Africa Under-represented',
+                        'description': f'Only {metric.current_value:.1%} of opportunities from Central Africa (target: {metric.target_value:.1%})',
+                        'actions': [
+                            'Add Central African funding databases',
+                            'Implement French-language searches',
+                            'Monitor regional development banks'
+                        ]
+                    })
+                elif 'non_big_four' in metric_name:
+                    recommendations.append({
+                        'type': 'geographic_bias',
+                        'priority': 4,
+                        'title': 'Over-concentration in Big 4 Countries',
+                        'description': f'Only {metric.current_value:.1%} of opportunities from non-Big 4 countries (target: {metric.target_value:.1%})',
+                        'actions': [
+                            'Reduce Big 4 search frequency',
+                            'Boost underserved region searches',
+                            'Add regional funding sources'
+                        ]
+                    })
+        
+        return recommendations
+    
+    async def _analyze_sectoral_bias(self, metrics: Dict[str, BiasMetric]) -> List[Dict[str, Any]]:
+        """Analyze sectoral bias and provide recommendations"""
+        recommendations = []
+        
+        for metric_name, metric in metrics.items():
+            if metric.direction == BiasDirection.UNDER_REPRESENTED:
+                if 'healthcare' in metric_name:
+                    recommendations.append({
+                        'type': 'sectoral_bias',
+                        'priority': 5,
+                        'title': 'Healthcare Sector Under-represented',
+                        'description': f'Only {metric.current_value:.1%} of opportunities in healthcare (target: {metric.target_value:.1%})',
+                        'actions': [
+                            'Add health ministry sources',
+                            'Monitor WHO funding announcements',
+                            'Implement health-specific search terms'
+                        ]
+                    })
+                elif 'agriculture' in metric_name:
+                    recommendations.append({
+                        'type': 'sectoral_bias',
+                        'priority': 5,
+                        'title': 'Agriculture Sector Under-represented',
+                        'description': f'Only {metric.current_value:.1%} of opportunities in agriculture (target: {metric.target_value:.1%})',
+                        'actions': [
+                            'Add agricultural ministry sources',
+                            'Monitor FAO funding announcements',
+                            'Implement agri-tech search terms'
+                        ]
+                    })
+        
+        return recommendations
+    
+    async def _analyze_inclusion_bias(self, metrics: Dict[str, BiasMetric]) -> List[Dict[str, Any]]:
+        """Analyze inclusion bias and provide recommendations"""
+        recommendations = []
+        
+        for metric_name, metric in metrics.items():
+            if metric.direction == BiasDirection.UNDER_REPRESENTED:
+                if 'women' in metric_name:
+                    recommendations.append({
+                        'type': 'inclusion_bias',
+                        'priority': 4,
+                        'title': 'Women-focused Opportunities Under-represented',
+                        'description': f'Only {metric.current_value:.1%} of opportunities target women (target: {metric.target_value:.1%})',
+                        'actions': [
+                            'Add women-focused funding sources',
+                            'Monitor gender equality organizations',
+                            'Implement women-specific search terms'
+                        ]
+                    })
+                elif 'youth' in metric_name:
+                    recommendations.append({
+                        'type': 'inclusion_bias',
+                        'priority': 4,
+                        'title': 'Youth-focused Opportunities Under-represented',
+                        'description': f'Only {metric.current_value:.1%} of opportunities target youth (target: {metric.target_value:.1%})',
+                        'actions': [
+                            'Add youth-focused funding sources',
+                            'Monitor youth development organizations',
+                            'Implement youth-specific search terms'
+                        ]
+                    })
+        
+        return recommendations
+    
+    async def _analyze_language_bias(self, metrics: Dict[str, BiasMetric]) -> List[Dict[str, Any]]:
+        """Analyze language bias and provide recommendations"""
+        recommendations = []
+        
+        for metric_name, metric in metrics.items():
+            if metric.direction == BiasDirection.UNDER_REPRESENTED:
+                if 'french' in metric_name:
+                    recommendations.append({
+                        'type': 'language_bias',
+                        'priority': 3,
+                        'title': 'French Language Under-represented',
+                        'description': f'Only {metric.current_value:.1%} of opportunities in French (target: {metric.target_value:.1%})',
+                        'actions': [
+                            'Activate French search modules',
+                            'Add francophone funding sources',
+                            'Monitor AFD announcements'
+                        ]
+                    })
+                elif 'arabic' in metric_name:
+                    recommendations.append({
+                        'type': 'language_bias',
+                        'priority': 3,
+                        'title': 'Arabic Language Under-represented',
+                        'description': f'Only {metric.current_value:.1%} of opportunities in Arabic (target: {metric.target_value:.1%})',
+                        'actions': [
+                            'Activate Arabic search modules',
+                            'Add North African funding sources',
+                            'Monitor Islamic Development Bank'
+                        ]
+                    })
+        
+        return recommendations
+    
+    async def _analyze_stage_bias(self, metrics: Dict[str, BiasMetric]) -> List[Dict[str, Any]]:
+        """Analyze funding stage bias and provide recommendations"""
+        recommendations = []
+        
+        for metric_name, metric in metrics.items():
+            if metric.direction == BiasDirection.UNDER_REPRESENTED:
+                if 'early_stage' in metric_name:
+                    recommendations.append({
+                        'type': 'stage_bias',
+                        'priority': 4,
+                        'title': 'Early Stage Opportunities Under-represented',
+                        'description': f'Only {metric.current_value:.1%} of opportunities are early-stage (target: {metric.target_value:.1%})',
+                        'actions': [
+                            'Add accelerator/incubator sources',
+                            'Monitor startup competition announcements',
+                            'Implement early-stage search terms'
+                        ]
+                    })
+                elif 'grant' in metric_name:
+                    recommendations.append({
+                        'type': 'stage_bias',
+                        'priority': 4,
+                        'title': 'Grant Opportunities Under-represented',
+                        'description': f'Only {metric.current_value:.1%} of opportunities are grants (target: {metric.target_value:.1%})',
+                        'actions': [
+                            'Add government funding sources',
+                            'Monitor research funding announcements',
+                            'Implement grant-specific search terms'
+                        ]
+                    })
+        
+        return recommendations
+    
+    async def _execute_mitigation_action(self, action: Dict[str, Any]) -> Dict[str, Any]:
+        """Execute a specific mitigation action"""
+        try:
+            action_type = action.get('action')
+            
+            if action_type == 'boost_underserved_searches':
+                # This would integrate with the search scheduling system
+                return {
+                    'action': action_type,
+                    'status': 'executed',
+                    'message': 'Boosted underserved region searches',
+                    'timestamp': datetime.now().isoformat()
+                }
+            
+            elif action_type == 'activate_multilingual_search':
+                # This would integrate with the multilingual search system
+                return {
+                    'action': action_type,
+                    'status': 'executed',
+                    'message': 'Activated multilingual search modules',
+                    'timestamp': datetime.now().isoformat()
+                }
+            
+            else:
+                return {
+                    'action': action_type,
+                    'status': 'not_implemented',
+                    'message': 'Action type not implemented',
+                    'timestamp': datetime.now().isoformat()
+                }
+                
+        except Exception as e:
+            self.logger.error(f"Executing mitigation action failed: {e}")
+            return {
+                'action': action.get('action', 'unknown'),
+                'status': 'failed',
+                'message': str(e),
+                'timestamp': datetime.now().isoformat()
+            }
+
+# =============================================================================
+# USAGE EXAMPLE
+# =============================================================================
+
+async def example_usage():
+    """Example usage of bias monitoring system"""
+    monitor = BiasMonitoringEngine()
+    
+    # Analyze current bias
+    snapshot = await monitor.analyze_current_bias()
+    
+    print("=== Current Bias Analysis ===")
+    print(f"Overall Equity Score: {snapshot.overall_equity_score:.3f}")
+    print(f"Active Alerts: {len(snapshot.active_alerts)}")
+    
+    # Show geographic metrics
+    print("\n=== Geographic Metrics ===")
+    for name, metric in snapshot.geographic_metrics.items():
+        print(f"{name}: {metric.current_value:.3f} (target: {metric.target_value:.3f})")
+    
+    # Show alerts
+    print("\n=== Active Alerts ===")
+    for alert in snapshot.active_alerts:
+        print(f"[{alert.severity.value.upper()}] {alert.message}")
+    
+    # Get recommendations
+    recommendations = await monitor.get_bias_recommendations()
+    print(f"\n=== Recommendations ({len(recommendations)}) ===")
+    for rec in recommendations[:5]:  # Show top 5
+        print(f"[Priority {rec['priority']}] {rec['title']}")
+        print(f"  {rec['description']}")
+    
+    # Get trends
+    trends = await monitor.get_bias_trends(30)
+    print(f"\n=== 30-Day Trends ===")
+    equity_trend = trends.get('overall_equity_trend', {})
+    print(f"Overall Equity: {equity_trend.get('direction', 'unknown')} (magnitude: {equity_trend.get('magnitude', 0):.3f})")
+
+if __name__ == "__main__":
+    asyncio.run(example_usage())

@@ -227,9 +227,9 @@ async def cancel_job(job_id: str):
 @router.post("/bulk-process")
 async def bulk_process_urls(
     urls: List[str],
+    background_tasks: BackgroundTasks,
     source_type: SourceType = SourceType.UNKNOWN,
     priority: ProcessingPriority = ProcessingPriority.LOW,
-    background_tasks: BackgroundTasks
 ):
     """
     Process multiple URLs in bulk
