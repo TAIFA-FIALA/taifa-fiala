@@ -13,7 +13,7 @@ import logging
 from typing import Dict, List, Any, Optional, Tuple
 from datetime import datetime
 
-from pinecone.spec import ServerlessSpec
+from pinecone import ServerlessSpec
 from pinecone.core.client.models import QueryResponse
 
 from app.core.pinecone_client import get_pinecone_client

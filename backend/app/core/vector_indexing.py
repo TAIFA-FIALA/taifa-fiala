@@ -13,7 +13,7 @@ import logging
 from typing import Dict, List, Any, Optional
 from datetime import datetime
 
-from pinecone.spec import ServerlessSpec
+from pinecone import ServerlessSpec
 
 
 from .etl_architecture import ETLTask, PipelineStage, Priority, ProcessingResult

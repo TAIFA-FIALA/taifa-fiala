@@ -14,7 +14,7 @@ import hashlib
 from dataclasses import dataclass, field
 
 # Vector and embedding imports
-from pinecone.spec import ServerlessSpec
+from pinecone import ServerlessSpec
 import openai
 from openai import OpenAI
 

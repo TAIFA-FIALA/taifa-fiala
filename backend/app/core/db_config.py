@@ -15,7 +15,7 @@ from typing import Optional
 from pydantic import BaseModel, Field
 from dotenv import load_dotenv
 from supabase import create_client, Client
-from pinecone.spec import ServerlessSpec
+from pinecone import ServerlessSpec
 
 # Local imports
 from app.core.pinecone_client import get_pinecone_client

@@ -23,7 +23,7 @@ import hashlib
 import numpy as np
 from concurrent.futures import ThreadPoolExecutor
 import openai
-from pinecone.spec import ServerlessSpec
+from pinecone import ServerlessSpec
 
 from app.core.pinecone_client import get_pinecone_client
 from app.core.etl_architecture import ETLTask, PipelineStage, ProcessingResult

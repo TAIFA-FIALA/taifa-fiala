@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 # Import directly from libraries rather than from refactored structure
 try:
     from supabase import create_client, Client
-    from pinecone.spec import ServerlessSpec
+    from pinecone import ServerlessSpec
     from app.core.pinecone_client import get_pinecone_client
 except ImportError:
     logger.error("❌ Required libraries not found. Please run: pip install supabase pinecone-client python-dotenv")

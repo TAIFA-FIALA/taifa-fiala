@@ -7,7 +7,7 @@ import os
 import asyncio
 import logging
 
-from pinecone.spec import ServerlessSpec
+from pinecone import ServerlessSpec
 
 # Local imports
 from app.core.pinecone_client import get_pinecone_client
