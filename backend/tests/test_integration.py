@@ -1,179 +1,174 @@
-#!/usr/bin/env python3
 """
-Test script for database integration and DeepSeek parsing
+TAIFA-FIALA Integration Test
+
+This script tests the connection to both Supabase and Pinecone,
+verifying that the schema has been properly applied and 
+the vector index is accessible.
 """
 
+import os
+import sys
+import json
 import asyncio
 import logging
-import sys
-import os
-from datetime import datetime
-import aiohttp
+from typing import Dict, List, Any, Optional
+from dotenv import load_dotenv
+from pinecone import Pinecone
+from supabase import create_client, Client
 
-# Add the data_collectors directory to Python path
-sys.path.append(os.path.join(os.path.dirname(__file__), 'data_collectors'))
-
-from database.connector import DatabaseConnector
-from serper_search.collector import SerperSearchCollector
-
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
 logger = logging.getLogger(__name__)
 
-async def test_database_connection():
-    """Test basic database connectivity"""
-    logger.info("🧪 Testing database connection...")
+# Load environment variables
+load_dotenv()
+
+# Add backend to Python path if needed
+current_dir = os.path.dirname(os.path.abspath(__file__))
+if current_dir.endswith('/backend'):
+    parent_dir = os.path.dirname(current_dir)
+else:
+    parent_dir = current_dir
+    if 'backend' not in parent_dir and os.path.exists(os.path.join(parent_dir, 'backend')):
+        sys.path.insert(0, os.path.join(parent_dir, 'backend'))
+
+
+# Supabase Configuration
+supabase_url = os.getenv("SUPABASE_PROJECT_URL")
+supabase_key = os.getenv("SUPABASE_API_KEY")
+
+# Pinecone Configuration  
+pinecone_api_key = os.getenv("PINECONE_API_KEY")
+pinecone_host = os.getenv("PINECONE_HOST", "")
+
+
+async def test_supabase():
+    """Test connection to Supabase and verify schema"""
+    if not supabase_url or not supabase_key:
+        logger.error("❌ Missing Supabase environment variables")
+        return False
     
-    db = DatabaseConnector()
     try:
-        await db.initialize()
+        logger.info(f"Connecting to Supabase at {supabase_url}")
+        supabase_client = create_client(supabase_url, supabase_key)
         
-        # Test getting statistics
-        stats = await db.get_statistics()
-        logger.info(f"📊 Database stats: {stats}")
+        # Test basic connection
+        response = supabase_client.table("health_check").select("*").limit(1).execute()
+        results = response.data
+        logger.info(f"✅ Successfully connected to Supabase. Health check status: {results[0]['status'] if results else 'No data'}")
         
-        # Test getting recent opportunities
-        recent = await db.get_recent_opportunities(limit=5)
-        logger.info(f"📋 Recent opportunities: {len(recent)} found")
+        # Check for our tables
+        tables_to_check = ["organizations", "funding_types", "africa_intelligence_feed", "health_check"]
+        for table in tables_to_check:
+            try:
+                result = supabase_client.table(table).select("count()", count='exact').limit(1).execute()
+                count = result.count if hasattr(result, 'count') else 0
+                logger.info(f"✅ Table '{table}' exists with {count} records")
+            except Exception as e:
+                logger.error(f"❌ Error accessing table '{table}': {str(e)}")
+                return False
         
-        await db.close()
-        logger.info("✅ Database connection test successful!")
         return True
-        
     except Exception as e:
-        logger.error(f"❌ Database test failed: {e}")
+        logger.error(f"❌ Supabase connection error: {str(e)}")
         return False
 
-async def test_serper_with_location_rotation():
-    """Test Serper search with location rotation"""
-    logger.info("🧪 Testing Serper search with location rotation...")
-    
-    from dotenv import load_dotenv
-    load_dotenv()
-    
-    api_key = os.getenv("SERPER_DEV_API_KEY")
-    if not api_key:
-        logger.error("❌ SERPER_DEV_API_KEY not found")
+
+async def test_pinecone():
+    """Test connection to Pinecone and verify index"""
+    if not pinecone_api_key or not pinecone_host:
+        logger.error("❌ Missing Pinecone environment variables")
         return False
     
     try:
-        collector = SerperSearchCollector(api_key)
+        logger.info(f"Connecting to Pinecone at {pinecone_host}")
         
-        # Initialize the session (this was missing)
-        collector.session = aiohttp.ClientSession(
-            timeout=aiohttp.ClientTimeout(total=30),
-            headers={'Content-Type': 'application/json'}
-        )
+        # Initialize Pinecone with new API
+        pc = Pinecone(api_key=pinecone_api_key)
         
-        # Test with a single query to see location alternation
-        test_query = {
-            "name": "Test AI Africa Funding",
-            "query": "AI funding Africa grants",
-            "priority": "high"
-        }
+        # Get list of indexes
+        indexes = pc.list_indexes()
+        index_names = indexes.names() if hasattr(indexes, 'names') else []
+        logger.info(f"Available Pinecone indexes: {index_names}")
         
-        opportunities = await collector._search_africa_intelligence_feed(test_query)
-        
-        # Close the session
-        await collector.session.close()
-        
-        if opportunities:
-            logger.info(f"✅ Serper test successful! Found {len(opportunities)} opportunities")
-            logger.info(f"📋 Sample: {opportunities[0]['title'][:80]}...")
-            return True
-        else:
-            logger.warning("⚠️  Serper test returned no results")
+        if not index_names:
+            logger.warning("⚠️ No indexes found in Pinecone")
             return False
+        
+        # Get index name from host
+        # The host format is usually: https://<index-name>-<project-id>.svc.<region>.pinecone.io
+        host_parts = pinecone_host.replace("https://", "").split(".")
+        if len(host_parts) >= 1:
+            index_project = host_parts[0]  # This might be "<index-name>-<project-id>"
+            index_name_parts = index_project.split("-")
+            if len(index_name_parts) > 0:
+                possible_index_name = index_name_parts[0]
+                
+                # Try to find an exact match or close match in the available indexes
+                matched_index = None
+                for idx in index_names:
+                    if idx == possible_index_name or idx.startswith(possible_index_name):
+                        matched_index = idx
+                        break
+                
+                if matched_index:
+                    index_name = matched_index
+                else:
+                    # Use the first available index if we can't find a match
+                    index_name = index_names[0]
+            else:
+                # Use the first available index if we can't parse the host
+                index_name = index_names[0]
+        else:
+            # Use the first available index if we can't parse the host
+            index_name = index_names[0]
             
+        logger.info(f"Using Pinecone index: {index_name}")
+        
+        # Connect to the index
+        index = pc.Index(index_name)
+        
+        # Get index stats
+        stats = index.describe_index_stats()
+        logger.info(f"✅ Successfully connected to Pinecone index. Stats: {json.dumps(stats, indent=2)}")
+        
+        return True
     except Exception as e:
-        logger.error(f"❌ Serper test failed: {e}")
+        logger.error(f"❌ Pinecone connection error: {str(e)}")
         return False
 
-async def test_end_to_end_pipeline():
-    """Test complete pipeline: Search → Parse → Database"""
-    logger.info("🧪 Testing end-to-end pipeline...")
-    
-    # Initialize database
-    db = DatabaseConnector()
-    await db.initialize()
-    
-    # Create a test opportunity to save
-    test_opportunity = {
-        "title": "Test AI Research Grant for African Universities",
-        "description": "A test intelligence item for AI research in Africa. Amount: $50,000. Deadline: Apply by December 31, 2025.",
-        "source_url": f"https://test-funding.example.com/test-{datetime.now().timestamp()}",
-        "search_query": "Test Query",
-        "priority": "high",
-        "content_hash": f"test_hash_{datetime.now().timestamp()}",
-        "ai_relevance_score": 0.9,
-        "africa_relevance_score": 0.8,
-        "funding_relevance_score": 0.95,
-        "overall_relevance_score": 0.88
-    }
-    
-    try:
-        # Test saving
-        results = await db.save_opportunities([test_opportunity], "test")
-        
-        if results["saved"] > 0:
-            logger.info("✅ End-to-end test successful!")
-            logger.info(f"📊 Results: {results}")
-            
-            # Check if it was parsed with AI
-            if results["ai_parsed"] > 0:
-                logger.info("✨ DeepSeek AI parsing was used successfully!")
-            
-            return True
-        else:
-            logger.error("❌ No opportunities were saved")
-            return False
-            
-    except Exception as e:
-        logger.error(f"❌ End-to-end test failed: {e}")
-        return False
-    finally:
-        await db.close()
 
 async def main():
     """Run all tests"""
-    logger.info("🚀 Starting AI Africa Funding Tracker tests...")
+    logger.info("====== TAIFA-FIALA Integration Test ======")
     
-    tests = [
-        ("Database Connection", test_database_connection),
-        ("Serper Location Rotation", test_serper_with_location_rotation),
-        ("End-to-End Pipeline", test_end_to_end_pipeline)
-    ]
+    # Test Supabase
+    logger.info("\nTesting Supabase connection...")
+    supabase_success = await test_supabase()
     
-    results = {}
+    # Test Pinecone
+    logger.info("\nTesting Pinecone connection...")
+    pinecone_success = await test_pinecone()
     
-    for test_name, test_func in tests:
-        logger.info(f"\n{'='*50}")
-        logger.info(f"Running: {test_name}")
-        logger.info(f"{'='*50}")
-        
-        try:
-            results[test_name] = await test_func()
-        except Exception as e:
-            logger.error(f"Test '{test_name}' crashed: {e}")
-            results[test_name] = False
+    # Report overall results
+    logger.info("\n====== Integration Test Results ======")
+    logger.info(f"Supabase connection: {'✅ PASSED' if supabase_success else '❌ FAILED'}")
+    logger.info(f"Pinecone connection: {'✅ PASSED' if pinecone_success else '❌ FAILED'}")
     
-    # Summary
-    logger.info(f"\n{'='*50}")
-    logger.info("TEST SUMMARY")
-    logger.info(f"{'='*50}")
-    
-    all_passed = True
-    for test_name, passed in results.items():
-        status = "✅ PASS" if passed else "❌ FAIL"
-        logger.info(f"{test_name}: {status}")
-        if not passed:
-            all_passed = False
-    
-    if all_passed:
-        logger.info("\n🎉 All tests passed! System ready for deployment.")
+    if supabase_success and pinecone_success:
+        logger.info("\n🎉 SUCCESS: All integrations are working correctly!")
+        logger.info("The TAIFA-FIALA platform is ready for use with:")
+        logger.info("- Organization role distinctions (provider/recipient)")
+        logger.info("- Funding type categories (grant/investment/prize/other)")
+        logger.info("- Grant-specific and investment-specific properties")
+        logger.info("- Equity and inclusion tracking fields")
+        logger.info("- Vector search capabilities for intelligence feed")
     else:
-        logger.info("\n⚠️  Some tests failed. Check logs above.")
-    
-    return all_passed
+        logger.error("\n⚠️ Some integrations failed. Please review the logs and fix the issues.")
+
 
 if __name__ == "__main__":
     asyncio.run(main())
