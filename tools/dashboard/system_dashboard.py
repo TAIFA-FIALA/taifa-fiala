@@ -28,6 +28,9 @@ from dotenv import load_dotenv
 from supabase import create_client
 import numpy as np
 
+# Import RSS Feed Manager
+from rss_feed_manager import RSSFeedManager
+
 # Load environment
 load_dotenv()
 
@@ -608,6 +611,7 @@ def main():
         "Collection Metrics", 
         "Coverage Analysis", 
         "Search Demo", 
+        "RSS Feed Manager",
         "Architecture",
         "Success Metrics"
     ])
@@ -621,6 +625,10 @@ def main():
         render_coverage_analysis(dashboard)
     elif page == "Search Demo":
         render_search_demo(dashboard)
+    elif page == "RSS Feed Manager":
+        # Initialize RSS Feed Manager
+        rss_manager = RSSFeedManager(dashboard.supabase)
+        rss_manager.render_feed_management_page()
     elif page == "Architecture":
         render_system_architecture()
     elif page == "Success Metrics":
