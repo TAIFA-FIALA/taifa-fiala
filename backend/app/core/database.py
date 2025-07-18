@@ -4,22 +4,36 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import NullPool
 import os
 
+# Import settings for configuration
+from app.core.config import settings
+
 # Load environment variables directly
 from dotenv import load_dotenv
 load_dotenv()
 
-# Define hard-coded database parameters from environment
-# These values come from running the backend/db_config.py script
-DB_USER = "postgres.turcbnsgdlyelzmcqixd"
-DB_PASSWORD = "cbGzmHCTZqbEsg6afVhL"
-DB_HOST = "aws-0-eu-central-2.pooler.supabase.com"
-DB_PORT = "5432"
-DB_NAME = "postgres"
+# Load database URL from environment variables
+database_url = os.environ.get('DATABASE_URL')
 
-# Construct URL directly without using regex manipulation
-database_url = f"postgresql+asyncpg://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+# Parse the database URL and replace the driver from asyncpg to psycopg
+if database_url and 'asyncpg' in database_url:
+    # Replace asyncpg with psycopg in the connection string
+    database_url = database_url.replace('postgresql+asyncpg', 'postgresql+psycopg')
+    # Add connection parameters for better compatibility
+    database_url = f"{database_url}?gssencmode=disable&client_encoding=utf8"
+    print(f"Using database URL from environment with psycopg driver")
+else:
+    # Fallback to hardcoded values if environment variable is not set
+    db_params = {
+        "user": "postgres.turcbnsgdlyelzmcqixd",
+        "password": "cbGzmHCTZqbEsg6afVhL",
+        "host": "aws-0-eu-central-2.pooler.supabase.com",
+        "port": "5432",
+        "database": "postgres"
+    }
+    database_url = f"postgresql+psycopg://{db_params['user']}:{db_params['password']}@{db_params['host']}:{db_params['port']}/{db_params['database']}?gssencmode=disable&client_encoding=utf8"
+    print("Using fallback database configuration")
 
-print(f"Using direct database URL construction: {database_url[:20]}...(truncated)")
+print(f"Using database URL: {database_url.split('@')[0].split('://')[-1].split(':')[0]}@...(truncated)")
 
 
 
@@ -27,7 +41,10 @@ print(f"Using direct database URL construction: {database_url[:20]}...(truncated
 engine = create_async_engine(
     database_url,
     poolclass=NullPool,  # Use NullPool for development
-    echo=settings.DEBUG  # Log SQL queries in debug mode
+    echo=settings.DEBUG,  # Log SQL queries in debug mode
+    connect_args={
+        'sslmode': 'prefer', # Add SSL mode preference for Supabase
+    }
 )
 
 # Create async session factory

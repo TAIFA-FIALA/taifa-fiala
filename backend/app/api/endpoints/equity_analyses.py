@@ -9,6 +9,66 @@ from app.models import Organization, AfricaIntelligenceItem, CommunityUser, Geog
 
 router = APIRouter()
 
+@router.get("/summary")
+async def get_equity_summary(db: Session = Depends(get_db)):
+    """Get a summary of key equity metrics for the dashboard"""
+    
+    # Get total funding opportunities
+    total_opportunities = db.query(func.count(distinct(AfricaIntelligenceItem.id))).scalar() or 0
+    
+    # Get total funding amount
+    total_funding = db.query(func.sum(cast(AfricaIntelligenceItem.funding_amount, Float))).scalar() or 0
+    
+    # Get geographic distribution summary (top 5)
+    geo_distribution = db.query(
+        GeographicScope.name,
+        func.count(distinct(AfricaIntelligenceItem.id)).label('opportunity_count')
+    ).join(
+        AfricaIntelligenceItem.geographic_scopes
+    ).filter(
+        GeographicScope.scope_type == 'country'
+    ).group_by(
+        GeographicScope.name
+    ).order_by(
+        desc('opportunity_count')
+    ).limit(5).all()
+    
+    # Get domain distribution summary (top 5)
+    domain_distribution = db.query(
+        AIDomain.name,
+        func.count(distinct(AfricaIntelligenceItem.id)).label('opportunity_count')
+    ).join(
+        AfricaIntelligenceItem.domains
+    ).group_by(
+        AIDomain.name
+    ).order_by(
+        desc('opportunity_count')
+    ).limit(5).all()
+    
+    # Get organization type distribution
+    org_distribution = db.query(
+        Organization.recipient_type,
+        func.count(distinct(Organization.id)).label('org_count')
+    ).filter(
+        Organization.recipient_type.isnot(None)
+    ).group_by(
+        Organization.recipient_type
+    ).all()
+    
+    return {
+        "total_opportunities": total_opportunities,
+        "total_funding": float(total_funding),
+        "geographic_distribution": [
+            {"name": geo[0], "count": geo[1]} for geo in geo_distribution
+        ],
+        "domain_distribution": [
+            {"name": domain[0], "count": domain[1]} for domain in domain_distribution
+        ],
+        "organization_distribution": [
+            {"type": org[0], "count": org[1]} for org in org_distribution
+        ]
+    }
+
 @router.get("/geographical")
 async def get_geographical_distribution(db: Session = Depends(get_db)):
     """Get geographical funding distribution"""
