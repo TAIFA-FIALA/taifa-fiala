@@ -156,19 +156,19 @@ async def start_basic_ingestion():
                     
                     if any(keyword.lower() in content_text for keyword in keywords):
                         # This looks relevant, let's store it
-                        # Use all available fields
+                        # Use correct column names that exist in the database
                         opportunity_data = {
                             'title': title,
                             'description': summary,
-                            'organization_name': feed.feed.get('title', 'Unknown'),
-                            'funding_type': 'opportunity',  # Default type
+                            'source_url': entry.get('link', ''),
+                            'application_url': entry.get('link', ''),
+                            'funding_type': 'opportunity',  # Maps to funding_type column
                             'application_deadline': None,
                             'funding_amount': None,
                             'eligibility_criteria': None,
                             'application_process': None,
                             'contact_information': entry.get('link', ''),
-                            'additional_notes': f'Collected from RSS feed: {feed_url}',
-                            'source_url': entry.get('link', ''),
+                            'additional_notes': f'Collected from RSS feed: {feed_url}. Source: {feed.feed.get("title", "Unknown")}',
                             'source_type': 'rss',
                             'keywords': '[]',  # Empty JSON array as string
                             'status': 'active'
