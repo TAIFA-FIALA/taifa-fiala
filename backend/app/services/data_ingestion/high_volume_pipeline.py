@@ -168,6 +168,12 @@ class HighVolumeDataPipeline:
             # Initialize PostgreSQL/Supabase connection pool
             db_url = os.getenv('DATABASE_URL')
             if db_url:
+                # Convert SQLAlchemy URL format to asyncpg format
+                if db_url.startswith('postgresql+asyncpg://'):
+                    db_url = db_url.replace('postgresql+asyncpg://', 'postgresql://')
+                elif db_url.startswith('postgresql+asyncpg://'):
+                    db_url = db_url.replace('postgresql+asyncpg://', 'postgres://')
+                
                 self.db_pool = await asyncpg.create_pool(
                     db_url,
                     min_size=10,
