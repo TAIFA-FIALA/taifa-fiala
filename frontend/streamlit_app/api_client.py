@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 class TaifaAPIClient:
     """API client for TAIFA-FIALA backend"""
     
-    def __init__(self, base_url: str = "http://localhost:8000/api/v1"):
+    def __init__(self, base_url: str = os.getenv("TAIFA_API_BASE_URL", "http://localhost:8000/api/v1")):
         self.base_url = base_url
         self.session = None
     

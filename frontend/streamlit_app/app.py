@@ -27,7 +27,7 @@ st.set_page_config(
 )
 
 # Configuration
-API_BASE_URL = "http://backend:8000/api/v1"
+API_BASE_URL = os.getenv("TAIFA_API_BASE_URL", "http://localhost:8000/api/v1")
 
 def main():
     """Main TAIFA-FIALA application"""
