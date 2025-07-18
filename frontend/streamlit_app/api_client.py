@@ -11,8 +11,19 @@ from typing import List, Dict, Any, Optional
 from datetime import datetime
 import streamlit as st
 import os
+from json import JSONEncoder
 
 logger = logging.getLogger(__name__)
+
+# Custom JSON encoder to handle HttpUrl objects
+class TaifaJsonEncoder(JSONEncoder):
+    """Custom JSON encoder that handles HttpUrl types"""
+    def default(self, obj):
+        # Check for common Pydantic types by name (avoiding direct import dependency)
+        if obj.__class__.__name__ == "HttpUrl":
+            return str(obj)
+        # Handle any other types with default behavior
+        return super().default(obj)
 
 class TaifaAPIClient:
     """API client for TAIFA-FIALA backend"""
@@ -89,8 +100,12 @@ class TaifaAPIClient:
         try:
             session = await self._get_session()
             
+            # Use custom encoder to properly serialize HttpUrl objects
+            json_data = json.dumps(opportunity_data, cls=TaifaJsonEncoder)
+            headers = {'Content-Type': 'application/json'}
+            
             url = f"{self.base_url}/funding-opportunities/"
-            async with session.post(url, json=opportunity_data) as response:
+            async with session.post(url, data=json_data, headers=headers) as response:
                 if response.status == 200:
                     return await response.json()
                 else:
@@ -185,19 +200,6 @@ def check_api_health():
     finally:
         loop.close()
 
-@st.cache_data(ttl=10) # Cache for 10 seconds
-def fetch_raw_opportunities_sync():
-    """Synchronous wrapper to fetch raw opportunities for debugging"""
-    client = TaifaAPIClient()
-    try:
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        result = loop.run_until_complete(client.get_raw_opportunities())
-        loop.run_until_complete(client.close())
-        return result
-    finally:
-        loop.close()
-
 # Demo-specific functions
 def demo_add_serper_opportunity(opportunity_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     """Demo function to add a SERPER-discovered opportunity"""
@@ -206,10 +208,18 @@ def demo_add_serper_opportunity(opportunity_data: Dict[str, Any]) -> Optional[Di
     api_data = {
         "title": opportunity_data.get("title", ""),
         "description": opportunity_data.get("description", ""),
-        "source_url": opportunity_data.get("source_url", ""),
+        "source_url": str(opportunity_data.get("source_url", "")),
         "status": "active",
         "geographical_scope": "Africa, Rwanda",
-        "eligibility_criteria": "AI/Tech projects focusing on African development"
+        "eligibility_criteria": "AI/Tech projects focusing on African development",
+        "application_url": str(opportunity_data.get("source_url", "")),
+        "application_url": str(opportunity_data.get("source_url", "")),
+        "application_url": str(opportunity_data.get("source_url", "")),
+        "application_url": str(opportunity_data.get("source_url", "")),
+        "application_url": str(opportunity_data.get("source_url", "")),
+        "application_url": str(opportunity_data.get("source_url", "")),
+        "application_url": str(opportunity_data.get("source_url", "")),
+        "application_url": str(opportunity_data.get("source_url", ""))
     }
     
     # Add optional fields if available
@@ -218,7 +228,7 @@ def demo_add_serper_opportunity(opportunity_data: Dict[str, Any]) -> Optional[Di
         amount_str = opportunity_data["estimated_amount"]
         try:
             import re
-            amount_match = re.search(r'[\d,]+', amount_str.replace('\n', '').replace(',', ''))
+            amount_match = re.search(r'[\d,]+', amount_str.replace('$', '').replace(',', ''))
             if amount_match:
                 api_data["amount"] = float(amount_match.group())
                 api_data["currency"] = "USD"

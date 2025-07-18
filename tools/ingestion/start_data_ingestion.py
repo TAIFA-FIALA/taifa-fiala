@@ -15,6 +15,12 @@ from datetime import datetime
 from dotenv import load_dotenv
 from supabase import create_client
 
+# Add project root to Python path to enable imports from other modules
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+    print(f"Added {project_root} to Python path")
+
 # Load environment variables
 load_dotenv()
 
@@ -107,10 +113,21 @@ async def start_basic_ingestion():
     
     # Import RSS feed reader and API client
     try:
+        logger.info("Attempting to import feedparser...")
         import feedparser
+        logger.info("✅ feedparser imported successfully")
+        
+        logger.info("Attempting to import requests...")
         import requests
+        logger.info("✅ requests imported successfully")
+        
+        logger.info("Attempting to import datetime...")
         from datetime import datetime
+        logger.info("✅ datetime imported successfully")
+        
+        logger.info("Attempting to import TaifaAPIClient...")
         from frontend.streamlit_app.api_client import TaifaAPIClient
+        logger.info("✅ TaifaAPIClient imported successfully")
         
         # Use the aggregate RSS feed provided by the user
         logger.info("Using Inoreader aggregate RSS feed for AI-Africa news")
@@ -156,16 +173,19 @@ async def start_basic_ingestion():
                     
                     if any(keyword.lower() in content_text for keyword in keywords):
                         # Prepare data for FastAPI endpoint
+                        # Ensure all URLs are strings to prevent HttpUrl serialization issues
+                        link = str(entry.get('link', '')) if entry.get('link') else ''
+                        
                         opportunity_data = {
                             'title': title,
                             'description': summary,
-                            'source_url': entry.get('link', ''),
-                            'application_url': entry.get('link', ''),
+                            'source_url': link,
+                            'application_url': link,
                             'funding_type_id': other_funding_type_id, # Use the ID for 'Other'
                             'status': 'active',
                             'geographical_scope': 'Africa',
                             'eligibility_criteria': 'N/A',
-                            'contact_info': entry.get('link', ''),
+                            'contact_info': link,
                             'application_deadline': None,
                             'amount': None,
                             'currency': 'USD'
