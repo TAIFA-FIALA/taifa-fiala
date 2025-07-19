@@ -17,6 +17,7 @@ from app.models.validation import ProcessingJob
 from app.core.logging import logger
 from app.core.config import settings
 from app.services.organization_mention_parser import OrganizationMentionParser
+from app.utils.serialization import serialize_json
 
 
 class OrganizationEnrichmentPipeline:
@@ -418,8 +419,8 @@ class OrganizationEnrichmentPipeline:
                 cultural_data = processed_data['cultural_context']
                 organization.founding_story = cultural_data.get('founding_story', organization.founding_story)
                 organization.cultural_significance = cultural_data.get('cultural_significance', organization.cultural_significance)
-                organization.local_partnerships = json.dumps(cultural_data.get('local_partnerships', []))
-                organization.languages_supported = json.dumps(cultural_data.get('languages_supported', []))
+                organization.local_partnerships = serialize_json(cultural_data.get('local_partnerships', []))
+                organization.languages_supported = serialize_json(cultural_data.get('languages_supported', []))
             
             # Update financial context
             if 'financial_context' in processed_data:
@@ -432,7 +433,7 @@ class OrganizationEnrichmentPipeline:
                 impact_data = processed_data['impact_metrics']
                 organization.beneficiaries_count = impact_data.get('beneficiaries_served', organization.beneficiaries_count)
                 organization.total_funding_distributed = impact_data.get('funding_distributed', organization.total_funding_distributed)
-                organization.success_stories = json.dumps(impact_data.get('success_stories', []))
+                organization.success_stories = serialize_json(impact_data.get('success_stories', []))
             
             # Update online presence
             if 'online_presence' in processed_data:
@@ -445,13 +446,13 @@ class OrganizationEnrichmentPipeline:
             # Update leadership
             if 'leadership' in processed_data:
                 leadership_data = processed_data['leadership']
-                organization.leadership_team = json.dumps(leadership_data.get('leadership_team', []))
+                organization.leadership_team = serialize_json(leadership_data.get('leadership_team', []))
             
             # Update recognition
             if 'recognition' in processed_data:
                 recognition_data = processed_data['recognition']
-                organization.awards_recognition = json.dumps(recognition_data.get('awards_received', []))
-                organization.notable_achievements = json.dumps(recognition_data.get('industry_recognition', []))
+                organization.awards_recognition = serialize_json(recognition_data.get('awards_received', []))
+                organization.notable_achievements = serialize_json(recognition_data.get('industry_recognition', []))
             
             self.db.commit()
             

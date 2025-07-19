@@ -20,10 +20,10 @@ class AfricaIntelligenceItemBase(BaseModel):
     start_date: Optional[datetime] = None
     status: str = "active"
     # Contact and general info
-    source_url: Optional[HttpUrl] = None
-    application_url: Optional[HttpUrl] = None
+    source_url: Optional[str] = None
+    application_url: Optional[str] = None
     contact_info: Optional[str] = None
-    geographical_scope: Optional[str] = None
+    geographical_scopes: Optional[List[str]] = None
     eligibility_criteria: Optional[str] = None
     application_deadline: Optional[datetime] = None
     max_funding_period_months: Optional[int] = None
@@ -176,7 +176,7 @@ class AfricaIntelligenceItemResponse(AfricaIntelligenceItemBase):
     recipient_is_startup: bool = False
     
     # Related entities
-    ai_domains: List[AIDomainBase] = []
+    ai_domains: Optional[List[AIDomainBase]] = None
     funding_type: Optional[FundingTypeBase] = None
     
     # Type-specific data

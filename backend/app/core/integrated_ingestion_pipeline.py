@@ -533,6 +533,7 @@ class IntegratedIngestionPipeline:
         """Execute Serper search with configuration"""
         try:
             import aiohttp
+            from app.utils.serialization import prepare_for_json
             
             # Prepare search parameters
             params = {
@@ -542,6 +543,9 @@ class IntegratedIngestionPipeline:
                 'gl': config.get('country', 'za'),  # Default to South Africa
                 'type': 'search'
             }
+            
+            # Ensure params are JSON-serializable
+            params = prepare_for_json(params)
             
             headers = {
                 'X-API-KEY': config.get('api_key', ''),

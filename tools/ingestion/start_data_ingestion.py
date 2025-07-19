@@ -112,23 +112,14 @@ async def start_basic_ingestion():
     logger.info("🔍 Using Inoreader aggregate RSS feed for AI-Africa content")
     
     # Import RSS feed reader and API client
+    import feedparser
+    import requests
+    from datetime import datetime
+    from frontend.streamlit_app.api_client import TaifaAPIClient
+    
+    logger.info(f"Python path: {sys.path}")
+    
     try:
-        logger.info("Attempting to import feedparser...")
-        import feedparser
-        logger.info("✅ feedparser imported successfully")
-        
-        logger.info("Attempting to import requests...")
-        import requests
-        logger.info("✅ requests imported successfully")
-        
-        logger.info("Attempting to import datetime...")
-        from datetime import datetime
-        logger.info("✅ datetime imported successfully")
-        
-        logger.info("Attempting to import TaifaAPIClient...")
-        from frontend.streamlit_app.api_client import TaifaAPIClient
-        logger.info("✅ TaifaAPIClient imported successfully")
-        
         # Use the aggregate RSS feed provided by the user
         logger.info("Using Inoreader aggregate RSS feed for AI-Africa news")
         rss_feeds = [
@@ -162,8 +153,8 @@ async def start_basic_ingestion():
                 
                 for entry in feed.entries:
                     # Check if content is relevant to AI/funding
-                    title = entry.get('title', '')
-                    summary = entry.get('summary', '') or entry.get('description', '')
+                    title = entry.get('title', '')[:255] # Truncate to 255 characters
+                    summary = (entry.get('summary', '') or entry.get('description', ''))[:255] # Truncate to 255 characters
                     
                     # Basic keyword filtering
                     keywords = ['AI', 'artificial intelligence', 'funding', 'investment', 'startup', 
@@ -174,7 +165,8 @@ async def start_basic_ingestion():
                     if any(keyword.lower() in content_text for keyword in keywords):
                         # Prepare data for FastAPI endpoint
                         # Ensure all URLs are strings to prevent HttpUrl serialization issues
-                        link = str(entry.get('link', '')) if entry.get('link') else ''
+                        link = str(entry.link) if hasattr(entry, 'link') else ''
+                        link = link[:255] # Truncate to 255 characters
                         
                         opportunity_data = {
                             'title': title,
@@ -183,12 +175,9 @@ async def start_basic_ingestion():
                             'application_url': link,
                             'funding_type_id': other_funding_type_id, # Use the ID for 'Other'
                             'status': 'active',
-                            'geographical_scope': 'Africa',
                             'eligibility_criteria': 'N/A',
-                            'contact_info': link,
-                            'application_deadline': None,
-                            'amount': None,
-                            'currency': 'USD'
+                            'amount_min': None,
+                            'amount_max': None,
                         }
                         
                         try:
@@ -218,6 +207,19 @@ async def start_basic_ingestion():
         logger.error(f"❌ Error during basic ingestion: {e}")
         return False
 
+async def get_table_schema(client, table_name: str):
+    """Fetches and prints the schema of a given table from Supabase."""
+    try:
+        response = client.from_('information_schema.columns').select('column_name, data_type').eq('table_name', table_name).execute()
+        if response.data:
+            logger.info(f"Schema for table '{table_name}':")
+            for col in response.data:
+                logger.info(f"  - {col['column_name']}: {col['data_type']}")
+        else:
+            logger.info(f"No schema found for table '{table_name}'.")
+    except Exception as e:
+        logger.error(f"Error fetching schema for table '{table_name}': {e}")
+
 async def main():
     """Main function to start data ingestion"""
     
@@ -234,6 +236,10 @@ async def main():
     logger.info("2. Setting up initial data sources...")
     if not setup_initial_data_sources():
         logger.warning("⚠️  Could not set up initial data sources")
+
+    # Get Supabase client for schema inspection
+    supabase_client = create_client(os.getenv('SUPABASE_PROJECT_URL'), os.getenv('SUPABASE_API_KEY'))
+    await get_table_schema(supabase_client, 'africa_intelligence_feed')
     
     # Start basic ingestion
     logger.info("3. Starting basic data ingestion...")

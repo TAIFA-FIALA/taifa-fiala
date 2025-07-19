@@ -494,6 +494,11 @@ class MultilingualSearchEngine:
     async def _execute_serper_search(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Execute search using Serper API"""
         try:
+            from app.utils.serialization import prepare_for_json
+            
+            # Ensure params are JSON-serializable
+            params = prepare_for_json(params)
+            
             headers = {
                 'X-API-KEY': self.serper_api_key,
                 'Content-Type': 'application/json'

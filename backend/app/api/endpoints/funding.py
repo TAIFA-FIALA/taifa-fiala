@@ -59,7 +59,7 @@ async def get_intelligence_item(
     
     return opportunity
 
-@router.post("/", response_model=AfricaIntelligenceItemResponse)
+@router.post("/", response_model=AfricaIntelligenceItemResponse, response_model_exclude_unset=True)
 async def create_intelligence_item(
     opportunity: AfricaIntelligenceItemCreate,
     db: Session = Depends(get_db)

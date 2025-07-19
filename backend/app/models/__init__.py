@@ -4,18 +4,18 @@ Includes all models with relationships and new lookup tables based on competitor
 """
 
 # Import all models to ensure they're registered with SQLAlchemy
-from app.models.funding import AfricaIntelligenceItem
-from app.models.organization import Organization
-from app.models.lookups import FundingType, AIDomain, GeographicScope, CommunityUser
-from app.models.domains import AIDomain as DomainAlias  # Keep existing import if needed
-from app.models.sources import DataSource
-from app.models.rfp import RFP
-from app.models.equity import (
+from .funding import AfricaIntelligenceItem
+from .organization import Organization
+from .lookups import FundingType, AIDomain, GeographicScope, CommunityUser
+from .domains import AIDomain as DomainAlias  # Keep existing import if needed
+from .sources import DataSource
+from .rfp import RFP
+from .equity import (
     GenderFundingData, UnderrepresentedGroup, InclusionMetric, 
     FeaturedFounder, FundingStageMetric, StageProgression,
     CollaborationSuggestion, SuggestedOpportunity
 )
-from app.models.validation import (
+from .validation import (
     ValidationResult, DuplicateDetection, ProcessingJob, 
     ModuleHealth, ContentFingerprint, SourceQuality
 )

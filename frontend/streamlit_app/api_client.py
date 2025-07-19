@@ -100,7 +100,12 @@ class TaifaAPIClient:
         try:
             session = await self._get_session()
             
-            # Use custom encoder to properly serialize HttpUrl objects
+            # Ensure URLs are strings before serialization
+            if 'source_url' in opportunity_data and opportunity_data['source_url'] is not None:
+                opportunity_data['source_url'] = str(opportunity_data['source_url'])
+            if 'application_url' in opportunity_data and opportunity_data['application_url'] is not None:
+                opportunity_data['application_url'] = str(opportunity_data['application_url'])
+
             json_data = json.dumps(opportunity_data, cls=TaifaJsonEncoder)
             headers = {'Content-Type': 'application/json'}
             
@@ -212,13 +217,6 @@ def demo_add_serper_opportunity(opportunity_data: Dict[str, Any]) -> Optional[Di
         "status": "active",
         "geographical_scope": "Africa, Rwanda",
         "eligibility_criteria": "AI/Tech projects focusing on African development",
-        "application_url": str(opportunity_data.get("source_url", "")),
-        "application_url": str(opportunity_data.get("source_url", "")),
-        "application_url": str(opportunity_data.get("source_url", "")),
-        "application_url": str(opportunity_data.get("source_url", "")),
-        "application_url": str(opportunity_data.get("source_url", "")),
-        "application_url": str(opportunity_data.get("source_url", "")),
-        "application_url": str(opportunity_data.get("source_url", "")),
         "application_url": str(opportunity_data.get("source_url", ""))
     }
     
