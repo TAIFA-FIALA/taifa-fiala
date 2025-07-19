@@ -8,6 +8,7 @@ to be used across the application.
 
 import os
 import logging
+from typing import Union
 from pinecone import Pinecone
 
 # Configure logging
@@ -26,7 +27,7 @@ except Exception as e:
     logger.error(f"Failed to initialize Pinecone client: {e}")
     pc = None
 
-def get_pinecone_client() -> Pinecone | None:
+def get_pinecone_client() -> Union[Pinecone, None]:
     """
     Returns the singleton Pinecone client instance.
     """
