@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List, Optional
 from datetime import datetime
+import logging
 
 from app.core.database import get_db
 from app.models import AfricaIntelligenceItem, Organization, AIDomain, FundingType, GeographicScope
@@ -9,8 +10,18 @@ from app.schemas.funding import (
     AfricaIntelligenceItemResponse, AfricaIntelligenceItemCreate, AfricaIntelligenceItemUpdate,
     GrantFundingSpecific, InvestmentFundingSpecific
 )
+from app.services.funding_intelligence.vector_intelligence import FundingIntelligenceVectorDB
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
+
+# Initialize vector database for Pinecone integration
+try:
+    vector_db = FundingIntelligenceVectorDB()
+    logger.info("✅ Pinecone vector database initialized for funding opportunities API")
+except Exception as e:
+    logger.warning(f"⚠️ Failed to initialize Pinecone vector database: {e}")
+    vector_db = None
 
 #
 # Core Intelligence Item Endpoints (from funding.py)
@@ -294,6 +305,39 @@ async def create_intelligence_item(
         if item_id is None:
             raise HTTPException(status_code=500, detail="Database did not return an ID for the created item")
 
+        # 🔥 ADD PINECONE VECTOR INDEXING 🔥
+        # Index the new opportunity in Pinecone for semantic search
+        if vector_db:
+            try:
+                # Prepare data for Pinecone indexing
+                pinecone_data = {
+                    'id': str(item_id),
+                    'title': db_opportunity.get('title', ''),
+                    'description': db_opportunity.get('description', ''),
+                    'funding_type': funding_type_data.get('name', ''),
+                    'funding_category': funding_category,
+                    'amount_min': db_opportunity.get('amount_min'),
+                    'amount_max': db_opportunity.get('amount_max'),
+                    'amount_exact': db_opportunity.get('amount_exact'),
+                    'currency': db_opportunity.get('currency', 'USD'),
+                    'geographical_scope': db_opportunity.get('geographical_scope', ''),
+                    'eligibility_criteria': db_opportunity.get('eligibility_criteria', ''),
+                    'source_url': db_opportunity.get('source_url', ''),
+                    'application_url': db_opportunity.get('application_url', ''),
+                    'deadline': db_opportunity.get('deadline'),
+                    'status': db_opportunity.get('status', 'open'),
+                    'created_at': db_opportunity.get('created_at')
+                }
+                
+                # Index to Pinecone asynchronously
+                await vector_db.upsert_intelligence_item(pinecone_data)
+                logger.info(f"✅ Successfully indexed opportunity {item_id} to Pinecone")
+                
+            except Exception as e:
+                # Don't fail the API call if Pinecone indexing fails
+                logger.error(f"❌ Failed to index opportunity {item_id} to Pinecone: {e}")
+                # Continue with the response even if Pinecone fails
+
         response_data = {
             **db_opportunity,
             "id": item_id,
@@ -337,6 +381,37 @@ async def create_intelligence_item(
         db.add(db_opportunity)
         db.commit()
         db.refresh(db_opportunity)
+        
+        # 🔥 ADD PINECONE VECTOR INDEXING FOR SQLALCHEMY 🔥
+        if vector_db:
+            try:
+                # Prepare data for Pinecone indexing
+                pinecone_data = {
+                    'id': str(db_opportunity.id),
+                    'title': db_opportunity.title or '',
+                    'description': db_opportunity.description or '',
+                    'funding_type': funding_type.name,
+                    'funding_category': funding_type.category,
+                    'amount_min': db_opportunity.amount_min,
+                    'amount_max': db_opportunity.amount_max,
+                    'amount_exact': db_opportunity.amount_exact,
+                    'currency': db_opportunity.currency or 'USD',
+                    'geographical_scope': db_opportunity.geographical_scope or '',
+                    'eligibility_criteria': db_opportunity.eligibility_criteria or '',
+                    'source_url': db_opportunity.source_url or '',
+                    'application_url': db_opportunity.application_url or '',
+                    'deadline': db_opportunity.deadline,
+                    'status': db_opportunity.status or 'open',
+                    'created_at': db_opportunity.created_at
+                }
+                
+                # Index to Pinecone asynchronously
+                await vector_db.upsert_intelligence_item(pinecone_data)
+                logger.info(f"✅ Successfully indexed opportunity {db_opportunity.id} to Pinecone")
+                
+            except Exception as e:
+                # Don't fail the API call if Pinecone indexing fails
+                logger.error(f"❌ Failed to index opportunity {db_opportunity.id} to Pinecone: {e}")
         
         # Create response with type-specific data
         response = AfricaIntelligenceItemResponse.from_orm(db_opportunity)
