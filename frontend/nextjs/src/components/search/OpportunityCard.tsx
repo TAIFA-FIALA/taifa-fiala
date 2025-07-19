@@ -278,10 +278,10 @@ export default function OpportunityCard({ opportunity, searchMode, onViewDetails
                     <span>Grant Details</span>
                   </h4>
                   <div className="space-y-2 text-sm">
-                    {opportunity.grant_specific.grant_duration_months && (
+                    {opportunity.grant_specific.duration_months && (
                       <div className="flex justify-between">
                         <span className="text-gray-600">Duration:</span>
-                        <span className="font-medium">{opportunity.grant_specific.grant_duration_months} months</span>
+                        <span className="font-medium">{opportunity.grant_specific.duration_months} months</span>
                       </div>
                     )}
                     {opportunity.grant_specific.renewable !== undefined && (
@@ -403,7 +403,7 @@ export default function OpportunityCard({ opportunity, searchMode, onViewDetails
                     <span>Bias Analysis</span>
                   </h4>
                   <div className="space-y-1">
-                    {opportunity.bias_flags.map((flag, index) => (
+                    {opportunity.bias_flags.map((flag: string, index: number) => (
                       <div key={index} className="text-xs text-yellow-700 bg-yellow-50 px-2 py-1 rounded">
                         {flag}
                       </div>

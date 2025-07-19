@@ -146,7 +146,7 @@ export default async function HomePage() {
       {/* Key Issues Section */}
       <section id="data" className="py-12 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-2xl font-serif text-gray-900 mb-8 flex items-center gap-3">
+          <h2 className="text-2xl font-display text-gray-900 mb-8 flex items-center gap-3">
             <TrendingUp className="w-6 h-6 text-taifa-primary" />
             Issues of Equity inAI Funding We're Tracking
           </h2>
@@ -277,7 +277,7 @@ export default async function HomePage() {
       // AI Funding Landscape Dashboard
       <section className="py-12 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-2xl font-serif text-gray-900 mb-8 flex items-center gap-3">
+          <h2 className="text-2xl font-display text-gray-900 mb-8 flex items-center gap-3">
             <BarChart3 className="w-6 h-6 text-taifa-primary" />
             AI Funding Landscape Dashboard
           </h2>
@@ -304,7 +304,7 @@ export default async function HomePage() {
       // Equity & Inclusion Analysis Hub
       <section className="py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-2xl font-serif text-gray-900 mb-8 flex items-center gap-3">
+          <h2 className="text-2xl font-display text-gray-900 mb-8 flex items-center gap-3">
             <Users className="w-6 h-6 text-taifa-primary" />
             Equity & Inclusion Analysis Hub
           </h2>

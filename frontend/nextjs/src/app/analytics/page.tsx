@@ -30,7 +30,7 @@ export default async function AnalyticsDashboardPage() {
       {/* Page Header */}
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-serif text-gray-900">
+          <h1 className="text-3xl font-display text-gray-900">
             AI Funding Analysis for Africa
           </h1>
           <p className="mt-1 text-sm text-gray-500">

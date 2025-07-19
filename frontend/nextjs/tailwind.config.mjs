@@ -8,9 +8,10 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        display: ['var(--font-montserrat)', 'Montserrat', 'system-ui', 'sans-serif'], // More modern headline font
-        sans: ['var(--font-nunito)', 'Nunito', 'system-ui', 'sans-serif'],           // Clean, friendly body font
-        serif: ['var(--font-lora)', 'Georgia', 'serif'],                              // Keep serif as fallback
+        display: ['Inter', 'system-ui', 'sans-serif'],        // Clean, modern headings
+        body: ['Source Sans Pro', 'system-ui', 'sans-serif'], // Readable body text
+        sans: ['Source Sans Pro', 'system-ui', 'sans-serif'], // Default sans-serif
+        serif: ['Georgia', 'serif'],                           // Fallback serif
       },
       colors: {
         // TAIFA-FIALA official color palette
@@ -36,20 +37,24 @@ export default {
         DEFAULT: {
           css: {
             h1: {
-              fontFamily: 'var(--font-lora)',
+              fontFamily: 'Inter, system-ui, sans-serif',
               color: '#1B365D',
+              fontWeight: '600',
             },
             h2: {
-              fontFamily: 'var(--font-lora)',
+              fontFamily: 'Inter, system-ui, sans-serif',
               color: '#1B365D',
+              fontWeight: '600',
             },
             h3: {
-              fontFamily: 'var(--font-lora)',
+              fontFamily: 'Inter, system-ui, sans-serif',
               color: '#1B365D',
+              fontWeight: '600',
             },
             'figure figcaption': {
               fontStyle: 'italic',
               color: '#666666',
+              fontFamily: 'Source Sans Pro, system-ui, sans-serif',
             },
           },
         },

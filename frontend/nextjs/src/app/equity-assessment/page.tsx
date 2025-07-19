@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { UploadCloud, Users, TrendingDown, AlertTriangle } from 'lucide-react';
+import StatCard from '@/components/equity-assessment/StatCard';
 
 // Placeholder for data fetching logic
 async function getEquityData() {
@@ -30,7 +31,7 @@ export default async function EquityAssessmentPage() {
       {/* Page Header */}
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-serif text-gray-900">
+          <h1 className="text-3xl font-display text-gray-900">
             Funding Equity Assessment
           </h1>
         </div>
@@ -51,37 +52,35 @@ export default async function EquityAssessmentPage() {
 
           {/* Assessment Metrics */}
           <div className="mb-8">
-            <h2 className="text-2xl font-serif text-gray-900 mb-6">Assessment Metrics</h2>
+            <h2 className="text-2xl font-display text-gray-900 mb-6">Assessment Metrics</h2>
             <div className="grid md:grid-cols-3 gap-6">
-              {/* Geographic Equity */}
-              <div className="bg-white p-6 rounded-lg shadow-sm border">
-                <h3 className="font-semibold text-gray-900 mb-3">Geographic Equity</h3>
-                <p className="text-4xl font-bold text-blue-700">{data.herfindahlIndex.toFixed(2)}</p>
-                <p className="text-sm text-gray-600">Herfindahl-Hirschman Index</p>
-                <p className="text-xs text-gray-500 mt-2">High concentration (0 = perfect distribution, 1 = complete concentration)</p>
-              </div>
-
-              {/* Gender Equity */}
-              <div className="bg-white p-6 rounded-lg shadow-sm border">
-                <h3 className="font-semibold text-gray-900 mb-3">Gender Equity</h3>
-                <p className="text-4xl font-bold text-red-700">{data.genderMetrics.femaleLedFundingPercentage}%</p>
-                <p className="text-sm text-gray-600">Female-led startups funded</p>
-                <p className="text-xs text-gray-500 mt-2">Significant disparity (target: 50%)</p>
-              </div>
-
-              {/* Funding Gap */}
-              <div className="bg-white p-6 rounded-lg shadow-sm border">
-                <h3 className="font-semibold text-gray-900 mb-3">Average Funding Gap</h3>
-                <p className="text-4xl font-bold text-orange-700">${(data.genderMetrics.averageFundingGap / 1000000).toFixed(1)}M</p>
-                <p className="text-sm text-gray-600">Male vs Female-led ventures</p>
-                <p className="text-xs text-gray-500 mt-2">Critical disparity requiring intervention</p>
-              </div>
+              <StatCard
+                title="Geographic Equity"
+                value={data.herfindahlIndex.toFixed(2)}
+                description="Herfindahl-Hirschman Index"
+                valueClassName="text-blue-700"
+                className="animate-fadeInUp"
+              />
+              <StatCard
+                title="Gender Equity"
+                value={`${data.genderMetrics.femaleLedFundingPercentage}%`}
+                description="Female-led startups funded"
+                valueClassName="text-red-700"
+                className="animate-fadeInUp"
+              />
+              <StatCard
+                title="Average Funding Gap"
+                value={`$${(data.genderMetrics.averageFundingGap / 1000000).toFixed(1)}M`}
+                description="Male vs Female-led ventures"
+                valueClassName="text-orange-700"
+                className="animate-fadeInUp"
+              />
             </div>
           </div>
 
           {/* Gender Disparity Deep Dive */}
           <div className="mb-8">
-            <h2 className="text-2xl font-serif text-gray-900 mb-6 flex items-center gap-3">
+            <h2 className="text-2xl font-display text-gray-900 mb-6 flex items-center gap-3">
               <Users className="w-6 h-6 text-red-600" />
               Gender Disparity Analysis
             </h2>
@@ -103,29 +102,42 @@ export default async function EquityAssessmentPage() {
 
             {/* Key Metrics Grid */}
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-              <div className="bg-white p-6 rounded-lg shadow-sm border text-center">
-                <TrendingDown className="w-8 h-8 text-red-600 mx-auto mb-3" />
-                <p className="text-2xl font-bold text-red-700">{data.genderMetrics.femaleLedFundingPercentage}%</p>
-                <p className="text-sm text-gray-600">Female-led funding share</p>
-              </div>
-              
-              <div className="bg-white p-6 rounded-lg shadow-sm border text-center">
-                <Users className="w-8 h-8 text-orange-600 mx-auto mb-3" />
-                <p className="text-2xl font-bold text-orange-700">{data.genderMetrics.femaleLeadershipPercentage}%</p>
-                <p className="text-sm text-gray-600">Female AI leadership</p>
-              </div>
-              
-              <div className="bg-white p-6 rounded-lg shadow-sm border text-center">
-                <TrendingDown className="w-8 h-8 text-red-600 mx-auto mb-3" />
-                <p className="text-2xl font-bold text-red-700">${(data.genderMetrics.averageFundingGap / 1000000).toFixed(1)}M</p>
-                <p className="text-sm text-gray-600">Average funding gap</p>
-              </div>
-              
-              <div className="bg-white p-6 rounded-lg shadow-sm border text-center">
-                <Users className="w-8 h-8 text-green-600 mx-auto mb-3" />
-                <p className="text-2xl font-bold text-green-700">+{data.genderMetrics.femaleFounderGrowthRate}%</p>
-                <p className="text-sm text-gray-600">Female founder growth</p>
-              </div>
+              <StatCard
+                title="Female-led funding share"
+                value={`${data.genderMetrics.femaleLedFundingPercentage}%`}
+                description=""
+                Icon={TrendingDown}
+                iconClassName="text-red-600"
+                valueClassName="text-red-700 text-2xl"
+                className="animate-fadeInUp text-center"
+              />
+              <StatCard
+                title="Female AI leadership"
+                value={`${data.genderMetrics.femaleLeadershipPercentage}%`}
+                description=""
+                Icon={Users}
+                iconClassName="text-orange-600"
+                valueClassName="text-orange-700 text-2xl"
+                className="animate-fadeInUp text-center"
+              />
+              <StatCard
+                title="Average funding gap"
+                value={`$${(data.genderMetrics.averageFundingGap / 1000000).toFixed(1)}M`}
+                description=""
+                Icon={TrendingDown}
+                iconClassName="text-red-600"
+                valueClassName="text-red-700 text-2xl"
+                className="animate-fadeInUp text-center"
+              />
+              <StatCard
+                title="Female founder growth"
+                value={`+${data.genderMetrics.femaleFounderGrowthRate}%`}
+                description=""
+                Icon={Users}
+                iconClassName="text-green-600"
+                valueClassName="text-green-700 text-2xl"
+                className="animate-fadeInUp text-center"
+              />
             </div>
 
             {/* Sector Analysis */}
@@ -181,14 +193,14 @@ export default async function EquityAssessmentPage() {
 
           {/* Portfolio Analysis */}
           <div className="bg-white p-8 rounded-lg shadow-sm border border-gray-200">
-            <h2 className="text-2xl font-serif text-gray-900 mb-4">Portfolio Comparison</h2>
+            <h2 className="text-2xl font-display text-gray-900 mb-4">Portfolio Comparison</h2>
             <p className="text-gray-700 mb-6 max-w-4xl">
               Organizations may submit their funding data for confidential 
               comparative analysis. Results are provided directly and not 
               stored or shared.
             </p>
             <div>
-              <Link href="/equity/portfolio-analysis" className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-700 hover:bg-blue-800">
+              <Link href="/equity/portfolio-analysis" className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-taifa-primary hover:bg-taifa-secondary">
                 <UploadCloud className="mr-3 h-5 w-5" />
                 Upload Portfolio Data (CSV)
               </Link>

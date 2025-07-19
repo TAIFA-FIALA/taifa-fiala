@@ -83,7 +83,7 @@ export default function PublicationsPage() {
       {/* Page Header */}
       <header className="bg-gray-50 border-b border-gray-200">
         <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-serif text-gray-900">
+          <h1 className="text-3xl font-display text-gray-900">
             Research Outputs
           </h1>
         </div>
@@ -96,17 +96,17 @@ export default function PublicationsPage() {
           {PUBLICATIONS_ENABLED ? (
             <>
               <section id="papers">
-                <h2 className="text-2xl font-serif text-gray-900 mb-6 border-b pb-2">Peer-Reviewed Papers</h2>
+                <h2 className="text-2xl font-display text-gray-900 mb-6 border-b pb-2">Peer-Reviewed Papers</h2>
                 {publications.papers.map(pub => <PublicationCard key={pub.title} {...pub as PublicationCardProps} />)}
               </section>
 
               <section id="briefs" className="mt-12">
-                <h2 className="text-2xl font-serif text-gray-900 mb-6 border-b pb-2">Policy Briefs</h2>
+                <h2 className="text-2xl font-display text-gray-900 mb-6 border-b pb-2">Policy Briefs</h2>
                 {publications.briefs.map(pub => <PublicationCard key={pub.title} {...pub as PublicationCardProps} />)}
               </section>
 
               <section id="reports" className="mt-12">
-                <h2 className="text-2xl font-serif text-gray-900 mb-6 border-b pb-2">Technical Reports</h2>
+                <h2 className="text-2xl font-display text-gray-900 mb-6 border-b pb-2">Technical Reports</h2>
                 {publications.reports.map(pub => <PublicationCard key={pub.title} {...pub as PublicationCardProps} />)}
               </section>
             </>

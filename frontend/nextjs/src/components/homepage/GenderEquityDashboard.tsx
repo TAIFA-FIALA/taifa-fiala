@@ -2,7 +2,6 @@
 
 import React from 'react';
 import {
-  LineChart,
   Line,
   XAxis,
   YAxis,
@@ -11,12 +10,7 @@ import {
   ResponsiveContainer,
   BarChart,
   Bar,
-  PieChart,
-  Pie,
-  Cell,
   ComposedChart,
-  Area,
-  AreaChart,
   Legend
 } from 'recharts';
 import { TrendingDown, AlertCircle, Users, DollarSign } from 'lucide-react';

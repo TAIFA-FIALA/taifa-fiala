@@ -13,13 +13,13 @@ export default function AboutPage() {
           </h1>
           <p className="text-xl text-gray-700 leading-relaxed max-w-3xl mx-auto">
             An independent initiative promoting transparency, equity, and accountability in AI funding 
-            across Africa. We apply advanced data analytics and research expertise to ensure AI development 
+            across Africa. We apply advanced data analytics and research expertise to facilitate a vision where AI development 
             serves all Africans, not just a privileged few.
           </p>
           <div className="mt-8 text-gray-600">
             <p className="text-lg">
-              <strong>Mission:</strong> Preventing AI from perpetuating the same disparities as previous innovations 
-              that promised much to Africans but failed to deliver equitably.
+              <strong>Mission:</strong> Preventing AI development from perpetuating the same disparities as previous innovations 
+              that promised much for Africans but failed to deliver equitably.
             </p>
           </div>
         </div>
@@ -31,7 +31,7 @@ export default function AboutPage() {
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Leadership Team</h2>
             <p className="text-gray-600">
-              Combining African data analytics expertise with global research experience
+              Combining expertise in data science and a passion for local development that serves community needs.
             </p>
           </div>
 
@@ -43,16 +43,16 @@ export default function AboutPage() {
                 <Users className="h-16 w-16 text-amber-700" />
               </div>
               
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Executive Director</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Hinda Ruton</h3>
               <div className="text-amber-700 font-medium mb-4">Africa Quantitative Sciences (AQS)</div>
               
               <p className="text-gray-700 leading-relaxed mb-6">
-                Leading Africa Quantitative Sciences, Rwanda's premier data analytics firm, our Executive Director 
+                Leading Africa Quantitative Sciences, Rwanda's premier data analytics firm, Hinda Ruton
                 brings extensive experience in transforming unstructured data into actionable insights across 
                 African contexts. With a focus on public health outcomes and global health security, 
-                they have pioneered innovative data-driven solutions that enhance vaccine and disease monitoring 
-                while strengthening health systems across the continent. Their vision combines cutting-edge 
-                technology with deep understanding of African operational realities.
+                he has pioneered innovative data-driven solutions that enhance vaccine and disease monitoring 
+                while strengthening health systems. His vision combines cutting-edge 
+                technology with deep understanding of operational realities of African businesses and agencies and the needs of the local communities they sereve..
               </p>
               
               <div className="flex justify-center items-center text-sm text-gray-500">
@@ -71,12 +71,12 @@ export default function AboutPage() {
               <div className="text-emerald-700 font-medium mb-4">Scientific Director</div>
               
               <p className="text-gray-700 leading-relaxed mb-6">
-                Dr. Forrest holds a PhD in Population and Public Health and has dedicated their career to 
-                addressing health and development challenges across Africa. With extensive experience living 
-                and working in Rwanda for many years, and earlier career experience in South Africa, 
-                they bring deep contextual understanding of African development dynamics. Their research 
-                expertise in funding analysis and commitment to equity-driven innovation drives TAIFA-FIALA's 
-                scientific approach to ensuring AI development serves all African communities.
+                Dr. Forrest holds a PhD in Population and Public Health and has dedicated his career to 
+                addressing health and development challenges in African countries. With many years of living 
+                and working in Rwanda, and earlier career experience in South Africa,  
+                he brings deep contextual understanding of African development dynamics. His research interests and 
+                expertise include digital health, clinical research, and equity-driven innovations like those driving TAIFA-FIALA's 
+                scientific approach to holding AI development accountable for its promise to all Africans.
               </p>
               
               <div className="flex justify-center items-center text-sm text-gray-500">
@@ -95,13 +95,13 @@ export default function AboutPage() {
           <div className="bg-amber-50 p-8 rounded-xl border-l-4 border-amber-500">
             <p className="text-lg text-gray-800 leading-relaxed">
               History shows us that technological innovations often promise transformation for Africa 
-              but frequently fail to deliver equitable benefits. From mobile banking to renewable energy, 
-              we've seen how good intentions can perpetuate existing disparities. 
+              but frequently fail to deliver the kind of equitable benefits that promise the tide to raise all boats. From mobile banking to renewable energy, 
+              we've seen how good intentions can perpetuate existing disparities that are deeply rooted. 
               <strong className="text-amber-800"> We founded TAIFA-FIALA to ensure AI doesn't repeat this pattern.</strong>
             </p>
             <p className="text-gray-700 mt-4">
-              By combining rigorous data analytics with deep African experience, we track where AI funding 
-              actually goes, who benefits, and whether promises translate to reality. Our goal is transparency 
+              By combining rigorous data analytics with lived experience, we are setting out on an ambitious journey to track where AI funding comes from,
+              where itactually goes, who benefits, and whether promises translate to reality. Our goal is transparency 
               that enables truly inclusive AI development across the continent.
             </p>
           </div>
@@ -121,7 +121,7 @@ export default function AboutPage() {
               work serves the broader African AI ecosystem.
             </p>
             <div className="mt-6 text-sm text-amber-700 font-medium">
-              Announcements forthcoming in Q4 2025
+              Announcements forthcoming
             </div>
           </div>
         </div>

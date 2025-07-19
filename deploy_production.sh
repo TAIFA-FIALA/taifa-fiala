@@ -184,31 +184,71 @@ ssh $SSH_USER@$PROD_SERVER "
 
 echo -e "${GREEN}✓ Existing services stopped${NC}"
 
-echo -e "${YELLOW}Step 8: Setting up Python environment${NC}"
+echo -e "${YELLOW}Step 8: Installing and configuring Redis${NC}"
 
-# Setup Python environment and install dependencies
+# Install and configure Redis on mac-mini
+ssh $SSH_USER@$PROD_SERVER "
+    # Check if Redis is installed
+    if ! command -v redis-server &> /dev/null; then
+        echo 'Installing Redis...'
+        # Install Redis using Homebrew (assuming macOS)
+        if command -v brew &> /dev/null; then
+            brew install redis
+        else
+            echo 'Error: Homebrew not found. Please install Redis manually.'
+            exit 1
+        fi
+    else
+        echo '✓ Redis already installed'
+    fi
+    
+    # Start Redis service
+    echo 'Starting Redis service...'
+    brew services start redis || redis-server --daemonize yes
+    
+    # Wait for Redis to start
+    sleep 3
+    
+    # Test Redis connection
+    if redis-cli ping | grep -q PONG; then
+        echo '✓ Redis is running and accessible'
+    else
+        echo 'Error: Redis is not responding'
+        exit 1
+    fi
+"
+
+REDIS_STATUS=$?
+
+if [ $REDIS_STATUS -ne 0 ]; then
+    echo -e "${RED}Error: Failed to setup Redis${NC}"
+    git tag -d "$DEPLOY_TAG" 2>/dev/null
+    exit 1
+fi
+
+echo -e "${GREEN}✓ Redis setup complete${NC}"
+
+echo -e "${YELLOW}Step 9: Setting up Python environment${NC}"
+
+# Setup Python environment
 ssh $SSH_USER@$PROD_SERVER "
     cd '$PROD_PATH'
     
     # Create virtual environment if it doesn't exist
     if [ ! -d 'venv' ]; then
-        echo 'Creating Python virtual environment...'
-        python3 -m venv venv
+        echo 'Creating virtual environment...'
+        $PYTHON_ENV -m venv venv
     fi
     
-    # Activate virtual environment and install requirements
     echo 'Installing Python dependencies...'
     source venv/bin/activate
     pip install --upgrade pip
-    pip install -r requirements.txt
+    pip install -r backend/requirements.txt
     
     # Install additional requirements if they exist
-    if [ -f 'requirements_crewai.txt' ]; then
-        pip install -r requirements_crewai.txt
+    if [ -f 'backend/requirements_crewai.txt' ]; then
+        pip install -r backend/requirements_crewai.txt
     fi
-    
-    # Install streamlit for dashboard
-    pip install streamlit
     
     echo 'Python environment ready'
 "
@@ -223,11 +263,48 @@ fi
 
 echo -e "${GREEN}✓ Python environment setup complete${NC}"
 
-echo -e "${YELLOW}Step 9: Starting TAIFA-FIALA services${NC}"
+echo -e "${YELLOW}Step 10: Deploying Frontend to Vercel${NC}"
 
-# Start services
+# Deploy frontend to Vercel
+echo "Deploying frontend to Vercel..."
+cd frontend/nextjs
+
+# Check if Vercel CLI is installed
+if ! command -v vercel &> /dev/null; then
+    echo "Installing Vercel CLI..."
+    npm install -g vercel
+fi
+
+# Deploy to Vercel (using token from .env)
+if [ -f ".env.local" ]; then
+    echo "✓ Found Vercel configuration"
+    echo "Deploying to Vercel project: TAIFA-FIALA-frontend"
+    vercel --prod --yes --name TAIFA-FIALA-frontend
+    VERCEL_STATUS=$?
+    
+    if [ $VERCEL_STATUS -eq 0 ]; then
+        echo -e "${GREEN}✓ Frontend deployed to Vercel successfully${NC}"
+        echo -e "${GREEN}✓ Project: TAIFA-FIALA-frontend${NC}"
+    else
+        echo -e "${RED}Error: Frontend deployment to Vercel failed${NC}"
+        exit 1
+    fi
+else
+    echo -e "${YELLOW}Warning: No .env.local found. Skipping Vercel deployment.${NC}"
+    echo -e "${YELLOW}Please ensure VERCEL_TOKEN is configured in frontend/nextjs/.env.local${NC}"
+fi
+
+# Return to project root
+cd ../..
+
+echo -e "${YELLOW}Step 11: Starting TAIFA-FIALA Backend Services${NC}"
+
+# Start backend services
 ssh $SSH_USER@$PROD_SERVER "
     cd '$PROD_PATH'
+    
+    # Create logs directory
+    mkdir -p logs
     
     # Clean Python cache on server
     echo 'Cleaning Python cache on server...'
@@ -235,34 +312,60 @@ ssh $SSH_USER@$PROD_SERVER "
     find . -name '*.pyc' -delete 2>/dev/null || true
     
     # Start services in background
-    echo 'Starting TAIFA-FIALA services...'
+    echo 'Starting TAIFA-FIALA backend services...'
     
-    # Start data ingestion service
-    nohup venv/bin/python tools/ingestion/start_data_ingestion.py > logs/data_ingestion.log 2>&1 &
-    echo \$! > .data_ingestion.pid
+    # Start FastAPI backend with Redis support
+    echo 'Starting FastAPI backend...'
+    cd backend
+    nohup ../venv/bin/python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload > ../logs/backend.log 2>&1 &
+    echo \$! > ../.backend.pid
+    cd ..
     
-    # Start dashboard service
-    nohup venv/bin/streamlit run tools/dashboard/system_dashboard.py --server.port 8501 --server.address 0.0.0.0 > logs/dashboard.log 2>&1 &
-    echo \$! > .dashboard.pid
+    # Start data ingestion service (if exists)
+    if [ -f 'tools/ingestion/start_data_ingestion.py' ]; then
+        nohup venv/bin/python tools/ingestion/start_data_ingestion.py > logs/data_ingestion.log 2>&1 &
+        echo \$! > .data_ingestion.pid
+    fi
     
     # Create logs directory if it doesn't exist
     mkdir -p logs
     
     echo 'Waiting for services to start...'
-    sleep 10
+    sleep 15
     
     # Check if services are running
     echo 'Service status:'
-    if kill -0 \$(cat .data_ingestion.pid 2>/dev/null) 2>/dev/null; then
-        echo '✓ Data ingestion service: RUNNING'
+    
+    # Check Redis
+    if redis-cli ping | grep -q PONG; then
+        echo '✓ Redis service: RUNNING'
     else
-        echo '✗ Data ingestion service: FAILED'
+        echo '✗ Redis service: FAILED'
     fi
     
-    if kill -0 \$(cat .dashboard.pid 2>/dev/null) 2>/dev/null; then
-        echo '✓ Dashboard service: RUNNING on port 8501'
+    # Check FastAPI backend
+    if kill -0 \$(cat .backend.pid 2>/dev/null) 2>/dev/null; then
+        echo '✓ FastAPI backend: RUNNING on port 8000'
+        # Test API health endpoint
+        sleep 5
+        if curl -s http://localhost:8000/health | grep -q 'healthy'; then
+            echo '✓ FastAPI backend health check: PASSED'
+        else
+            echo '⚠ FastAPI backend health check: PENDING (may still be starting)'
+        fi
     else
-        echo '✗ Dashboard service: FAILED'
+        echo '✗ FastAPI backend: FAILED'
+    fi
+    
+    # Check data ingestion service (if exists)
+    if [ -f '.data_ingestion.pid' ]; then
+        if kill -0 \$(cat .data_ingestion.pid 2>/dev/null) 2>/dev/null; then
+            echo '✓ Data ingestion service: RUNNING'
+        else
+            echo '✗ Data ingestion service: FAILED'
+        fi
+    else
+        echo 'ℹ Data ingestion service: NOT CONFIGURED'
     fi
 "
 
@@ -272,46 +375,83 @@ if [ $DEPLOY_STATUS -eq 0 ]; then
     echo -e "${GREEN}✓ TAIFA-FIALA services started successfully${NC}"
     
     # Final health check
-    echo -e "${YELLOW}Checking service health...${NC}"
+    echo -e "${YELLOW}Performing final health checks...${NC}"
     sleep 5
     
     ssh $SSH_USER@$PROD_SERVER "
         cd '$PROD_PATH'
         echo 'Final service status:'
+        echo '=========================================='
         
-        # Check processes
-        if kill -0 \$(cat .data_ingestion.pid 2>/dev/null) 2>/dev/null; then
-            echo '✓ Data ingestion: RUNNING (PID: '\$(cat .data_ingestion.pid)')'
+        # Check Redis
+        if redis-cli ping | grep -q PONG; then
+            echo '✓ Redis: RUNNING and responding'
         else
-            echo '✗ Data ingestion: NOT RUNNING'
+            echo '✗ Redis: NOT RESPONDING'
         fi
         
-        if kill -0 \$(cat .dashboard.pid 2>/dev/null) 2>/dev/null; then
-            echo '✓ Dashboard: RUNNING (PID: '\$(cat .dashboard.pid)')'
+        # Check FastAPI backend
+        if kill -0 \$(cat .backend.pid 2>/dev/null) 2>/dev/null; then
+            echo '✓ FastAPI Backend: RUNNING (PID: '\$(cat .backend.pid)')'
+            # Final API health check
+            if curl -s http://localhost:8000/health | grep -q 'healthy'; then
+                echo '✓ API Health Check: PASSED'
+            else
+                echo '⚠ API Health Check: FAILED or PENDING'
+            fi
         else
-            echo '✗ Dashboard: NOT RUNNING'
+            echo '✗ FastAPI Backend: NOT RUNNING'
+        fi
+        
+        # Check data ingestion service
+        if [ -f '.data_ingestion.pid' ]; then
+            if kill -0 \$(cat .data_ingestion.pid 2>/dev/null) 2>/dev/null; then
+                echo '✓ Data Ingestion: RUNNING (PID: '\$(cat .data_ingestion.pid)')'
+            else
+                echo '✗ Data Ingestion: NOT RUNNING'
+            fi
+        else
+            echo 'ℹ Data Ingestion: NOT CONFIGURED'
         fi
         
         echo
         echo 'Recent logs:'
-        echo '--- Data Ingestion ---'
-        tail -5 logs/data_ingestion.log 2>/dev/null || echo 'No logs yet'
-        echo '--- Dashboard ---'
-        tail -5 logs/dashboard.log 2>/dev/null || echo 'No logs yet'
+        echo '--- FastAPI Backend ---'
+        tail -5 logs/backend.log 2>/dev/null || echo 'No logs yet'
+        if [ -f 'logs/data_ingestion.log' ]; then
+            echo '--- Data Ingestion ---'
+            tail -5 logs/data_ingestion.log 2>/dev/null || echo 'No logs yet'
+        fi
     "
     
     echo
     echo -e "${GREEN}=== TAIFA-FIALA Deployment Complete ===${NC}"
     echo -e "${BLUE}Deployment tag: ${DEPLOY_TAG}${NC}"
     echo -e "${BLUE}Branch deployed: ${CURRENT_BRANCH} (${CURRENT_COMMIT})${NC}"
-    echo -e "${YELLOW}Backend services running on Mac-mini${NC}"
-    echo -e "${YELLOW}Dashboard available at: http://${PROD_SERVER}:8501${NC}"
-    echo -e "${YELLOW}Remember to deploy frontend to Vercel separately${NC}"
     echo
-    echo "Useful commands:"
-    echo -e "${BLUE}Check logs:${NC} ssh $SSH_USER@$PROD_SERVER 'cd $PROD_PATH && tail -f logs/*.log'"
-    echo -e "${BLUE}Check status:${NC} ssh $SSH_USER@$PROD_SERVER 'cd $PROD_PATH && ps aux | grep -E \"(ingestion|dashboard)\"'"
-    echo -e "${BLUE}Restart services:${NC} ssh $SSH_USER@$PROD_SERVER 'cd $PROD_PATH && ./restart_services.sh'"
+    echo -e "${GREEN}✓ Services Status:${NC}"
+    echo -e "${YELLOW}  • Redis: Running on localhost:6379${NC}"
+    echo -e "${YELLOW}  • FastAPI Backend: Running on http://${PROD_SERVER}:8000${NC}"
+    echo -e "${YELLOW}  • Frontend: Deployed to Vercel${NC}"
+    echo -e "${YELLOW}  • Data Ingestion: Configured (if available)${NC}"
+    echo
+    echo -e "${GREEN}🌐 Access URLs:${NC}"
+    echo -e "${BLUE}  • API Documentation: http://${PROD_SERVER}:8000/docs${NC}"
+    echo -e "${BLUE}  • API Health Check: http://${PROD_SERVER}:8000/health${NC}"
+    echo -e "${BLUE}  • Frontend Application: Check Vercel deployment output${NC}"
+    echo
+    echo -e "${GREEN}🔧 Useful Commands:${NC}"
+    echo -e "${BLUE}Check backend logs:${NC} ssh $SSH_USER@$PROD_SERVER 'cd $PROD_PATH && tail -f logs/backend.log'"
+    echo -e "${BLUE}Check all logs:${NC} ssh $SSH_USER@$PROD_SERVER 'cd $PROD_PATH && tail -f logs/*.log'"
+    echo -e "${BLUE}Check services:${NC} ssh $SSH_USER@$PROD_SERVER 'cd $PROD_PATH && ps aux | grep -E \"(uvicorn|python)\"'"
+    echo -e "${BLUE}Test API:${NC} curl http://${PROD_SERVER}:8000/health"
+    echo -e "${BLUE}Redis status:${NC} ssh $SSH_USER@$PROD_SERVER 'redis-cli ping'"
+    echo
+    echo -e "${GREEN}📝 Next Steps:${NC}"
+    echo -e "${YELLOW}  1. Verify frontend deployment URL from Vercel output${NC}"
+    echo -e "${YELLOW}  2. Test API endpoints using the documentation at /docs${NC}"
+    echo -e "${YELLOW}  3. Monitor logs for any startup issues${NC}"
+    echo -e "${YELLOW}  4. Configure domain/SSL if needed${NC}"
     
 else
     echo -e "${RED}Error: Failed to start TAIFA-FIALA services${NC}"
