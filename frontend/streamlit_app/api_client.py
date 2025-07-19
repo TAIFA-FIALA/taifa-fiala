@@ -22,6 +22,8 @@ class TaifaJsonEncoder(JSONEncoder):
         # Check for common Pydantic types by name (avoiding direct import dependency)
         if obj.__class__.__name__ == "HttpUrl":
             return str(obj)
+        if isinstance(obj, datetime):
+            return obj.isoformat()
         # Handle any other types with default behavior
         return super().default(obj)
 
@@ -97,9 +99,8 @@ class TaifaAPIClient:
     
     async def create_intelligence_item(self, opportunity_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         """Create a new intelligence item"""
+        session = await self._get_session()
         try:
-            session = await self._get_session()
-            
             # Ensure URLs are strings before serialization
             if 'source_url' in opportunity_data and opportunity_data['source_url'] is not None:
                 opportunity_data['source_url'] = str(opportunity_data['source_url'])
@@ -113,6 +114,17 @@ class TaifaAPIClient:
             async with session.post(url, data=json_data, headers=headers) as response:
                 if response.status == 200:
                     return await response.json()
+                elif response.status == 500:
+                    error_text = await response.text()
+                    logger.error(f"Create API error 500: {error_text}")
+                    # Try to parse the error to see if it's a validation issue
+                    try:
+                        error_json = json.loads(error_text)
+                        if "ValidationError" in error_json.get("error_type", ""):
+                            logger.error(f"Validation error from server: {error_json.get('error_message')}")
+                    except json.JSONDecodeError:
+                        pass # Not a JSON error, just log the raw text
+                    return None
                 else:
                     error_text = await response.text()
                     logger.error(f"Create API error {response.status}: {error_text}")
@@ -120,6 +132,8 @@ class TaifaAPIClient:
         except Exception as e:
             logger.error(f"Error creating opportunity: {e}")
             return None
+        finally:
+            await self.close()
     
     async def get_opportunity_by_id(self, opportunity_id: int) -> Optional[Dict[str, Any]]:
         """Get a specific opportunity by ID"""

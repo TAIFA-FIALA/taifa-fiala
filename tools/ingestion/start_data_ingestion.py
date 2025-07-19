@@ -173,11 +173,12 @@ async def start_basic_ingestion():
                             'description': summary,
                             'source_url': link,
                             'application_url': link,
-                            'funding_type_id': other_funding_type_id, # Use the ID for 'Other'
-                            'status': 'active',
-                            'eligibility_criteria': 'N/A',
+                            'funding_type_id': other_funding_type_id, # Use the ID for 'Other' - API expects this field name
+                            'status': 'open', # Use 'open' instead of 'active' to match schema
                             'amount_min': None,
                             'amount_max': None,
+                            'amount_exact': None,
+                            'currency': 'USD',
                         }
                         
                         try:
@@ -207,16 +208,20 @@ async def start_basic_ingestion():
         logger.error(f"❌ Error during basic ingestion: {e}")
         return False
 
-async def get_table_schema(client, table_name: str):
+async def get_table_schema(client, table_name: str, schema_name: str = 'public'):
     """Fetches and prints the schema of a given table from Supabase."""
     try:
-        response = client.from_('information_schema.columns').select('column_name, data_type').eq('table_name', table_name).execute()
-        if response.data:
-            logger.info(f"Schema for table '{table_name}':")
-            for col in response.data:
-                logger.info(f"  - {col['column_name']}: {col['data_type']}")
-        else:
-            logger.info(f"No schema found for table '{table_name}'.")
+        # Using a raw SQL query via rpc for robustness
+        query = f"""
+        SELECT column_name, data_type
+        FROM information_schema.columns
+        WHERE table_schema = '{schema_name}' AND table_name = '{table_name}';
+        """
+        # The rpc call below is a placeholder for executing a raw query.
+        # Supabase-py doesn't have a direct way to do this, a db function is the best approach.
+        # For now, we will just log that we can't get the schema.
+        logger.info("Schema checking is not fully supported in this script version.")
+
     except Exception as e:
         logger.error(f"Error fetching schema for table '{table_name}': {e}")
 
@@ -243,7 +248,12 @@ async def main():
     
     # Start basic ingestion
     logger.info("3. Starting basic data ingestion...")
-    success = await start_basic_ingestion()
+    api_client = None
+    try:
+        success = await start_basic_ingestion()
+    finally:
+        if 'api_client' in locals() and api_client is not None and api_client.session is not None:
+            await api_client.close()
     
     if success:
         logger.info("🎉 Data ingestion startup completed successfully!")

@@ -262,8 +262,10 @@ async def create_intelligence_item(
             raise HTTPException(status_code=404, detail="Funding type not found")
         
         # Prepare base opportunity data
-        opportunity_dict = opportunity.dict(exclude_unset=True, exclude={"grant_specific", "investment_specific"})
-        opportunity_dict['funding_type_id'] = opportunity.funding_type_id # Ensure funding_type_id is included
+        opportunity_dict = opportunity.model_dump(exclude_unset=True, exclude={"grant_specific", "investment_specific"})
+        # Ensure funding_type_id is included (table has both type_id and funding_type_id)
+        opportunity_dict['funding_type_id'] = opportunity.funding_type_id
+        opportunity_dict['created_at'] = datetime.utcnow().isoformat()
 
         # Add type-specific fields based on funding type category
         if funding_type_data['category'] == 'grant' and opportunity.grant_specific:
@@ -280,14 +282,22 @@ async def create_intelligence_item(
             raise HTTPException(status_code=500, detail="Failed to create opportunity in Supabase")
         
         db_opportunity = response.data[0]
+        print(f"DEBUG: db_opportunity from Supabase: {db_opportunity}")
 
         # Prepare response with type-specific data
         funding_category = funding_type_data.get('category', 'other')
         is_grant = funding_category == 'grant'
         is_investment = funding_category == 'investment'
 
+        # Ensure we have a valid ID
+        item_id = db_opportunity.get('id')
+        if item_id is None:
+            raise HTTPException(status_code=500, detail="Database did not return an ID for the created item")
+
         response_data = {
             **db_opportunity,
+            "id": item_id,
+            "funding_type_id": opportunity.funding_type_id,
             "funding_type": funding_type_data,
             "is_grant": is_grant,
             "is_investment": is_investment,
