@@ -149,7 +149,7 @@ export default async function HomePage() {
         <div className="max-w-7xl mx-auto">
           <h2 className="text-2xl font-display text-gray-900 mb-8 flex items-center gap-3">
             <TrendingUp className="w-6 h-6 text-taifa-primary" />
-            Issues of Equity inAI Funding We're Tracking
+            Issues of Equity in AI Funding We are Tracking
           </h2>
           
           {/* Issue 1: Geographic Concentration */}

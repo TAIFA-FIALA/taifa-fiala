@@ -12,7 +12,7 @@ export default function AboutPage() {
             About TAIFA-FIALA
           </h1>
           <p className="text-xl text-gray-700 leading-relaxed max-w-3xl mx-auto">
-            An independent initiative promoting transparency, equity, and accountability in AI funding 
+            TAIFA-FIALA is an independent initiative promoting transparency, equity, and accountability in AI funding 
             across Africa. We apply advanced data analytics and research expertise to facilitate a vision where AI development 
             serves all Africans, not just a privileged few.
           </p>

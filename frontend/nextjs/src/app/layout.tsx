@@ -68,7 +68,7 @@ export default function RootLayout({
                 <ul className="space-y-2 text-sm">
                   <li><a href="https://github.com/drjforrest/taifa" className="hover:text-yellow-300 transition-colors duration-300 ease-in-out">GitHub</a></li>
                   <li><Link href="/about#contact" className="hover:text-yellow-300 transition-colors duration-300 ease-in-out">Contact</Link></li>
-                  <li><span className="text-xs">44 Data Sources • Daily Updates</span></li>
+                  <li><span className="text-xs">New Data Sources • Daily Updates</span></li>
                 </ul>
               </div>
             </div>
