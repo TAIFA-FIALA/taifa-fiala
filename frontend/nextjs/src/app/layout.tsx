@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Lora, Inter } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
-import Image from "next/image";
 import Navbar from "@/components/layout/Navbar";
 
 const lora = Lora({
@@ -74,7 +73,7 @@ export default function RootLayout({
               </div>
             </div>
             <div className="border-t border-gray-700 mt-6 pt-6 text-center text-sm">
-              <p>&copy; 2025 TAIFA-FIALA. Supporting AI development across Africa.</p>
+              <p>&copy; 2025 TAIFA-FIALA. Supporting Equitable AI development across Africa.</p>
             </div>
           </div>
         </footer>

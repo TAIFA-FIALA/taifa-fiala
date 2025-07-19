@@ -215,10 +215,10 @@ export default function DatabaseGrowthChart({ className = '' }: DatabaseGrowthCh
           
           <div className="bg-green-50 rounded-lg p-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-gray-600">Data Sources</span>
-              <span className="text-lg font-bold text-green-600">44+</span>
+              <span className="text-sm font-medium text-gray-600">Coverage Areas</span>
+              <span className="text-lg font-bold text-green-600">54</span>
             </div>
-            <div className="text-xs text-gray-500 mt-1">Active feeds</div>
+            <div className="text-xs text-gray-500 mt-1">African countries</div>
           </div>
         </div>
       </div>

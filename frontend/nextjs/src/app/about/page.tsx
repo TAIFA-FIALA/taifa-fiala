@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import Link from 'next/link';
 import { Globe, Scale, Search } from 'lucide-react';
 
 // About Us page component
@@ -52,7 +51,7 @@ export default function AboutPage() {
           <h1 className="text-4xl font-bold mb-4 text-center">About TAIFA-FIALA</h1>
           <p className="text-xl text-center max-w-3xl mx-auto">
             Democratizing AI funding access across Africa through transparency, 
-            equity, and community collaboration.
+        and accountability in AI funding.
           </p>
         </div>
       </section>

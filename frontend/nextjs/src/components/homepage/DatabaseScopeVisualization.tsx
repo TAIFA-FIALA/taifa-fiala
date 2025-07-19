@@ -384,7 +384,7 @@ export default function DatabaseScopeVisualization() {
         {activeTab === 'sources' && (
           <div className="space-y-6">
             <div>
-              <h4 className="text-lg font-semibold text-gray-900 mb-4">Priority Data Sources</h4>
+              <h4 className="text-lg font-semibold text-gray-900 mb-4">Research Focus Areas</h4>
               <div className="space-y-4">
                 {prioritySources.map((source, index) => (
                   <div key={index} className="bg-gray-50 rounded-lg p-4">

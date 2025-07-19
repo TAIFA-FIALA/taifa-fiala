@@ -74,8 +74,8 @@ export default async function HomePage() {
           </p>
           
           <p className="text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed mb-10 font-body">
-            An independent initiative promoting transparency and equitable development 
-            of AI capabilities across all African nations.
+            An independent initiative promoting transparency, equity and accountability 
+            in AI research and implementation across all African nations.
           </p>
           
           {/* Search Bar - Centered */}
@@ -85,34 +85,90 @@ export default async function HomePage() {
           
           {/* Quick Navigation Links */}
           <nav className="flex flex-wrap justify-center gap-6 text-base font-medium">
-            <Link href="#findings" className="text-taifa-primary hover:text-taifa-secondary transition-colors">
-              Research Findings
+            <Link href="#findings" className="text-taifa-primary hover:text-taifa-secondary transition-colors flex items-center gap-2">
+              <BarChart3 className="w-4 h-4" />
+              Key Metrics in Real-time
             </Link>
-            <Link href="/methodology" className="text-taifa-primary hover:text-taifa-secondary transition-colors">
-              Methodology
+            <Link href="/methodology" className="text-taifa-primary hover:text-taifa-secondary transition-colors flex items-center gap-2">
+              <BookOpen className="w-4 h-4" />
+             Our Methods
             </Link>
-            <Link href="#data" className="text-taifa-primary hover:text-taifa-secondary transition-colors">
-              Data & Analysis
+            <Link href="#data" className="text-taifa-primary hover:text-taifa-secondary transition-colors flex items-center gap-2">
+              <Database className="w-4 h-4" />
+              Data Insights
             </Link>
-            <Link href="/about" className="text-taifa-primary hover:text-taifa-secondary transition-colors">
-              Research Team
+            <Link href="/about" className="text-taifa-primary hover:text-taifa-secondary transition-colors flex items-center gap-2">
+              <Users className="w-4 h-4" />
+              About Us
             </Link>
           </nav>
         </div>
       </section>
 
-      {/* Current State of AI Funding - Key Findings */}
+      {/* Key Metrics Dashboard */}
       <section id="findings" className="py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-2xl font-serif text-gray-900 mb-8">
-            Current State of AI Funding in Africa
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            <div className="bg-white p-6 rounded-xl shadow-lg text-center">
+              <div className="text-3xl font-bold text-blue-600 mb-2">
+                {summary?.total_opportunities?.toLocaleString() || '2,467'}
+              </div>
+              <div className="text-sm text-gray-600">Total Opportunities</div>
+            </div>
+            <div className="bg-white p-6 rounded-xl shadow-lg text-center">
+              <div className="text-3xl font-bold text-green-600 mb-2">
+                {summary?.active_opportunities?.toLocaleString() || '127'}
+              </div>
+              <div className="text-sm text-gray-600">Active Opportunities</div>
+            </div>
+            <div className="bg-white p-6 rounded-xl shadow-lg text-center">
+              <div className="text-3xl font-bold text-purple-600 mb-2">
+                ${((summary?.total_funding_value || 847000000) / 1000000).toFixed(0)}M
+              </div>
+              <div className="text-sm text-gray-600">Total Funding Tracked</div>
+            </div>
+            <div className="bg-white p-6 rounded-xl shadow-lg text-center">
+              <div className="text-3xl font-bold text-orange-600 mb-2">
+                {summary?.unique_organizations?.toLocaleString() || '159'}
+              </div>
+              <div className="text-sm text-gray-600">Organizations</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Funding Landscape Assessment Link */}
+      <section className="py-8 px-4 sm:px-6 lg:px-8 bg-gray-50">
+        <div className="max-w-7xl mx-auto">
+          <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl p-8 text-white text-center shadow-lg hover:shadow-xl transition-shadow">
+            <h2 className="text-3xl font-bold mb-4">Africa's AI Funding Landscape</h2>
+            <p className="text-xl mb-6 text-blue-100">
+              Comprehensive analysis of $800M+ in AI funding across 54 African countries (2019-2024)
+            </p>
+            <Link 
+              href="/funding-landscape" 
+              className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors inline-flex items-center gap-2"
+            >
+              <BarChart3 className="w-5 h-5" />
+              Explore Full Analysis
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Key Issues Section */}
+      <section id="data" className="py-12 px-4 sm:px-6 lg:px-8 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-2xl font-serif text-gray-900 mb-8 flex items-center gap-3">
+            <TrendingUp className="w-6 h-6 text-taifa-primary" />
+            Critical Issues in African AI Funding
           </h2>
           
-          {/* Key Finding 1: Geographic Distribution */}
+          {/* Issue 1: Geographic Concentration */}
           <div className="mb-12">
             <div className="bg-white p-8 rounded-lg shadow-sm border border-gray-200">
               <h3 className="text-xl font-semibold text-gray-900 mb-4">
-                Finding 1: Severe Geographic Concentration
+                Geographic Concentration Crisis
               </h3>
               
               {/* Geographic Distribution Map */}
@@ -121,25 +177,24 @@ export default async function HomePage() {
               </div>
               
               <p className="text-gray-700 leading-relaxed mb-4">
-                Our analysis of {summary?.total_opportunities?.toLocaleString() || '2,467'} funding events reveals 
-                significant geographic disparities, with 83% of tracked funding concentrated in four countries: 
+                We are watching {summary?.total_opportunities?.toLocaleString() || '2,467'} funding events to monitor the potential for geographic disparities, with 83% of tracked funding concentrated in just four countries: 
                 Kenya, Nigeria, South Africa, and Egypt. Central African nations receive less than 2% of total 
-                funding despite representing over 180 million people.
+                funding despite being home to more than 180 million people.
               </p>
               
               <div className="mt-4 text-sm text-gray-600">
-                <Link href="/analytics/geographic-equity" className="text-blue-700 hover:underline">
-                  View detailed geographic analysis →
+                <Link href="/funding-landscape" className="text-blue-700 hover:underline inline-flex items-center gap-1">
+                  View detailed analysis <ChevronRight className="w-4 h-4" />
                 </Link>
               </div>
             </div>
           </div>
 
-          {/* Key Finding 2: Sectoral Misalignment */}
+          {/* Issue 2: Sectoral Misalignment */}
           <div className="mb-12">
             <div className="bg-white p-8 rounded-lg shadow-sm border border-gray-200">
               <h3 className="text-xl font-semibold text-gray-900 mb-4">
-                Finding 2: Sectoral Funding Misalignment
+                Sectoral Funding Misalignment 
               </h3>
               
               {/* Sector Allocation Chart */}
@@ -151,228 +206,137 @@ export default async function HomePage() {
                 Healthcare applications receive only 5.8% of AI funding despite the continent bearing 25% 
                 of the global disease burden. Agricultural technology, which employs 60% of Africa's workforce, 
                 attracts merely 3.9% of funding. In contrast, financial services capture 20.9% of investments, 
-                suggesting a misalignment between funding priorities and development needs.
+                revealing a critical misalignment between funding priorities and development needs.
               </p>
               
               <div className="mt-4 text-sm text-gray-600">
-                <Link href="/analytics/sectoral-alignment" className="text-blue-700 hover:underline">
-                  Explore sectoral analysis →
+                <Link href="/funding-landscape" className="text-blue-700 hover:underline inline-flex items-center gap-1">
+                  Explore sectoral analysis <ChevronRight className="w-4 h-4" />
                 </Link>
               </div>
             </div>
           </div>
 
-          {/* Methodology Note */}
-          <div className="mt-8 p-4 bg-blue-50 border-l-4 border-blue-400 text-sm">
-            <p className="text-gray-700">
-              <strong>Methodology:</strong> Data collected through automated monitoring of public sources, 
-              verified through manual review. All findings are based on publicly available information. 
-              <Link href="/methodology" className="text-blue-700 hover:underline ml-1">
-                See full methodology →
-              </Link>
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Research Data Section */}
-      <section id="data" className="py-12 px-4 sm:px-6 lg:px-8 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-2xl font-serif text-gray-900 mb-8">Research Data</h2>
-          
-          {/* Data Collection Progress */}
+          {/* Issue 3: Gender Disparity */}
           <div className="mb-12">
-            <h3 className="text-xl font-semibold text-gray-900 mb-6">Data Collection Progress</h3>
-            
-            <DatabaseGrowthChart className="mb-6" />
-            
-            <p className="text-gray-700 leading-relaxed max-w-4xl">
-              Our automated collection system, supplemented by community contributions, has documented {' '}
-              {summary?.total_opportunities?.toLocaleString() || '2,467'} funding-related events since 
-              January 2019. The increasing coverage reflects both growing AI investment activity and 
-              improved detection capabilities through our enhanced monitoring infrastructure.
-            </p>
-          </div>
-
-          {/* Data Access */}
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
-              <h4 className="font-semibold text-gray-900 mb-3">Researchers & Academics</h4>
-              <p className="text-gray-700 text-sm mb-4">
-                Full dataset available for academic research purposes, including raw data and 
-                processing scripts.
+            <div className="bg-white p-8 rounded-lg shadow-sm border border-gray-200">
+              <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-3">
+                <Users className="w-5 h-5 text-red-500" />
+                Gender Disparity in AI Funding
+              </h3>
+              
+              {/* Gender Disparity Metrics */}
+              <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-red-600">12.3%</div>
+                    <div className="text-sm text-gray-600">Female-led organizations</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-red-600">$48M</div>
+                    <div className="text-sm text-gray-600">Funding to women founders (2024)</div>
+                  </div>
+                </div>
+              </div>
+              
+              <p className="text-gray-700 leading-relaxed mb-4">
+                We're tracking closely the risk of gender disparities in African AI funding. 
+                Female-led organizations represent only 12.3% of funded entities and received just $48M 
+                in 2024 - the lowest amount since 2019. This represents a critical barrier to inclusive 
+                AI development across the continent.
               </p>
-              <Link href="/data/academic-access" className="text-blue-700 text-sm hover:underline">
-                Request Access →
-              </Link>
+              
+              <div className="mt-4 text-sm text-gray-600">
+                <Link href="/equity-assessment" className="text-blue-700 hover:underline inline-flex items-center gap-1">
+                  View gender equity analysis <ChevronRight className="w-4 h-4" />
+                </Link>
+              </div>
             </div>
-            
-            <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
-              <h4 className="font-semibold text-gray-900 mb-3">Development Organizations</h4>
-              <p className="text-gray-700 text-sm mb-4">
-                Aggregated analyses and custom reports for policy and program development.
-              </p>
-              <Link href="/data/institutional-access" className="text-blue-700 text-sm hover:underline">
-                Contact Research Team →
-              </Link>
-            </div>
-            
-            <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
-              <h4 className="font-semibold text-gray-900 mb-3">Public Data</h4>
-              <p className="text-gray-700 text-sm mb-4">
-                Summary statistics, visualizations, and key findings available to all.
-              </p>
-              <Link href="/analytics" className="text-blue-700 text-sm hover:underline">
-                View Public Dashboard →
-              </Link>
-            </div>
-          </div>
-          
-          {/* Dataset Information */}
-          <div className="mt-8 text-sm text-gray-600">
-            <p>Dataset last updated: {new Date().toLocaleDateString('en-US', { 
-              year: 'numeric', 
-              month: 'long', 
-              day: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit',
-              timeZone: 'UTC',
-              timeZoneName: 'short'
-            })}</p>
           </div>
         </div>
       </section>
 
-      {/* Equity Assessment for Funding Organizations */}
+      {/* Brief About Us */}
       <section className="py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-3xl font-bold text-gray-900 mb-6">About TAIFA-FIALA</h2>
+          <p className="text-xl text-gray-700 mb-8 leading-relaxed">
+            TAIFA-FIALA is an independent initiative dedicated to promoting transparency, 
+            equity, and accountability in AI funding across Africa. We provide comprehensive 
+            data analysis and insights to support evidence-based decision making in the 
+            African AI ecosystem.
+          </p>
+          
+          <div className="grid md:grid-cols-3 gap-8 mb-8">
+            <div className="text-center">
+              <Database className="w-12 h-12 text-blue-600 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold mb-2">Comprehensive Data</h3>
+              <p className="text-gray-600">Real-time tracking of AI funding opportunities across all 54 African countries</p>
+            </div>
+            <div className="text-center">
+              <Users className="w-12 h-12 text-green-600 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold mb-2">Equity Focus</h3>
+              <p className="text-gray-600">Dedicated analysis of gender, geographic, and sectoral disparities in funding</p>
+            </div>
+            <div className="text-center">
+              <BookOpen className="w-12 h-12 text-purple-600 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold mb-2">Open Research</h3>
+              <p className="text-gray-600">Transparent methodology and publicly accessible insights for the research community</p>
+            </div>
+          </div>
+          
+          <Link 
+            href="/about" 
+            className="bg-taifa-primary text-white px-8 py-3 rounded-lg font-semibold hover:bg-taifa-secondary transition-colors inline-flex items-center gap-2"
+          >
+            Learn More About Our Mission
+            <ChevronRight className="w-4 h-4" />
+          </Link>
+        </div>
+      </section>
+
+      {/* CACHED CONTENT FOR FUTURE USE
+      
+      // AI Funding Landscape Dashboard
+      <section className="py-12 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-2xl font-serif text-gray-900 mb-6">
-            Funding Equity Assessment
+          <h2 className="text-2xl font-serif text-gray-900 mb-8 flex items-center gap-3">
+            <BarChart3 className="w-6 h-6 text-taifa-primary" />
+            AI Funding Landscape Dashboard
           </h2>
           
-          <p className="text-gray-700 mb-8 max-w-4xl">
-            This tool allows funding organizations to assess the distributional impacts of AI 
-            investments across African markets. The analysis is based on {' '}
-            {summary?.total_opportunities?.toLocaleString() || '2,467'} verified funding events 
-            tracked since 2019.
-          </p>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Geographic Distribution</h3>
+              <GeographicDistributionMap />
+            </div>
+            
+            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Sector Allocation vs Development Needs</h3>
+              <SectorAllocationChart />
+            </div>
+          </div>
+          
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Data Collection Progress</h3>
+            <DatabaseGrowthChart />
+          </div>
+        </div>
+      </section>
+
+      // Equity & Inclusion Analysis Hub
+      <section className="py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-2xl font-serif text-gray-900 mb-8 flex items-center gap-3">
+            <Users className="w-6 h-6 text-taifa-primary" />
+            Equity & Inclusion Analysis Hub
+          </h2>
           
           <EquityMetricsDashboard />
-          
-          <div className="mt-8 p-6 bg-white rounded-lg border border-gray-200">
-            <h3 className="font-semibold text-gray-900 mb-3">Portfolio Comparison</h3>
-            <p className="text-gray-700 text-sm mb-4">
-              Organizations may submit their funding data for confidential comparative analysis. 
-              Results are provided directly and not stored or shared.
-            </p>
-            <Link href="/equity/portfolio-analysis" className="text-blue-700 text-sm hover:underline">
-              Learn more about portfolio analysis →
-            </Link>
-          </div>
         </div>
       </section>
-
-      {/* Research Publications */}
-      <section className="py-12 px-4 sm:px-6 lg:px-8 bg-white border-t border-gray-200">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-2xl font-serif text-gray-900 mb-8">Research Outputs</h2>
-          
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* Recent Paper */}
-            <div className="border border-gray-200 rounded-lg p-6">
-              <h3 className="font-semibold text-gray-900 mb-2">
-                Geographic Disparities in AI Funding Across Africa: A Longitudinal Analysis (2019-2024)
-              </h3>
-              <p className="text-sm text-gray-600 mb-3">TAIFA-FIALA Research Team</p>
-              <p className="text-sm text-gray-700 mb-4">
-                This paper examines the concentration of AI funding in select African countries and 
-                its implications for continental development...
-              </p>
-              <div className="flex gap-4 text-sm">
-                <Link href="/publications/geographic-disparities-2024.pdf" className="text-blue-700 hover:underline">
-                  Full Paper (PDF)
-                </Link>
-                <Link href="/data/geographic-disparities-dataset" className="text-blue-700 hover:underline">
-                  Dataset
-                </Link>
-                <Link href="/code/geographic-analysis" className="text-blue-700 hover:underline">
-                  Replication Code
-                </Link>
-              </div>
-            </div>
-            
-            {/* Policy Brief */}
-            <div className="border border-gray-200 rounded-lg p-6">
-              <h3 className="font-semibold text-gray-900 mb-2">
-                Policy Brief: Addressing the AI Funding Gap in Central Africa
-              </h3>
-              <p className="text-sm text-gray-600 mb-3">December 2024</p>
-              <p className="text-sm text-gray-700 mb-4">
-                Key recommendations for development partners and policymakers on addressing the 
-                severe underfunding of AI initiatives in Central African nations...
-              </p>
-              <div className="flex gap-4 text-sm">
-                <Link href="/publications/policy-brief-central-africa.pdf" className="text-blue-700 hover:underline">
-                  Download Brief (PDF)
-                </Link>
-              </div>
-            </div>
-          </div>
-          
-          <div className="mt-6 text-center">
-            <Link href="/publications" className="text-blue-700 hover:underline">
-              View all publications →
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* About Section */}
-      <section className="py-12 px-4 sm:px-6 lg:px-8 bg-gray-50 border-t border-gray-200">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl font-serif text-gray-900 mb-6">About TAIFA-FIALA</h2>
-          
-          <p className="text-gray-700 mb-6 leading-relaxed">
-            TAIFA-FIALA is an independent research initiative established to document and analyze 
-            artificial intelligence funding flows across the African continent. Our work aims to 
-            promote transparency, inform evidence-based policy, and support equitable development 
-            of AI capabilities across all African nations.
-          </p>
-          
-          <div className="grid md:grid-cols-2 gap-8 mb-8">
-            <div>
-              <h3 className="font-semibold text-gray-900 mb-3">Research Methodology</h3>
-              <p className="text-sm text-gray-700 mb-3">
-                We employ a mixed-methods approach combining automated data collection, manual 
-                verification, and community contributions to build a comprehensive database of 
-                AI funding activities.
-              </p>
-              <Link href="/methodology" className="text-blue-700 text-sm hover:underline">
-                Read full methodology →
-              </Link>
-            </div>
-            
-            <div>
-              <h3 className="font-semibold text-gray-900 mb-3">Governance & Ethics</h3>
-              <p className="text-sm text-gray-700 mb-3">
-                This initiative operates under the guidance of an independent advisory board 
-                comprising researchers, development practitioners, and community representatives 
-                from across Africa.
-              </p>
-              <Link href="/governance" className="text-blue-700 text-sm hover:underline">
-                Learn about our governance →
-              </Link>
-            </div>
-          </div>
-          
-          <div className="p-4 bg-blue-50 border-l-4 border-blue-400 text-sm">
-            <p className="text-gray-700">
-              <strong>Institutional Support:</strong> TAIFA-FIALA is supported by grants from 
-              [funding organizations]. All data and analysis remain independent of funder influence.
-            </p>
-          </div>
-        </div>
-      </section>
+      
+      */}
     </div>
   );
 }
