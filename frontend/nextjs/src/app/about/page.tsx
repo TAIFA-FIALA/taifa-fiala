@@ -44,7 +44,7 @@ export default function AboutPage() {
               </div>
               
               <h3 className="text-xl font-bold text-gray-900 mb-2">Hinda Ruton</h3>
-              <div className="text-amber-700 font-medium mb-4">Africa Quantitative Sciences (AQS)</div>
+              <div className="text-amber-700 font-medium mb-4">Executive Director</div>
               
               <p className="text-gray-700 leading-relaxed mb-6">
                 Leading Africa Quantitative Sciences, Rwanda's premier data analytics firm, Hinda Ruton
@@ -81,7 +81,7 @@ export default function AboutPage() {
               
               <div className="flex justify-center items-center text-sm text-gray-500">
                 <MapPin className="h-4 w-4 mr-1" />
-                <span>Rwanda</span>
+                <span>Canada / Rwanda</span>
               </div>
             </div>
           </div>

@@ -30,8 +30,8 @@ const Navbar = () => {
             <Link href="/funding-landscape" className="text-taifa-primary hover:text-taifa-accent text-sm font-medium nav-pill">
               Funding Landscape
             </Link>
-            <Link href="/equity-assessment" className="text-taifa-primary hover:text-taifa-accent text-sm font-medium nav-pill">
-              Equity Assessments
+            <Link href="/funding-landscape" className="text-taifa-primary hover:text-taifa-accent text-sm font-medium nav-pill">
+              Funding Landscape
             </Link>
             <Link href="/methodology" className="text-taifa-primary hover:text-taifa-accent text-sm font-medium nav-pill">
               Methodology
@@ -70,8 +70,8 @@ const Navbar = () => {
           <Link href="/funding-landscape" className="block px-3 py-2 rounded-md text-base font-medium text-taifa-primary hover:text-taifa-secondary">
             Funding Landscape
           </Link>
-          <Link href="/equity-assessment" className="block px-3 py-2 rounded-md text-base font-medium text-taifa-primary hover:text-taifa-secondary">
-            Equity Assessments
+          <Link href="/funding-landscape" className="block px-3 py-2 rounded-md text-base font-medium text-taifa-primary hover:text-taifa-secondary">
+            Funding Landscape
           </Link>
           <Link href="/methodology" className="block px-3 py-2 rounded-md text-base font-medium text-taifa-primary hover:text-taifa-secondary">
             Methodology
