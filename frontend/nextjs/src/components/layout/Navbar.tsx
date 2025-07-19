@@ -15,9 +15,9 @@ const Navbar = () => {
           <div className="flex items-center">
             <Link href="/" className="flex items-center">
               <Image
-                src="/TAIFA-FIALA-logo-transparent.png"
-                width={40}
-                height={40}
+                src="/TAIFA-FIALA-Logo_transparent.png"
+                width={(60)}
+                height={(30)}
                 alt="TAIFA-FIALA"
                 className="mr-2"
               />
@@ -25,27 +25,19 @@ const Navbar = () => {
             </Link>
           </div>
           
-          {/* Search Bar */}
-          <div className="hidden md:flex items-center space-x-4 ml-4">
-            {/* Search moved to Hero component */}
-          </div>
-          
-          {/* Navigation Links */}
-          <div className="hidden md:flex items-center space-x-6">
+          {/* Navigation Links - Centered */}
+          <div className="hidden md:flex items-center space-x-8 flex-1 justify-center">
+            <Link href="/funding-landscape" className="text-taifa-primary hover:text-taifa-accent text-sm font-medium nav-pill">
+              Funding Landscape
+            </Link>
+            <Link href="/equity-assessment" className="text-taifa-primary hover:text-taifa-accent text-sm font-medium nav-pill">
+              Equity Assessments
+            </Link>
             <Link href="/methodology" className="text-taifa-primary hover:text-taifa-accent text-sm font-medium nav-pill">
               Methodology
             </Link>
-            <Link href="/analytics" className="text-taifa-primary hover:text-taifa-accent text-sm font-medium nav-pill">
-              Data & Analysis
-            </Link>
-            <Link href="/publications" className="text-taifa-primary hover:text-taifa-accent text-sm font-medium nav-pill">
-              Publications
-            </Link>
-            <Link href="/funding" className="text-taifa-primary hover:text-taifa-accent text-sm font-medium nav-pill">
-              Funding
-            </Link>
             <Link href="/about" className="text-taifa-primary hover:text-taifa-accent text-sm font-medium nav-pill">
-              About
+              About Us
             </Link>
           </div>
           
@@ -75,24 +67,17 @@ const Navbar = () => {
       {/* Mobile menu, show/hide based on menu state */}
       {isMobileMenuOpen && (
         <div className="md:hidden px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-taifa-light border-b border-gray-200">
-          {/* Mobile search moved to Hero component */}
-          <div className="mt-4">
-            {/* Search functionality moved to Hero component */}
-          </div>
+          <Link href="/funding-landscape" className="block px-3 py-2 rounded-md text-base font-medium text-taifa-primary hover:text-taifa-secondary">
+            Funding Landscape
+          </Link>
+          <Link href="/equity-assessment" className="block px-3 py-2 rounded-md text-base font-medium text-taifa-primary hover:text-taifa-secondary">
+            Equity Assessments
+          </Link>
           <Link href="/methodology" className="block px-3 py-2 rounded-md text-base font-medium text-taifa-primary hover:text-taifa-secondary">
             Methodology
           </Link>
-          <Link href="/analytics" className="block px-3 py-2 rounded-md text-base font-medium text-taifa-primary hover:text-taifa-secondary">
-            Data & Analysis
-          </Link>
-          <Link href="/publications" className="block px-3 py-2 rounded-md text-base font-medium text-taifa-primary hover:text-taifa-secondary">
-            Publications
-          </Link>
-          <Link href="/funding" className="block px-3 py-2 rounded-md text-base font-medium text-taifa-primary hover:text-taifa-secondary">
-            Funding Database
-          </Link>
           <Link href="/about" className="block px-3 py-2 rounded-md text-base font-medium text-taifa-primary hover:text-taifa-secondary">
-            About
+            About Us
           </Link>
         </div>
       )}

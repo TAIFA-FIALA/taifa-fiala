@@ -1,0 +1,21 @@
+Build Error Error:   × ssr: false is not allowed with next/dynamic in Server Components. Please move it into a client component. ./src/app/page.tsx Error:   × ssr: false is not allowed with next/dynamic in Server Components. Please move it into a client component.
+╭─[/Users/drjforrest/dev/devprojects/ai-africa-funding-tracker/frontend/nextjs/src/app/page.tsx:11:1]
+8 │     import SearchBar from '@/components/homepage/SearchBar';
+9 │10 │     // Dynamically import map component with SSR disabled to prevent hydration issues
+11 │ ╭─▶ const GeographicDistributionMap = dynamic(
+12 │ │     () => import('@/components/homepage/GeographicDistributionMap'),
+13 │ │     {
+14 │ │       ssr: false,
+15 │ │       loading: () => (
+16 │ │         
+17 │ │           
+18 │ │             
+19 │ │             Loading map...
+20 │ │           
+21 │ │         
+22 │ │       )
+23 │ │     }
+24 │ ╰─▶ );
+25 │26 │     interface AnalyticsSummary {
+27 │       total_opportunities?: number;
+╰────

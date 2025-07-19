@@ -22,7 +22,7 @@ export default function SearchBar() {
         type="text"
         name="query"
         placeholder="Search for funds by funder, recipient, or project"
-        className="pl-6 pr-4 py-4 w-full rounded-l-lg border-0 focus:ring-2 focus:ring-taifa-secondary text-lg"
+        className="pl-6 pr-4 py-4 w-full rounded-l-lg border border-gray-200 focus:ring-2 focus:ring-taifa-secondary focus:border-taifa-secondary text-lg bg-white/90 backdrop-blur-sm"
       />
       <button 
         type="submit" 

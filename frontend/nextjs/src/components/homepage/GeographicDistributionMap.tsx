@@ -68,14 +68,16 @@ const GeographicDistributionMap = () => {
     
     setCountryPolygons(countries);
     
-    // Simulated data - replace with actual API call
+    // Simulated data with coordinates in [latitude, longitude] format for pigeon-maps
     const mockData: CountryData[] = [
-      { country: 'Nigeria', fundingAmount: 245000000, fundingCount: 487, percentageTotal: 28.4, center: [8.6753, 9.0820] },
-      { country: 'Kenya', fundingAmount: 198000000, fundingCount: 412, percentageTotal: 22.9, center: [37.9062, 0.0236] },
-      { country: 'South Africa', fundingAmount: 167000000, fundingCount: 356, percentageTotal: 19.3, center: [22.9375, -30.5595] },
-      { country: 'Egypt', fundingAmount: 112000000, fundingCount: 289, percentageTotal: 12.9, center: [30.8025, 26.8206] },
-      { country: 'Rwanda', fundingAmount: 45000000, fundingCount: 98, percentageTotal: 5.2, center: [29.8739, -1.9403] },
-      { country: 'Ghana', fundingAmount: 34000000, fundingCount: 76, percentageTotal: 3.9, center: [-1.0232, 7.9465] },
+      { country: 'Nigeria', fundingAmount: 245000000, fundingCount: 487, percentageTotal: 28.4, center: [9.0820, 8.6753] },
+      { country: 'Kenya', fundingAmount: 198000000, fundingCount: 412, percentageTotal: 22.9, center: [-0.0236, 37.9062] },
+      { country: 'South Africa', fundingAmount: 167000000, fundingCount: 356, percentageTotal: 19.3, center: [-28.8166, 24.7461] },
+      { country: 'Egypt', fundingAmount: 112000000, fundingCount: 289, percentageTotal: 12.9, center: [26.8206, 30.8025] },
+      { country: 'Rwanda', fundingAmount: 45000000, fundingCount: 98, percentageTotal: 5.2, center: [-1.9403, 29.8739] },
+      { country: 'Ghana', fundingAmount: 34000000, fundingCount: 76, percentageTotal: 3.9, center: [7.9465, -1.0232] },
+      { country: 'Tunisia', fundingAmount: 244400000, fundingCount: 9, percentageTotal: 15.8, center: [33.8869, 9.5375] },
+      { country: 'Morocco', fundingAmount: 89000000, fundingCount: 67, percentageTotal: 6.2, center: [31.7917, -7.0926] },
       // Add more countries as needed
     ];
 

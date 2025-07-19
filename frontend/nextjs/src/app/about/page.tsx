@@ -1,260 +1,187 @@
-'use client';
+import React from 'react';
+import { Mail, MapPin, Users, Calendar, ExternalLink } from 'lucide-react';
+import Image from 'next/image';
 
-import React, { useState } from 'react';
-import { Globe, Scale, Search } from 'lucide-react';
-
-// About Us page component
 export default function AboutPage() {
-  // Form state
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    organization: '',
-    message: '',
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitSuccess, setSubmitSuccess] = useState(false);
-
-  // Handle form input changes
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  // Handle form submission
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    
-    // Simulate form submission
-    // In a real implementation, this would be an API call
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setSubmitSuccess(true);
-      setFormData({
-        name: '',
-        email: '',
-        organization: '',
-        message: '',
-      });
-      
-      // Reset success message after 5 seconds
-      setTimeout(() => setSubmitSuccess(false), 5000);
-    }, 1500);
-  };
-
   return (
-    <div className="bg-gray-50 min-h-screen">
-      {/* Hero section */}
-      <section className="bg-gradient-to-r from-blue-900 to-red-900 text-white py-16">
-        <div className="container mx-auto px-4">
-          <h1 className="text-4xl font-bold mb-4 text-center">About TAIFA-FIALA</h1>
-          <p className="text-xl text-center max-w-3xl mx-auto">
-            Democratizing AI funding access across Africa through transparency, 
-        and accountability in AI funding.
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50">
+      {/* Hero Section */}
+      <section className="bg-white border-b border-gray-200">
+        <div className="max-w-4xl mx-auto py-16 px-4 sm:px-6 lg:px-8 text-center">
+          <h1 className="text-4xl font-bold text-gray-900 mb-6">
+            About TAIFA-FIALA
+          </h1>
+          <p className="text-xl text-gray-700 leading-relaxed max-w-3xl mx-auto">
+            An independent initiative promoting transparency, equity, and accountability in AI funding 
+            across Africa. We apply advanced data analytics and research expertise to ensure AI development 
+            serves all Africans, not just a privileged few.
           </p>
-        </div>
-      </section>
-
-      {/* Mission section */}
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl font-bold mb-6 text-center">Our Mission</h2>
-            <div className="prose lg:prose-lg mx-auto">
-              <p className="mb-4">
-                TAIFA-FIALA (Tracking AI Funding for Africa - Financement Pour L'intelligence Artificielle en Afrique) 
-                is a community-driven membership organization and digital platform dedicated to democratizing 
-                funding for artificial intelligence research and implementation in African countries.
-              </p>
-              <p className="mb-4">
-                We are a group of passionate African researchers, technologists, and advocates committed to 
-                increasing African representation in global AI through principles of equity, accountability, 
-                and transparency on the part of donors, investors, grantees, and entrepreneurs.
-              </p>
-              <p className="mb-4">
-                Our platform serves as the central hub for AI funding opportunities in Africa, bringing together 
-                researchers, startups, funders, and implementers in a collaborative ecosystem. We leverage advanced 
-                data collection technologies and human expertise to ensure high-quality, relevant, and timely 
-                information for the African AI community.
-              </p>
-            </div>
+          <div className="mt-8 text-gray-600">
+            <p className="text-lg">
+              <strong>Mission:</strong> Preventing AI from perpetuating the same disparities as previous innovations 
+              that promised much to Africans but failed to deliver equitably.
+            </p>
           </div>
         </div>
       </section>
 
-      {/* Vision section with cards */}
-      <section className="py-16 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold mb-12 text-center">Our Vision</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <div className="text-blue-800 mb-4">
-                <Globe className="w-12 h-12" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Geographic Equity</h3>
-              <p className="text-gray-600">
-                Ensuring AI funding reaches all African regions, not just the top four countries 
-                that currently receive 83% of investments.
-              </p>
-            </div>
-
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <div className="text-blue-800 mb-4">
-                <Scale className="w-12 h-12" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Inclusive Access</h3>
-              <p className="text-gray-600">
-                Creating pathways for underrepresented groups, particularly women who currently 
-                receive only 2% of AI funding in Africa.
-              </p>
-            </div>
-
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <div className="text-blue-800 mb-4">
-                <Search className="w-12 h-12" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Transparency</h3>
-              <p className="text-gray-600">
-                Bringing clarity to funding processes through comprehensive data collection, 
-                analysis, and community-driven accountability.
-              </p>
-            </div>
+      {/* Leadership Team */}
+      <section className="py-16">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Leadership Team</h2>
+            <p className="text-gray-600">
+              Combining African data analytics expertise with global research experience
+            </p>
           </div>
-        </div>
-      </section>
 
-      {/* Roadmap section */}
-      <section id="roadmap" className="py-16 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl font-bold mb-6 text-center">Our Roadmap</h2>
-            <div className="space-y-6">
-              <div className="border-l-4 border-blue-800 pl-4">
-                <h3 className="text-xl font-semibold">Enhanced Geographic Equity Features</h3>
-                <p className="text-gray-600 mt-2">
-                  Real-time visualization of funding concentration, opportunity amplification for 
-                  neglected regions, and language expansion beyond French/English to include 
-                  Portuguese, Arabic, and Swahili.
-                </p>
+          <div className="grid md:grid-cols-2 gap-12 max-w-5xl mx-auto">
+            
+            {/* Executive Director */}
+            <div className="bg-white p-8 rounded-xl shadow-lg text-center">
+              <div className="w-32 h-32 bg-amber-100 rounded-full mx-auto mb-6 flex items-center justify-center">
+                <Users className="h-16 w-16 text-amber-700" />
               </div>
               
-              <div className="border-l-4 border-blue-800 pl-4">
-                <h3 className="text-xl font-semibold">Sectoral Alignment Dashboard</h3>
-                <p className="text-gray-600 mt-2">
-                  Dedicated tracking for underserved sectors like healthcare (5.8% of funding), 
-                  agriculture (3.9%), and climate AI (1.3%), with impact potential metrics aligned to 
-                  AU development goals and SDGs.
-                </p>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Executive Director</h3>
+              <div className="text-amber-700 font-medium mb-4">Africa Quantitative Sciences (AQS)</div>
+              
+              <p className="text-gray-700 leading-relaxed mb-6">
+                Leading Africa Quantitative Sciences, Rwanda's premier data analytics firm, our Executive Director 
+                brings extensive experience in transforming unstructured data into actionable insights across 
+                African contexts. With a focus on public health outcomes and global health security, 
+                they have pioneered innovative data-driven solutions that enhance vaccine and disease monitoring 
+                while strengthening health systems across the continent. Their vision combines cutting-edge 
+                technology with deep understanding of African operational realities.
+              </p>
+              
+              <div className="flex justify-center items-center text-sm text-gray-500">
+                <MapPin className="h-4 w-4 mr-1" />
+                <span>Kigali, Rwanda</span>
+              </div>
+            </div>
+
+            {/* Scientific Director */}
+            <div className="bg-white p-8 rounded-xl shadow-lg text-center">
+              <div className="w-32 h-32 bg-emerald-100 rounded-full mx-auto mb-6 flex items-center justify-center">
+                <Users className="h-16 w-16 text-emerald-700" />
               </div>
               
-              <div className="border-l-4 border-blue-800 pl-4">
-                <h3 className="text-xl font-semibold">Gender and Inclusion Analytics</h3>
-                <p className="text-gray-600 mt-2">
-                  Highlighting funding for women-led initiatives, providing inclusive application resources,
-                  and featuring success stories from female and youth AI entrepreneurs.
-                </p>
-              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Dr. Jamie Forrest</h3>
+              <div className="text-emerald-700 font-medium mb-4">Scientific Director</div>
               
-              <div className="border-l-4 border-blue-800 pl-4">
-                <h3 className="text-xl font-semibold">Funding Lifecycle Support</h3>
-                <p className="text-gray-600 mt-2">
-                  Stage-appropriate matching for projects, consortium building features to help 
-                  smaller entities access larger grants, and post-award tracking to build evidence 
-                  for future applications.
-                </p>
+              <p className="text-gray-700 leading-relaxed mb-6">
+                Dr. Forrest holds a PhD in Population and Public Health and has dedicated their career to 
+                addressing health and development challenges across Africa. With extensive experience living 
+                and working in Rwanda for many years, and earlier career experience in South Africa, 
+                they bring deep contextual understanding of African development dynamics. Their research 
+                expertise in funding analysis and commitment to equity-driven innovation drives TAIFA-FIALA's 
+                scientific approach to ensuring AI development serves all African communities.
+              </p>
+              
+              <div className="flex justify-center items-center text-sm text-gray-500">
+                <MapPin className="h-4 w-4 mr-1" />
+                <span>Rwanda</span>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Contact section */}
-      <section id="contact" className="py-16 bg-gray-100">
-        <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto bg-white rounded-lg shadow-lg p-8">
-            <h2 className="text-3xl font-bold mb-6 text-center">Get in Touch</h2>
-            <p className="text-center mb-8 text-gray-600">
-              Have questions or want to collaborate with us? Send us a message and we'll get back to you.
+      {/* Initiative Background */}
+      <section className="py-12 bg-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Why TAIFA-FIALA?</h2>
+          <div className="bg-amber-50 p-8 rounded-xl border-l-4 border-amber-500">
+            <p className="text-lg text-gray-800 leading-relaxed">
+              History shows us that technological innovations often promise transformation for Africa 
+              but frequently fail to deliver equitable benefits. From mobile banking to renewable energy, 
+              we've seen how good intentions can perpetuate existing disparities. 
+              <strong className="text-amber-800"> We founded TAIFA-FIALA to ensure AI doesn't repeat this pattern.</strong>
+            </p>
+            <p className="text-gray-700 mt-4">
+              By combining rigorous data analytics with deep African experience, we track where AI funding 
+              actually goes, who benefits, and whether promises translate to reality. Our goal is transparency 
+              that enables truly inclusive AI development across the continent.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Coming Soon - Advisory Board */}
+      <section className="py-16">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="bg-gradient-to-r from-amber-100 to-orange-100 p-8 rounded-xl border border-amber-200">
+            <Calendar className="h-12 w-12 text-amber-700 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Coming Soon</h2>
+            <h3 className="text-xl font-semibold text-amber-800 mb-3">Advisory Board</h3>
+            <p className="text-gray-700 max-w-2xl mx-auto">
+              We are assembling a distinguished advisory board of African AI researchers, policy makers, 
+              and development practitioners to guide TAIFA-FIALA's strategic direction and ensure our 
+              work serves the broader African AI ecosystem.
+            </p>
+            <div className="mt-6 text-sm text-amber-700 font-medium">
+              Announcements forthcoming in Q4 2025
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Contact & Collaboration */}
+      <section className="py-16 bg-white border-t border-gray-200">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Contact & Collaboration</h2>
+            <p className="text-gray-600 mb-6">
+              Partner with us in building transparent, equitable AI development across Africa
             </p>
             
-            {submitSuccess ? (
-              <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
-                Thank you for your message! We'll get back to you soon.
-              </div>
-            ) : null}
+            {/* Funding Statement */}
+            <div className="bg-amber-50 p-6 rounded-lg border-l-4 border-amber-500 max-w-3xl mx-auto mb-8">
+              <p className="text-gray-800 leading-relaxed">
+                <strong>TAIFA-FIALA is currently self-supporting.</strong> If you are interested in helping us 
+                grow our reach and expand our platform to serve more African communities, 
+                please get in touch with us below.
+              </p>
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="text-center p-6 bg-amber-50 rounded-lg">
+              <Mail className="h-8 w-8 text-amber-700 mx-auto mb-3" />
+              <h3 className="font-semibold text-gray-900 mb-2">General Inquiries</h3>
+              <p className="text-gray-600 text-sm">
+                Research partnerships and collaboration opportunities
+              </p>
+            </div>
             
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-                    Your Name
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-800 focus:border-blue-800"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                    Email Address
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-800 focus:border-blue-800"
-                  />
-                </div>
-              </div>
-              
-              <div>
-                <label htmlFor="organization" className="block text-sm font-medium text-gray-700 mb-1">
-                  Organization (optional)
-                </label>
-                <input
-                  type="text"
-                  id="organization"
-                  name="organization"
-                  value={formData.organization}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-800 focus:border-blue-800"
-                />
-              </div>
-              
-              <div>
-                <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">
-                  Your Message
-                </label>
-                <textarea
-                  id="message"
-                  name="message"
-                  rows={4}
-                  value={formData.message}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-800 focus:border-blue-800"
-                ></textarea>
-              </div>
-              
-              <div className="flex justify-center">
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="px-6 py-3 bg-gradient-to-r from-blue-800 to-red-800 text-white font-medium rounded-md hover:opacity-90 transition-opacity disabled:opacity-70"
-                >
-                  {isSubmitting ? 'Sending...' : 'Send Message'}
-                </button>
-              </div>
-            </form>
+            <div className="text-center p-6 bg-emerald-50 rounded-lg">
+              <Users className="h-8 w-8 text-emerald-700 mx-auto mb-3" />
+              <h3 className="font-semibold text-gray-900 mb-2">Grant Funding</h3>
+              <p className="text-gray-600 text-sm">
+                Supporting transparent AI development across Africa
+              </p>
+            </div>
+            
+            <div className="text-center p-6 bg-orange-50 rounded-lg">
+              <ExternalLink className="h-8 w-8 text-orange-700 mx-auto mb-3" />
+              <h3 className="font-semibold text-gray-900 mb-2">Data Access</h3>
+              <p className="text-gray-600 text-sm">
+                Academic and institutional research partnerships
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-12 text-center">
+            <div className="bg-gray-50 p-6 rounded-lg">
+              <p className="text-sm text-gray-600 mb-2">
+                <strong>Transparency Note:</strong> TAIFA-FIALA operates as an independent initiative.
+              </p>
+              <p className="text-xs text-gray-500">
+                Our funding sources and methodology are fully documented to ensure accountability 
+                in our mission to promote transparency in African AI development.
+              </p>
+            </div>
           </div>
         </div>
       </section>
