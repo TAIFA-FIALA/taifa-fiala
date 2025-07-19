@@ -21,7 +21,14 @@ from pathlib import Path
 data_connectors_path = Path(__file__).parent.parent.parent.parent / "data_connectors"
 sys.path.append(str(data_connectors_path))
 
-from crawl4ai import AsyncWebCrawler, LLMExtractionStrategy
+# Temporarily disabled due to Python 3.9 compatibility issues
+# from crawl4ai import AsyncWebCrawler, LLMExtractionStrategy
+try:
+    from crawl4ai import AsyncWebCrawler, LLMExtractionStrategy
+except ImportError:
+    # Fallback for Python 3.9 compatibility
+    AsyncWebCrawler = None
+    LLMExtractionStrategy = None
 from serper_search.collector import SerperSearchCollector
 from database.connector import DatabaseConnector
 from app.core.config import settings
