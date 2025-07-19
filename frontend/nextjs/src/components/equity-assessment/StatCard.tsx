@@ -1,7 +1,5 @@
-import { bg } from "date-fns/locale"
-
-`qq21``111  qimport { LucideIcon } from 'lucide-react';
-q11
+import { ReactNode } from 'react';
+import { LucideIcon } from 'lucide-react';
 interface StatCardProps {
   title: string;
   value: string | ReactNode;
@@ -35,4 +33,4 @@ export default function StatCard({
       <p className="text-sm text-gray-600">{description}</p>
     </div>
   );
-}zźq1
+}

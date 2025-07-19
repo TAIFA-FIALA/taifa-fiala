@@ -6,6 +6,7 @@ import GenderEquityDashboard from '@/components/homepage/GenderEquityDashboard';
 import { Database, BarChart3, BookOpen, Users, TrendingUp, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
 import SearchBar from '@/components/homepage/SearchBar';
+import { getApiUrl, API_ENDPOINTS } from '@/lib/api-config';
 
 interface AnalyticsSummary {
   total_opportunities?: number;
@@ -16,7 +17,7 @@ interface AnalyticsSummary {
 
 async function getAnalyticsSummary(): Promise<AnalyticsSummary | null> {
   try {
-    const res = await fetch('http://localhost:8000/api/v1/equity-analyses/summary', {
+    const res = await fetch(getApiUrl(API_ENDPOINTS.equityAnalysesSummary), {
       next: { revalidate: 300 } // Revalidate every 5 minutes
     });
     if (!res.ok) {
