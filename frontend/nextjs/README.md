@@ -33,3 +33,4 @@ To learn more about Next.js, take a look at the following resources:
 -   [Learn Next.js](https://nextjs.org/learn)
 
 <!-- Test comment for Git hook sync - $(date) -->
+<!-- Testing Vercel deployment trigger -->
