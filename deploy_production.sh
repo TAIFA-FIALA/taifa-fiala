@@ -532,7 +532,7 @@ if [ $DEPLOY_STATUS -eq 0 ]; then
     echo -e "${BLUE}Check all logs:${NC} ssh $SSH_USER@$PROD_SERVER 'cd $PROD_PATH && tail -f logs/*.log'"
     echo -e "${BLUE}Check services:${NC} ssh $SSH_USER@$PROD_SERVER 'cd $PROD_PATH && ps aux | grep -E \"(uvicorn|python)\"'"
     echo -e "${BLUE}Test API:${NC} curl http://${PROD_SERVER}:8000/health"
-    echo -e "${BLUE}Redis status:${NC} ssh $SSH_USER@$PROD_SERVER '/usr/local/bin/redis-cli ping'"
+    echo -e "${BLUE}Redis status:${NC} ssh $SSH_USER@$PROD_SERVER '/usr/local/bin/redis-cli -a redis1484 ping'"
     echo
     echo -e "${GREEN}📝 Next Steps:${NC}"
     echo -e "${YELLOW}  1. Verify frontend deployment URL from Vercel output${NC}"
