@@ -190,7 +190,7 @@ export default async function HomePage() {
               </div>
               
               <p className="text-gray-700 leading-relaxed mb-4">
-                Healthcare applications receive only 5.8% of AI funding despite the continent bearing 25% 
+                Health applications receive only 5.8% of AI funding despite the continent bearing 25% 
                 of the global disease burden. Agricultural technology, which employs 60% of Africa's workforce, 
                 attracts merely 3.9% of funding. In contrast, financial services capture 20.9% of investments, 
                 revealing a critical misalignment between funding priorities and development needs.

@@ -126,7 +126,7 @@ const GenderEquityDashboard: React.FC = () => {
               <YAxis yAxisId="right" orientation="right" stroke="#ef4444" />
               <Tooltip 
                 formatter={(value, name) => [
-                  typeof value === 'number' ? (name.includes('Percent') ? `${value}%` : value) : value,
+                  typeof value === 'number' ? (typeof name === 'string' && name.includes('Percent') ? `${value}%` : value) : value,
                   name === 'femalePercent' ? 'Female %' : name === 'female' ? 'Female-led' : 'Male-led'
                 ]}
               />
@@ -196,7 +196,7 @@ const GenderEquityDashboard: React.FC = () => {
               <YAxis stroke="#6b7280" />
               <Tooltip formatter={(value, name) => [
                 name === 'female' || name === 'male' ? 
-                  (value > 10 ? `$${value}M` : `${value}%`) : value,
+                  (typeof value === 'number' && value > 10 ? `$${value}M` : `${value}%`) : value,
                 name === 'female' ? 'Female' : 'Male'
               ]} />
               <Legend />
