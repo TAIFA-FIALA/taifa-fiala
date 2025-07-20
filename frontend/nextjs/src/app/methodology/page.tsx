@@ -309,10 +309,10 @@ export default function MethodologyPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold mb-6 text-white">Vision: AI by Africans, for Africans</h2>
           <p className="text-xl max-w-4xl mx-auto leading-relaxed" style={{ color: '#F0E68C' }}>
-            TAIFA-FIALA's ultimate goal extends beyond data collection to become the central platform 
+            TAIFA-FIALA&amp;apos;s ultimate goal extends beyond data collection to become the central platform 
             enabling African-led AI development. Through transparent funding intelligence, project amplification, 
             and ecosystem building, we democratize access to AI development resources and ensure African voices 
-            lead the continent's AI transformation.
+            lead the continent&amp;apos;s AI transformation.
           </p>
           
           <div className="mt-12 grid md:grid-cols-3 gap-8">

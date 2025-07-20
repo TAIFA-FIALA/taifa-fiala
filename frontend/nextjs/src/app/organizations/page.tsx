@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Scrollbar, A11y } from 'swiper/modules';
 
@@ -85,7 +86,7 @@ export default function OrganizationsPage() {
           {organizations.map((org) => (
             <SwiperSlide key={org.id}>
               <div className="flex flex-col items-center justify-between h-full p-6 bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out border border-gray-200">
-                <img src={org.logo_url || 'https://via.placeholder.com/150'} alt={org.name} className="w-32 h-32 object-contain mb-4 rounded-full border-2 border-indigo-500 p-1" />
+                <Image src={org.logo_url || 'https://via.placeholder.com/150'} alt={org.name} width={128} height={128} className="object-contain mb-4 rounded-full border-2 border-indigo-500 p-1" />
                 <h2 className="text-xl font-bold text-gray-800 text-center mb-2">{org.name}</h2>
                 <p className="text-gray-600 text-sm text-center mb-3 line-clamp-4">{org.description}</p>
                 <div className="text-gray-700 text-xs text-center mb-4">

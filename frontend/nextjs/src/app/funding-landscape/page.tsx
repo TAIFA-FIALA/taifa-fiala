@@ -1,7 +1,7 @@
 'use client';
 
 import { TrendingUp, AlertTriangle, DollarSign, Briefcase, Target, BarChart3, PieChart, MapPin } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart as RechartsPieChart, Pie, Cell, LineChart, Line, ComposedChart, Area, AreaChart } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart as RechartsPieChart, Pie, Cell, Line, ComposedChart, Area, AreaChart } from 'recharts';
 
 import React from 'react';
 
@@ -28,12 +28,6 @@ interface SectorData {
   funding?: string;
 }
 
-interface GeographicData {
-  region: string;
-  funding: string;
-  countries: number;
-  highlight: boolean;
-}
 
 // Components for visual storytelling
 
@@ -73,7 +67,6 @@ const regionalGapsData = [
   { region: 'Central Africa', funding: 18.3, countries: 9, population: 185 },
 ];
 
-const COLORS = ['#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#22D3EE', '#6B7280'];
 
 // Components for visual storytelling
 
@@ -188,7 +181,7 @@ export default function FundingLandscapePage() {
         <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-4xl font-bold text-taifa-primary mb-2">
-              Africa's AI Funding Landscape
+              Africa&amp;apos;s AI Funding Landscape
             </h1>
             <p className="text-xl text-taifa-muted">2019-2024 Analysis</p>
           </div>
@@ -212,7 +205,7 @@ export default function FundingLandscapePage() {
           <div className="bg-white rounded-xl p-8 shadow-lg mb-12">
             <div className="text-center mb-8">
               <h2 className="text-3xl font-bold text-gray-900 mb-2">Geographic Concentration Crisis</h2>
-              <p className="text-gray-600">The "Big Four" dominate while regions are left behind</p>
+              <p className="text-gray-600">The &quot;Big Four&quot; dominate while regions are left behind</p>
             </div>
             
             <div className="grid md:grid-cols-2 gap-8">
@@ -314,7 +307,7 @@ export default function FundingLandscapePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Funding Landscape Deep Dive</h2>
-            <p className="text-gray-600">Interactive analysis of Africa's AI funding patterns</p>
+            <p className="text-gray-600">Interactive analysis of Africa&amp;apos;s AI funding patterns</p>
           </div>
 
           {/* Funding by Country Chart */}

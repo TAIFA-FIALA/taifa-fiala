@@ -1,15 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-
-// Use dynamic import only if needed for specific SSR issues
-const ChartContainer = dynamic(() => Promise.resolve(({ children }: { children: React.ReactNode }) => (
-  <div className="h-64">{children}</div>
-)), {
-  ssr: false,
-  loading: () => <div className="h-64 bg-gray-50 rounded-lg flex items-center justify-center">Loading chart...</div>,
-});
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 interface FundingStage {
   stage: string;
@@ -183,40 +175,6 @@ export default function FundingLifecycleSupport({ className = '' }: FundingLifec
   }));
 
   // Chart options
-  const chartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        display: false,
-      },
-      title: {
-        display: true,
-        text: 'Project Distribution by Funding Stage',
-      },
-      tooltip: {
-        callbacks: {
-          label: function(context: any) {
-            const index = context.dataIndex;
-            const stage = fundingStages[index];
-            return [
-              `Projects: ${stage.percentage}% (${stage.projects_count})`,
-              `Range: ${stage.typical_range}`
-            ];
-          }
-        }
-      }
-    },
-    scales: {
-      y: {
-        beginAtZero: true,
-        title: {
-          display: true,
-          text: 'Percentage of Projects (%)'
-        }
-      }
-    }
-  };
 
   if (loading) {
     return <div className="flex justify-center items-center h-64 bg-gray-50 rounded-lg">Loading funding lifecycle data...</div>;
@@ -251,7 +209,7 @@ export default function FundingLifecycleSupport({ className = '' }: FundingLifec
                 <Tooltip
                   content={({ active, payload }) => {
                     if (active && payload && payload.length) {
-                      const data = payload[0].payload;
+                      const data = payload[0].payload as { stage: string; percentage: number };
                       return (
                         <div className="bg-white p-2 border border-gray-200 rounded-md shadow-sm">
                           <div className="text-sm font-medium">{data.stage}</div>

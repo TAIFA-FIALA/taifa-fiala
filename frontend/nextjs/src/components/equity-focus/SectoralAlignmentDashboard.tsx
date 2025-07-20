@@ -2,16 +2,16 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, 
-  Legend, ResponsiveContainer, Cell, ReferenceLine, Label 
+  Legend, ResponsiveContainer, Cell, Label
 } from 'recharts';
 
 // Custom tooltip component
-const CustomTooltip = ({ active, payload, label }: any) => {
+const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: any[]; label?: string }) => {
   if (active && payload && payload.length) {
     return (
       <div className="bg-white p-2 border border-gray-200 shadow-sm rounded">
         <p className="font-medium">{label}</p>
-        {payload.map((item: any, index: number) => (
+        {payload.map((item: { color: string; name: string; value: number }, index: number) => (
           <p key={index} className="text-sm" style={{ color: item.color }}>
             {item.name}: {item.value}{item.name.includes('Percentage') || item.name.includes('Priority') ? '%' : ''}
           </p>

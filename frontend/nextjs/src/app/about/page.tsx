@@ -95,7 +95,7 @@ export default function AboutPage() {
             <p className="text-lg text-gray-800 leading-relaxed">
               History shows us that technological innovations often promise transformation for Africa 
               but frequently fail to deliver the kind of equitable benefits that promise the tide to raise all boats. From mobile banking to renewable energy, 
-              we've seen how good intentions can perpetuate existing disparities that are deeply rooted. 
+              we&amp;apos;ve seen how good intentions can perpetuate existing disparities that are deeply rooted. 
               <strong className="text-amber-800"> We founded TAIFA-FIALA to ensure AI doesn&apos;t repeat this pattern.</strong>
             </p>
             <p className="text-gray-700 mt-4">

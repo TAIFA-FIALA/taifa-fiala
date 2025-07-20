@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { FileText, Target, Users } from 'lucide-react';
+import Image from 'next/image';
 import { 
   PieChart, Pie, Cell, ResponsiveContainer,
   LineChart, Line, XAxis, YAxis, CartesianGrid, 
@@ -8,7 +9,7 @@ import {
 } from 'recharts';
 
 // Custom tooltip component for the pie chart
-const CustomPieTooltip = ({ active, payload }: any) => {
+const CustomPieTooltip = ({ active, payload }: { active?: boolean; payload?: any[] }) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
     return (
@@ -293,7 +294,7 @@ export default function GenderInclusionDashboard({ className = '' }: GenderInclu
                 <div key={founder.name} className="bg-white rounded-lg shadow p-3 flex space-x-3">
                   <div className="flex-shrink-0">
                     <div className="w-16 h-16 bg-gray-200 rounded-full overflow-hidden">
-                      <img src={founder.image_url} alt={founder.name} className="w-full h-full object-cover" />
+                      <Image src={founder.image_url} alt={founder.name} width={64} height={64} className="w-full h-full object-cover" />
                     </div>
                   </div>
                   <div className="flex-grow">

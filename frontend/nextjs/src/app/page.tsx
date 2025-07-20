@@ -230,7 +230,7 @@ export default async function HomePage() {
               
               <p className="text-taifa-muted leading-relaxed mb-4">
                 Health applications receive only 5.8% of AI funding despite the continent bearing 25% 
-                of the global disease burden. Agricultural technology, which employs 60% of Africa's workforce, 
+                of the global disease burden. Agricultural technology, which employs 60% of Africa&amp;apos;s workforce, 
                 attracts merely 3.9% of funding. In contrast, financial services capture 20.9% of investments, 
                 revealing a critical misalignment between funding priorities and development needs.
               </p>

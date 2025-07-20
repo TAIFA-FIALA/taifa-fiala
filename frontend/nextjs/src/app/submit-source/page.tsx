@@ -59,7 +59,7 @@ export default function SubmitSourcePage() {
         if (!res.ok) throw new Error('Failed to fetch form options');
         const data = await res.json();
         setFormOptions(data);
-      } catch (error) {
+      } catch {
         setMessage({ type: 'error', text: 'Could not load form options. Please try again later.' });
       }
     }
@@ -128,8 +128,12 @@ export default function SubmitSourcePage() {
       const result = await res.json();
       setMessage({ type: 'success', text: `Source submitted successfully! Submission ID: ${result.submission_id}. Next steps: ${result.next_steps.join(', ')}` });
       // Reset form
-    } catch (error: any) {
-      setMessage({ type: 'error', text: `Submission failed: ${error.message}` });
+    } catch (error) {
+      if (error instanceof Error) {
+        setMessage({ type: 'error', text: `Submission failed: ${error.message}` });
+      } else {
+        setMessage({ type: 'error', text: 'An unknown error occurred during submission.' });
+      }
     } finally {
       setIsLoading(false);
     }

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, ReactNode } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Map, ZoomControl } from 'pigeon-maps';
@@ -140,25 +140,11 @@ const CountryPolygon: React.FC<CountryPolygonProps> = ({ feature, color, onClick
 };
 
 // Sample data to use when API is not available
-const demoCountryData: CountryData[] = [
-  { name: "Nigeria", code: "NG", funding: 4500000, projects: 32 },
-  { name: "Kenya", code: "KE", funding: 3200000, projects: 28 },
-  { name: "South Africa", code: "ZA", funding: 2800000, projects: 24 },
-  { name: "Egypt", code: "EG", funding: 1900000, projects: 18 },
-  { name: "Ghana", code: "GH", funding: 950000, projects: 12 },
-  { name: "Rwanda", code: "RW", funding: 750000, projects: 10 },
-  { name: "Ethiopia", code: "ET", funding: 620000, projects: 8 },
-  { name: "Tunisia", code: "TN", funding: 580000, projects: 7 },
-  { name: "Morocco", code: "MA", funding: 510000, projects: 6 },
-  { name: "Uganda", code: "UG", funding: 480000, projects: 6 },
-  { name: "Senegal", code: "SN", funding: 320000, projects: 4 },
-  { name: "Tanzania", code: "TZ", funding: 280000, projects: 4 },
-];
 
 // Use the imported GeoJSON data for African countries
 
 const GeographicEquityMap: React.FC<GeographicEquityMapProps> = ({ className = '' }) => {
-  const router = useRouter();
+  useRouter();
   const [fundingData, setFundingData] = useState<FundingDistribution[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -253,15 +239,6 @@ const GeographicEquityMap: React.FC<GeographicEquityMapProps> = ({ className = '
     }
   };
 
-  const countryStyle = (feature: any) => {
-    return {
-      fillColor: getCountryColor(feature.properties.ISO_A2 || feature.properties.iso_a2),
-      weight: 1,
-      opacity: 1,
-      color: 'white',
-      fillOpacity: 0.7
-    };
-  };
 
   const handleCountryMouseEnter = (feature: GeoJSONFeature) => {
     const countryCode = feature.properties.ISO_A2 || feature.properties.iso_a2 || '';

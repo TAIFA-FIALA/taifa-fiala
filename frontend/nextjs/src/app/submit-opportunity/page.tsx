@@ -198,7 +198,7 @@ export default function SubmitOpportunity() {
                   {submitResult.requires_review ? (
                     <>
                       <p>• Your submission will be reviewed by our community within 24-48 hours</p>
-                      <p>• You'll receive an email notification once the review is complete</p>
+                      <p>• You&amp;apos;ll receive an email notification once the review is complete</p>
                       <p>• Track your submission status using the ID above</p>
                     </>
                   ) : (
@@ -255,7 +255,7 @@ export default function SubmitOpportunity() {
             Submit Funding Opportunity
             </h1>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Help the African AI community by sharing funding opportunities you've discovered. 
+              Help the African AI community by sharing funding opportunities you&amp;apos;ve discovered. 
               Your contribution helps researchers and entrepreneurs across the continent.
             </p>
           </div>
@@ -281,7 +281,7 @@ export default function SubmitOpportunity() {
                 </ul>
               </div>
               <div>
-                <h3 className="font-medium mb-2">❌ Please don't submit:</h3>
+                <h3 className="font-medium mb-2">❌ Please don&amp;apos;t submit:</h3>
                 <ul className="space-y-1">
                   <li>• Expired opportunities</li>
                   <li>• Opportunities not relevant to AI/tech</li>
