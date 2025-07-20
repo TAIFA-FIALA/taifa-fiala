@@ -19,7 +19,7 @@ interface DatabaseMetrics {
 }
 
 export default function DatabaseScopeVisualization() {
-  const [metrics, setMetrics] = useState<DatabaseMetrics>({
+  const [metrics] = useState<DatabaseMetrics>({
     totalOpportunities: 12847,
     activeOpportunities: 8934,
     uniqueOrganizations: 1247,

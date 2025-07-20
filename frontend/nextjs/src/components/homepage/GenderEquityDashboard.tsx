@@ -7,7 +7,6 @@ import React, { useState, useEffect } from 'react';
 import {
   BarChart,
   Bar,
-  LineChart as RechartsLineChart,
   Line,
   XAxis,
   YAxis,
@@ -22,8 +21,7 @@ import {
 import { 
   AlertCircle, 
   DollarSign, 
-  TrendingDown,
-  ArrowRight
+  TrendingDown
 } from 'lucide-react';
 
 // TAIFA color scheme for charts
@@ -107,7 +105,7 @@ const CustomTooltip = <T extends Record<string, unknown>>({
 
 const GenderEquityDashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error] = useState<string | null>(null);
 
   // Responsive dimensions for charts
   const [dimensions, setDimensions] = useState({
@@ -143,26 +141,12 @@ const GenderEquityDashboard = () => {
     { year: 2024, female: 289, male: 512, total: 801, femalePercentage: 36.1 },
   ];
 
-  const sectorGenderData: SectorGenderData[] = [
-    { sector: 'AI/ML', femalePercent: 28, malePercent: 72 },
-    { sector: 'FinTech', femalePercent: 32, malePercent: 68 },
-    { sector: 'HealthTech', femalePercent: 45, malePercent: 55 },
-    { sector: 'AgriTech', femalePercent: 38, malePercent: 62 },
-    { sector: 'EdTech', femalePercent: 52, malePercent: 48 },
-  ];
-
   const regionalGenderData: RegionalGenderData[] = [
     { region: 'East Africa', femalePercent: 35, total: 189 },
     { region: 'West Africa', femalePercent: 28, total: 245 },
     { region: 'Southern Africa', femalePercent: 41, total: 176 },
     { region: 'North Africa', femalePercent: 22, total: 143 },
     { region: 'Central Africa', femalePercent: 19, total: 98 },
-  ];
-
-  const fundingComparisonData: FundingComparisonData[] = [
-    { category: 'Seed', female: 1200000, male: 4500000, total: 5700000, femalePercentage: 21.1 },
-    { category: 'Series A', female: 4500000, male: 18000000, total: 22500000, femalePercentage: 16.7 },
-    { category: 'Series B+', female: 12000000, male: 75000000, total: 87000000, femalePercentage: 12.1 },
   ];
 
   const totalFunding = genderTimelineData.reduce((sum, item) => sum + item.female + item.male, 0);

@@ -44,7 +44,7 @@ export default function DualModeSearch() {
   const [searchMode, setSearchMode] = useState<'discover' | 'explore'>('discover');
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [showEquityFilters, setShowEquityFilters] = useState(false);
-  const [dbStats, setDbStats] = useState<DatabaseStats>({
+  const [dbStats] = useState<DatabaseStats>({
     total_opportunities: 12847,
     active_opportunities: 8934,
     total_funding: 2400000000,
@@ -126,11 +126,7 @@ export default function DualModeSearch() {
     }
   }, [searchMode]);
 
-  const handleModeToggle = () => {
-    setSearchMode(prev => prev === 'discover' ? 'explore' : 'discover');
-  };
-
-  const handleFilterChange = (key: keyof SearchFilters, value: any) => {
+  const handleFilterChange = (key: keyof SearchFilters, value: string | number | boolean) => {
     setFilters(prev => ({ ...prev, [key]: value }));
   };
 

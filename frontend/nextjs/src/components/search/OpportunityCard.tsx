@@ -14,7 +14,7 @@ interface OpportunityCardProps {
   onViewDetails?: (id: number) => void;
 }
 
-export default function OpportunityCard({ opportunity, searchMode, onViewDetails }: OpportunityCardProps) {
+export default function OpportunityCard({ opportunity, searchMode }: OpportunityCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [showEquityDetails, setShowEquityDetails] = useState(false);
 

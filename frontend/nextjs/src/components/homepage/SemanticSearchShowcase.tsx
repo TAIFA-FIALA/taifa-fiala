@@ -80,7 +80,7 @@ export default function SemanticSearchShowcase() {
     }, 4000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [searchExamples.length]);
 
   const handleSearch = () => {
     setIsSearching(true);

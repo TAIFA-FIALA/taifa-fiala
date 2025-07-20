@@ -175,14 +175,6 @@ const GeographicDistributionMap = () => {
     setTooltipContent(null);
   };
 
-  // Function to convert coordinates from GeoJSON format to pigeon-maps format
-  const convertCoordinates = (coords: number[][]): [number, number][] => {
-    return coords.map((coord): [number, number] => {
-      // Convert longitude and latitude to pigeon-maps coordinates
-      return [coord[0], coord[1]];
-    });
-  };
-
   return (
     <VisualizationErrorBoundary>
       <figure className="chart-container relative">
