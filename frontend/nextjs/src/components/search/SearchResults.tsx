@@ -158,7 +158,7 @@ export default function SearchResults({ searchMode, filters, loading, onLoadMore
     };
 
     fetchResults();
-  }, [searchMode, filters]);
+  }, [searchMode, filters, mockOpportunities]);
 
   const handleSort = (sortBy: string) => {
     setState(prev => ({
