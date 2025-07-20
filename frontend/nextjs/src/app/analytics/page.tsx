@@ -1,4 +1,3 @@
-import { GetServerSideProps } from 'next';
 import GeographicAnalysis from '@/components/analytics/GeographicAnalysis';
 import TemporalAnalysis from '@/components/analytics/TemporalAnalysis';
 import NetworkAnalysis from '@/components/analytics/NetworkAnalysis';

@@ -86,7 +86,7 @@ function GrantContent() {
 
         setOrganizations(orgsData);
         setCountries(countriesData);
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error("Failed to fetch initial data:", err);
         setError("Failed to load initial data (organizations, countries).");
       }
@@ -127,7 +127,7 @@ function GrantContent() {
         const data = await res.json();
         setOpportunities(data.opportunities || data);
         setTotalCount(data.total_count || data.length);
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error("Failed to fetch grant opportunities:", err);
         setError("Failed to load grant opportunities.");
       } finally {

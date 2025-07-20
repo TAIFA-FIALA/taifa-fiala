@@ -1,6 +1,5 @@
 import React from 'react';
 import { Mail, MapPin, Users, Calendar, ExternalLink } from 'lucide-react';
-import Image from 'next/image';
 
 export default function AboutPage() {
   return (
@@ -47,7 +46,7 @@ export default function AboutPage() {
               <div className="text-amber-700 font-medium mb-4">Executive Director</div>
               
               <p className="text-gray-700 leading-relaxed mb-6">
-                Leading Africa Quantitative Sciences, Rwanda's premier data analytics firm, Hinda Ruton
+                Leading Africa Quantitative Sciences, Rwanda&apos;s premier data analytics firm, Hinda Ruton
                 brings extensive experience in transforming unstructured data into actionable insights across 
                 African contexts. With a focus on public health outcomes and global health security, 
                 he has pioneered innovative data-driven solutions that enhance vaccine and disease monitoring 
@@ -75,7 +74,7 @@ export default function AboutPage() {
                 addressing health and development challenges in African countries. With many years of living 
                 and working in Rwanda, and earlier career experience in South Africa,  
                 he brings deep contextual understanding of African development dynamics. His research interests and 
-                expertise include digital health, clinical research, and equity-driven innovations like those driving TAIFA-FIALA's 
+                expertise include digital health, clinical research, and equity-driven innovations like those driving TAIFA-FIALA&apos;s 
                 scientific approach to holding AI development accountable for its promise to all Africans.
               </p>
               
@@ -97,7 +96,7 @@ export default function AboutPage() {
               History shows us that technological innovations often promise transformation for Africa 
               but frequently fail to deliver the kind of equitable benefits that promise the tide to raise all boats. From mobile banking to renewable energy, 
               we've seen how good intentions can perpetuate existing disparities that are deeply rooted. 
-              <strong className="text-amber-800"> We founded TAIFA-FIALA to ensure AI doesn't repeat this pattern.</strong>
+              <strong className="text-amber-800"> We founded TAIFA-FIALA to ensure AI doesn&apos;t repeat this pattern.</strong>
             </p>
             <p className="text-gray-700 mt-4">
               By combining rigorous data analytics with lived experience, we are setting out on an ambitious journey to track where AI funding comes from,
@@ -117,7 +116,7 @@ export default function AboutPage() {
             <h3 className="text-xl font-semibold text-amber-800 mb-3">Advisory Board</h3>
             <p className="text-gray-700 max-w-2xl mx-auto">
               We are assembling a distinguished advisory board of African AI researchers, policy makers, 
-              and development practitioners to guide TAIFA-FIALA's strategic direction and ensure our 
+              and development practitioners to guide TAIFA-FIALA&apos;s strategic direction and ensure our
               work serves the broader African AI ecosystem.
             </p>
             <div className="mt-6 text-sm text-amber-700 font-medium">

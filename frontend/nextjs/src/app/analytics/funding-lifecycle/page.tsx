@@ -22,7 +22,7 @@ export default function FundingLifecyclePage() {
             </div>
             <h1 className="text-3xl font-bold text-blue-dark mt-2">Funding Lifecycle Support</h1>
             <p className="mt-2 text-lg text-gray-600">
-              Breaking the "seed trap" and supporting AI startups through the full funding lifecycle.
+              Breaking the &ldquo;seed trap&rdquo; and supporting AI startups through the full funding lifecycle.
             </p>
           </div>
         </div>

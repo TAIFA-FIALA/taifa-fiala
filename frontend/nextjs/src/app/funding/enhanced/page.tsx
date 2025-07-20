@@ -29,12 +29,12 @@ interface SearchFilters {
 
 function EnhancedFundingContent() {
   const searchParams = useSearchParams();
-  const [searchMode, setSearchMode] = useState<'discover' | 'explore'>('discover');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [searchMode] = useState<'discover' | 'explore'>('discover');
+  const [loading] = useState(false);
+  const [error] = useState<string | null>(null);
   const [showOnboarding, setShowOnboarding] = useState(false);
   
-  const [filters, setFilters] = useState<SearchFilters>({
+  const [filters] = useState<SearchFilters>({
     query: searchParams.get('q') || '',
     min_amount: searchParams.get('min_amount') || '',
     max_amount: searchParams.get('max_amount') || '',
@@ -54,7 +54,7 @@ function EnhancedFundingContent() {
     equity_score_min: Number(searchParams.get('equity_score_min')) || 0,
   });
 
-  const [quickStats, setQuickStats] = useState({
+  const [quickStats] = useState({
     total_opportunities: 12847,
     active_opportunities: 8934,
     total_funding: 2400000000,
@@ -77,41 +77,6 @@ function EnhancedFundingContent() {
   const handleOnboardingComplete = () => {
     localStorage.setItem('funding_onboarding_seen', 'true');
     setShowOnboarding(false);
-  };
-
-  const handleSearch = async (newFilters: SearchFilters) => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      // In real implementation, this would make API calls
-      // For now, we'll simulate the search
-      setFilters(newFilters);
-      
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Update URL with search parameters
-      const params = new URLSearchParams();
-      Object.entries(newFilters).forEach(([key, value]) => {
-        if (value && value !== '' && value !== false && value !== 0) {
-          if (Array.isArray(value)) {
-            if (value.length > 0) params.set(key, value.join(','));
-          } else {
-            params.set(key, value.toString());
-          }
-        }
-      });
-      
-      // Update URL without page reload
-      window.history.replaceState({}, '', `?${params.toString()}`);
-      
-    } catch (err) {
-      setError('Failed to search opportunities. Please try again.');
-      console.error('Search error:', err);
-    } finally {
-      setLoading(false);
-    }
   };
 
   const formatNumber = (num: number) => {

@@ -89,7 +89,7 @@ function InvestmentContent() {
 
         setOrganizations(orgsData);
         setCountries(countriesData);
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error("Failed to fetch initial data:", err);
         setError("Failed to load initial data (organizations, countries).");
       }
@@ -130,7 +130,7 @@ function InvestmentContent() {
         const data = await res.json();
         setOpportunities(data.opportunities || data);
         setTotalCount(data.total_count || data.length);
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error("Failed to fetch investment opportunities:", err);
         setError("Failed to load investment opportunities.");
       } finally {

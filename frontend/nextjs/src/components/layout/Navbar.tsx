@@ -30,9 +30,6 @@ const Navbar = () => {
             <Link href="/funding-landscape" className="text-taifa-primary hover:text-taifa-accent text-sm font-medium nav-pill">
               Funding Landscape
             </Link>
-            <Link href="/funding" className="text-taifa-primary hover:text-taifa-accent text-sm font-medium nav-pill">
-              Funding
-            </Link>
             <Link href="/methodology" className="text-taifa-primary hover:text-taifa-accent text-sm font-medium nav-pill">
               Methodology
             </Link>
@@ -69,9 +66,6 @@ const Navbar = () => {
         <div className="md:hidden px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-taifa-light border-b border-gray-200">
           <Link href="/funding-landscape" className="block px-3 py-2 rounded-md text-base font-medium text-taifa-primary hover:text-taifa-secondary">
             Funding Landscape
-          </Link>
-          <Link href="/funding" className="block px-3 py-2 rounded-md text-base font-medium text-taifa-primary hover:text-taifa-secondary">
-            Funding
           </Link>
           <Link href="/methodology" className="block px-3 py-2 rounded-md text-base font-medium text-taifa-primary hover:text-taifa-secondary">
             Methodology

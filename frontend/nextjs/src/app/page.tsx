@@ -86,10 +86,6 @@ export default async function HomePage() {
               <BarChart3 className="w-4 h-4 text-taifa-primary" />
               Funding Landscape
             </Link>
-            <Link href="/funding" className="text-taifa-primary hover:text-taifa-secondary transition-colors flex items-center gap-2">
-              <BookOpen className="w-4 h-4 text-taifa-primary" />
-             Funding
-            </Link>
             <Link href="/methodology" className="text-taifa-primary hover:text-taifa-secondary transition-colors flex items-center gap-2">
               <Database className="w-4 h-4 text-taifa-primary" />
               Methodology
