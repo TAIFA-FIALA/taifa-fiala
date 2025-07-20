@@ -8,25 +8,7 @@ import {
 } from 'lucide-react';
 import OpportunityCard from './OpportunityCard';
 import { FundingOpportunity } from '@/types/funding';
-
-interface SearchResultsProps {
-  searchMode: 'discover' | 'explore';
-  filters: any;
-  loading: boolean;
-  onLoadMore?: () => void;
-}
-
-interface SearchResultsState {
-  opportunities: FundingOpportunity[];
-  total: number;
-  currentPage: number;
-  totalPages: number;
-  perPage: number;
-  sortBy: string;
-  sortOrder: 'asc' | 'desc';
-  viewMode: 'grid' | 'list';
-  selectedFilters: string[];
-}
+import { SearchResultsProps, SearchResultsState } from '@/types/search';
 
 export default function SearchResults({ searchMode, filters, loading, onLoadMore }: SearchResultsProps) {
   const [state, setState] = useState<SearchResultsState>({

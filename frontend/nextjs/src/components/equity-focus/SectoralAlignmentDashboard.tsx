@@ -5,8 +5,23 @@ import {
   Legend, ResponsiveContainer, Cell, Label
 } from 'recharts';
 
+// Type for tooltip payload item
+interface TooltipPayloadItem {
+  color: string;
+  name: string;
+  value: number;
+  payload: SectorData;
+}
+
+// Type for tooltip props
+interface TooltipProps {
+  active?: boolean;
+  payload?: TooltipPayloadItem[];
+  label?: string;
+}
+
 // Custom tooltip component
-const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: any[]; label?: string }) => {
+const CustomTooltip = ({ active, payload, label }: TooltipProps) => {
   if (active && payload && payload.length) {
     return (
       <div className="bg-white p-2 border border-gray-200 shadow-sm rounded">

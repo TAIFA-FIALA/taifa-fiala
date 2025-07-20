@@ -8,8 +8,16 @@ import {
   Tooltip, Legend
 } from 'recharts';
 
+// Type for the tooltip payload
+interface TooltipPayload {
+  payload: GenderData;
+  name: string;
+  value: number;
+  color: string;
+}
+
 // Custom tooltip component for the pie chart
-const CustomPieTooltip = ({ active, payload }: { active?: boolean; payload?: any[] }) => {
+const CustomPieTooltip = ({ active, payload }: { active?: boolean; payload?: TooltipPayload[] }) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
     return (

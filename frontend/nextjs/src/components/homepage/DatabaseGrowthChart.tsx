@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { LineChart, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
+import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
 import { TrendingUp, Database, RefreshCw } from 'lucide-react';
 
 interface DataPoint {
@@ -93,8 +93,19 @@ export default function DatabaseGrowthChart({ className = '' }: DatabaseGrowthCh
     });
   };
 
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
+  interface TooltipProps {
+    active?: boolean;
+    payload?: Array<{
+      payload: DataPoint;
+      value: number;
+      name: string;
+      color: string;
+    }>;
+    label?: string;
+  }
+
+  const CustomTooltip = ({ active, payload, label }: TooltipProps) => {
+    if (active && payload && payload.length && label) {
       const data = payload[0].payload;
       return (
         <div className="bg-white p-4 border border-gray-200 rounded-lg shadow-lg">

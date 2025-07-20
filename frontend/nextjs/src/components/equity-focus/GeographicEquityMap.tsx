@@ -32,12 +32,6 @@ interface GeoJSONCollection {
   features: GeoJSONFeature[];
 }
 
-interface CountryData {
-  name: string;
-  code: string;
-  funding: number;
-  projects: number;
-}
 
 interface FundingDistribution {
   country_code: string;

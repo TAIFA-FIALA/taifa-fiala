@@ -6,6 +6,31 @@ import { Map, Overlay } from 'pigeon-maps';
 import africanCountriesGeo from '@/data/african_countries_geo.json';
 import VisualizationErrorBoundary from '@/components/common/VisualizationErrorBoundary';
 
+// Types for GeoJSON features
+interface GeoJSONProperties {
+  name: string;
+  region: string;
+  lat?: number;
+  lon?: number;
+  [key: string]: unknown;
+}
+
+interface GeoJSONGeometry {
+  type: 'Polygon' | 'MultiPolygon';
+  coordinates: number[][][] | number[][][][];
+}
+
+interface GeoJSONFeature {
+  type: 'Feature';
+  properties: GeoJSONProperties;
+  geometry: GeoJSONGeometry;
+}
+
+interface GeoJSONFeatureCollection {
+  type: 'FeatureCollection';
+  features: GeoJSONFeature[];
+}
+
 interface CountryData {
   country: string;
   fundingAmount: number;
@@ -23,19 +48,31 @@ const GeographicDistributionMap = () => {
   const [tooltipPosition, setTooltipPosition] = useState<{x: number, y: number} | null>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
   const [data, setData] = useState<CountryData[]>([]);
-  const [countryPolygons, setCountryPolygons] = useState<any[]>([]);
+  // Define the type for country polygons
+  interface CountryPolygon {
+    id: string;
+    name: string;
+    coordinates: [number, number][][];
+    center?: [number, number];
+    data?: CountryData;
+  }
+
+  const [countryPolygons, setCountryPolygons] = useState<CountryPolygon[]>([]);
 
   useEffect(() => {
+    // Type assertion for the imported GeoJSON data
+    const geoData = africanCountriesGeo as unknown as GeoJSONFeatureCollection;
+    
     // Process GeoJSON data to extract polygons for each country
-    const countries = africanCountriesGeo.features.map(feature => {
+    const countries = geoData.features.map(feature => {
       const countryName = feature.properties.name;
       
       // Extract center point for the country if available
       let centerPoint: [number, number] | undefined;
       
       // Check for custom lat/lon properties in the GeoJSON if available
-      const customLat = (feature.properties as any).lat;
-      const customLon = (feature.properties as any).lon;
+      const customLat = feature.properties.lat;
+      const customLon = feature.properties.lon;
       
       if (customLat && customLon) {
         centerPoint = [customLon, customLat];
@@ -48,21 +85,36 @@ const GeographicDistributionMap = () => {
         const coords = feature.geometry.coordinates[0];
         
         // Ensure coords is an array and each element is an array with at least 2 elements
-        if (Array.isArray(coords) && coords.length > 0 && coords.every(c => Array.isArray(c) && c.length >= 2)) {
-          const lons = coords.map((c: number[]) => c[0]);
-          const lats = coords.map((c: number[]) => c[1]);
+        if (Array.isArray(coords) && coords.length > 0) {
+          // Flatten the coordinates array to handle both Polygon and MultiPolygon cases
+          const flatCoords = coords.flat();
           
-          const avgLon = lons.reduce((sum: number, val: number) => sum + val, 0) / lons.length;
-          const avgLat = lats.reduce((sum: number, val: number) => sum + val, 0) / lats.length;
+          // Extract all longitudes and latitudes
+          const lons: number[] = [];
+          const lats: number[] = [];
           
-          centerPoint = [avgLon, avgLat];
+          flatCoords.forEach(coord => {
+            if (Array.isArray(coord) && coord.length >= 2) {
+              lons.push(Number(coord[0]));
+              lats.push(Number(coord[1]));
+            }
+          });
+          
+          if (lons.length > 0 && lats.length > 0) {
+            const avgLon = lons.reduce((sum, val) => sum + val, 0) / lons.length;
+            const avgLat = lats.reduce((sum, val) => sum + val, 0) / lats.length;
+          
+            centerPoint = [avgLon, avgLat];
+          }
         }
       }
       
       return {
+        id: feature.properties.name.toLowerCase().replace(/\s+/g, '-'),
         name: countryName,
+        coordinates: feature.geometry.coordinates as [number, number][][],
         center: centerPoint,
-        geometry: feature.geometry
+        data: undefined
       };
     });
     

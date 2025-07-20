@@ -65,21 +65,28 @@ interface FundingComparisonData {
   femalePercentage: number;
 }
 
-interface TooltipProps {
-  active?: boolean;
-  payload?: Array<{
-    name: string;
-    value: number;
-    color: string;
-    dataKey?: string;
-    payload?: any;
-  }>;
-  label?: string | number;
-  formatter?: (value: any, name: string) => [number | string, string];
+interface TooltipPayload<T = Record<string, unknown>> {
+  name: string;
+  value: number;
+  color: string;
+  dataKey?: string;
+  payload: T;
 }
 
-// Custom Tooltip Component
-const CustomTooltip = ({ active, payload, label, formatter }: TooltipProps) => {
+interface TooltipProps<T = Record<string, unknown>> {
+  active?: boolean;
+  payload?: TooltipPayload<T>[];
+  label?: string | number;
+  formatter?: (value: number, name: string) => [string | number, string];
+}
+
+// Custom Tooltip Component with generic type for payload
+const CustomTooltip = <T extends Record<string, unknown>>({ 
+  active, 
+  payload, 
+  label, 
+  formatter 
+}: TooltipProps<T>) => {
   if (active && payload && payload.length) {
     return (
       <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
