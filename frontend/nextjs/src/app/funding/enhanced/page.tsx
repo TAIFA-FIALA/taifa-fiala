@@ -6,26 +6,7 @@ import DualModeSearch from '@/components/search/DualModeSearch';
 import SearchResults from '@/components/search/SearchResults';
 import { AlertCircle, TrendingUp, Globe, Users, Database, Clock, Target } from 'lucide-react';
 
-interface SearchFilters {
-  query: string;
-  min_amount: string;
-  max_amount: string;
-  deadline_after: string;
-  deadline_before: string;
-  status: string;
-  funding_type: string;
-  geographic_scope: string[];
-  ai_domains: string[];
-  organization_type: string;
-  // Equity-aware filters
-  underserved_focus: boolean;
-  women_focus: boolean;
-  youth_focus: boolean;
-  rural_focus: boolean;
-  inclusion_indicators: string[];
-  bias_score_min: number;
-  equity_score_min: number;
-}
+import { SearchFilters } from '@/types/search';
 
 function EnhancedFundingContent() {
   const searchParams = useSearchParams();
@@ -36,22 +17,26 @@ function EnhancedFundingContent() {
   
   const [filters] = useState<SearchFilters>({
     query: searchParams.get('q') || '',
-    min_amount: searchParams.get('min_amount') || '',
-    max_amount: searchParams.get('max_amount') || '',
+    min_amount: parseFloat(searchParams.get('min_amount') || '0') || 0,
+    max_amount: parseFloat(searchParams.get('max_amount') || '0') || 0,
+    amount_exact: parseFloat(searchParams.get('amount_exact') || '0') || 0,
     deadline_after: searchParams.get('deadline_after') || '',
     deadline_before: searchParams.get('deadline_before') || '',
     status: searchParams.get('status') || '',
     funding_type: searchParams.get('funding_type') || '',
-    geographic_scope: searchParams.get('geographic_scope')?.split(',') || [],
-    ai_domains: searchParams.get('ai_domains')?.split(',') || [],
+    geographic_scope: searchParams.get('geographic_scope')?.split(',').filter(Boolean) || [],
+    target_audience: searchParams.get('target_audience')?.split(',').filter(Boolean) || [],
+    focus_areas: searchParams.get('focus_areas')?.split(',').filter(Boolean) || [],
+    sort_by: (searchParams.get('sort_by') as 'relevance' | 'deadline' | 'amount' | 'date_added') || 'relevance',
+    sort_order: (searchParams.get('sort_order') as 'asc' | 'desc') || 'desc',
+    page: parseInt(searchParams.get('page') || '1') || 1,
+    page_size: parseInt(searchParams.get('page_size') || '10') || 10,
+    opportunity_type: searchParams.get('opportunity_type') || '',
     organization_type: searchParams.get('organization_type') || '',
     underserved_focus: searchParams.get('underserved_focus') === 'true',
     women_focus: searchParams.get('women_focus') === 'true',
     youth_focus: searchParams.get('youth_focus') === 'true',
     rural_focus: searchParams.get('rural_focus') === 'true',
-    inclusion_indicators: searchParams.get('inclusion_indicators')?.split(',') || [],
-    bias_score_min: Number(searchParams.get('bias_score_min')) || 0,
-    equity_score_min: Number(searchParams.get('equity_score_min')) || 0,
   });
 
   const [quickStats] = useState({
