@@ -42,7 +42,7 @@ export default async function HomePage() {
   return (
     <div className="min-h-screen">
       {/* Modern Hero Section with Africa Outline */}
-      <section className="relative overflow-hidden py-8 sm:py-12 border-b border-gray-200">
+      <section className="relative overflow-hidden py-8 sm:py-12 border-b border-taifa-border">
         {/* Background Africa Outline */}
         <div className="absolute inset-0 flex justify-center items-center z-0 opacity-10">
           <Image 
@@ -70,7 +70,7 @@ export default async function HomePage() {
             Tracking AI Funding in Africa | Financements Pour IA en Afrique
           </div>
           
-          <p className="text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed mb-10 font-body">
+          <p className="text-xl text-taifa-muted max-w-3xl mx-auto leading-relaxed mb-10 font-body">
             An independent initiative promoting transparency, equity and accountability 
             in AI research and implementation across all African nations.
           </p>
@@ -83,19 +83,19 @@ export default async function HomePage() {
           {/* Quick Navigation Links */}
           <nav className="flex flex-wrap justify-center gap-6 text-base font-medium">
             <Link href="/funding-landscape" className="text-taifa-primary hover:text-taifa-secondary transition-colors flex items-center gap-2">
-              <BarChart3 className="w-4 h-4" />
+              <BarChart3 className="w-4 h-4 text-taifa-primary" />
               Funding Landscape
             </Link>
             <Link href="/funding" className="text-taifa-primary hover:text-taifa-secondary transition-colors flex items-center gap-2">
-              <BookOpen className="w-4 h-4" />
+              <BookOpen className="w-4 h-4 text-taifa-primary" />
              Funding
             </Link>
             <Link href="/methodology" className="text-taifa-primary hover:text-taifa-secondary transition-colors flex items-center gap-2">
-              <Database className="w-4 h-4" />
+              <Database className="w-4 h-4 text-taifa-primary" />
               Methodology
             </Link>
             <Link href="/about" className="text-taifa-primary hover:text-taifa-secondary transition-colors flex items-center gap-2">
-              <Users className="w-4 h-4" />
+              <Users className="w-4 h-4 text-taifa-primary" />
               About Us  
             </Link>
           </nav>
@@ -103,41 +103,58 @@ export default async function HomePage() {
       </section>
 
       {/* Key Metrics Dashboard with Live Chart */}
-      <section id="findings" className="py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
+      <section id="findings" className="py-12 px-4 sm:px-6 lg:px-8 bg-taifa-light">
         <div className="max-w-7xl mx-auto">
-          {/* Animated Metric Cards */}
+          {/* Animated Metric Cards with Color Accents */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-            <div className="bg-white p-6 rounded-xl shadow-lg text-center border-l-4 border-amber-600 transform hover:scale-105 transition-all duration-300 hover:shadow-xl">
-              <div className="text-3xl font-bold text-amber-700 mb-2 animate-pulse">
+            <div className="bg-gradient-to-br from-white to-taifa-primary/5 p-6 rounded-lg border-l-4 border-taifa-primary shadow-sm hover:shadow-lg hover:scale-105 transition-all duration-300 text-center group">
+              <div className="w-12 h-12 rounded-full bg-taifa-primary/10 flex items-center justify-center mx-auto mb-3 group-hover:bg-taifa-primary/20 transition-colors">
+                <Database className="w-6 h-6" style={{ color: '#3E4B59' }} />
+              </div>
+              <div className="text-2xl font-semibold mb-2" style={{ color: '#3E4B59' }}>
                 {summary?.total_opportunities?.toLocaleString() || '2,467'}
               </div>
-              <div className="text-sm text-gray-600">Total Opportunities</div>
+              <div className="text-sm text-taifa-muted">Total Opportunities</div>
             </div>
-            <div className="bg-white p-6 rounded-xl shadow-lg text-center border-l-4 border-emerald-600 transform hover:scale-105 transition-all duration-300 hover:shadow-xl">
-              <div className="text-3xl font-bold text-emerald-700 mb-2 animate-pulse">
+            <div className="bg-gradient-to-br from-white to-taifa-secondary/5 p-6 rounded-lg border-l-4 border-taifa-secondary shadow-sm hover:shadow-lg hover:scale-105 transition-all duration-300 text-center group">
+              <div className="w-12 h-12 rounded-full bg-taifa-secondary/10 flex items-center justify-center mx-auto mb-3 group-hover:bg-taifa-secondary/20 transition-colors">
+                <TrendingUp className="w-6 h-6" style={{ color: '#F0A621' }} />
+              </div>
+              <div className="text-2xl font-semibold mb-2" style={{ color: '#F0A621' }}>
                 {summary?.active_opportunities?.toLocaleString() || '127'}
               </div>
-              <div className="text-sm text-gray-600">Active Opportunities</div>
+              <div className="text-sm text-taifa-muted">Active Opportunities</div>
             </div>
-            <div className="bg-white p-6 rounded-xl shadow-lg text-center border-l-4 border-orange-600 transform hover:scale-105 transition-all duration-300 hover:shadow-xl">
-              <div className="text-3xl font-bold text-orange-700 mb-2 animate-pulse">
+            <div className="bg-gradient-to-br from-white to-taifa-accent/5 p-6 rounded-lg border-l-4 border-taifa-accent shadow-sm hover:shadow-lg hover:scale-105 transition-all duration-300 text-center group">
+              <div className="w-12 h-12 rounded-full bg-taifa-accent/10 flex items-center justify-center mx-auto mb-3 group-hover:bg-taifa-accent/20 transition-colors">
+                <BarChart3 className="w-6 h-6" style={{ color: '#007A56' }} />
+              </div>
+              <div className="text-2xl font-semibold mb-2" style={{ color: '#007A56' }}>
                 ${((summary?.total_funding_value || 847000000) / 1000000).toFixed(0)}M
               </div>
-              <div className="text-sm text-gray-600">Total Funding Tracked</div>
+              <div className="text-sm text-taifa-muted">Total Funding Tracked</div>
             </div>
-            <div className="bg-white p-6 rounded-xl shadow-lg text-center border-l-4 border-red-600 transform hover:scale-105 transition-all duration-300 hover:shadow-xl">
-              <div className="text-3xl font-bold text-red-700 mb-2 animate-pulse">
+            <div className="bg-gradient-to-br from-white to-taifa-primary/5 p-6 rounded-lg border-l-4 border-taifa-primary shadow-sm hover:shadow-lg hover:scale-105 transition-all duration-300 text-center group">
+              <div className="w-12 h-12 rounded-full bg-taifa-primary/10 flex items-center justify-center mx-auto mb-3 group-hover:bg-taifa-primary/20 transition-colors">
+                <Users className="w-6 h-6" style={{ color: '#3E4B59' }} />
+              </div>
+              <div className="text-2xl font-semibold mb-2" style={{ color: '#3E4B59' }}>
                 {summary?.unique_organizations?.toLocaleString() || '159'}
               </div>
-              <div className="text-sm text-gray-600">Organizations</div>
+              <div className="text-sm text-taifa-muted">Organizations</div>
             </div>
           </div>
 
-          {/* Live Database Growth Chart */}
-          <div className="bg-white rounded-xl shadow-lg p-8 mb-8">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">Live Intelligence Collection</h2>
-              <p className="text-gray-600">Real-time tracking of AI funding opportunities across Africa</p>
+          {/* Standardized Live Database Growth Chart */}
+          <div className="bg-white rounded-lg border border-taifa-border shadow-sm hover:shadow-md transition-shadow p-8 mb-8">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-12 h-12 rounded-full bg-taifa-secondary/10 flex items-center justify-center">
+                <Database className="w-6 h-6 text-taifa-secondary" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-taifa-primary mb-1">Live Intelligence Collection - Database Growth</h2>
+                <p className="text-taifa-muted">Real-time tracking of AI funding opportunities across Africa</p>
+              </div>
             </div>
             <DatabaseGrowthChart />
           </div>
@@ -147,40 +164,46 @@ export default async function HomePage() {
       {/* Key Issues Section */}
       <section id="data" className="py-12 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">
+          <h2 className="text-3xl font-bold text-taifa-primary mb-12 text-center">
             <span className="inline-block relative">
               <span className="relative z-10">
                 <TrendingUp className="w-8 h-8 text-taifa-primary inline-block mr-3 -mt-1" />
                 Issues of Equity in AI Funding We are Tracking
               </span>
-              <span className="absolute -left-4 -top-6 text-8xl font-black text-gray-100 -z-10">•••</span>
+              <span className="absolute -left-4 -top-6 text-8xl font-black text-taifa-border -z-10">•••</span>
             </span>
           </h2>
           
           {/* Issue 1: Geographic Concentration */}
-          <div className="mb-12 relative group">
-            <div className="absolute -left-12 top-0 w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center text-4xl font-black text-blue-700 shadow-md">
-              1
-            </div>
-            <div className="bg-white p-8 pl-16 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
-              <h3 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-                <Globe className="w-6 h-6 text-blue-600" />
-                Geographic Concentration
-              </h3>
+          <div className="mb-12">
+            <div className="bg-white p-8 rounded-lg border border-taifa-border shadow-sm hover:shadow-md transition-shadow relative">
+              {/* Numbered Icon in top-left corner */}
+              <div className="absolute -top-3 -left-3 w-12 h-12 rounded-full bg-taifa-primary flex items-center justify-center text-xl font-bold text-white shadow-lg z-10">
+                1
+              </div>
+              <div className="flex items-center gap-4 mb-6">
+                <div>
+                  <h3 className="text-2xl font-bold text-taifa-primary mb-1 flex items-center gap-3">
+                    <Globe className="w-6 h-6 text-taifa-primary" />
+                    Geographic Concentration
+                  </h3>
+                  <p className="text-taifa-muted text-sm">Tracking funding distribution across African regions</p>
+                </div>
+              </div>
               
               {/* Geographic Distribution Map */}
               <div className="mb-6">
                 <GeographicDistributionMapWrapper />
               </div>
               
-              <p className="text-gray-700 leading-relaxed mb-4">
+              <p className="text-taifa-muted leading-relaxed mb-4">
                 We are watching {summary?.total_opportunities?.toLocaleString() || '2,467'} funding events to monitor the potential for geographic disparities, with 83% of tracked funding concentrated in just four countries: 
                 Kenya, Nigeria, South Africa, and Egypt. Central African nations receive less than 2% of total 
                 funding despite being home to more than 180 million people.
               </p>
               
-              <div className="mt-4 text-sm text-gray-600">
-                <Link href="/funding-landscape" className="text-blue-700 hover:underline inline-flex items-center gap-1">
+              <div className="mt-4 text-sm text-taifa-muted">
+                <Link href="/funding-landscape" className="text-taifa-primary hover:text-taifa-secondary hover:underline inline-flex items-center gap-1">
                   View detailed analysis <ChevronRight className="w-4 h-4" />
                 </Link>
               </div>
@@ -188,30 +211,36 @@ export default async function HomePage() {
           </div>
 
           {/* Issue 2: Sectoral Misalignment */}
-          <div className="mb-12 relative group">
-            <div className="absolute -left-12 top-0 w-16 h-16 rounded-full bg-green-100 flex items-center justify-center text-4xl font-black text-green-700 shadow-md">
-              2
-            </div>
-            <div className="bg-white p-8 pl-16 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
-              <h3 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-                <PieChart className="w-6 h-6 text-green-600" />
-                Sectoral Funding Misalignment
-              </h3>
+          <div className="mb-12">
+            <div className="bg-white p-8 rounded-lg border border-taifa-border shadow-sm hover:shadow-md transition-shadow relative">
+              {/* Numbered Icon in top-left corner */}
+              <div className="absolute -top-3 -left-3 w-12 h-12 rounded-full bg-taifa-secondary flex items-center justify-center text-xl font-bold text-white shadow-lg z-10">
+                2
+              </div>
+              <div className="flex items-center gap-4 mb-6">
+                <div>
+                  <h3 className="text-2xl font-bold text-taifa-primary mb-1 flex items-center gap-3">
+                    <PieChart className="w-6 h-6 text-taifa-secondary" />
+                    Sectoral Funding Misalignment
+                  </h3>
+                  <p className="text-taifa-muted text-sm">Analyzing funding allocation vs development priorities</p>
+                </div>
+              </div>
               
               {/* Sector Allocation Chart */}
               <div className="mb-6">
                 <SectorAllocationChart />
               </div>
               
-              <p className="text-gray-700 leading-relaxed mb-4">
+              <p className="text-taifa-muted leading-relaxed mb-4">
                 Health applications receive only 5.8% of AI funding despite the continent bearing 25% 
                 of the global disease burden. Agricultural technology, which employs 60% of Africa's workforce, 
                 attracts merely 3.9% of funding. In contrast, financial services capture 20.9% of investments, 
                 revealing a critical misalignment between funding priorities and development needs.
               </p>
               
-              <div className="mt-4 text-sm text-gray-600">
-                <Link href="/funding-landscape" className="text-blue-700 hover:underline inline-flex items-center gap-1">
+              <div className="mt-4 text-sm text-taifa-muted">
+                <Link href="/funding-landscape" className="text-taifa-primary hover:text-taifa-secondary hover:underline inline-flex items-center gap-1">
                   Explore sectoral analysis <ChevronRight className="w-4 h-4" />
                 </Link>
               </div>
@@ -219,29 +248,35 @@ export default async function HomePage() {
           </div>
 
           {/* Issue 3: Gender Disparity */}
-          <div className="mb-12 relative group">
-            <div className="absolute -left-12 top-0 w-16 h-16 rounded-full bg-pink-100 flex items-center justify-center text-4xl font-black text-pink-700 shadow-md">
-              3
-            </div>
-            <div className="bg-white p-8 pl-16 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
-              <h3 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-                <Users className="w-6 h-6 text-pink-600" />
-                Gender Disparity
-              </h3>
+          <div className="mb-12">
+            <div className="bg-white p-8 rounded-lg border border-taifa-border shadow-sm hover:shadow-md transition-shadow relative">
+              {/* Numbered Icon in top-left corner */}
+              <div className="absolute -top-3 -left-3 w-12 h-12 rounded-full bg-taifa-accent flex items-center justify-center text-xl font-bold text-white shadow-lg z-10">
+                3
+              </div>
+              <div className="flex items-center gap-4 mb-6">
+                <div>
+                  <h3 className="text-2xl font-bold text-taifa-primary mb-1 flex items-center gap-3">
+                    <Users className="w-6 h-6 text-taifa-accent" />
+                    Gender Disparity
+                  </h3>
+                  <p className="text-taifa-muted text-sm">Monitoring gender equity in AI funding and leadership</p>
+                </div>
+              </div>
               
               {/* Enhanced Gender Equity Dashboard */}
               <GenderEquityDashboard />
               
-              <div className="mt-6 p-4 bg-amber-50 rounded-lg border-l-4 border-amber-600">
-                <p className="text-sm text-amber-800">
+              <div className="mt-6 p-4 bg-red-50 rounded-lg border-l-4 border-red-400">
+                <p className="text-sm text-red-800">
                   <strong>Urgent Action Needed:</strong> Female leadership in African AI has declined consistently 
                   over 6 years, with funding gaps widening across all sectors and regions. This threatens 
                   inclusive AI development across the continent.
                 </p>
               </div>
               
-              <div className="mt-4 text-sm text-gray-600">
-                <Link href="/equity-assessment" className="text-amber-700 hover:underline inline-flex items-center gap-1">
+              <div className="mt-4 text-sm text-taifa-muted">
+                <Link href="/equity-assessment" className="text-taifa-primary hover:text-taifa-secondary hover:underline inline-flex items-center gap-1">
                   View comprehensive gender equity analysis <ChevronRight className="w-4 h-4" />
                 </Link>
               </div>
@@ -251,10 +286,10 @@ export default async function HomePage() {
       </section>
 
       {/* Brief About Us */}
-      <section className="py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
+      <section className="py-12 px-4 sm:px-6 lg:px-8 bg-taifa-light">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-gray-900 mb-6">About TAIFA-FIALA</h2>
-          <p className="text-xl text-gray-700 mb-8 leading-relaxed">
+          <h2 className="text-3xl font-bold text-taifa-primary mb-6">About TAIFA-FIALA</h2>
+          <p className="text-xl text-taifa-muted mb-8 leading-relaxed">
             TAIFA-FIALA is an independent initiative dedicated to promoting transparency, 
             equity, and accountability in AI funding across Africa. We provide comprehensive 
             data analysis and insights to support evidence-based decision making in the 
@@ -262,20 +297,26 @@ export default async function HomePage() {
           </p>
           
           <div className="grid md:grid-cols-3 gap-8 mb-8">
-            <div className="text-center">
-              <Database className="w-12 h-12 text-amber-700 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Comprehensive Data</h3>
-              <p className="text-gray-600">Real-time tracking of AI funding opportunities across all 54 African countries</p>
+            <div className="text-center group hover:scale-105 transition-transform duration-300">
+              <div className="w-16 h-16 rounded-full bg-taifa-primary/10 flex items-center justify-center mx-auto mb-4 group-hover:bg-taifa-primary/20 transition-colors">
+                <Database className="w-8 h-8" style={{ color: '#3E4B59' }} />
+              </div>
+              <h3 className="text-lg font-semibold mb-2" style={{ color: '#3E4B59' }}>Comprehensive Data</h3>
+              <p className="text-taifa-muted">Real-time tracking of AI funding opportunities across all 54 African countries</p>
             </div>
-            <div className="text-center">
-              <Users className="w-12 h-12 text-emerald-700 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Equity Focus</h3>
-              <p className="text-gray-600">Dedicated analysis of gender, geographic, and sectoral disparities in funding</p>
+            <div className="text-center group hover:scale-105 transition-transform duration-300">
+              <div className="w-16 h-16 rounded-full bg-taifa-secondary/10 flex items-center justify-center mx-auto mb-4 group-hover:bg-taifa-secondary/20 transition-colors">
+                <Users className="w-8 h-8" style={{ color: '#F0A621' }} />
+              </div>
+              <h3 className="text-lg font-semibold mb-2" style={{ color: '#F0A621' }}>Equity Focus</h3>
+              <p className="text-taifa-muted">Dedicated analysis of gender, geographic, and sectoral disparities in funding</p>
             </div>
-            <div className="text-center">
-              <BookOpen className="w-12 h-12 text-orange-700 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Open Research</h3>
-              <p className="text-gray-600">Transparent methodology and publicly accessible insights for the research community</p>
+            <div className="text-center group hover:scale-105 transition-transform duration-300">
+              <div className="w-16 h-16 rounded-full bg-taifa-accent/10 flex items-center justify-center mx-auto mb-4 group-hover:bg-taifa-accent/20 transition-colors">
+                <BookOpen className="w-8 h-8" style={{ color: '#007A56' }} />
+              </div>
+              <h3 className="text-lg font-semibold mb-2" style={{ color: '#007A56' }}>Open Research</h3>
+              <p className="text-taifa-muted">Transparent methodology and publicly accessible insights for the research community</p>
             </div>
           </div>
           

@@ -14,23 +14,32 @@ export default {
         serif: ['Georgia', 'serif'],                           // Fallback serif
       },
       colors: {
-        // TAIFA-FIALA official color palette
+        // TAIFA-FIALA official color palette from provided scheme
         'taifa': {
-          primary: '#0C2340',    // Navy blue (from TAIFA-colour-palette.png)
-          secondary: '#FFD100',  // Bright yellow (from TAIFA-colour-palette.png)
-          accent: '#4B9CD3',     // Light blue (from Africa-outline-blue.png)
-          light: '#F9F7F0',      // Warm light background
-          dark: '#2C3E50',       // Dark slate
-          lightblue: '#8BB8E8',  // Lighter blue accent (from Africa-outline-blue.png)
-          grey: '#A2AAAD',       // Grey (from Africa-outline-grey.png)
+          primary: '#3E4B59',    // Dark blue-gray
+          secondary: '#F0A621',  // Orange/yellow
+          accent: '#007A56',     // Teal green
+          light: '#F9FAFB',      // Very light gray
+          dark: '#3E4B59',       // Dark blue-gray
+          muted: '#6B7280',      // Muted gray
+          border: '#F2F2F2',     // Light gray border
+          olive: '#5F763B',      // Olive green
+          orange: '#BA4D00',     // Dark orange
+          yellow: '#F0E68C',     // Light yellow
+          red: '#A62E2E',        // Dark red
+          white: '#FFFFFF',      // Pure white
         },
         'chart': {
-          blue: '#3498DB',
-          red: '#E74C3C',
-          green: '#27AE60',
-          yellow: '#F1C40F',
-          purple: '#9B59B6',
-          gray: '#95A5A6',
+          primary: '#3E4B59',    // Dark blue-gray
+          secondary: '#F0A621',  // Orange/yellow
+          accent: '#007A56',     // Teal green
+          neutral: '#6B7280',    // Gray
+          light: '#F9FAFB',      // Very light gray
+          success: '#007A56',    // Teal green
+          olive: '#5F763B',      // Olive green
+          orange: '#BA4D00',     // Dark orange
+          yellow: '#F0E68C',     // Light yellow
+          red: '#A62E2E',        // Dark red
         },
       },
       typography: {
@@ -38,17 +47,17 @@ export default {
           css: {
             h1: {
               fontFamily: 'Inter, system-ui, sans-serif',
-              color: '#1B365D',
+              color: '#3E4B59',
               fontWeight: '600',
             },
             h2: {
               fontFamily: 'Inter, system-ui, sans-serif',
-              color: '#1B365D',
+              color: '#3E4B59',
               fontWeight: '600',
             },
             h3: {
               fontFamily: 'Inter, system-ui, sans-serif',
-              color: '#1B365D',
+              color: '#3E4B59',
               fontWeight: '600',
             },
             'figure figcaption': {

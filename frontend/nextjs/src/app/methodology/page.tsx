@@ -85,15 +85,15 @@ export default function MethodologyPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50">
+    <div className="min-h-screen bg-taifa-light">
       {/* Hero Section */}
-      <section className="bg-white border-b border-gray-200">
+      <section className="bg-white border-b border-taifa-border">
         <div className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            <h1 className="text-4xl font-bold text-taifa-primary mb-4">
               Technical Methodology & Architecture
             </h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-taifa-muted max-w-3xl mx-auto">
               Sophisticated three-stage pipeline combining automated aggregation, intelligent scraping, 
               and targeted enrichment for comprehensive African AI funding intelligence
             </p>
@@ -105,86 +105,95 @@ export default function MethodologyPage() {
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Three-Stage Data Collection Pipeline</h2>
-            <p className="text-gray-600">Volume → Depth → Precision</p>
+            <h2 className="text-3xl font-bold text-taifa-primary mb-4">Three-Stage Data Collection Pipeline</h2>
+            <p className="text-taifa-muted">Volume → Depth → Precision</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8 mb-12">
-            {stages.map((stage, index) => (
-              <div key={index} className="relative">
-                <div className={`bg-white p-8 rounded-xl shadow-lg border-l-4 border-${stage.color}-500 hover:shadow-xl transition-shadow`}>
-                  <div className="flex items-center mb-4">
-                    <div className={`w-12 h-12 bg-${stage.color}-100 text-${stage.color}-700 rounded-full flex items-center justify-center mr-4`}>
-                      {stage.icon}
-                    </div>
-                    <div>
-                      <div className={`text-sm font-bold text-${stage.color}-600`}>STAGE {stage.number}</div>
-                      <div className="text-lg font-semibold text-gray-900">{stage.title}</div>
-                      <div className={`text-sm font-medium text-${stage.color}-700`}>{stage.subtitle}</div>
-                    </div>
-                  </div>
-                  
-                  <p className="text-gray-700 mb-6">{stage.description}</p>
-                  
-                  <div className="space-y-2">
-                    {stage.metrics.map((metric, idx) => (
-                      <div key={idx} className="flex items-center text-sm">
-                        <CheckCircle className={`h-4 w-4 text-${stage.color}-600 mr-2`} />
-                        <span className="text-gray-600">{metric}</span>
+            {stages.map((stage, index) => {
+              const stageColors = [
+                { border: 'border-taifa-accent', bg: 'bg-taifa-light', text: 'text-taifa-accent' },
+                { border: 'border-taifa-secondary', bg: 'bg-taifa-light', text: 'text-taifa-secondary' },
+                { border: 'border-taifa-primary', bg: 'bg-taifa-light', text: 'text-taifa-primary' }
+              ];
+              const colors = stageColors[index];
+              
+              return (
+                <div key={index} className="relative">
+                  <div className={`bg-white p-8 rounded-xl shadow-lg border-l-4 ${colors.border} hover:shadow-xl transition-shadow`}>
+                    <div className="flex items-center mb-4">
+                      <div className={`w-12 h-12 ${colors.bg} ${colors.text} rounded-full flex items-center justify-center mr-4`}>
+                        {stage.icon}
                       </div>
-                    ))}
+                      <div>
+                        <div className={`text-sm font-bold ${colors.text}`}>STAGE {stage.number}</div>
+                        <div className="text-lg font-semibold text-taifa-primary">{stage.title}</div>
+                        <div className={`text-sm font-medium ${colors.text}`}>{stage.subtitle}</div>
+                      </div>
+                    </div>
+                    
+                    <p className="text-taifa-muted mb-6">{stage.description}</p>
+                    
+                    <div className="space-y-2">
+                      {stage.metrics.map((metric, idx) => (
+                        <div key={idx} className="flex items-center text-sm">
+                          <CheckCircle className={`h-4 w-4 ${colors.text} mr-2`} />
+                          <span className="text-taifa-muted">{metric}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
+                  
+                  {index < stages.length - 1 && (
+                    <div className="hidden md:block absolute top-1/2 -right-4 transform -translate-y-1/2">
+                      <ArrowRight className="h-8 w-8 text-taifa-border" />
+                    </div>
+                  )}
                 </div>
-                
-                {index < stages.length - 1 && (
-                  <div className="hidden md:block absolute top-1/2 -right-4 transform -translate-y-1/2">
-                    <ArrowRight className="h-8 w-8 text-gray-300" />
-                  </div>
-                )}
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Pipeline Flow Diagram */}
-          <div className="bg-white p-8 rounded-xl shadow-lg">
-            <h3 className="text-xl font-semibold text-gray-900 mb-6 text-center">Complete Pipeline Flow</h3>
+          <div className="bg-white p-8 rounded-xl shadow-lg border border-taifa-border">
+            <h3 className="text-xl font-semibold text-taifa-primary mb-6 text-center">Complete Pipeline Flow</h3>
             <div className="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0 md:space-x-4">
               <div className="flex-1 text-center">
-                <div className="w-16 h-16 bg-amber-100 text-amber-700 rounded-full flex items-center justify-center mx-auto mb-2">
+                <div className="w-16 h-16 bg-taifa-light text-taifa-accent rounded-full flex items-center justify-center mx-auto mb-2">
                   <Database className="h-8 w-8" />
                 </div>
-                <div className="text-sm font-medium">200+ RSS Feeds</div>
-                <div className="text-xs text-gray-500">15-30 min polling</div>
+                <div className="text-sm font-medium text-taifa-primary">200+ RSS Feeds</div>
+                <div className="text-xs text-taifa-muted">15-30 min polling</div>
               </div>
               
-              <ArrowRight className="text-gray-300 hidden md:block" />
+              <ArrowRight className="text-taifa-border hidden md:block" />
               
               <div className="flex-1 text-center">
-                <div className="w-16 h-16 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center mx-auto mb-2">
+                <div className="w-16 h-16 bg-taifa-light text-taifa-secondary rounded-full flex items-center justify-center mx-auto mb-2">
                   <Code className="h-8 w-8" />
                 </div>
-                <div className="text-sm font-medium">Intelligent Scraping</div>
-                <div className="text-xs text-gray-500">Deep content extraction</div>
+                <div className="text-sm font-medium text-taifa-primary">Intelligent Scraping</div>
+                <div className="text-xs text-taifa-muted">Deep content extraction</div>
               </div>
               
-              <ArrowRight className="text-gray-300 hidden md:block" />
+              <ArrowRight className="text-taifa-border hidden md:block" />
               
               <div className="flex-1 text-center">
-                <div className="w-16 h-16 bg-orange-100 text-orange-700 rounded-full flex items-center justify-center mx-auto mb-2">
+                <div className="w-16 h-16 bg-taifa-light text-taifa-primary rounded-full flex items-center justify-center mx-auto mb-2">
                   <Search className="h-8 w-8" />
                 </div>
-                <div className="text-sm font-medium">Targeted Search</div>
-                <div className="text-xs text-gray-500">Gap filling precision</div>
+                <div className="text-sm font-medium text-taifa-primary">Targeted Search</div>
+                <div className="text-xs text-taifa-muted">Gap filling precision</div>
               </div>
               
-              <ArrowRight className="text-gray-300 hidden md:block" />
+              <ArrowRight className="text-taifa-border hidden md:block" />
               
               <div className="flex-1 text-center">
-                <div className="w-16 h-16 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center mx-auto mb-2">
+                <div className="w-16 h-16 bg-taifa-light text-taifa-secondary rounded-full flex items-center justify-center mx-auto mb-2">
                   <CheckCircle className="h-8 w-8" />
                 </div>
-                <div className="text-sm font-medium">Complete Dataset</div>
-                <div className="text-xs text-gray-500">90%+ field completion</div>
+                <div className="text-sm font-medium text-taifa-primary">Complete Dataset</div>
+                <div className="text-xs text-taifa-muted">90%+ field completion</div>
               </div>
             </div>
           </div>
@@ -195,27 +204,34 @@ export default function MethodologyPage() {
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Technology Stack</h2>
-            <p className="text-gray-600">Modern, scalable architecture built for African AI intelligence</p>
+            <h2 className="text-3xl font-bold text-taifa-primary mb-4">Technology Stack</h2>
+            <p className="text-taifa-muted">Modern, scalable architecture built for African AI intelligence</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {techStack.map((stack, index) => (
-              <div key={index} className={`p-6 rounded-xl border-2 ${stack.color}`}>
-                <div className="flex items-center mb-4">
-                  {stack.icon}
-                  <h3 className="text-lg font-semibold text-gray-900 ml-2">{stack.category}</h3>
+            {techStack.map((stack, index) => {
+              const stackColors = [
+                'bg-taifa-light border-taifa-primary',
+                'bg-taifa-light border-taifa-secondary', 
+                'bg-taifa-light border-taifa-accent'
+              ];
+              return (
+                <div key={index} className={`p-6 rounded-xl border-2 ${stackColors[index]}`}>
+                  <div className="flex items-center mb-4">
+                    <div className="text-taifa-primary">{stack.icon}</div>
+                    <h3 className="text-lg font-semibold text-taifa-primary ml-2">{stack.category}</h3>
+                  </div>
+                  <ul className="space-y-2">
+                    {stack.technologies.map((tech, idx) => (
+                      <li key={idx} className="text-sm text-taifa-muted flex items-center">
+                        <div className="w-2 h-2 bg-taifa-border rounded-full mr-2"></div>
+                        {tech}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-                <ul className="space-y-2">
-                  {stack.technologies.map((tech, idx) => (
-                    <li key={idx} className="text-sm text-gray-700 flex items-center">
-                      <div className="w-2 h-2 bg-gray-400 rounded-full mr-2"></div>
-                      {tech}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -224,20 +240,28 @@ export default function MethodologyPage() {
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Data Quality & Performance</h2>
-            <p className="text-gray-600">Rigorous validation ensuring reliable intelligence</p>
+            <h2 className="text-3xl font-bold text-taifa-primary mb-4">Data Quality & Performance</h2>
+            <p className="text-taifa-muted">Rigorous validation ensuring reliable intelligence</p>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {qualityMetrics.map((metric, index) => (
-              <div key={index} className="bg-white p-6 rounded-xl shadow-lg text-center">
-                <div className={`text-3xl font-bold ${metric.color} mb-2`}>
-                  {metric.current}
+            {qualityMetrics.map((metric, index) => {
+              const metricColors = [
+                'text-taifa-secondary',
+                'text-taifa-primary', 
+                'text-taifa-accent',
+                'text-taifa-secondary'
+              ];
+              return (
+                <div key={index} className="bg-white p-6 rounded-xl shadow-lg text-center border border-taifa-border">
+                  <div className={`text-3xl font-bold ${metricColors[index]} mb-2`}>
+                    {metric.current}
+                  </div>
+                  <div className="text-sm font-medium text-taifa-primary mb-1">{metric.label}</div>
+                  <div className="text-xs text-taifa-muted">Target: {metric.target}</div>
                 </div>
-                <div className="text-sm font-medium text-gray-900 mb-1">{metric.label}</div>
-                <div className="text-xs text-gray-500">Target: {metric.target}</div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -246,29 +270,29 @@ export default function MethodologyPage() {
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Development Roadmap</h2>
-            <p className="text-gray-600">Building toward AI by Africans, for Africans</p>
+            <h2 className="text-3xl font-bold text-taifa-primary mb-4">Development Roadmap</h2>
+            <p className="text-taifa-muted">Building toward AI by Africans, for Africans</p>
           </div>
 
           <div className="space-y-8">
             {futurePhases.map((phase, index) => (
-              <div key={index} className="bg-gradient-to-r from-amber-50 to-orange-50 p-8 rounded-xl">
+              <div key={index} className="bg-taifa-light p-8 rounded-xl border border-taifa-border">
                 <div className="flex flex-col md:flex-row items-start">
                   <div className="md:w-1/3 mb-4 md:mb-0">
-                    <div className="text-sm font-bold text-amber-600 mb-1">{phase.phase}</div>
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">{phase.title}</h3>
-                    <div className="inline-block bg-amber-100 text-amber-800 text-xs px-2 py-1 rounded-full">
+                    <div className="text-sm font-bold text-taifa-accent mb-1">{phase.phase}</div>
+                    <h3 className="text-xl font-semibold text-taifa-primary mb-2">{phase.title}</h3>
+                    <div className="inline-block bg-white text-taifa-primary text-xs px-2 py-1 rounded-full border border-taifa-border">
                       {phase.timeline}
                     </div>
                   </div>
                   
                   <div className="md:w-2/3 md:pl-8">
-                    <p className="text-gray-700 mb-4">{phase.description}</p>
+                    <p className="text-taifa-muted mb-4">{phase.description}</p>
                     <div className="grid grid-cols-2 gap-3">
                       {phase.features.map((feature, idx) => (
                         <div key={idx} className="flex items-center text-sm">
-                          <CheckCircle className="h-4 w-4 text-emerald-600 mr-2" />
-                          <span className="text-gray-600">{feature}</span>
+                          <CheckCircle className="h-4 w-4 text-taifa-secondary mr-2" />
+                          <span className="text-taifa-muted">{feature}</span>
                         </div>
                       ))}
                     </div>
@@ -281,10 +305,10 @@ export default function MethodologyPage() {
       </section>
 
       {/* Vision Statement */}
-      <section className="py-16 bg-gradient-to-r from-amber-700 to-orange-800 text-white">
+      <section className="py-16" style={{ background: 'linear-gradient(to right, #3E4B59, #5F763B)' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold mb-6">Vision: AI by Africans, for Africans</h2>
-          <p className="text-xl text-amber-100 max-w-4xl mx-auto leading-relaxed">
+          <h2 className="text-3xl font-bold mb-6 text-white">Vision: AI by Africans, for Africans</h2>
+          <p className="text-xl max-w-4xl mx-auto leading-relaxed" style={{ color: '#F0E68C' }}>
             TAIFA-FIALA's ultimate goal extends beyond data collection to become the central platform 
             enabling African-led AI development. Through transparent funding intelligence, project amplification, 
             and ecosystem building, we democratize access to AI development resources and ensure African voices 
@@ -293,19 +317,19 @@ export default function MethodologyPage() {
           
           <div className="mt-12 grid md:grid-cols-3 gap-8">
             <div className="text-center">
-              <Users className="h-12 w-12 mx-auto mb-4 text-amber-200" />
-              <h3 className="text-lg font-semibold mb-2">For Students</h3>
-              <p className="text-amber-100 text-sm">Educational resources and funding guidance</p>
+              <Users className="h-12 w-12 mx-auto mb-4" style={{ color: '#F0A621' }} />
+              <h3 className="text-lg font-semibold mb-2 text-white">For Students</h3>
+              <p className="text-sm" style={{ color: '#F0E68C' }}>Educational resources and funding guidance</p>
             </div>
             <div className="text-center">
-              <TrendingUp className="h-12 w-12 mx-auto mb-4 text-amber-200" />
-              <h3 className="text-lg font-semibold mb-2">For Businesses</h3>
-              <p className="text-amber-100 text-sm">Market intelligence and investment insights</p>
+              <TrendingUp className="h-12 w-12 mx-auto mb-4" style={{ color: '#F0A621' }} />
+              <h3 className="text-lg font-semibold mb-2 text-white">For Businesses</h3>
+              <p className="text-sm" style={{ color: '#F0E68C' }}>Market intelligence and investment insights</p>
             </div>
             <div className="text-center">
-              <Shield className="h-12 w-12 mx-auto mb-4 text-amber-200" />
-              <h3 className="text-lg font-semibold mb-2">For Governments</h3>
-              <p className="text-amber-100 text-sm">Policy development and strategic planning</p>
+              <Shield className="h-12 w-12 mx-auto mb-4" style={{ color: '#F0A621' }} />
+              <h3 className="text-lg font-semibold mb-2 text-white">For Governments</h3>
+              <p className="text-sm" style={{ color: '#F0E68C' }}>Policy development and strategic planning</p>
             </div>
           </div>
         </div>

@@ -119,7 +119,7 @@ const SectorAllocationChart = () => {
             <Bar 
               dataKey="currentAllocation" 
               name="Current Allocation"
-              fill="#1B365D"
+              fill="#3E4B59"
               radius={[4, 4, 0, 0]}
             />
             
@@ -129,7 +129,7 @@ const SectorAllocationChart = () => {
                 key={`ref-${index}`}
                 y={entry.developmentNeed}
                 segment={[{x: index - 0.25, y: entry.developmentNeed}, {x: index + 0.25, y: entry.developmentNeed}]}
-                stroke="#7B1F1D"
+                stroke="#BA4D00"
                 strokeWidth={2}
                 strokeDasharray="3 3"
               />
@@ -147,11 +147,11 @@ const SectorAllocationChart = () => {
       {/* Legend */}
       <div className="flex justify-center space-x-8 mt-4">
         <div className="flex items-center space-x-2">
-          <div className="w-4 h-4 bg-[#1B365D]"></div>
+          <div className="w-4 h-4 bg-[#3E4B59]"></div>
           <span className="text-sm text-gray-600">Current Allocation</span>
         </div>
         <div className="flex items-center space-x-2">
-          <div className="w-6 h-[2px] bg-[#7B1F1D] border-dashed"></div>
+          <div className="w-6 h-[2px] bg-[#BA4D00] border-dashed"></div>
           <span className="text-sm text-gray-600">Development Need</span>
         </div>
       </div>

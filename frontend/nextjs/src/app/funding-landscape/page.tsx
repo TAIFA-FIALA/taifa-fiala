@@ -39,21 +39,21 @@ interface GeographicData {
 
 // Chart data for visualizations
 const fundingByCountryData = [
-  { country: 'Tunisia', funding: 244.4, deals: 9, color: '#3B82F6' },
-  { country: 'Kenya', funding: 242.3, deals: 30, color: '#10B981' },
-  { country: 'South Africa', funding: 150.4, deals: 29, color: '#F59E0B' },
-  { country: 'Egypt', funding: 83.4, deals: 17, color: '#EF4444' },
-  { country: 'Nigeria', funding: 45.2, deals: 32, color: '#8B5CF6' },
-  { country: 'Ghana', funding: 28.1, deals: 12, color: '#EC4899' },
+  { country: 'Tunisia', funding: 244.4, deals: 9, color: '#3E4B59' },
+  { country: 'Kenya', funding: 242.3, deals: 30, color: '#F0A621' },
+  { country: 'South Africa', funding: 150.4, deals: 29, color: '#007A56' },
+  { country: 'Egypt', funding: 83.4, deals: 17, color: '#BA4D00' },
+  { country: 'Nigeria', funding: 45.2, deals: 32, color: '#5F763B' },
+  { country: 'Ghana', funding: 28.1, deals: 12, color: '#A62E2E' },
 ];
 
 const sectorDistributionData = [
-  { name: 'Financial Services', value: 20.9, funding: 134, color: '#3B82F6' },
-  { name: 'Healthcare', value: 5.8, funding: 46, color: '#EF4444' },
-  { name: 'Agriculture', value: 3.9, funding: 31, color: '#10B981' },
-  { name: 'Education', value: 8.2, funding: 66, color: '#F59E0B' },
-  { name: 'Climate AI', value: 1.3, funding: 10, color: '#22D3EE' },
-  { name: 'Other', value: 59.9, funding: 513, color: '#6B7280' },
+  { name: 'Financial Services', value: 20.9, funding: 134, color: '#3E4B59' },
+  { name: 'Healthcare', value: 5.8, funding: 46, color: '#A62E2E' },
+  { name: 'Agriculture', value: 3.9, funding: 31, color: '#007A56' },
+  { name: 'Education', value: 8.2, funding: 66, color: '#F0A621' },
+  { name: 'Climate AI', value: 1.3, funding: 10, color: '#5F763B' },
+  { name: 'Other', value: 59.9, funding: 513, color: '#F0E68C' },
 ];
 
 const fundingTimelineData = [
@@ -90,14 +90,14 @@ const MetricCard: React.FC<{ metric: FundingMetric }> = ({ metric }) => (
 );
 
 const CountryCard: React.FC<{ country: CountryFunding; rank: number }> = ({ country, rank }) => (
-  <div className="bg-white p-4 rounded-lg border border-gray-200 hover:border-blue-300 transition-colors">
+  <div className="bg-white p-4 rounded-lg border border-taifa-border hover:border-taifa-primary transition-colors">
     <div className="flex items-center justify-between mb-2">
-      <span className="text-lg font-semibold text-gray-900">#{rank} {country.country}</span>
-      <MapPin className="h-5 w-5 text-blue-600" />
+      <span className="text-lg font-semibold text-taifa-primary">#{rank} {country.country}</span>
+      <MapPin className="h-5 w-5 text-taifa-secondary" />
     </div>
-    <div className="text-2xl font-bold text-blue-600 mb-1">{country.amount}</div>
+    <div className="text-2xl font-bold text-taifa-accent mb-1">{country.amount}</div>
     {country.avgPerStartup && (
-      <div className="text-sm text-gray-500">Avg: {country.avgPerStartup}/startup</div>
+      <div className="text-sm text-taifa-muted">Avg: {country.avgPerStartup}/startup</div>
     )}
   </div>
 );
@@ -143,27 +143,27 @@ export default function FundingLandscapePage() {
       value: "$800M+",
       label: "Total AI Funding 2019-2024",
       icon: <DollarSign />,
-      color: "border-green-500",
+      color: "border-taifa-accent",
       trend: 'up'
     },
     {
       value: "103",
       label: "Private Sector Deals",
       icon: <Briefcase />,
-      color: "border-blue-500"
+      color: "border-taifa-primary"
     },
     {
       value: "83%",
       label: "Funding to 4 Countries Only",
       icon: <AlertTriangle />,
-      color: "border-red-500",
+      color: "border-taifa-red",
       trend: 'up'
     },
     {
       value: "16",
       label: "Countries with AI Strategies",
       icon: <Target />,
-      color: "border-purple-500"
+      color: "border-taifa-secondary"
     }
   ];
 
@@ -182,15 +182,15 @@ export default function FundingLandscapePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-taifa-light">
       {/* Hero Section */}
-      <header className="bg-white shadow-sm">
+      <header className="bg-white shadow-sm border-b border-taifa-border">
         <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">
+            <h1 className="text-4xl font-bold text-taifa-primary mb-2">
               Africa's AI Funding Landscape
             </h1>
-            <p className="text-xl text-gray-600">2019-2024 Analysis</p>
+            <p className="text-xl text-taifa-muted">2019-2024 Analysis</p>
           </div>
         </div>
       </header>

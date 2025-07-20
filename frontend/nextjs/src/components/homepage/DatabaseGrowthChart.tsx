@@ -99,10 +99,10 @@ export default function DatabaseGrowthChart({ className = '' }: DatabaseGrowthCh
       return (
         <div className="bg-white p-4 border border-gray-200 rounded-lg shadow-lg">
           <p className="text-sm font-medium text-gray-600">{formatDate(label)}</p>
-          <p className="text-lg font-bold text-amber-800">
+          <p className="text-lg font-bold text-taifa-secondary">
             {data.records.toLocaleString()} records
           </p>
-          <p className="text-sm text-orange-600">
+          <p className="text-sm text-taifa-accent">
             +{data.dailyGrowth} today
           </p>
         </div>
@@ -135,7 +135,7 @@ export default function DatabaseGrowthChart({ className = '' }: DatabaseGrowthCh
       <div className="p-6 border-b border-gray-100">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
-            <div className="w-12 h-12 flex items-center justify-center rounded-full bg-amber-600 text-white mr-4">
+            <div className="w-12 h-12 flex items-center justify-center rounded-full bg-taifa-secondary text-white mr-4">
               <Database className="h-6 w-6" />
             </div>
             <div>
@@ -145,12 +145,12 @@ export default function DatabaseGrowthChart({ className = '' }: DatabaseGrowthCh
           </div>
           <div className="flex items-center space-x-4">
             <div className="text-right">
-              <div className="text-2xl font-bold text-amber-800">
+              <div className="text-2xl font-bold text-taifa-secondary">
                 {totalRecords.toLocaleString()}
               </div>
               <div className="text-sm text-gray-500">total records</div>
             </div>
-            <div className="flex items-center space-x-1 text-emerald-700">
+            <div className="flex items-center space-x-1 text-taifa-accent">
               <TrendingUp className="h-4 w-4" />
               <span className="text-sm font-medium">+{weeklyGrowth.toFixed(1)}%</span>
             </div>
@@ -165,8 +165,8 @@ export default function DatabaseGrowthChart({ className = '' }: DatabaseGrowthCh
             <AreaChart data={data}>
               <defs>
                 <linearGradient id="colorGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#D2691E" stopOpacity={0.3}/>
-                  <stop offset="95%" stopColor="#D2691E" stopOpacity={0}/>
+                  <stop offset="5%" stopColor="#F0A621" stopOpacity={0.3}/>
+                  <stop offset="95%" stopColor="#F0A621" stopOpacity={0}/>
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -187,7 +187,7 @@ export default function DatabaseGrowthChart({ className = '' }: DatabaseGrowthCh
               <Area
                 type="monotone"
                 dataKey="records"
-                stroke="#D2691E"
+                stroke="#F0A621"
                 strokeWidth={2}
                 fill="url(#colorGradient)"
               />
@@ -197,26 +197,26 @@ export default function DatabaseGrowthChart({ className = '' }: DatabaseGrowthCh
 
         {/* Growth indicators */}
         <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-amber-50 rounded-lg p-3 border-l-4 border-amber-500">
+          <div className="bg-taifa-secondary/10 rounded-lg p-3 border-l-4 border-taifa-secondary">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-gray-600">This Week</span>
-              <span className="text-lg font-bold text-amber-700">+{Math.floor(weeklyGrowth * 10)}</span>
+              <span className="text-lg font-bold text-taifa-secondary">+{Math.floor(weeklyGrowth * 10)}</span>
             </div>
             <div className="text-xs text-gray-500 mt-1">New records added</div>
           </div>
           
-          <div className="bg-orange-50 rounded-lg p-3 border-l-4 border-orange-500">
+          <div className="bg-taifa-accent/10 rounded-lg p-3 border-l-4 border-taifa-accent">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-gray-600">Daily Avg</span>
-              <span className="text-lg font-bold text-orange-700">~{Math.floor(weeklyGrowth * 1.4)}</span>
+              <span className="text-lg font-bold text-taifa-accent">~{Math.floor(weeklyGrowth * 1.4)}</span>
             </div>
             <div className="text-xs text-gray-500 mt-1">Records per day</div>
           </div>
           
-          <div className="bg-emerald-50 rounded-lg p-3 border-l-4 border-emerald-500">
+          <div className="bg-taifa-primary/10 rounded-lg p-3 border-l-4 border-taifa-primary">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-gray-600">Coverage Areas</span>
-              <span className="text-lg font-bold text-emerald-700">54</span>
+              <span className="text-lg font-bold text-taifa-primary">54</span>
             </div>
             <div className="text-xs text-gray-500 mt-1">African countries</div>
           </div>

@@ -133,12 +133,12 @@ function FundingPageContent() {
   const totalPages = Math.ceil(totalCount / itemsPerPage);
 
   return (
-    <div className="container mx-auto p-4 py-8">
-      <h1 className="text-3xl font-extrabold text-gray-900 mb-8 text-center">Funding Opportunities</h1>
+    <div className="container mx-auto p-4 py-8 bg-taifa-light min-h-screen">
+      <h1 className="text-3xl font-extrabold text-taifa-primary mb-8 text-center">Funding Opportunities</h1>
 
       {/* Filter Section */}
-      <div className="card p-6 mb-8">
-        <h2 className="text-xl font-bold mb-4">Filter Opportunities</h2>
+      <div className="bg-white p-6 mb-8 rounded-lg border border-taifa-border shadow-sm">
+        <h2 className="text-xl font-bold mb-4 text-taifa-primary">Filter Opportunities</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div>
             <label htmlFor="keyword" className="block text-sm font-medium text-gray-700">Keyword</label>
@@ -147,7 +147,7 @@ function FundingPageContent() {
               id="keyword"
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50"
+              className="mt-1 block w-full rounded-md border-taifa-border shadow-sm focus:border-taifa-primary focus:ring focus:ring-taifa-primary focus:ring-opacity-50"
               placeholder="Search title or description"
             />
           </div>
@@ -158,7 +158,7 @@ function FundingPageContent() {
               id="minAmount"
               value={minAmount}
               onChange={(e) => setMinAmount(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50"
+              className="mt-1 block w-full rounded-md border-taifa-border shadow-sm focus:border-taifa-primary focus:ring focus:ring-taifa-primary focus:ring-opacity-50"
               placeholder="e.g., 10000"
             />
           </div>
@@ -169,7 +169,7 @@ function FundingPageContent() {
               id="maxAmount"
               value={maxAmount}
               onChange={(e) => setMaxAmount(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50"
+              className="mt-1 block w-full rounded-md border-taifa-border shadow-sm focus:border-taifa-primary focus:ring focus:ring-taifa-primary focus:ring-opacity-50"
               placeholder="e.g., 50000"
             />
           </div>
@@ -180,7 +180,7 @@ function FundingPageContent() {
               id="startDate"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50"
+              className="mt-1 block w-full rounded-md border-taifa-border shadow-sm focus:border-taifa-primary focus:ring focus:ring-taifa-primary focus:ring-opacity-50"
             />
           </div>
           <div>
@@ -190,7 +190,7 @@ function FundingPageContent() {
               id="endDate"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50"
+              className="mt-1 block w-full rounded-md border-taifa-border shadow-sm focus:border-taifa-primary focus:ring focus:ring-taifa-primary focus:ring-opacity-50"
             />
           </div>
           <div>
@@ -199,7 +199,7 @@ function FundingPageContent() {
               id="status"
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50"
+              className="mt-1 block w-full rounded-md border-taifa-border shadow-sm focus:border-taifa-primary focus:ring focus:ring-taifa-primary focus:ring-opacity-50"
             >
               <option value="">All</option>
               {statuses.map((s) => (
@@ -213,7 +213,7 @@ function FundingPageContent() {
               id="organization"
               value={selectedOrganization}
               onChange={(e) => setSelectedOrganization(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50"
+              className="mt-1 block w-full rounded-md border-taifa-border shadow-sm focus:border-taifa-primary focus:ring focus:ring-taifa-primary focus:ring-opacity-50"
             >
               <option value="">All</option>
               {organizations.map((org) => (
@@ -227,7 +227,7 @@ function FundingPageContent() {
               id="country"
               value={selectedCountry}
               onChange={(e) => setSelectedCountry(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50"
+              className="mt-1 block w-full rounded-md border-taifa-border shadow-sm focus:border-taifa-primary focus:ring focus:ring-taifa-primary focus:ring-opacity-50"
             >
               <option value="">All</option>
               {countries.map((c) => (
@@ -280,24 +280,24 @@ function FundingPageContent() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {opportunities.map((opportunity) => (
-            <div key={opportunity.id} className="card flex flex-col justify-between">
+            <div key={opportunity.id} className="bg-white p-6 rounded-lg border border-taifa-border shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
               <div>
-                <h2 className="text-xl font-bold text-gray-800 mb-2">{opportunity.title}</h2>
-                <p className="text-gray-600 text-sm mb-4 line-clamp-4">{opportunity.description}</p>
+                <h2 className="text-xl font-bold text-taifa-primary mb-2">{opportunity.title}</h2>
+                <p className="text-taifa-muted text-sm mb-4 line-clamp-4">{opportunity.description}</p>
               </div>
               <div className="space-y-2 text-sm">
                 {opportunity.amount_usd && (
-                  <p className="text-blue-600 font-semibold">Amount: {opportunity.amount_usd.toLocaleString()} {opportunity.currency}</p>
+                  <p className="font-semibold" style={{ color: '#007A56' }}>Amount: {opportunity.amount_usd.toLocaleString()} {opportunity.currency}</p>
                 )}
-                <p className="text-red-600">Deadline: {format(new Date(opportunity.deadline), 'PPP')}</p>
-                <p className="text-green-600">Status: <span className="capitalize">{opportunity.status}</span></p>
+                <p className="font-semibold" style={{ color: '#A62E2E' }}>Deadline: {format(new Date(opportunity.deadline), 'PPP')}</p>
+                <p className="font-semibold" style={{ color: '#F0A621' }}>Status: <span className="capitalize">{opportunity.status}</span></p>
                 {opportunity.organization_id && (
-                  <p className="text-gray-500">
+                  <p className="text-taifa-muted">
                     Organization: {organizations.find(org => org.id === opportunity.organization_id)?.name || 'N/A'}
                   </p>
                 )}
                 {opportunity.link && (
-                  <a href={opportunity.link} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline block mt-2">
+                  <a href={opportunity.link} target="_blank" rel="noopener noreferrer" className="text-taifa-primary hover:text-taifa-secondary hover:underline block mt-2">
                     View Details
                   </a>
                 )}

@@ -2,30 +2,34 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Source+Sans+Pro:wght@300;400;500;600;700&display=swap');
 
 :root {
-  /* Academic Color Palette */
-  --scholarly-primary: #1B365D;    /* Deep navy blue */
-  --scholarly-secondary: #7B1F1D;  /* Burgundy */
-  --scholarly-accent: #8B7355;     /* Warm brown */
-  --scholarly-light: #F5F5F5;      /* Light gray */
-  --scholarly-dark: #2C3E50;       /* Dark slate */
+  /* TAIFA-FIALA Official Color Palette */
+  --scholarly-primary: #3E4B59;    /* Dark blue-gray */
+  --scholarly-secondary: #F0A621;  /* Orange/yellow */
+  --scholarly-accent: #007A56;     /* Teal green */
+  --scholarly-light: #F9FAFB;      /* Very light gray */
+  --scholarly-dark: #3E4B59;       /* Dark blue-gray */
   
-  /* New Typography Variables */
+  /* Typography Variables */
   --font-display: 'Inter', system-ui, sans-serif;
   --font-body: 'Source Sans Pro', system-ui, sans-serif;
   
-  /* Chart Colors */
-  --chart-blue: #3498DB;
-  --chart-red: #E74C3C;
-  --chart-green: #27AE60;
-  --chart-yellow: #F1C40F;
-  --chart-purple: #9B59B6;
-  --chart-gray: #95A5A6;
+  /* Professional Chart Colors */
+  --chart-primary: #3E4B59;        /* Dark blue-gray */
+  --chart-secondary: #F0A621;      /* Orange/yellow */
+  --chart-accent: #007A56;         /* Teal green */
+  --chart-neutral: #6B7280;        /* Gray */
+  --chart-light: #F9FAFB;          /* Very light gray */
+  --chart-success: #007A56;        /* Teal green */
+  --chart-olive: #5F763B;          /* Olive green */
+  --chart-orange: #BA4D00;         /* Dark orange */
+  --chart-yellow: #F0E68C;         /* Light yellow */
+  --chart-red: #A62E2E;            /* Dark red */
   
   /* System Colors */
-  --background: #ffffff;
-  --foreground: #2C3E50;
-  --border-color: #E5E7EB;
-  --text-muted: #64748B;
+  --background: #FFFFFF;
+  --foreground: #3E4B59;
+  --border-color: #F2F2F2;
+  --text-muted: #6B7280;
 }
 
 @media (prefers-color-scheme: dark) {
