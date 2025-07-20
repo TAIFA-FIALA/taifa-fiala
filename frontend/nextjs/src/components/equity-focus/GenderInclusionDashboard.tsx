@@ -23,7 +23,7 @@ const CustomPieTooltip = ({ active, payload }: { active?: boolean; payload?: any
   return null;
 };
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
+const COLORS = ['#3E4B59', '#F0A621', '#BA4D00', '#5F763B', '#007A56'];
 
 interface GenderData {
   gender: string;
@@ -89,7 +89,7 @@ export default function GenderInclusionDashboard({ className = '' }: GenderInclu
         // Fallback data for demonstration
         setGenderData([
           { gender: 'Male-led', funding_percentage: 82, project_count: 412 },
-          { gender: 'Female-led', funding_percentage: 2, project_count: 38 },
+          { gender: 'Female-led', funding_percentage: 12, project_count: 38 },
           { gender: 'Mixed teams', funding_percentage: 16, project_count: 85 },
         ]);
         
@@ -178,19 +178,19 @@ export default function GenderInclusionDashboard({ className = '' }: GenderInclu
         <div className="lg:col-span-3 space-y-6">
           {/* Key stats */}
           <div className="grid grid-cols-3 gap-4">
-            <div className="bg-pink-50 p-4 rounded-lg border border-pink-100">
+            <div className="bg-taifa-secondary/10 p-4 rounded-lg border border-taifa-secondary/20">
               <div className="text-xs text-gray-500 uppercase">Female-led funding</div>
-              <div className="text-2xl font-bold text-pink-600 mt-1">
-                {genderData.find(d => d.gender === 'Female-led')?.funding_percentage || 2}%
+              <div className="text-2xl font-bold text-taifa-secondary mt-1">
+                {genderData.find(d => d.gender === 'Female-led')?.funding_percentage || 12}%
               </div>
               <div className="text-xs text-red-500 mt-1">
-                23% below global average
+                11% below global average
               </div>
             </div>
             
-            <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+            <div className="bg-taifa-primary/5 p-4 rounded-lg border border-taifa-primary/10">
               <div className="text-xs text-gray-500 uppercase">Youth-led funding</div>
-              <div className="text-2xl font-bold text-blue-600 mt-1">
+              <div className="text-2xl font-bold text-taifa-primary mt-1">
                 {trendData[trendData.length - 1]?.youth_led_percentage || 12.4}%
               </div>
               <div className="text-xs text-green-500 mt-1">
@@ -198,9 +198,9 @@ export default function GenderInclusionDashboard({ className = '' }: GenderInclu
               </div>
             </div>
             
-            <div className="bg-purple-50 p-4 rounded-lg border border-purple-100">
+            <div className="bg-taifa-accent/10 p-4 rounded-lg border border-taifa-accent/20">
               <div className="text-xs text-gray-500 uppercase">Rural funding</div>
-              <div className="text-2xl font-bold text-purple-600 mt-1">
+              <div className="text-2xl font-bold text-taifa-accent mt-1">
                 {trendData[trendData.length - 1]?.rural_percentage || 2.3}%
               </div>
               <div className="text-xs text-red-500 mt-1">
@@ -264,7 +264,7 @@ export default function GenderInclusionDashboard({ className = '' }: GenderInclu
                 <Line 
                   type="monotone" 
                   dataKey="Female-led Projects" 
-                  stroke="rgba(255, 99, 132, 1)" 
+                  stroke="#F0A621"
                   activeDot={{ r: 8 }} 
                   strokeWidth={2}
                 />

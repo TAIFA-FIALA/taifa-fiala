@@ -28,9 +28,9 @@ import {
 
 // TAIFA color scheme for charts
 const CHART_COLORS = {
-  female: '#007A56',  // TAIFA teal green
-  male: '#3E4B59',    // TAIFA primary dark blue-gray
-  femaleLight: '#F0A621', // TAIFA golden yellow
+  female: '#F0A621',    // TAIFA golden yellow
+  male: '#3E4B59',      // TAIFA primary dark blue-gray
+  femaleLight: '#BA4D00', // TAIFA dark orange
   maleLight: '#5F763B',   // TAIFA olive green
   gridLine: '#E5E7EB',
   text: '#1F2937'
@@ -388,7 +388,7 @@ const GenderEquityDashboard = () => {
                   ]}
                   content={<CustomTooltip />}
                 />
-                <Bar dataKey="femalePercent" fill={CHART_COLORS.female} name="Female Leadership %" />
+                <Bar dataKey="femalePercent" fill={CHART_COLORS.female} name="Female Leadership %" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
