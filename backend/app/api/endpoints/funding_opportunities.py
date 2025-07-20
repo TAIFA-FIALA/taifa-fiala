@@ -288,12 +288,33 @@ async def create_intelligence_item(
             opportunity_dict.update(investment_data)
         
         # Insert into Supabase
-        response = db.table('africa_intelligence_feed').insert(opportunity_dict).execute()
-        if not response.data:
-            raise HTTPException(status_code=500, detail="Failed to create opportunity in Supabase")
+        logger.info("Inserting opportunity into Supabase...")
+        insert_response = db.table('africa_intelligence_feed').insert(opportunity_dict).execute()
         
-        db_opportunity = response.data[0]
-        print(f"DEBUG: db_opportunity from Supabase: {db_opportunity}")
+        # Check if the insert was successful
+        if hasattr(insert_response, 'data') and insert_response.data:
+            # If the insert returns the data, use it
+            db_opportunity = insert_response.data[0] if isinstance(insert_response.data, list) else insert_response.data
+            logger.info(f"✅ Successfully inserted opportunity. ID: {db_opportunity.get('id')}")
+        else:
+            # If insert didn't return the data, try to fetch the most recent record
+            logger.info("Insert response didn't contain data. Trying to fetch most recent record...")
+            try:
+                recent = db.table('africa_intelligence_feed')\
+                         .select('*')\
+                         .order('created_at', desc=True)\
+                         .limit(1)\
+                         .execute()
+                
+                if recent.data:
+                    db_opportunity = recent.data[0]
+                    logger.info(f"✅ Retrieved recently inserted record with fallback query. ID: {db_opportunity.get('id')}")
+                else:
+                    logger.error("❌ No records found in the table after insert")
+                    raise HTTPException(status_code=500, detail="Failed to create opportunity in Supabase")
+            except Exception as e:
+                logger.error(f"❌ Fallback query failed: {str(e)}")
+                raise HTTPException(status_code=500, detail="Failed to create or retrieve opportunity")
 
         # Prepare response with type-specific data
         funding_category = funding_type_data.get('category', 'other')

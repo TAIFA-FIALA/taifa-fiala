@@ -1,212 +1,233 @@
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.pool import NullPool
+"""
+Database Configuration Module
+
+This module provides database connectivity using Supabase client for all database operations.
+Direct database connections are not used - all operations go through the Supabase API.
+"""
 import os
 import logging
-from urllib.parse import quote_plus
-
-# Import settings for configuration
-from app.core.config import settings
-
-# Load environment variables directly from backend directory
-from dotenv import load_dotenv
-backend_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-env_path = os.path.join(backend_dir, '.env')
-load_dotenv(env_path)
+from typing import Optional, Dict, Any, List, Union, TypeVar, Type
+from datetime import datetime
 
 # Import Supabase client for API-based operations
-from app.core.supabase_client import get_supabase_client, test_supabase_connection
+from app.core.supabase_client import get_supabase_client
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Load database URL and service key from environment variables
-database_url = os.environ.get('DATABASE_URL')
-service_key = os.environ.get('SUPABASE_SERVICE_API_KEY')
+# Initialize Supabase client
+supabase = get_supabase_client()
 
-# Check if we can use the production database or fall back to SQLite
-use_sqlite_fallback = os.environ.get('USE_SQLITE_FALLBACK', 'false').lower() == 'true'
+# Type variable for generic model types
+ModelType = TypeVar('ModelType', bound='BaseModel')
 
-if use_sqlite_fallback:
-    # Use SQLite for development when Supabase is not available
-    # Create the database in the backend directory
-    backend_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    db_path = os.path.join(backend_dir, "ai_africa_funding.db")
-    database_url = f"sqlite+aiosqlite:///{db_path}"
-    logger.info(f"Using SQLite fallback database for development: {db_path}")
-elif service_key:
-    # Service key available - prefer Supabase API over direct connection
-    logger.info("Service key available - will use Supabase API for database operations")
-    # Set database_url to None to force API-only mode
-    database_url = None
-elif not database_url:
-    # Fallback to hardcoded Supabase values if environment variable is not set
-    db_params = {
-        "user": "postgres.turcbnsgdlyelzmcqixd",
-        "password": "cbGzmHCTZqbEsg6afVhL",
-        "host": "aws-0-eu-central-2.pooler.supabase.com",
-        "port": "5432",
-        "database": "postgres"
-    }
-    # URL-encode the password to handle special characters properly
-    encoded_password = quote_plus(db_params['password'])
-    # Try psycopg instead of asyncpg for better Supabase compatibility
-    database_url = f"postgresql+psycopg://{db_params['user']}:{encoded_password}@{db_params['host']}:{db_params['port']}/{db_params['database']}"
-    logger.info("Using fallback database configuration with psycopg driver")
-else:
-    # Also ensure the existing DATABASE_URL has properly encoded password
-    # Parse and re-encode if needed, and switch to psycopg driver
-    if '@' in database_url and ':' in database_url:
-        parts = database_url.split('://')
-        if len(parts) == 2:
-            protocol = parts[0]
-            rest = parts[1]
-            if '@' in rest:
-                auth_part, host_part = rest.split('@', 1)
-                if ':' in auth_part:
-                    user, password = auth_part.split(':', 1)
-                    encoded_password = quote_plus(password)
-                    # Switch to psycopg driver for better compatibility
-                    database_url = f"postgresql+psycopg://{user}:{encoded_password}@{host_part}"
-                    logger.info("Re-encoded password and switched to psycopg driver")
+class DatabaseError(Exception):
+    """Base exception for database operations"""
+    pass
 
-# Configure for Supabase compatibility
-supabase_connection = database_url and 'supabase.com' in database_url
-sqlite_connection = database_url and 'sqlite' in database_url
-api_only_mode = database_url is None and service_key
+class DatabaseConnectionError(DatabaseError):
+    """Raised when there's an error connecting to the database"""
+    pass
 
-if api_only_mode:
-    logger.info("Configuring for Supabase API-only mode with service key")
-    # Create a dummy engine that won't be used
-    engine = None
-elif supabase_connection:
-    logger.info("Configuring connection parameters for Supabase compatibility")
-elif sqlite_connection:
-    logger.info("Configuring connection parameters for SQLite compatibility")
+class DatabaseOperationError(DatabaseError):
+    """Raised when a database operation fails"""
+    pass
 
-if database_url:
-    logger.info(f"Using database URL: {database_url.split('@')[0].split('://')[-1].split(':')[0] if '@' in database_url else 'sqlite'}@...(truncated)")
-else:
-    logger.info("No direct database connection - using Supabase API only")
+def get_table(table_name: str):
+    """Get a Supabase table reference with error handling"""
+    try:
+        return supabase.table(table_name)
+    except Exception as e:
+        logger.error(f"Error getting table {table_name}: {str(e)}")
+        raise DatabaseConnectionError(f"Could not connect to table {table_name}") from e
 
-# Create SQLAlchemy async engine with appropriate configuration
-if api_only_mode:
-    logger.info("Skipping SQLAlchemy engine creation - using Supabase API only")
-    engine = None
-elif supabase_connection:
-    engine = create_async_engine(
-        database_url,
-        poolclass=NullPool,  # Use NullPool for development
-        echo=settings.DEBUG,  # Log SQL queries in debug mode
-        connect_args={
-            "application_name": "ai-africa-funding-tracker",
-            "sslmode": "require",  # Force SSL for Supabase
-            "gssencmode": "disable",  # Disable GSSAPI encryption for compatibility
-        }
-    )
-elif sqlite_connection:
-    engine = create_async_engine(
-        database_url,
-        poolclass=NullPool,  # Use NullPool for development
-        echo=settings.DEBUG,  # Log SQL queries in debug mode
-        connect_args={"check_same_thread": False}  # SQLite specific
-    )
-else:
-    engine = create_async_engine(
-        database_url,
-        poolclass=NullPool,  # Use NullPool for development
-        echo=settings.DEBUG,  # Log SQL queries in debug mode
-        connect_args={
-            "application_name": "ai-africa-funding-tracker",
-        }
-    )
+async def fetch_all(
+    table_name: str,
+    columns: str = "*",
+    filters: Optional[Dict[str, Any]] = None,
+    limit: int = 100,
+    offset: int = 0,
+    order_by: Optional[Dict[str, str]] = None
+) -> List[Dict[str, Any]]:
+    """
+    Fetch multiple records from a table with optional filtering and pagination
+    
+    Args:
+        table_name: Name of the table to query
+        columns: Comma-separated string of columns to select (default: "*")
+        filters: Dictionary of column: value pairs to filter by
+        limit: Maximum number of records to return
+        offset: Number of records to skip
+        order_by: Dictionary of column: 'asc'|'desc' for ordering results
+    
+    Returns:
+        List of records as dictionaries
+    """
+    try:
+        query = get_table(table_name).select(columns).limit(limit).range(offset, offset + limit - 1)
+        
+        if filters:
+            for key, value in filters.items():
+                if value is not None:
+                    query = query.eq(key, value)
+        
+        if order_by:
+            for column, direction in order_by.items():
+                query = query.order(column, desc=(direction.lower() == 'desc'))
+        
+        result = query.execute()
+        return result.data if hasattr(result, 'data') else []
+    except Exception as e:
+        logger.error(f"Error fetching from {table_name}: {str(e)}")
+        raise DatabaseOperationError(f"Failed to fetch from {table_name}") from e
 
-# Create async session factory
-if engine:
-    SessionLocal = sessionmaker(
-        autocommit=False,
-        autoflush=False,
-        bind=engine,
-        class_=AsyncSession, # Use AsyncSession for async operations
-    )
-else:
-    # API-only mode - no SQLAlchemy sessions
-    SessionLocal = None
+async def fetch_one(
+    table_name: str,
+    columns: str = "*",
+    filters: Optional[Dict[str, Any]] = None
+) -> Optional[Dict[str, Any]]:
+    """
+    Fetch a single record from a table
+    
+    Args:
+        table_name: Name of the table to query
+        columns: Comma-separated string of columns to select (default: "*")
+        filters: Dictionary of column: value pairs to filter by
+    
+    Returns:
+        A single record as a dictionary, or None if not found
+    """
+    try:
+        result = await fetch_all(table_name, columns, filters, limit=1)
+        return result[0] if result else None
+    except Exception as e:
+        logger.error(f"Error fetching single record from {table_name}: {str(e)}")
+        raise DatabaseOperationError(f"Failed to fetch from {table_name}") from e
 
-# Create declarative base for models
-Base = declarative_base()
+async def insert(
+    table_name: str,
+    data: Dict[str, Any],
+    returning: str = "*"
+) -> Dict[str, Any]:
+    """
+    Insert a new record into a table
+    
+    Args:
+        table_name: Name of the table to insert into
+        data: Dictionary of column: value pairs to insert
+        returning: Columns to return in the response (default: "*")
+    
+    Returns:
+        The inserted record as a dictionary
+    """
+    try:
+        result = get_table(table_name).insert(data).select(returning).execute()
+        if hasattr(result, 'data') and result.data:
+            return result.data[0]
+        raise DatabaseOperationError("No data returned after insert")
+    except Exception as e:
+        logger.error(f"Error inserting into {table_name}: {str(e)}")
+        raise DatabaseOperationError(f"Failed to insert into {table_name}") from e
 
-# Metadata for table operations
-# metadata = MetaData() # Not needed with declarative_base for this purpose
+async def update(
+    table_name: str,
+    data: Dict[str, Any],
+    filters: Dict[str, Any],
+    returning: str = "*"
+) -> Optional[Dict[str, Any]]:
+    """
+    Update records in a table
+    
+    Args:
+        table_name: Name of the table to update
+        data: Dictionary of column: value pairs to update
+        filters: Dictionary of column: value pairs to identify records to update
+        returning: Columns to return in the response (default: "*")
+    
+    Returns:
+        The updated record as a dictionary, or None if no records were updated
+    """
+    try:
+        query = get_table(table_name).update(data).select(returning)
+        
+        for key, value in filters.items():
+            if value is not None:
+                query = query.eq(key, value)
+        
+        result = query.execute()
+        return result.data[0] if hasattr(result, 'data') and result.data else None
+    except Exception as e:
+        logger.error(f"Error updating {table_name}: {str(e)}")
+        raise DatabaseOperationError(f"Failed to update {table_name}") from e
+
+async def delete(
+    table_name: str,
+    filters: Dict[str, Any]
+) -> int:
+    """
+    Delete records from a table
+    
+    Args:
+        table_name: Name of the table to delete from
+        filters: Dictionary of column: value pairs to identify records to delete
+    
+    Returns:
+        Number of records deleted
+    """
+    try:
+        query = get_table(table_name).delete()
+        
+        for key, value in filters.items():
+            if value is not None:
+                query = query.eq(key, value)
+        
+        result = query.execute()
+        return len(result.data) if hasattr(result, 'data') else 0
+    except Exception as e:
+        logger.error(f"Error deleting from {table_name}: {str(e)}")
+        raise DatabaseOperationError(f"Failed to delete from {table_name}") from e
+
+
+# This module only uses Supabase client for database operations
+
+# Configure for Supabase client usage
+logger.info("Using Supabase client for all database operations")
+
+# No SQLAlchemy engine or sessions needed - using Supabase client only
+engine = None
+SessionLocal = None
+Base = None
 
 async def get_db():
-    """Dependency to get async database session"""
-    if SessionLocal is None:
-        # API-only mode - return Supabase client instead
-        yield get_supabase_client()
-    else:
-        async with SessionLocal() as session:
-            yield session
+    """Dependency to get database client"""
+    try:
+        # Return the Supabase client for all database operations
+        yield supabase
+    except Exception as e:
+        logger.error(f"Error getting database client: {str(e)}")
+        raise DatabaseConnectionError("Could not connect to database") from e
 
 # Alias for backward compatibility
 get_database = get_db
 
 async def create_tables():
-    """Create all tables - gracefully handle connection failures"""
-    if api_only_mode:
-        logger.info("✅ Using Supabase API-only mode - skipping table creation")
-        return
-    
-    try:
-        from sqlalchemy import text
-        # First test if we can connect
-        async with engine.connect() as conn:
-            await conn.execute(text("SELECT 1"))
-        
-        # If connection works, proceed with table creation
-        async with engine.begin() as conn:
-            await conn.run_sync(Base.metadata.create_all)
-        logger.info("✅ Database tables created successfully")
-    except Exception as e:
-        logger.error(f"⚠️ Database table creation failed: {e}")
-        logger.info("🔄 Application will continue with Supabase API-only functionality")
-        # Don't re-raise the exception - let the app continue with API-only access
+    """No-op function - tables are managed through Supabase directly"""
+    logger.info("✅ Using Supabase API - table creation is managed through Supabase")
+    return
 
 async def test_connection():
-    """Test database connection - tries Supabase API first, then SQLAlchemy"""
-    
-    # First try Supabase API connection
-    if not sqlite_connection:
+    """Test Supabase API connection"""
+    try:
         logger.info("🔄 Testing Supabase API connection...")
-        supabase_success = await test_supabase_connection()
-        if supabase_success:
+        # Test the connection by making a simple query
+        result = supabase.table('africa_intelligence_feed').select("id").limit(1).execute()
+        if hasattr(result, 'data') and isinstance(result.data, list):
             logger.info("✅ Supabase API connection successful")
             return True
         else:
-            logger.warning("⚠️ Supabase API connection failed, trying SQLAlchemy...")
-    
-    # Fallback to SQLAlchemy connection
-    try:
-        from sqlalchemy import text
-        async with engine.connect() as conn:
-            result = await conn.execute(text("SELECT 1"))
-            logger.info("✅ SQLAlchemy database connection successful")
-            return True
+            logger.error("❌ Supabase API connection failed - invalid response")
+            return False
     except Exception as e:
-        logger.error(f"❌ SQLAlchemy database connection failed: {e}")
-        if '@' in database_url:
-            logger.error(f"Database URL format: {database_url.split('@')[0].split('://')[1].split(':')[0]}@...")
-        else:
-            logger.error(f"Database URL format: {database_url}")
-        
-        # Try to provide more specific error information
-        if "authentication" in str(e).lower():
-            logger.error("🔐 Authentication error - check credentials and connection string")
-        elif "timeout" in str(e).lower():
-            logger.error("⏱️ Connection timeout - check network and host")
-        elif "ssl" in str(e).lower():
-            logger.error("🔒 SSL connection error - check SSL configuration")
-        
+        logger.error(f"❌ Supabase API connection failed: {e}")
         return False

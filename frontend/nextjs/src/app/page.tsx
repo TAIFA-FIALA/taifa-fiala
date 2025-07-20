@@ -66,7 +66,7 @@ export default async function HomePage() {
             />
           </div>
           
-          <div className="flex text-3xl font-bold justify-center mb-6">
+          <div className="flex text-4xl font-bold justify-center mb-6">
             Tracking AI Funding in Africa | Financements Pour IA en Afrique
           </div>
           
