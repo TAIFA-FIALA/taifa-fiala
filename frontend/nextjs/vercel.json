@@ -1,8 +1,0 @@
-{
-  "version": 2,
-  "name": "taifa-fiala-frontend",
-  "framework": "nextjs",
-  "github": {
-    "autoAlias": true
-  }
-}
