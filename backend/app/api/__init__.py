@@ -4,6 +4,7 @@ from app.api.endpoints import (
     africa_intelligence_feed, organizations, domains, sources, analytics, search, rfp, source_validation,
     user_submissions, admin_scraping, automated_discovery, equity_analyses, stakeholder_reports
 )
+from app.api.v1.intelligent_search import router as intelligent_search_router
 
 # Create main API router
 api_router = APIRouter()
@@ -43,6 +44,13 @@ api_router.include_router(
     search.router, 
     prefix="/search", 
     tags=["search"]
+)
+
+# New intelligent search with vector filtering (replaces deprecated RFPs)
+api_router.include_router(
+    intelligent_search_router,
+    prefix="/v1/intelligent-search",
+    tags=["intelligent-search"]
 )
 
 api_router.include_router(

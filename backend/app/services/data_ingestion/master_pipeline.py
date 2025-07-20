@@ -15,7 +15,7 @@ This is the main orchestrator that brings together all data ingestion components
 Designed for production deployment with comprehensive error handling,
 monitoring, and scalability features.
 """
-
+import os
 import asyncio
 import logging
 import threading
@@ -25,12 +25,14 @@ from datetime import datetime, timedelta
 from dataclasses import dataclass
 from enum import Enum
 import json
-import os
 from pathlib import Path
 import schedule
 import signal
 import sys
 from contextlib import asynccontextmanager
+
+# Import Supabase utilities
+from .supabase_utils import supabase_utils
 
 # Import our pipeline components
 from .high_volume_pipeline import HighVolumeDataPipeline
@@ -38,6 +40,10 @@ from .web_scraping_engine import HighVolumeWebScrapingEngine
 from .news_api_collector import HighVolumeNewsAPICollector
 from .batch_processor import HighVolumeBatchProcessor, BatchConfig, BatchTask, DataSource
 from .monitoring_system import ComprehensiveMonitoringSystem, MonitoringConfig, MetricType, Threshold, AlertLevel
+
+# Import enrichment layers (CRITICAL: These were missing!)
+from .crawl4ai_integration import EnhancedCrawl4AIProcessor, Crawl4AIConfig, CrawlTarget, Crawl4AIMasterPipelineIntegration
+from ..ETL_pipelines.serper_search import SerperSearch
 
 logger = logging.getLogger(__name__)
 
@@ -61,6 +67,9 @@ class PipelineConfig:
     news_api_config: Dict[str, Any]
     batch_processing_config: BatchConfig
     monitoring_config: MonitoringConfig
+    
+    # Enrichment layer configurations (CRITICAL: Stage 2 & 3)
+    enrichment_config: Dict[str, Any] = None
     
     # Pipeline settings
     max_concurrent_jobs: int = 10
@@ -108,6 +117,27 @@ class MasterDataIngestionPipeline:
         self.batch_processor = HighVolumeBatchProcessor(config.batch_processing_config)
         
         self.monitoring_system = ComprehensiveMonitoringSystem(config.monitoring_config)
+        
+        # Initialize enrichment layers (CRITICAL: Stage 2 & 3 processing)
+        self.crawl4ai_config = Crawl4AIConfig(
+            max_concurrent_crawlers=config.enrichment_config.get('crawl4ai_max_workers', 5),
+            batch_size=config.enrichment_config.get('crawl4ai_batch_size', 50),
+            llm_api_key=os.getenv('OPENAI_API_KEY', ''),
+            relevance_threshold=0.6,
+            enable_content_validation=True
+        )
+        
+        self.crawl4ai_processor = EnhancedCrawl4AIProcessor(
+            self.crawl4ai_config, 
+            self.monitoring_system
+        )
+        
+        self.crawl4ai_integration = Crawl4AIMasterPipelineIntegration(
+            self, 
+            self.crawl4ai_processor
+        )
+        
+        self.serper_search = SerperSearch()
         
         # Pipeline control
         self.stop_event = threading.Event()
@@ -401,15 +431,24 @@ class MasterDataIngestionPipeline:
             logger.error(f"Error scheduling news collection: {e}")
     
     async def _process_rss_data(self, batch_data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """Process RSS data batch"""
+        """Process RSS data batch WITH ENRICHMENT (Stage 1 -> 2 -> 3)"""
         try:
-            # Run RSS pipeline
+            # STAGE 1: Run RSS pipeline (Volume collection)
+            logger.info("STAGE 1: Starting RSS data collection...")
             stats = await self.rss_pipeline.process_funding_intelligence(
                 search_mode="comprehensive",
                 processing_mode="batch"
             )
             
-            return [{'success': True, 'stats': stats}]
+            # STAGE 2 & 3: Enrich sparse RSS data with Crawl4AI and serper-dev
+            logger.info("STAGE 2 & 3: Starting enrichment of RSS data...")
+            enrichment_results = await self._enrich_rss_data(stats)
+            
+            return [{
+                'success': True, 
+                'stats': stats,
+                'enrichment_results': enrichment_results
+            }]
             
         except Exception as e:
             logger.error(f"Error processing RSS data: {e}")
@@ -438,6 +477,234 @@ class MasterDataIngestionPipeline:
         except Exception as e:
             logger.error(f"Error processing news data: {e}")
             return [{'success': False, 'error': str(e)}]
+    
+    async def _enrich_rss_data(self, rss_stats: Dict[str, Any]) -> Dict[str, Any]:
+        """CRITICAL: Enrich sparse RSS data with Crawl4AI and serper-dev (Stage 2 & 3)"""
+        try:
+            logger.info("Starting RSS data enrichment pipeline...")
+            
+            # Get recent RSS items that need enrichment (sparse data)
+            recent_items = await supabase_utils.get_sparse_rss_items(hours=24, limit=50)
+            
+            logger.info(f"Found {len(recent_items)} RSS items needing enrichment")
+            
+            enrichment_results = {
+                'total_items_processed': len(recent_items),
+                'crawl4ai_enriched': 0,
+                'serper_enriched': 0,
+                'errors': 0,
+                'enrichment_details': []
+            }
+            
+            if not recent_items:
+                logger.info("No RSS items need enrichment at this time")
+                return enrichment_results
+            
+            # STAGE 2: Crawl4AI enrichment (extract precise data from source URLs)
+            logger.info("STAGE 2: Starting Crawl4AI enrichment...")
+            crawl4ai_results = await self._crawl4ai_enrich_items(recent_items)
+            enrichment_results['crawl4ai_enriched'] = crawl4ai_results['enriched_count']
+            enrichment_results['enrichment_details'].extend(crawl4ai_results['details'])
+            
+            # STAGE 3: Serper-dev search enrichment (find related opportunities)
+            logger.info("STAGE 3: Starting serper-dev search enrichment...")
+            serper_results = await self._serper_enrich_items(recent_items)
+            enrichment_results['serper_enriched'] = serper_results['enriched_count']
+            enrichment_results['enrichment_details'].extend(serper_results['details'])
+            
+            logger.info(f"Enrichment completed: {enrichment_results['crawl4ai_enriched']} Crawl4AI + {enrichment_results['serper_enriched']} serper-dev")
+            
+            # Update monitoring metrics
+            self.monitoring_system.record_metric(
+                'enrichment_pipeline_success_rate',
+                MetricType.GAUGE,
+                (enrichment_results['crawl4ai_enriched'] + enrichment_results['serper_enriched']) / max(len(recent_items), 1) * 100
+            )
+            
+            return enrichment_results
+            
+        except Exception as e:
+            logger.error(f"Critical error in RSS enrichment pipeline: {e}")
+            return {
+                'total_items_processed': 0,
+                'crawl4ai_enriched': 0,
+                'serper_enriched': 0,
+                'errors': 1,
+                'error_message': str(e)
+            }
+    
+    async def _crawl4ai_enrich_items(self, items: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """STAGE 2: Use Crawl4AI to extract precise data from source URLs"""
+        try:
+            enriched_count = 0
+            details = []
+            
+            # Create crawl targets from RSS items with source URLs
+            crawl_targets = []
+            for item in items:
+                source_url = item.get('source_url')
+                if source_url and source_url.startswith('http'):
+                    target = CrawlTarget(
+                        url=source_url,
+                        target_type='funding_opportunity',
+                        priority=1,
+                        extraction_strategy='intelligence_item',
+                        metadata={
+                            'rss_item_id': item['id'],
+                            'title': item.get('title', ''),
+                            'description': (item.get('description') or '')[:200]
+                        }
+                    )
+                    crawl_targets.append(target)
+            
+            logger.info(f"Created {len(crawl_targets)} Crawl4AI targets from RSS items")
+            
+            if not crawl_targets:
+                return {'enriched_count': 0, 'details': []}
+            
+            # Process targets with Crawl4AI
+            enrichment_opportunities = await self.crawl4ai_processor.process_high_volume_batch(crawl_targets)
+            
+            # Prepare updates for Supabase
+            updates = []
+            for opportunity in enrichment_opportunities:
+                rss_item_id = opportunity.get('metadata', {}).get('rss_item_id')
+                if not rss_item_id:
+                    continue
+                
+                # Prepare update object
+                update_data = {
+                    'id': rss_item_id,
+                    'enrichment_status': 'crawl4ai_enriched',
+                    'updated_at': datetime.utcnow().isoformat()
+                }
+                
+                # Add fields to update if they exist in the opportunity
+                for field in ['funding_amount', 'application_deadline', 'eligibility_criteria', 
+                            'contact_email', 'application_url']:
+                    if field in opportunity and opportunity[field] is not None:
+                        update_data[field] = opportunity[field]
+                
+                # Handle relevance score
+                if 'relevance_score' in opportunity and opportunity['relevance_score'] is not None:
+                    # Get current relevance score to compare
+                    current_item = await supabase_utils.get_item_by_id(rss_item_id)
+                    current_score = current_item.get('relevance_score', 0) if current_item else 0
+                    update_data['relevance_score'] = max(
+                        current_score,
+                        float(opportunity['relevance_score'])
+                    )
+                
+                updates.append(update_data)
+                
+                # Track enrichment details
+                enriched_fields = [k for k in opportunity.keys() 
+                                 if k not in ['metadata', 'relevance_score'] and opportunity[k] is not None]
+                if enriched_fields:
+                    details.append({
+                        'item_id': rss_item_id,
+                        'enrichment_type': 'crawl4ai',
+                        'fields_enriched': enriched_fields
+                    })
+            
+            # Apply updates in bulk
+            if updates:
+                result = await supabase_utils.bulk_update_items(updates)
+                enriched_count = result.get('success', 0)
+                logger.info(f"Crawl4AI updated {enriched_count} RSS items via Supabase")
+            
+            return {
+                'enriched_count': enriched_count,
+                'details': details
+            }
+            
+        except Exception as e:
+            logger.error(f"Error in Crawl4AI enrichment: {e}")
+            return {'enriched_count': 0, 'details': [], 'error': str(e)}
+    
+    async def _serper_enrich_items(self, items: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """STAGE 3: Use serper-dev to find related opportunities and additional context"""
+        try:
+            enriched_count = 0
+            details = []
+            updates = []
+            
+            # Process each item with serper search (limit to first 10 to avoid API quota issues)
+            for item in items[:10]:
+                try:
+                    # Create search query from item title and description
+                    title = item.get('title', '')
+                    description = item.get('description', '')
+                    search_query = f"{title} funding opportunity application"
+                    if description:
+                        search_query += f" {description[:100]}"
+                    
+                    # Search for related opportunities
+                    search_results = await self.serper_search.search(search_query, num_results=5)
+                    
+                    if not search_results or 'organic' not in search_results:
+                        continue
+                    
+                    # Process search results and extract relevant information
+                    for result in search_results['organic']:
+                        # Prepare update data for this item
+                        update_data = {
+                            'id': item['id'],
+                            'enrichment_status': 'serper_enriched',
+                            'updated_at': datetime.utcnow().isoformat()
+                        }
+                        updated_fields = []
+                        
+                        # Extract funding amount if not already set
+                        snippet = result.get('snippet', '').lower()
+                        if 'funding' in snippet and not item.get('funding_amount'):
+                            # Simple regex to find dollar amounts in the snippet
+                            import re
+                            funding_match = re.search(r'\$([\d,]+(?:[.]\d{2})?)', snippet)
+                            if funding_match:
+                                update_data['funding_amount'] = funding_match.group(1)
+                                updated_fields.append('funding_amount')
+                        
+                        # Update application URL if not already set
+                        if 'link' in result and not item.get('application_url'):
+                            update_data['application_url'] = result['link']
+                            updated_fields.append('application_url')
+                        
+                        # Update eligibility criteria if we find relevant information
+                        if 'eligibility' in snippet and not item.get('eligibility_criteria'):
+                            # Extract a portion of the snippet as eligibility criteria
+                            update_data['eligibility_criteria'] = snippet[:500]  # Truncate to avoid too much text
+                            updated_fields.append('eligibility_criteria')
+                        
+                        # Only add to updates if we found new information
+                        if len(updated_fields) > 1:  # More than just the status and timestamp
+                            updates.append(update_data)
+                            details.append({
+                                'item_id': item['id'],
+                                'enrichment_type': 'serper',
+                                'fields_enriched': updated_fields,
+                                'source_url': result.get('link')
+                            })
+                            break  # Only process first relevant result per item
+                            
+                except Exception as e:
+                    logger.error(f"Error enriching item with serper: {e}")
+                    continue
+            
+            # Apply all updates in bulk
+            if updates:
+                result = await supabase_utils.bulk_update_items(updates)
+                enriched_count = result.get('success', 0)
+                logger.info(f"Serper updated {enriched_count} RSS items via Supabase")
+            
+            return {
+                'enriched_count': enriched_count,
+                'details': details
+            }
+            
+        except Exception as e:
+            logger.error(f"Error in serper-dev enrichment: {e}")
+            return {'enriched_count': 0, 'details': [], 'error': str(e)}
     
     def _status_monitor(self):
         """Monitor pipeline status and health"""
@@ -492,14 +759,23 @@ class MasterDataIngestionPipeline:
             await self.rss_pipeline.start_pipeline()
             
             if self.config.enable_scheduled_jobs:
-                # Start web scraping (continuous)
-                self.web_scraper.start_continuous_scraping(interval_hours=2)
+                # Start web scraping (every 12 hours)
+                self.web_scraper.start_continuous_scraping(interval_hours=12)
                 
-                # Start news collection (continuous)
-                self.news_collector.start_continuous_collection(interval_hours=1)
+                # Start news collection (every 12 hours)
+                self.news_collector.start_continuous_collection(interval_hours=12)
             
             # Start batch processor
             self.batch_processor.start()
+            
+            # CRITICAL: Initialize and start enrichment layers (Stage 2 & 3)
+            logger.info("Initializing enrichment layers (Crawl4AI and serper-dev)...")
+            await self.crawl4ai_processor.initialize()
+            
+            # Start Crawl4AI scheduled monitoring for continuous enrichment
+            if self.config.enable_scheduled_jobs:
+                await self.crawl4ai_processor.start_scheduled_monitoring(interval_hours=12)
+                logger.info("Crawl4AI scheduled monitoring started (12-hour intervals)")
             
             # Start scheduled jobs
             if self.config.enable_scheduled_jobs:
@@ -529,7 +805,7 @@ class MasterDataIngestionPipeline:
             self.status = PipelineStatus.ERROR
             raise
     
-    def stop(self):
+    async def stop(self):
         """Stop the master pipeline"""
         if self.status == PipelineStatus.STOPPED:
             logger.warning("Master pipeline is already stopped")
@@ -556,6 +832,11 @@ class MasterDataIngestionPipeline:
             
             # Stop monitoring
             self.monitoring_system.stop()
+            
+            # CRITICAL: Stop enrichment layers
+            logger.info("Stopping enrichment layers...")
+            self.crawl4ai_processor.stop_scheduled_monitoring()
+            await self.crawl4ai_processor.close()
             
             # Wait for threads to finish
             if self.scheduler_thread:
@@ -614,20 +895,20 @@ def create_default_config() -> PipelineConfig:
     """Create default pipeline configuration"""
     return PipelineConfig(
         rss_pipeline_config={
-            'max_workers': 50,
-            'batch_size': 1000
+            'max_workers': 10,  # Reduced workers for less frequent processing
+            'batch_size': 50    # Smaller batches, processed less frequently
         },
         web_scraping_config={
-            'max_workers': 20,
-            'batch_size': 100
+            'max_workers': 5,   # Reduced workers
+            'batch_size': 50    # Consistent batch size
         },
         news_api_config={
-            'max_workers': 10,
-            'batch_size': 100
+            'max_workers': 5,   # Reduced workers
+            'batch_size': 50    # Consistent batch size
         },
         batch_processing_config=BatchConfig(
-            max_workers=10,
-            batch_size=1000,
+            max_workers=5,      # Reduced workers
+            batch_size=50,      # Consistent with new strategy
             enable_checkpointing=True
         ),
         monitoring_config=MonitoringConfig(

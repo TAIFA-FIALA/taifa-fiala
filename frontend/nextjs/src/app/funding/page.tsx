@@ -80,30 +80,30 @@ function FundingPageContent() {
       setError(null);
 
       const params = new URLSearchParams();
-      if (keyword) params.append('keyword', keyword);
-      if (minAmount) params.append('min_amount_usd', minAmount);
-      if (maxAmount) params.append('max_amount_usd', maxAmount);
-      if (startDate) params.append('start_deadline', startDate);
-      if (endDate) params.append('end_deadline', endDate);
-      if (selectedStatus) params.append('status', selectedStatus);
-      if (selectedCategories.length > 0) params.append('category', selectedCategories.join(','));
-      if (selectedOrganization) params.append('organization_id', selectedOrganization);
-      if (selectedCountry) params.append('country', selectedCountry);
-
-      params.append('skip', String((currentPage - 1) * itemsPerPage));
-      params.append('limit', String(itemsPerPage));
+      if (keyword) params.append('q', keyword); // Main search query
+      if (minAmount) params.append('min_amount', minAmount);
+      if (maxAmount) params.append('max_amount', maxAmount);
+      if (startDate) params.append('deadline_after', startDate);
+      if (endDate) params.append('deadline_before', endDate);
+      if (selectedCountry) params.append('geographic_focus', selectedCountry);
+      
+      // Set max results based on pagination
+      params.append('max_results', String(itemsPerPage));
+      
+      // Set minimum relevance score for quality filtering
+      params.append('min_relevance', '0.6');
 
       const queryString = params.toString();
       router.push(`/funding?${queryString}`);
 
       try {
-        const res = await fetch(`http://localhost:8000/api/v1/rfps/?${queryString}`);
+        const res = await fetch(`http://localhost:8000/api/v1/intelligent-search/opportunities?${queryString}`);
         if (!res.ok) {
           throw new Error(`HTTP error! status: ${res.status}`);
         }
         const data = await res.json();
-        setOpportunities(data.rfps); // Access rfps array
-        setTotalCount(data.total_count); // Access total_count
+        setOpportunities(data.results);
+        setTotalCount(data.total_count);
       } catch (err: Error | unknown) {
         console.error("Failed to fetch funding opportunities:", err);
         setError("Failed to load funding opportunities.");

@@ -693,44 +693,192 @@ class EnhancedCrawl4AIProcessor:
         return filtered
     
     def _calculate_relevance_score(self, opportunity: Dict[str, Any]) -> float:
-        """Calculate relevance score for intelligence item"""
+        """Calculate objective relevance score based on measurable criteria"""
         score = 0.0
-        
-        # AI/tech keywords
-        ai_keywords = ['ai', 'artificial intelligence', 'machine learning', 'technology', 'innovation', 'digital']
-        africa_keywords = ['africa', 'african', 'ghana', 'nigeria', 'south africa', 'kenya', 'uganda']
-        funding_keywords = ['grant', 'funding', 'investment', 'award', 'prize', 'fellowship']
         
         title = opportunity.get('title', '').lower()
         description = opportunity.get('description', '').lower()
         full_text = f"{title} {description}"
         
-        # Score based on keyword presence
-        for keyword in ai_keywords:
-            if keyword in full_text:
-                score += 0.3
+        # 1. Geographic Relevance (0.0 - 0.25)
+        score += self._score_geographic_relevance(full_text)
         
-        for keyword in africa_keywords:
-            if keyword in full_text:
-                score += 0.2
+        # 2. Technology Relevance (0.0 - 0.30)
+        score += self._score_technology_relevance(full_text)
         
-        for keyword in funding_keywords:
-            if keyword in full_text:
-                score += 0.1
+        # 3. Funding Specificity & Disbursement Clarity (0.0 - 0.35)
+        score += self._score_funding_specificity(opportunity, full_text)
         
-        # Additional scoring factors
-        if opportunity.get('funding_amount'):
-            score += 0.1
-        
-        if opportunity.get('deadline'):
-            score += 0.1
-        
-        if opportunity.get('ai_tech_relevance'):
-            score += 0.2
+        # 4. Urgency & Actionability (0.0 - 0.10)
+        score += self._score_urgency_actionability(opportunity)
         
         return min(score, 1.0)
     
-    async def start_scheduled_monitoring(self, interval_hours: int = 6):
+    def _score_geographic_relevance(self, full_text: str) -> float:
+        """Score geographic relevance to Africa"""
+        african_countries = [
+            'africa', 'african', 'ghana', 'nigeria', 'south africa', 'kenya', 'uganda',
+            'ethiopia', 'tanzania', 'morocco', 'egypt', 'senegal', 'rwanda', 'botswana',
+            'zambia', 'zimbabwe', 'mali', 'burkina faso', 'ivory coast', 'cameroon'
+        ]
+        
+        developing_terms = ['developing countries', 'global south', 'emerging markets']
+        international_terms = ['international', 'worldwide', 'global']
+        exclusion_terms = ['us only', 'usa only', 'american residents', 'eu only', 'europe only']
+        
+        # Check for exclusions first
+        for term in exclusion_terms:
+            if term in full_text:
+                return 0.0
+        
+        # Check for African countries/regions
+        for country in african_countries:
+            if country in full_text:
+                return 0.25
+        
+        # Check for developing country terms
+        for term in developing_terms:
+            if term in full_text:
+                return 0.15
+        
+        # Check for international terms
+        for term in international_terms:
+            if term in full_text:
+                return 0.10
+        
+        # Default: no geographic restrictions mentioned
+        return 0.05
+    
+    def _score_technology_relevance(self, full_text: str) -> float:
+        """Score technology relevance to AI/tech"""
+        ai_title_keywords = ['ai', 'artificial intelligence', 'machine learning', 'ml']
+        ai_desc_keywords = ['neural network', 'deep learning', 'algorithm', 'data science']
+        tech_keywords = ['digital', 'innovation', 'technology', 'tech']
+        adjacent_tech = ['automation', 'robotics', 'data analytics', 'software']
+        research_terms = ['research', 'innovation', 'development']
+        
+        # AI/ML in title gets highest score
+        title_part = full_text.split(' ')[:10]  # First 10 words approximate title
+        title_text = ' '.join(title_part)
+        
+        for keyword in ai_title_keywords:
+            if keyword in title_text:
+                return 0.30
+        
+        # AI/ML in description with tech keywords
+        ai_in_desc = any(keyword in full_text for keyword in ai_title_keywords + ai_desc_keywords)
+        tech_in_desc = any(keyword in full_text for keyword in tech_keywords)
+        
+        if ai_in_desc and tech_in_desc:
+            return 0.25
+        
+        # General tech keywords
+        if any(keyword in full_text for keyword in tech_keywords):
+            return 0.20
+        
+        # Adjacent tech fields
+        if any(keyword in full_text for keyword in adjacent_tech):
+            return 0.15
+        
+        # Broad research/innovation focus
+        if any(keyword in full_text for keyword in research_terms):
+            return 0.10
+        
+        return 0.0
+    
+    def _score_funding_specificity(self, opportunity: Dict[str, Any], full_text: str) -> float:
+        """Score funding specificity and disbursement clarity"""
+        score = 0.0
+        
+        # Disbursement Language (0.0 - 0.15)
+        active_disbursement = [
+            'accepting applications', 'now open', 'apply by', 'grants awarded',
+            'applications due', 'submit proposal', 'deadline', 'apply now'
+        ]
+        present_funding = [
+            'offers grants', 'provides funding', 'supports', 'funds',
+            'available', 'open for', 'invites applications'
+        ]
+        future_conditional = [
+            'will fund', 'plans to support', 'intends to', 'aims to provide',
+            'expects to', 'looking to fund'
+        ]
+        vague_allocation = [
+            'allocated', 'committed', 'announced', 'pledged', 'set aside'
+        ]
+        
+        if any(term in full_text for term in active_disbursement):
+            score += 0.15
+        elif any(term in full_text for term in present_funding):
+            score += 0.10
+        elif any(term in full_text for term in future_conditional):
+            score += 0.05
+        elif any(term in full_text for term in vague_allocation):
+            score += 0.00
+        
+        # Amount Specificity (0.0 - 0.10)
+        funding_amount = opportunity.get('funding_amount', '')
+        if funding_amount:
+            amount_text = str(funding_amount).lower()
+            if 'per project' in amount_text or 'per grant' in amount_text or 'individual' in amount_text:
+                score += 0.10
+            elif '-' in amount_text and ('grant' in amount_text or 'award' in amount_text):
+                score += 0.08
+            elif any(word in full_text for word in ['total', 'grants', 'recipients']):
+                score += 0.05
+            elif any(char.isdigit() for char in amount_text):
+                score += 0.02
+        
+        # Application Process Clarity (0.0 - 0.10)
+        clarity_score = 0.0
+        if opportunity.get('application_url'):
+            clarity_score += 0.025
+        if opportunity.get('application_deadline') or opportunity.get('deadline'):
+            clarity_score += 0.025
+        if opportunity.get('eligibility_criteria'):
+            clarity_score += 0.025
+        if opportunity.get('contact_email') or opportunity.get('contact_info'):
+            clarity_score += 0.025
+        
+        score += clarity_score
+        
+        return score
+    
+    def _score_urgency_actionability(self, opportunity: Dict[str, Any]) -> float:
+        """Score urgency and actionability based on deadlines"""
+        from datetime import datetime, timedelta
+        
+        deadline_field = opportunity.get('application_deadline') or opportunity.get('deadline')
+        if not deadline_field:
+            # Check for rolling/ongoing applications
+            description = opportunity.get('description', '').lower()
+            if any(term in description for term in ['rolling', 'ongoing', 'continuous']):
+                return 0.02
+            return 0.0
+        
+        try:
+            # Try to parse deadline (this would need more robust date parsing in production)
+            deadline_str = str(deadline_field).lower()
+            current_date = datetime.now()
+            
+            # Simple heuristic - look for month names and years
+            # In production, you'd want more sophisticated date parsing
+            if any(month in deadline_str for month in ['january', 'february', 'march']):
+                # Rough estimate - within 3 months
+                return 0.10
+            elif any(month in deadline_str for month in ['april', 'may', 'june']):
+                # Rough estimate - within 6 months  
+                return 0.08
+            elif '2024' in deadline_str or '2025' in deadline_str:
+                # Within a year
+                return 0.05
+            
+        except Exception:
+            pass
+        
+        return 0.02  # Default for having a deadline but unable to parse
+    
+    async def start_scheduled_monitoring(self, interval_hours: int = 12):
         """Start scheduled monitoring of crawl targets"""
         logger.info(f"Starting scheduled monitoring every {interval_hours} hours")
         
@@ -902,7 +1050,7 @@ async def main():
         print(f"Batch processing: {len(batch_results)} opportunities extracted")
         
         # Start scheduled monitoring
-        await processor.start_scheduled_monitoring(interval_hours=6)
+        await processor.start_scheduled_monitoring(interval_hours=12)
         
         # Get statistics
         stats = processor.get_stats()
