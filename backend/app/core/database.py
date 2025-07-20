@@ -9,6 +9,9 @@ import logging
 from typing import Optional, Dict, Any, List, Union, TypeVar, Type
 from datetime import datetime
 
+# Import Base from base.py to avoid circular imports
+from .base import Base
+
 # Import Supabase client for API-based operations
 from app.core.supabase_client import get_supabase_client
 

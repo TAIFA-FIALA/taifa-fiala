@@ -3,7 +3,7 @@ import DatabaseGrowthChart from '@/components/homepage/DatabaseGrowthChart';
 import GeographicDistributionMapWrapper from '@/components/homepage/GeographicDistributionMapWrapper';
 import SectorAllocationChart from '@/components/homepage/SectorAllocationChart';
 import GenderEquityDashboard from '@/components/homepage/GenderEquityDashboard';
-import { Database, BarChart3, BookOpen, Users, TrendingUp, ChevronRight } from 'lucide-react';
+import { Database, BarChart3, BookOpen, Users, TrendingUp, ChevronRight, Globe, PieChart } from 'lucide-react';
 import Image from 'next/image';
 import SearchBar from '@/components/homepage/SearchBar';
 import { getApiUrl, API_ENDPOINTS } from '@/lib/api-config';
@@ -147,15 +147,24 @@ export default async function HomePage() {
       {/* Key Issues Section */}
       <section id="data" className="py-12 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-2xl font-display text-gray-900 mb-8 flex items-center gap-3">
-            <TrendingUp className="w-6 h-6 text-taifa-primary" />
-            Issues of Equity in AI Funding We are Tracking
+          <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">
+            <span className="inline-block relative">
+              <span className="relative z-10">
+                <TrendingUp className="w-8 h-8 text-taifa-primary inline-block mr-3 -mt-1" />
+                Issues of Equity in AI Funding We are Tracking
+              </span>
+              <span className="absolute -left-4 -top-6 text-8xl font-black text-gray-100 -z-10">•••</span>
+            </span>
           </h2>
           
           {/* Issue 1: Geographic Concentration */}
-          <div className="mb-12">
-            <div className="bg-white p-8 rounded-lg shadow-sm border border-gray-200">
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">
+          <div className="mb-12 relative group">
+            <div className="absolute -left-12 top-0 w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center text-4xl font-black text-blue-700 shadow-md">
+              1
+            </div>
+            <div className="bg-white p-8 pl-16 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+              <h3 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
+                <Globe className="w-6 h-6 text-blue-600" />
                 Geographic Concentration
               </h3>
               
@@ -179,10 +188,14 @@ export default async function HomePage() {
           </div>
 
           {/* Issue 2: Sectoral Misalignment */}
-          <div className="mb-12">
-            <div className="bg-white p-8 rounded-lg shadow-sm border border-gray-200">
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">
-                Sectoral Funding Misalignment 
+          <div className="mb-12 relative group">
+            <div className="absolute -left-12 top-0 w-16 h-16 rounded-full bg-green-100 flex items-center justify-center text-4xl font-black text-green-700 shadow-md">
+              2
+            </div>
+            <div className="bg-white p-8 pl-16 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+              <h3 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
+                <PieChart className="w-6 h-6 text-green-600" />
+                Sectoral Funding Misalignment
               </h3>
               
               {/* Sector Allocation Chart */}
@@ -206,10 +219,13 @@ export default async function HomePage() {
           </div>
 
           {/* Issue 3: Gender Disparity */}
-          <div className="mb-12">
-            <div className="bg-white p-8 rounded-lg shadow-sm border border-gray-200">
-              <h3 className="text-xl font-semibold text-gray-900 mb-6 flex items-center gap-3">
-                <Users className="w-5 h-5 text-red-600" />
+          <div className="mb-12 relative group">
+            <div className="absolute -left-12 top-0 w-16 h-16 rounded-full bg-pink-100 flex items-center justify-center text-4xl font-black text-pink-700 shadow-md">
+              3
+            </div>
+            <div className="bg-white p-8 pl-16 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+              <h3 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+                <Users className="w-6 h-6 text-pink-600" />
                 Gender Disparity
               </h3>
               

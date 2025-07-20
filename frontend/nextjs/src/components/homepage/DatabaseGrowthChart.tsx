@@ -135,12 +135,12 @@ export default function DatabaseGrowthChart({ className = '' }: DatabaseGrowthCh
       <div className="p-6 border-b border-gray-100">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
-            <div className="w-10 h-10 flex items-center justify-center rounded-full bg-amber-600 text-white mr-3">
-              <Database className="h-5 w-5" />
+            <div className="w-12 h-12 flex items-center justify-center rounded-full bg-amber-600 text-white mr-4">
+              <Database className="h-6 w-6" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-gray-800">Database Growth</h3>
-              <p className="text-sm text-gray-500">Live intelligence collection</p>
+              <h3 className="text-xl font-bold text-gray-800">Database Growth</h3>
+              <p className="text-base text-gray-600">Live intelligence collection</p>
             </div>
           </div>
           <div className="flex items-center space-x-4">
