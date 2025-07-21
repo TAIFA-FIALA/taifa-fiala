@@ -193,7 +193,7 @@ async def example_database_schema():
     logger.info("To apply the funding intelligence schema to Supabase:")
     logger.info("1. Set environment variables:")
     logger.info("   export SUPABASE_URL='your-supabase-url'")
-    logger.info("   export SUPABASE_SERVICE_KEY='your-service-key'")
+    logger.info("   export SUPABASE_API_KEY='your-api-key'")
     logger.info("2. Run the setup script:")
     logger.info("   python scripts/supabase_funding_intelligence.py")
     logger.info("3. Or use the SQL migration:")

@@ -11,10 +11,10 @@ from typing import Optional
 def get_supabase_client() -> Optional[Client]:
     """Get Supabase client from environment variables"""
     url = os.getenv("SUPABASE_URL")
-    key = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+    key = os.getenv("SUPABASE_API_KEY")
     
     if not url or not key:
-        print("❌ Error: SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY environment variables are required")
+        print("❌ Error: SUPABASE_URL and SUPABASE_API_KEY environment variables are required")
         return None
     
     try:

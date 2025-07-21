@@ -16,7 +16,7 @@ url = os.getenv('SUPABASE_PROJECT_URL')
 key = os.getenv('SUPABASE_SERVICE_API_KEY')
 
 if not url or not key:
-    raise ValueError("Missing SUPABASE_PROJECT_URL or SUPABASE_SERVICE_API_KEY in environment variables")
+    raise ValueError("Missing SUPABASE_PROJECT_URL or SUPABASE_API_KEY in environment variables")
 
 supabase: Client = create_client(url, key)
 

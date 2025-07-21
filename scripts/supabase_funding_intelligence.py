@@ -28,10 +28,10 @@ class SupabaseFundingIntelligence:
     
     def __init__(self):
         self.supabase_url = os.getenv('SUPABASE_URL')
-        self.supabase_key = os.getenv('SUPABASE_SERVICE_KEY')  # Use service key for admin operations
+        self.supabase_key = os.getenv('SUPABASE_API_KEY')  # Use service key for admin operations
         
         if not self.supabase_url or not self.supabase_key:
-            raise ValueError("SUPABASE_URL and SUPABASE_SERVICE_KEY must be set in environment variables")
+            raise ValueError("SUPABASE_URL and SUPABASE_API_KEY must be set in environment variables")
         
         self.supabase: Client = create_client(self.supabase_url, self.supabase_key)
         self.schema_file = Path(__file__).parent.parent / "database" / "migrations" / "funding_intelligence_schema.sql"
@@ -541,14 +541,14 @@ def main():
     
     # Check environment variables
     supabase_url = os.getenv('SUPABASE_URL')
-    supabase_key = os.getenv('SUPABASE_SERVICE_KEY')
+    supabase_key = os.getenv('SUPABASE_API_KEY')
     
     if not supabase_url:
         print("❌ SUPABASE_URL environment variable not set")
         return 1
     
     if not supabase_key:
-        print("❌ SUPABASE_SERVICE_KEY environment variable not set")
+        print("❌ SUPABASE_API_KEY environment variable not set")
         print("   Please set your Supabase service key (not anon key)")
         return 1
     

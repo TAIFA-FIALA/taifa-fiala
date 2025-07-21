@@ -14,9 +14,9 @@ load_dotenv()
 # Initialize Supabase client
 def get_supabase_client() -> Client:
     url = os.getenv("SUPABASE_URL")
-    key = os.getenv("SUPABASE_SERVICE_API_KEY")
+    key = os.getenv("SUPABASE_API_KEY")
     if not url or not key:
-        raise ValueError("Missing SUPABASE_URL or SUPABASE_SERVICE_API_KEY in environment variables")
+        raise ValueError("Missing SUPABASE_URL or SUPABASE_API_KEY in environment variables")
     return create_client(url, key)
 
 def get_recent_records(limit: int = 10) -> List[Dict[str, Any]]:

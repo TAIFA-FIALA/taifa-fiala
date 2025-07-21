@@ -6,9 +6,8 @@ Direct database connections are not used - all operations go through the Supabas
 """
 import os
 import logging
-from typing import Optional, Dict, Any, List, Union, TypeVar, Type
+from typing import Optional, Dict, Any, List, TypeVar
 from datetime import datetime
-from app.core.database import get_db
 
 # Import Base from base.py to avoid circular imports
 from .base import Base, metadata

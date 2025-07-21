@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 # Supabase configuration
 SUPABASE_URL = os.environ.get('SUPABASE_URL')
-SUPABASE_KEY = os.environ.get('SUPABASE_SERVICE_API_KEY')  # Use the service key for backend operations
+SUPABASE_KEY = os.environ.get('SUPABASE_API_KEY')  # Use the service key for backend operations
 SUPABASE_ANON_KEY = os.environ.get('SUPABASE_PUBLISHABLE_KEY')  # This is the anon key for client-side
 
 def create_supabase_client(use_service_key: bool = True) -> Optional[Client]:

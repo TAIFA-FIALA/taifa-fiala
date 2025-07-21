@@ -15,7 +15,7 @@ from typing import Optional
 from pydantic import BaseModel, Field
 from dotenv import load_dotenv
 from supabase import create_client, Client
-from pinecone import ServerlessSpec
+
 
 # Local imports
 from app.core.pinecone_client import get_pinecone_client
@@ -30,7 +30,7 @@ logger = logging.getLogger(__name__)
 class SupabaseConfig(BaseModel):
     """Configuration for Supabase client"""
     url: str = Field(default_factory=lambda: os.getenv("SUPABASE_URL", ""))
-    key: str = Field(default_factory=lambda: os.getenv("SUPABASE_SERVICE_API_KEY", ""))
+    key: str = Field(default_factory=lambda: os.getenv("SUPABASE_API_KEY", ""))
     
     @property
     def is_valid(self) -> bool:
