@@ -205,7 +205,7 @@ start_services() {
         echo 'Stopping existing services...'
         \$DOCKER_COMPOSE_CMD down --remove-orphans
         echo 'Building and starting services...'
-        \$DOCKER_COMPOSE_CMD up -d --build
+        \$DOCKER_COMPOSE_CMD up -d --build --no-cache
     " || {
         warning "Service startup failed."
         cleanup_and_exit
@@ -215,11 +215,14 @@ start_services() {
 
 health_check() {
     step "Step 8: Performing Health Checks"
+    info "Waiting for services to initialize..."
+    sleep 15
     info "Checking service health..."
 
     ssh $SSH_USER@$PROD_SERVER "
-        pm2 list
-        
+        echo 'Checking Docker container status...'
+        docker ps
+
         echo 'Checking Next.js frontend...'
         curl --silent --fail http://localhost:3020 > /dev/null && echo -e '${GREEN}✓ Frontend is healthy.${NC}' || echo -e '${RED}✗ Frontend health check failed.${NC}'
         
