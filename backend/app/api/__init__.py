@@ -2,9 +2,10 @@ from fastapi import APIRouter
 
 from app.api.endpoints import (
     africa_intelligence_feed, organizations, domains, sources, analytics, search, rfp, source_validation,
-    user_submissions, admin_scraping, automated_discovery, equity_analyses, stakeholder_reports
+    user_submissions, admin_scraping, automated_discovery, equity_analyses, stakeholder_reports, data_ingestion
 )
 from app.api.v1.intelligent_search import router as intelligent_search_router
+from app.core.database import get_db
 
 # Create main API router
 api_router = APIRouter()
@@ -49,7 +50,6 @@ api_router.include_router(
 # New intelligent search with vector filtering (replaces deprecated RFPs)
 api_router.include_router(
     intelligent_search_router,
-    prefix="/v1/intelligent-search",
     tags=["intelligent-search"]
 )
 
@@ -76,6 +76,12 @@ api_router.include_router(
     admin_scraping.router,
     prefix="/admin/scraping",
     tags=["admin-scraping"]
+)
+
+api_router.include_router(
+    data_ingestion.router,
+    prefix="/data-ingestion",
+    tags=["data-ingestion"]
 )
 
 api_router.include_router(

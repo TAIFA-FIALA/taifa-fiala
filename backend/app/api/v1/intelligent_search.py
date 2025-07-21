@@ -10,7 +10,7 @@ import logging
 
 from app.services.funding_intelligence.vector_intelligence import VectorSearchService
 from app.models.funding import AfricaIntelligenceItem
-from app.core.database import get_db_session
+from app.core.database import get_db
 from sqlalchemy.orm import Session
 from sqlalchemy import and_, or_, func
 

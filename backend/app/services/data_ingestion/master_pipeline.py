@@ -931,6 +931,35 @@ class MasterDataIngestionPipeline:
 
 def create_default_config() -> PipelineConfig:
     """Create default pipeline configuration"""
+    # Parse database URL if available
+    db_url = os.getenv('DATABASE_URL', '')
+    db_config = {}
+    
+    if db_url:
+        try:
+            from urllib.parse import urlparse
+            parsed = urlparse(db_url)
+            if parsed.hostname:
+                db_config['db_host'] = parsed.hostname
+            if parsed.port:
+                db_config['db_port'] = parsed.port
+            if parsed.username:
+                db_config['db_user'] = parsed.username
+            if parsed.password:
+                db_config['db_password'] = parsed.password
+            if parsed.path and len(parsed.path) > 1:
+                db_config['db_name'] = parsed.path[1:]  # Remove leading '/'
+        except Exception as e:
+            logging.warning(f"Failed to parse DATABASE_URL: {e}")
+    
+    # Default enrichment configuration
+    enrichment_config = {
+        'crawl4ai_max_workers': 5,
+        'crawl4ai_batch_size': 50,
+        'serper_enabled': True,
+        'serper_api_key': os.getenv('SERPER_API_KEY', '')
+    }
+    
     return PipelineConfig(
         rss_pipeline_config={
             'max_workers': 10,  # Reduced workers for less frequent processing
@@ -952,14 +981,17 @@ def create_default_config() -> PipelineConfig:
         monitoring_config=MonitoringConfig(
             slack_webhook_url=os.getenv('SLACK_WEBHOOK_URL'),
             prometheus_enabled=True,
-            enable_anomaly_detection=True
+            enable_anomaly_detection=True,
+            prometheus_port=8001  # Explicitly set port to avoid conflicts
         ),
+        enrichment_config=enrichment_config,  # Add the enrichment config
         max_concurrent_jobs=10,
         enable_scheduled_jobs=True,
-        database_url=os.getenv('DATABASE_URL', ''),
         supabase_url=os.getenv('SUPABASE_URL', ''),
         supabase_key=os.getenv('SUPABASE_SERVICE_API_KEY', ''),
-        log_level='INFO'
+        **db_config,  # Unpack the database configuration
+        log_level='INFO',
+        log_file='logs/master_pipeline.log'
     )
 
 
