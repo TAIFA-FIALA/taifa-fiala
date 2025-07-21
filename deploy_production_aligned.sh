@@ -202,6 +202,8 @@ start_services() {
         fi
         
         echo \"Using Docker Compose command: \$DOCKER_COMPOSE_CMD\"
+        echo 'Stopping existing services...'
+        \$DOCKER_COMPOSE_CMD down --remove-orphans
         echo 'Building and starting services...'
         \$DOCKER_COMPOSE_CMD up -d --build
     " || {
@@ -219,7 +221,7 @@ health_check() {
         pm2 list
         
         echo 'Checking Next.js frontend...'
-        curl --silent --fail http://localhost:3000 > /dev/null && echo -e '${GREEN}✓ Frontend is healthy.${NC}' || echo -e '${RED}✗ Frontend health check failed.${NC}'
+        curl --silent --fail http://localhost:3020 > /dev/null && echo -e '${GREEN}✓ Frontend is healthy.${NC}' || echo -e '${RED}✗ Frontend health check failed.${NC}'
         
         echo 'Checking FastAPI backend...'
         curl --silent --fail http://localhost:8000/health > /dev/null && echo -e '${GREEN}✓ Backend is healthy.${NC}' || echo -e '${RED}✗ Backend health check failed.${NC}'
@@ -270,7 +272,7 @@ main() {
     warning "Backend FastAPI running on: http://${PROD_SERVER}:8000"
     warning "Streamlit Dashboard running on: http://${PROD_SERVER}:8501"
     warning "API Documentation: http://${PROD_SERVER}:8000/docs"
-    warning "Next.js frontend running on: http://${PROD_SERVER}:3000"
+    warning "Next.js frontend running on: http://${PROD_SERVER}:3020"
     echo
     info "Useful commands:"
     echo "Check logs: ssh $SSH_USER@$PROD_SERVER 'cd $PROD_PATH && tail -f logs/*.log'"
