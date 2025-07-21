@@ -473,32 +473,32 @@ def downgrade() -> None:
         print("SCHEMA COMPARISON REPORT")
         print("="*60)
         
-        print(f"\nLocal Models: {len(comparison['local_tables'])} tables")
+        print("\nLocal Models: {} tables".format(len(comparison['local_tables'])))
         for table in sorted(comparison['local_tables']):
             print(f"  - {table}")
         
         if comparison['supabase_tables']:
-            print(f"\nSupabase Database: {len(comparison['supabase_tables'])} tables")
+            print("\nSupabase Database: {} tables".format(len(comparison['supabase_tables'])))
             for table in sorted(comparison['supabase_tables']):
                 print(f"  - {table}")
         else:
             print("\nSupabase Database: Not accessible")
         
         if comparison['missing_in_supabase']:
-            print(f"\n⚠️  Tables missing in Supabase:")
+            print("\n⚠️  Tables missing in Supabase:")
             for table in sorted(comparison['missing_in_supabase']):
                 print(f"  - {table}")
         
         if comparison['missing_in_local']:
-            print(f"\n⚠️  Tables missing in local models:")
+            print("\n⚠️  Tables missing in local models:")
             for table in sorted(comparison['missing_in_local']):
                 print(f"  - {table}")
         
         if comparison['table_differences']:
-            print(f"\n📊 Table differences:")
+            print("\n📊 Table differences:")
             for table_name, diffs in comparison['table_differences'].items():
                 if any(diffs.values()):
-                    print(f"\n  {table_name}:")
+                    print("\n  {}:".format(table_name))
                     if diffs['missing_columns_in_supabase']:
                         print(f"    Missing in Supabase: {', '.join(diffs['missing_columns_in_supabase'])}")
                     if diffs['missing_columns_in_local']:
@@ -541,13 +541,13 @@ def main():
     if args.get_schema:
         schema = helper.get_schema(args.get_schema)
         if schema:
-            print(f"\n" + "="*60)
-            print(f"{args.get_schema.upper()} SCHEMA")
+            print("\n" + "="*60)
+            print("{} SCHEMA".format(args.get_schema.upper()))
             print("="*60)
-            print(f"Tables: {len(schema.tables)}")
+            print("Tables: {}".format(len(schema.tables)))
             for table_name in sorted(schema.tables.keys()):
                 table = schema.tables[table_name]
-                print(f"\n{table_name}:")
+                print("\n{}:".format(table_name))
                 for col in table.columns:
                     print(f"  - {col.name}: {col.type}")
     
