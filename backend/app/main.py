@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import uvicorn      
+from typing import List, Dict, Any
 
 from app.core.config import settings
 from app.core.database import create_tables
@@ -16,6 +17,20 @@ app = FastAPI(
     docs_url="/docs",
     redoc_url="/redoc",
 )
+
+# Simple debug endpoint to list all routes
+@app.get("/debug-routes")
+async def debug_routes():
+    """Debug endpoint to list all registered routes"""
+    routes = []
+    for route in app.routes:
+        route_info = {
+            "path": getattr(route, "path", ""),
+            "name": getattr(route, "name", ""),
+            "methods": list(getattr(route, "methods", [])),
+        }
+        routes.append(route_info)
+    return {"routes": routes}
 
 # Configure CORS
 app.add_middleware(

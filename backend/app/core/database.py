@@ -201,7 +201,7 @@ logger.info("Using Supabase client for all database operations")
 engine = None
 SessionLocal = None
 
-async def get_db():
+def get_db():
     """Dependency to get database client"""
     try:
         # Return the Supabase client for all database operations
@@ -209,7 +209,7 @@ async def get_db():
     except Exception as e:
         logger.error(f"Error getting database client: {str(e)}")
         raise DatabaseConnectionError("Could not connect to database") from e
-
+    
 # Alias for backward compatibility
 get_database = get_db
 

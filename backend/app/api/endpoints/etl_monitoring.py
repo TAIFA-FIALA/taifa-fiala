@@ -3,10 +3,10 @@ ETL Monitoring API Endpoints
 Provides real-time monitoring and statistics for the multi-stage data pipeline
 """
 
-from fastapi import APIRouter, HTTPException, Depends, Query
-from pydantic import BaseModel
+from fastapi import APIRouter, HTTPException, Depends, Query, status
+from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Any, Union
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from enum import Enum
 import logging
 import asyncio
@@ -17,7 +17,8 @@ from app.core.supabase_client import get_supabase_client
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter()
+# Create router without the version prefix (it will be added in __init__.py)
+router = APIRouter(prefix="/etl-monitoring", tags=["etl-monitoring"])
 
 class PipelineStage(str, Enum):
     """ETL Pipeline stages"""
@@ -38,25 +39,17 @@ class ETLStageStats(BaseModel):
     stage: PipelineStage
     status: ProcessingStatus
     current_batch_id: Optional[str] = None
-    
-    # Progress metrics
     total_items_processed: int = 0
     items_processed_today: int = 0
     items_processed_last_hour: int = 0
     current_batch_size: int = 0
     current_batch_progress: int = 0
-    
-    # Quality metrics
     success_rate: float = 0.0
     error_count: int = 0
     duplicate_count: int = 0
-    
-    # Performance metrics
     avg_processing_time_seconds: float = 0.0
     items_per_minute: float = 0.0
     last_processed_at: Optional[datetime] = None
-    
-    # Stage-specific metrics
     stage_specific_metrics: Dict[str, Any] = {}
 
 class ETLOverallStats(BaseModel):
@@ -65,23 +58,14 @@ class ETLOverallStats(BaseModel):
     total_opportunities_in_db: int
     opportunities_added_today: int
     opportunities_added_last_hour: int
-    
-    # Quality overview
     overall_success_rate: float
     total_duplicates_prevented: int
     data_completeness_score: float
-    
-    # Performance overview
     total_processing_time_hours: float
     avg_opportunities_per_hour: float
-    
-    # Stage breakdown
     stage_stats: List[ETLStageStats]
-    
-    # Recent activity
     recent_errors: List[Dict[str, Any]] = []
     recent_successes: List[Dict[str, Any]] = []
-    
     last_updated: datetime
 
 class ETLHistoricalData(BaseModel):
@@ -93,6 +77,21 @@ class ETLHistoricalData(BaseModel):
     total_opportunities_added: int = 0
     success_rate: float = 0.0
     avg_processing_time: float = 0.0
+
+class DailyNewRecords(BaseModel):
+    """Daily new records statistics"""
+    date: datetime
+    stage: str
+    new_records_count: int
+    source: Optional[str] = None
+
+class DailyDuplicatesRemoved(BaseModel):
+    """Daily duplicates removed statistics"""
+    date: datetime
+    stage: str
+    duplicates_removed: int
+    total_processed: int
+    duplicate_rate: float
 
 @router.get("/stats/live", response_model=ETLOverallStats)
 async def get_live_etl_stats(db: AsyncSession = Depends(get_db)):
@@ -159,7 +158,7 @@ async def get_live_etl_stats(db: AsyncSession = Depends(get_db)):
         
     except Exception as e:
         logger.error(f"Error getting live ETL stats: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Failed to get ETL statistics: {str(e)}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to get ETL statistics: {str(e)}")
 
 @router.get("/stats/historical", response_model=List[ETLHistoricalData])
 async def get_historical_etl_stats(
@@ -190,7 +189,7 @@ async def get_historical_etl_stats(
         
     except Exception as e:
         logger.error(f"Error getting historical ETL stats: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Failed to get historical statistics: {str(e)}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to get historical statistics: {str(e)}")
 
 @router.get("/stats/stage/{stage}", response_model=ETLStageStats)
 async def get_stage_specific_stats(
@@ -210,11 +209,11 @@ async def get_stage_specific_stats(
         elif stage == PipelineStage.STAGE3_SERPER_ENRICHMENT:
             return await _get_stage3_stats(supabase)
         else:
-            raise HTTPException(status_code=400, detail="Invalid stage")
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid stage")
             
     except Exception as e:
         logger.error(f"Error getting stage {stage} stats: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Failed to get stage statistics: {str(e)}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to get stage statistics: {str(e)}")
 
 @router.post("/control/{stage}/{action}")
 async def control_pipeline_stage(
@@ -227,7 +226,7 @@ async def control_pipeline_stage(
     """
     valid_actions = ["start", "stop", "pause", "resume"]
     if action not in valid_actions:
-        raise HTTPException(status_code=400, detail=f"Invalid action. Must be one of: {valid_actions}")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Invalid action. Must be one of: {valid_actions}")
     
     try:
         # TODO: Implement pipeline control logic
@@ -238,22 +237,231 @@ async def control_pipeline_stage(
         
     except Exception as e:
         logger.error(f"Error controlling pipeline stage {stage}: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Failed to control pipeline: {str(e)}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to control pipeline: {str(e)}")
 
-# Helper functions
+@router.get("/daily-new-records")
+async def get_daily_new_records(
+    days: int = Query(default=7, ge=1, le=30, description="Number of days of data to return"),
+    stage: Optional[PipelineStage] = Query(None, description="Filter by pipeline stage")
+):
+    """
+    Get the number of new records added per day, with optional filtering by pipeline stage.
+    
+    This endpoint provides visibility into the volume of new data being ingested
+    through different stages of the ETL pipeline.
+    """
+    try:
+        db = get_supabase_client()
+        if not db:
+            logger.error("Supabase client not available")
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="Database connection not available"
+            )
+            
+        end_date = datetime.utcnow()
+        start_date = end_date - timedelta(days=days)
+        
+        logger.debug(f"Querying daily new records from {start_date} to {end_date}")
+        
+        try:
+            # First, verify the table exists
+            test_query = db.table('etl_processing_logs').select('*', count='exact').limit(1).execute()
+            if hasattr(test_query, 'error') and test_query.error:
+                logger.error(f"Error accessing etl_processing_logs table: {test_query.error}")
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail=f"Error accessing processing logs: {str(test_query.error)}"
+                )
+            
+            # Build the main query
+            query = db.table('etl_processing_logs') \
+                .select('date(created_at) as date, pipeline_stage as stage, count(*) as new_records_count, source') \
+                .gte('created_at', start_date.isoformat()) \
+                .order('date', desc=True) \
+                .eq('operation_type', 'insert')
+                
+            if stage:
+                query = query.eq('pipeline_stage', stage.value)
+                
+            result = query.execute()
+            
+            if hasattr(result, 'error') and result.error:
+                logger.error(f"Error querying daily new records: {result.error}")
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail=f"Error retrieving daily new records: {str(result.error)}"
+                )
+                
+            logger.debug(f"Successfully retrieved {len(result.data) if result.data else 0} records")
+            
+            return [
+                DailyNewRecords(
+                    date=datetime.strptime(row['date'], '%Y-%m-%d').date() if isinstance(row['date'], str) else row['date'],
+                    stage=row['stage'],
+                    new_records_count=row['new_records_count'],
+                    source=row.get('source')
+                )
+                for row in (result.data or [])
+            ]
+            
+        except Exception as query_error:
+            logger.exception(f"Error in daily new records query: {str(query_error)}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Query error: {str(query_error)}"
+            )
+            
+    except HTTPException as http_error:
+        # Re-raise HTTP exceptions as-is
+        raise http_error
+    except Exception as e:
+        logger.exception("Unexpected error in get_daily_new_records")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"An unexpected error occurred: {str(e)}"
+        )
 
-async def _get_total_opportunities_count(supabase) -> int:
+@router.get("/duplicates-removed", response_model=List[DailyDuplicatesRemoved])
+async def get_daily_duplicates_removed(
+    days: int = Query(default=7, ge=1, le=30, description="Number of days of data to return"),
+    stage: Optional[PipelineStage] = Query(None, description="Filter by pipeline stage")
+):
+    """
+    Get the number of duplicate records removed per day, with optional filtering by pipeline stage.
+    
+    This endpoint helps track data quality by showing how many duplicate records
+    were detected and removed during the ETL process.
+    """
+    try:
+        db = get_supabase_client()
+        if not db:
+            logger.error("Supabase client not available")
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="Database connection not available"
+            )
+            
+        end_date = datetime.utcnow()
+        start_date = end_date - timedelta(days=days)
+        
+        logger.debug(f"Querying daily duplicates removed from {start_date} to {end_date}")
+        
+        try:
+            # First, verify the table exists
+            test_query = db.table('etl_duplicate_logs').select('*', count='exact').limit(1).execute()
+            if hasattr(test_query, 'error') and test_query.error:
+                logger.error(f"Error accessing etl_duplicate_logs table: {test_query.error}")
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail=f"Error accessing duplicate logs: {str(test_query.error)}"
+                )
+            
+            # Check available columns for debugging
+            test_columns_query = db.table('etl_duplicate_logs').select('*').limit(1).execute()
+            if hasattr(test_columns_query, 'data') and test_columns_query.data:
+                logger.debug(f"Available columns in etl_duplicate_logs: {list(test_columns_query.data[0].keys())}")
+                timestamp_column = 'created_at' if 'created_at' in test_columns_query.data[0] else 'detected_at'
+            else:
+                timestamp_column = 'created_at' # Default fallback
+
+            # Fetch all relevant records
+            query = db.table('etl_duplicate_logs') \
+                .select('*') \
+                .gte(timestamp_column, start_date.isoformat())
+                
+            if stage:
+                query = query.eq('pipeline_stage', stage.value)
+                
+            result = query.execute()
+            
+            if hasattr(result, 'error') and result.error:
+                logger.error(f"Error querying duplicates removed: {result.error}")
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail=f"Error retrieving duplicates removed data: {str(result.error)}"
+                )
+            
+            # Process and aggregate the data in Python
+            from collections import defaultdict
+            
+            # Group by date and pipeline stage
+            daily_data = defaultdict(lambda: {
+                'date': None,
+                'stage': None,
+                'duplicates_removed': 0,
+                'batch_ids': set()
+            })
+            
+            for row in (result.data or []):
+                if not row.get(timestamp_column):
+                    continue
+                    
+                # Convert to date string for grouping
+                date_str = row[timestamp_column].split('T')[0]
+                stage_name = row.get('pipeline_stage', 'unknown')
+                key = (date_str, stage_name)
+                
+                if key not in daily_data:
+                    daily_data[key] = {
+                        'date': date_str,
+                        'stage': stage_name,
+                        'duplicates_removed': 0,
+                        'batch_ids': set()
+                    }
+                
+                daily_data[key]['duplicates_removed'] += 1
+                if row.get('batch_id'):
+                    daily_data[key]['batch_ids'].add(row['batch_id'])
+            
+            # Convert to response format
+            response = []
+            for key, data in daily_data.items():
+                total_batches = len(data['batch_ids']) if data['batch_ids'] else 1
+                total_processed = total_batches * 100  # Assuming 100 items per batch
+                response.append(DailyDuplicatesRemoved(
+                    date=datetime.strptime(data['date'], '%Y-%m-%d').date(),
+                    stage=data['stage'],
+                    duplicates_removed=data['duplicates_removed'],
+                    total_processed=total_processed,
+                    duplicate_rate=min(100.0, (data['duplicates_removed'] / total_processed) * 100) if total_processed > 0 else 0.0
+                ))
+            
+            # Sort by date descending
+            response.sort(key=lambda x: x.date, reverse=True)
+            
+            logger.debug(f"Successfully processed {len(response)} date/stage groups")
+            return response
+            
+        except Exception as query_error:
+            logger.exception(f"Error in duplicates removed query: {str(query_error)}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Query error: {str(query_error)}"
+            )
+            
+    except HTTPException as http_error:
+        # Re-raise HTTP exceptions as-is
+        raise http_error
+    except Exception as e:
+        logger.exception("Unexpected error in get_daily_duplicates_removed")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"An unexpected error occurred: {str(e)}"
+        )
+
+async def _get_total_opportunities_count(db) -> int:
     """Get total count of opportunities in database"""
     try:
-        response = supabase.table('africa_intelligence_feed').select('id', count='exact').execute()
+        response = db.table('africa_intelligence_feed').select('id', count='exact').execute()
         return response.count if response.count else 0
     except Exception:
         return 0
 
-async def _get_opportunities_count_since(supabase, since_date: datetime) -> int:
+async def _get_opportunities_count_since(db, since_date: datetime) -> int:
     """Get count of opportunities added since a specific date"""
     try:
-        response = supabase.table('africa_intelligence_feed')\
+        response = db.table('africa_intelligence_feed')\
             .select('id', count='exact')\
             .gte('created_at', since_date.isoformat())\
             .execute()
@@ -261,7 +469,7 @@ async def _get_opportunities_count_since(supabase, since_date: datetime) -> int:
     except Exception:
         return 0
 
-async def _get_stage1_stats(supabase) -> ETLStageStats:
+async def _get_stage1_stats(db) -> ETLStageStats:
     """Get Stage 1 (RSS Ingestion) statistics"""
     # TODO: Implement based on actual Stage 1 logging/tracking
     return ETLStageStats(
@@ -276,7 +484,7 @@ async def _get_stage1_stats(supabase) -> ETLStageStats:
         }
     )
 
-async def _get_stage2_stats(supabase) -> ETLStageStats:
+async def _get_stage2_stats(db) -> ETLStageStats:
     """Get Stage 2 (Crawl4AI Scraping) statistics"""
     # TODO: Implement based on actual Stage 2 logging/tracking
     return ETLStageStats(
@@ -291,7 +499,7 @@ async def _get_stage2_stats(supabase) -> ETLStageStats:
         }
     )
 
-async def _get_stage3_stats(supabase) -> ETLStageStats:
+async def _get_stage3_stats(db) -> ETLStageStats:
     """Get Stage 3 (Serper Enrichment) statistics"""
     # TODO: Implement based on actual Stage 3 logging/tracking
     return ETLStageStats(
@@ -317,12 +525,12 @@ def _determine_pipeline_status(stage_stats: List[ETLStageStats]) -> ProcessingSt
     else:
         return ProcessingStatus.IDLE
 
-async def _get_recent_errors(supabase) -> List[Dict[str, Any]]:
+async def _get_recent_errors(db) -> List[Dict[str, Any]]:
     """Get recent error logs"""
     # TODO: Implement based on actual error logging system
     return []
 
-async def _get_recent_successes(supabase) -> List[Dict[str, Any]]:
+async def _get_recent_successes(db) -> List[Dict[str, Any]]:
     """Get recent successful operations"""
     # TODO: Implement based on actual success logging system
     return []

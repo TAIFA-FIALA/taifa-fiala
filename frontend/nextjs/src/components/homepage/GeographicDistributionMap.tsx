@@ -5,6 +5,8 @@ import { scaleLinear } from 'd3-scale';
 import { Map, Overlay } from 'pigeon-maps';
 import africanCountriesGeo from '@/data/african_countries_geo.json';
 import VisualizationErrorBoundary from '@/components/common/VisualizationErrorBoundary';
+import Image from 'next/image';
+import { ScaleIcon } from 'lucide-react';
 
 // Types for GeoJSON features
 interface GeoJSONProperties {
@@ -177,103 +179,111 @@ const GeographicDistributionMap = () => {
 
   return (
     <VisualizationErrorBoundary>
-      <figure className="chart-container relative">
-        <div className="chart-title" id="figure-1">Figure 1: Geographic Distribution of AI Funding (2019-2024)</div>
-      
-        <div className="relative w-full h-[500px]" data-tip="">
-          <Map
-            height={500}
-            defaultCenter={AFRICA_CENTER}
-            defaultZoom={DEFAULT_ZOOM}
-            attribution={false}
-          >
-            {/* Render African countries with color-coding based on funding data */}
-            {countryPolygons.map((country, index) => {
-              const countryName = country.name;
-              const fillColor = getFundingColor(countryName);
-              
-              // Display markers for countries with significant funding
-              const countryData = data.find(d => d.country === countryName);
-              if (countryData && countryData.center) {
-                return (
-                  <Overlay key={`marker-${index}`} anchor={countryData.center} offset={[0, 0]}>
-                    <div
-                      className="relative"
-                      style={{
-                        width: '100px',
-                        height: '100px',
-                        transform: 'translate(-50%, -50%)'
-                      }}
-                      onMouseEnter={(e) => handleCountryHover(countryName, e)}
-                      onMouseLeave={handleMouseLeave}
-                    >
+      <div className="relative">
+        <Image 
+          src="/number-1.png" 
+          alt="Number 1" 
+          width={150} 
+          height={150} 
+          className="absolute -left-10 top-1/2 transform -translate-y-1/2" 
+        />
+        <figure className="chart-container relative pl-24">
+          <div className="chart-title" id="figure-1">Figure 1: Geographic Distribution of AI Funding (2019-2024)</div>
+          <div className="relative w-full h-[500px]" data-tip="">
+            <Map
+              height={500}
+              defaultCenter={AFRICA_CENTER}
+              defaultZoom={DEFAULT_ZOOM}
+              attribution={false}
+            >
+              {/* Render African countries with color-coding based on funding data */}
+              {countryPolygons.map((country, index) => {
+                const countryName = country.name;
+                const fillColor = getFundingColor(countryName);
+                
+                // Display markers for countries with significant funding
+                const countryData = data.find(d => d.country === countryName);
+                if (countryData && countryData.center) {
+                  return (
+                    <Overlay key={`marker-${index}`} anchor={countryData.center} offset={[0, 0]}>
                       <div
-                        className="absolute rounded-full opacity-70 cursor-pointer"
+                        className="relative"
                         style={{
-                          backgroundColor: fillColor,
-                          width: `${Math.max(20, countryData.percentageTotal * 3)}px`,
-                          height: `${Math.max(20, countryData.percentageTotal * 3)}px`,
-                          top: '50%',
-                          left: '50%',
-                          transform: 'translate(-50%, -50%)',
-                          border: '1px solid rgba(255, 255, 255, 0.5)',
+                          width: '100px',
+                          height: '100px',
+                          transform: 'translate(-50%, -50%)'
                         }}
-                      />
-                      <div 
-                        className="absolute text-xs font-bold text-center whitespace-nowrap"
-                        style={{
-                          top: '100%',
-                          left: '50%',
-                          transform: 'translateX(-50%)',
-                          color: countryData.percentageTotal > 10 ? '#1B365D' : '#666',
-                          textShadow: '0 0 3px rgba(255, 255, 255, 0.8)'
-                        }}
+                        onMouseEnter={(e) => handleCountryHover(countryName, e)}
+                        onMouseLeave={handleMouseLeave}
                       >
-                        {countryName}
+                        <div
+                          className="absolute rounded-full opacity-70 cursor-pointer"
+                          style={{
+                            backgroundColor: fillColor,
+                            width: `${Math.max(20, countryData.percentageTotal * 3)}px`,
+                            height: `${Math.max(20, countryData.percentageTotal * 3)}px`,
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                            border: '1px solid rgba(255, 255, 255, 0.5)',
+                          }}
+                        />
+                        <div 
+                          className="absolute text-xs font-bold text-center whitespace-nowrap"
+                          style={{
+                            top: '100%',
+                            left: '50%',
+                            transform: 'translateX(-50%)',
+                            color: countryData.percentageTotal > 10 ? '#1B365D' : '#666',
+                            textShadow: '0 0 3px rgba(255, 255, 255, 0.8)'
+                          }}
+                        >
+                          {countryName}
+                        </div>
                       </div>
-                    </div>
-                  </Overlay>
-                );
-              }
-              return null;
-            })}
-          </Map>
-        </div>
+                    </Overlay>
+                  );
+                }
+                return null;
+              })}
+            </Map>
+          </div>
 
-        <figcaption className="chart-caption">
-          Note: The map shows percentage distribution of tracked AI funding across Africa from 2019 to 2024. 
-          Larger circles indicate higher funding concentration. Four countries (Nigeria, Kenya, South Africa, 
-          and Egypt) account for 83% of total funding.
-        </figcaption>
-        
-        {/* Legend */}
-        <div className="absolute top-4 right-4 bg-white p-4 border border-gray-200 rounded">
-          <div className="text-sm font-medium mb-2">Funding Share (%)</div>
-          <div className="flex items-center space-x-2">
-            <div className="w-4 h-4 rounded-full bg-[#E5E7EB]"></div>
-            <span className="text-xs">0%</span>
+          <figcaption className="chart-caption">
+            Note: The map shows percentage distribution of tracked AI funding across Africa from 2019 to 2024. 
+            Larger circles indicate higher funding concentration. Four countries (Nigeria, Kenya, South Africa, 
+            and Egypt) account for 83% of total funding.
+          </figcaption>
+          
+          {/* Legend */}
+          <div className="absolute top-4 right-4 bg-white p-4 border border-gray-200 rounded">
+            <div className="text-sm font-medium mb-2">Funding Share (%)</div>
+            <div className="flex items-center space-x-2">
+              <div className="w-4 h-4 rounded-full bg-[#E5E7EB]"></div>
+              <span className="text-xs">0%</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className="w-4 h-4 rounded-full bg-[#1B365D]"></div>
+              <span className="text-xs">30%+</span>
+            </div>
           </div>
-          <div className="flex items-center space-x-2">
-            <div className="w-4 h-4 rounded-full bg-[#1B365D]"></div>
-            <span className="text-xs">30%+</span>
-          </div>
-        </div>
 
-        {/* Custom tooltip implementation */}
-        {tooltipContent && tooltipPosition && (
-          <div
-            ref={tooltipRef}
-            className="absolute bg-white text-gray-800 border border-gray-200 shadow-sm p-2 rounded z-50 pointer-events-none"
-            style={{
-              left: `${tooltipPosition.x + 10}px`,
-              top: `${tooltipPosition.y - 10}px`,
-              maxWidth: '250px'
-            }}
-          >
-            {tooltipContent}
-          </div>
-        )}
-      </figure>
+          {/* Custom tooltip implementation */}
+          {tooltipContent && tooltipPosition && (
+            <div
+              ref={tooltipRef}
+              className="absolute bg-white text-gray-800 border border-gray-200 shadow-sm p-2 rounded z-50 pointer-events-none"
+              style={{
+                left: `${tooltipPosition.x + 10}px`,
+                top: `${tooltipPosition.y - 10}px`,
+                maxWidth: '250px'
+              }}
+            >
+              {tooltipContent}
+            </div>
+          )}
+        </figure>
+      </div>
     </VisualizationErrorBoundary>
   );
 };

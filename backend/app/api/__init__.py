@@ -2,7 +2,8 @@ from fastapi import APIRouter
 
 from app.api.endpoints import (
     africa_intelligence_feed, organizations, domains, sources, analytics, search, rfp, source_validation,
-    user_submissions, admin_scraping, automated_discovery, equity_analyses, stakeholder_reports, data_ingestion
+    user_submissions, admin_scraping, automated_discovery, equity_analyses, stakeholder_reports, data_ingestion,
+    etl_monitoring
 )
 from app.api.v1.intelligent_search import router as intelligent_search_router
 from app.api.v1.funding_opportunities import router as funding_opportunities_router
@@ -10,6 +11,14 @@ from app.core.database import get_db
 
 # Create main API router
 api_router = APIRouter()
+
+# Include ETL monitoring endpoints without adding an additional prefix
+# The router already has the full path prefix included
+api_router.include_router(
+    etl_monitoring.router,
+    prefix="",  # No additional prefix
+    tags=["etl-monitoring"]
+)
 
 # Funding opportunities API endpoints
 api_router.include_router(

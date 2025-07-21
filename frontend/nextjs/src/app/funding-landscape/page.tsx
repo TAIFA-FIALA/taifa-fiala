@@ -181,7 +181,7 @@ export default function FundingLandscapePage() {
         <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-4xl font-bold text-taifa-primary mb-2">
-              Africa&amp;apos;s AI Funding Landscape
+              African AI Funding Landscape
             </h1>
             <p className="text-xl text-taifa-muted">2019-2024 Analysis</p>
           </div>

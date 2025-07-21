@@ -3,7 +3,7 @@ import DatabaseGrowthChart from '@/components/homepage/DatabaseGrowthChart';
 import GeographicDistributionMapWrapper from '@/components/homepage/GeographicDistributionMapWrapper';
 import SectorAllocationChart from '@/components/homepage/SectorAllocationChart';
 import GenderEquityDashboard from '@/components/homepage/GenderEquityDashboard';
-import { Database, BarChart3, BookOpen, Users, TrendingUp, ChevronRight, Globe, PieChart } from 'lucide-react';
+import { Database, BarChart3, BookOpen, Users, ChevronRight, Globe, PieChart, TrendingUp } from 'lucide-react';
 import Image from 'next/image';
 import SearchBar from '@/components/homepage/SearchBar';
 import { getApiUrl, API_ENDPOINTS } from '@/lib/api-config';
@@ -17,13 +17,25 @@ interface AnalyticsSummary {
 
 async function getAnalyticsSummary(): Promise<AnalyticsSummary | null> {
   try {
-    const res = await fetch(getApiUrl(API_ENDPOINTS.equityAnalysesSummary), {
+    const endpoint = API_ENDPOINTS.equityAnalysesSummary;
+    const url = getApiUrl(endpoint);
+    console.log('Fetching analytics summary from:', url);
+    
+    const res = await fetch(url, {
       next: { revalidate: 300 } // Revalidate every 5 minutes
     });
+    
+    console.log('Response status:', res.status);
+    
     if (!res.ok) {
-      throw new Error(`HTTP error! status: ${res.status}`);
+      const errorText = await res.text();
+      console.error('Error response:', errorText);
+      throw new Error(`HTTP error! status: ${res.status}, response: ${errorText}`);
     }
-    return res.json();
+    
+    const data = await res.json();
+    console.log('Analytics summary data:', data);
+    return data;
   } catch (error) {
     console.error("Failed to fetch analytics summary:", error);
     // Return demo data if API is unavailable
@@ -162,8 +174,14 @@ export default async function HomePage() {
         <div className="max-w-7xl mx-auto">
           <h2 className="text-3xl font-bold text-taifa-primary mb-12 text-center">
             <span className="inline-block relative">
-              <span className="relative z-10">
-                <TrendingUp className="w-8 h-8 text-taifa-primary inline-block mr-3 -mt-1" />
+              <span className="relative z-10 flex items-center justify-center">
+                <Image 
+                  src="/justice.png" 
+                  alt="Justice" 
+                  width={32} 
+                  height={32} 
+                  className="inline-block mr-3"
+                />
                 Issues of Equity in AI Funding We are Tracking
               </span>
               <span className="absolute -left-4 -top-6 text-8xl font-black text-taifa-border -z-10">•••</span>
@@ -208,73 +226,91 @@ export default async function HomePage() {
 
           {/* Issue 2: Sectoral Misalignment */}
           <div className="mb-12">
-            <div className="bg-white p-8 rounded-lg border border-taifa-border shadow-sm hover:shadow-md transition-shadow relative">
-              {/* Numbered Icon in top-left corner */}
-              <div className="absolute -top-3 -left-3 w-12 h-12 rounded-full bg-taifa-secondary flex items-center justify-center text-xl font-bold text-white shadow-lg z-10">
-                2
-              </div>
-              <div className="flex items-center gap-4 mb-6">
-                <div>
-                  <h3 className="text-2xl font-bold text-taifa-primary mb-1 flex items-center gap-3">
-                    <PieChart className="w-6 h-6 text-taifa-secondary" />
-                    Sectoral Funding Misalignment
-                  </h3>
-                  <p className="text-taifa-muted text-sm">Analyzing funding allocation vs development priorities</p>
+            <div className="relative">
+              <Image 
+                src="/number-2.png" 
+                alt="Number 2" 
+                width={150} 
+                height={150} 
+                className="absolute -left-10 top-1/2 transform -translate-y-1/2" 
+              />
+              <div className="bg-white p-8 rounded-lg border border-taifa-border shadow-sm hover:shadow-md transition-shadow relative pl-24">
+                {/* Numbered Icon in top-left corner */}
+                <div className="absolute -top-3 -left-3 w-12 h-12 rounded-full bg-taifa-secondary flex items-center justify-center text-xl font-bold text-white shadow-lg z-10">
+                  2
                 </div>
-              </div>
-              
-              {/* Sector Allocation Chart */}
-              <div className="mb-6">
-                <SectorAllocationChart />
-              </div>
-              
-              <p className="text-taifa-muted leading-relaxed mb-4">
-                Health applications receive only 5.8% of AI funding despite the continent bearing 25% 
-                of the global disease burden. Agricultural technology, which employs 60% of Africa&amp;apos;s workforce, 
-                attracts merely 3.9% of funding. In contrast, financial services capture 20.9% of investments, 
-                revealing a critical misalignment between funding priorities and development needs.
-              </p>
-              
-              <div className="mt-4 text-sm text-taifa-muted">
-                <Link href="/funding-landscape" className="text-taifa-primary hover:text-taifa-secondary hover:underline inline-flex items-center gap-1">
-                  Explore sectoral analysis <ChevronRight className="w-4 h-4" />
-                </Link>
+                <div className="flex items-center gap-4 mb-6">
+                  <div>
+                    <h3 className="text-2xl font-bold text-taifa-primary mb-1 flex items-center gap-3">
+                      <PieChart className="w-6 h-6 text-taifa-secondary" />
+                      Sectoral Funding Misalignment
+                    </h3>
+                    <p className="text-taifa-muted text-sm">Analyzing funding allocation vs development priorities</p>
+                  </div>
+                </div>
+                
+                {/* Sector Allocation Chart */}
+                <div className="mb-6">
+                  <SectorAllocationChart />
+                </div>
+                
+                <p className="text-taifa-muted leading-relaxed mb-4">
+                  Health applications receive only 5.8% of AI funding despite the continent bearing 25% 
+                  of the global disease burden. Agricultural technology, which employs 60% of Africa&amp;apos;s workforce, 
+                  attracts merely 3.9% of funding. In contrast, financial services capture 20.9% of investments, 
+                  revealing a critical misalignment between funding priorities and development needs.
+                </p>
+                
+                <div className="mt-4 text-sm text-taifa-muted">
+                  <Link href="/funding-landscape" className="text-taifa-primary hover:text-taifa-secondary hover:underline inline-flex items-center gap-1">
+                    Explore sectoral analysis <ChevronRight className="w-4 h-4" />
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
 
           {/* Issue 3: Gender Disparity */}
           <div className="mb-12">
-            <div className="bg-white p-8 rounded-lg border border-taifa-border shadow-sm hover:shadow-md transition-shadow relative">
-              {/* Numbered Icon in top-left corner */}
-              <div className="absolute -top-3 -left-3 w-12 h-12 rounded-full bg-taifa-accent flex items-center justify-center text-xl font-bold text-white shadow-lg z-10">
-                3
-              </div>
-              <div className="flex items-center gap-4 mb-6">
-                <div>
-                  <h3 className="text-2xl font-bold text-taifa-primary mb-1 flex items-center gap-3">
-                    <Users className="w-6 h-6 text-taifa-accent" />
-                    Gender Disparity
-                  </h3>
-                  <p className="text-taifa-muted text-sm">Monitoring gender equity in AI funding and leadership</p>
+            <div className="relative">
+              <Image 
+                src="/number-3.png" 
+                alt="Number 3" 
+                width={150} 
+                height={150} 
+                className="absolute -left-10 top-1/2 transform -translate-y-1/2" 
+              />
+              <div className="bg-white p-8 rounded-lg border border-taifa-border shadow-sm hover:shadow-md transition-shadow relative pl-24">
+                {/* Numbered Icon in top-left corner */}
+                <div className="absolute -top-3 -left-3 w-12 h-12 rounded-full bg-taifa-accent flex items-center justify-center text-xl font-bold text-white shadow-lg z-10">
+                  3
                 </div>
-              </div>
-              
-              {/* Enhanced Gender Equity Dashboard */}
-              <GenderEquityDashboard />
-              
-              <div className="mt-6 p-4 bg-red-50 rounded-lg border-l-4 border-red-400">
-                <p className="text-sm text-red-800">
-                  <strong>Urgent Action Needed:</strong> Female leadership in African AI has declined consistently 
-                  over 6 years, with funding gaps widening across all sectors and regions. This threatens 
-                  inclusive AI development across the continent.
-                </p>
-              </div>
-              
-              <div className="mt-4 text-sm text-taifa-muted">
-                <Link href="/equity-assessment" className="text-taifa-primary hover:text-taifa-secondary hover:underline inline-flex items-center gap-1">
-                  View comprehensive gender equity analysis <ChevronRight className="w-4 h-4" />
-                </Link>
+                <div className="flex items-center gap-4 mb-6">
+                  <div>
+                    <h3 className="text-2xl font-bold text-taifa-primary mb-1 flex items-center gap-3">
+                      <Users className="w-6 h-6 text-taifa-accent" />
+                      Gender Disparity
+                    </h3>
+                    <p className="text-taifa-muted text-sm">Monitoring gender equity in AI funding and leadership</p>
+                  </div>
+                </div>
+                
+                {/* Enhanced Gender Equity Dashboard */}
+                <GenderEquityDashboard />
+                
+                <div className="mt-6 p-4 bg-red-50 rounded-lg border-l-4 border-red-400">
+                  <p className="text-sm text-red-800">
+                    <strong>Urgent Action Needed:</strong> Female leadership in African AI has declined consistently 
+                    over 6 years, with funding gaps widening across all sectors and regions. This threatens 
+                    inclusive AI development across the continent.
+                  </p>
+                </div>
+                
+                <div className="mt-4 text-sm text-taifa-muted">
+                  <Link href="/equity-assessment" className="text-taifa-primary hover:text-taifa-secondary hover:underline inline-flex items-center gap-1">
+                    View comprehensive gender equity analysis <ChevronRight className="w-4 h-4" />
+                  </Link>
+                </div>
               </div>
             </div>
           </div>

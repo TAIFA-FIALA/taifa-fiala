@@ -11,9 +11,6 @@ from enum import Enum
 import logging
 import uuid
 
-from app.services.unified_scraper import UnifiedScraperModule, InputSource, ProcessingPriority
-from app.core.database import get_db
-
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
@@ -27,6 +24,12 @@ class SourceType(str, Enum):
     MULTILATERAL = "multilateral"
     NGO = "ngo"
     UNKNOWN = "unknown"
+
+class ProcessingPriority(str, Enum):
+    """Priority levels for processing scraping jobs"""
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
 
 class ScrapingJobCreate(BaseModel):
     """Schema for creating a new scraping job"""

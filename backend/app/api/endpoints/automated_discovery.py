@@ -11,9 +11,6 @@ from enum import Enum
 import logging
 import uuid
 
-from app.services.unified_scraper import UnifiedScraperModule, InputSource, ProcessingPriority
-from app.core.database import get_db
-
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
@@ -24,6 +21,12 @@ class SearchType(str, Enum):
     TARGETED = "targeted"
     GEOGRAPHIC = "geographic"
     SECTOR_SPECIFIC = "sector_specific"
+
+class ProcessingPriority(str, Enum):
+    """Priority levels for processing jobs"""
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
 
 class DiscoveryJobCreate(BaseModel):
     """Schema for creating automated discovery job"""

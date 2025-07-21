@@ -9,7 +9,6 @@ from typing import Optional, List
 from datetime import datetime
 import logging
 
-from app.services.unified_scraper import UnifiedScraperModule, InputSource
 from app.core.database import get_db
 
 logger = logging.getLogger(__name__)
