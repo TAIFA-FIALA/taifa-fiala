@@ -218,12 +218,12 @@ start_services() {
 health_check() {
     step "Step 8: Performing Health Checks"
     info "Waiting for services to initialize..."
-    sleep 15
+    sleep 30
     info "Checking service health..."
 
     ssh $SSH_USER@$PROD_SERVER "
         echo 'Checking Docker container status...'
-        docker ps
+        $DOCKER_COMPOSE_CMD ps
 
         echo 'Checking Next.js frontend...'
         curl --silent --fail http://localhost:3020 > /dev/null && echo -e '${GREEN}✓ Frontend is healthy.${NC}' || echo -e '${RED}✗ Frontend health check failed.${NC}'

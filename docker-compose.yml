@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   backend:
     build:
@@ -10,7 +8,10 @@ services:
     env_file:
       - ./backend/.env
     volumes:
-      - ./backend:/app
+      - ./backend:/app/backend
+      - ./data_connectors:/app/data_connectors
+    environment:
+      - PYTHONPATH=/app
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
   frontend:
