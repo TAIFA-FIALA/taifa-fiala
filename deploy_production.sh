@@ -204,8 +204,10 @@ start_services() {
         echo \"Using Docker Compose command: \$DOCKER_COMPOSE_CMD\"
         echo 'Stopping existing services...'
         \$DOCKER_COMPOSE_CMD down --remove-orphans
-        echo 'Building and starting services...'
-        \$DOCKER_COMPOSE_CMD up -d --build --no-cache
+        echo 'Building services with no cache...'
+        \$DOCKER_COMPOSE_CMD build --no-cache
+        echo 'Starting services...'
+        \$DOCKER_COMPOSE_CMD up -d
     " || {
         warning "Service startup failed."
         cleanup_and_exit
