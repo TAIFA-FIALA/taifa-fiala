@@ -25,11 +25,11 @@ DEPLOY_TAG=""
 BACKUP_DIR=""
 
 # --- Helper Functions ---
-info() { echo -e "${BLUE}$1${NC}"; }
-success() { echo -e "${GREEN}$1${NC}"; }
-warning() { echo -e "${YELLOW}$1${NC}"; }
-error() { echo -e "${RED}$1${NC}"; }
-step() { echo -e "\n${YELLOW}--- $1 ---${NC}"; }
+info() { printf "${BLUE}%s${NC}\n" "$1"; }
+success() { printf "${GREEN}%s${NC}\n" "$1"; }
+warning() { printf "${YELLOW}%s${NC}\n" "$1"; }
+error() { printf "${RED}%s${NC}\n" "$1"; }
+step() { printf "\n${YELLOW}--- %s ---${NC}\n" "$1"; }
 
 cleanup_and_exit() {
     error "Deployment failed."
@@ -66,13 +66,6 @@ check_prerequisites() {
     done
     success "✓ Required files are present."
 
-    info "Checking for Vercel CLI..."
-    if ! command -v vercel &> /dev/null; then
-        error "Vercel CLI not found."
-        warning "Please install it with: npm install -g vercel"
-        exit 1
-    fi
-    success "✓ Vercel CLI is installed."
 }
 
 git_safety_checks() {
@@ -95,7 +88,7 @@ git_safety_checks() {
     CURRENT_BRANCH=$(git branch --show-current)
     CURRENT_COMMIT=$(git rev-parse --short HEAD)
     DEPLOY_TAG="production_${TIMESTAMP}_${CURRENT_COMMIT}"
-    info "Deploying branch: ${CURRENT_BRANCH} (${CURRENT_COMMIT})"
+    info "Deploying branch: ${CURRENT_BRANCH} ${CURRENT_COMMIT}"
 
     info "Creating deployment tag: ${DEPLOY_TAG}"
     git tag "$DEPLOY_TAG" || cleanup_and_exit
@@ -118,30 +111,19 @@ backup_production() {
 
 sync_files() {
     step "Step 4: Syncing Project Files"
-    info "Syncing docker-compose file and environment file..."
+    info "Syncing project files to production server..."
     rsync -avz --progress \
-        "$LOCAL_PATH/docker-compose.yml" \
-        "$LOCAL_PATH/backend/.env" \
-        "$SSH_USER@$PROD_SERVER:$PROD_PATH/" || cleanup_and_exit
-    success "✓ Docker-compose and environment files synced."
+        --exclude 'venv' \
+        --exclude 'node_modules' \
+        --exclude 'logs' \
+        --exclude '.git' \
+        --exclude '.idea' \
+        --exclude '__pycache__' \
+        --exclude '*.pyc' \
+        "$LOCAL_PATH/" "$SSH_USER@$PROD_SERVER:$PROD_PATH/" || cleanup_and_exit
+    success "✓ Project files synced."
 }
 
-setup_remote_environment() {
-    step "Step 5: Building and Pushing Docker Images"
-    info "Building and pushing backend image..."
-    /usr/local/bin/docker build -t jforrest/ai-africa-backend:latest ./backend
-    /usr/local/bin/docker push jforrest/ai-africa-backend:latest
-
-    info "Building and pushing frontend image..."
-    /usr/local/bin/docker build -t jforrest/ai-africa-frontend:latest ./frontend/nextjs
-    /usr/local/bin/docker push jforrest/ai-africa-frontend:latest
-
-    info "Building and pushing streamlit image..."
-    /usr/local/bin/docker build -t jforrest/ai-africa-streamlit:latest ./frontend/streamlit_app
-    /usr/local/bin/docker push jforrest/ai-africa-streamlit:latest
-    
-    success "✓ Docker images built and pushed."
-}
 
 run_migrations() {
     step "Step 6: Running Database Migrations"
@@ -161,11 +143,8 @@ start_services() {
         set -e
         cd '$PROD_PATH'
         
-        echo 'Pulling latest images...'
-        /usr/local/bin/docker-compose pull
-        
-        echo 'Starting services...'"
-        /usr/local/bin/docker-compose up -d
+        echo 'Building and starting services...'
+        /usr/local/bin/docker-compose up -d --build
     " || {
         warning "Service startup failed."
         cleanup_and_exit
@@ -213,7 +192,6 @@ rollback_deployment() {
 
 main() {
     info "=== AI Africa Funding Tracker Production Deployment ==="
-    info "Backend: Mac-mini (FastAPI + Streamlit) | Frontend: Vercel (Next.js)"
 
     trap cleanup_and_exit SIGINT SIGTERM
 
@@ -221,7 +199,6 @@ main() {
     git_safety_checks
     backup_production
     sync_files
-    setup_remote_environment
     run_migrations
     start_services
     health_check
@@ -229,8 +206,8 @@ main() {
     echo
     success "=== Deployment Complete ==="
     info "Deployment tag: ${DEPLOY_TAG}"
-    info "Branch deployed: ${CURRENT_BRANCH} (${CURRENT_COMMIT})"
-    warning "Backend (FastAPI) running on: http://${PROD_SERVER}:8000"
+    info "Branch deployed: ${CURRENT_BRANCH} ${CURRENT_COMMIT}"
+    warning "Backend FastAPI running on: http://${PROD_SERVER}:8000"
     warning "Streamlit Dashboard running on: http://${PROD_SERVER}:8501"
     warning "API Documentation: http://${PROD_SERVER}:8000/docs"
     warning "Next.js frontend running on: http://${PROD_SERVER}:3000"

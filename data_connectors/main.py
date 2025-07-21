@@ -48,10 +48,6 @@ class DataCollector:
         """Initialize all data collectors and database"""
         logger.info("Initializing AI Africa Funding Tracker data collectors...")
         
-        # Initialize database connector
-        self.db_connector = DatabaseConnector(settings.DATABASE_URL)
-        await self.db_connector.initialize()
-        
         # Initialize RSS monitors for known sources
         await self._setup_rss_monitors()
         
