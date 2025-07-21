@@ -315,10 +315,10 @@ class MigrationHelper:
                 col_def += ")"
                 columns.append(col_def)
             
-            upgrade_ops.append(f"""
-    op.create_table('{table_name}',
-        {',\n        '.join(columns)}
-    )""")
+            upgrade_ops.append("""
+    op.create_table('{}',
+        {}
+    )""".format(table_name, ',\n        '.join(columns)))
             
             downgrade_ops.append(f"    op.drop_table('{table_name}')")
         
