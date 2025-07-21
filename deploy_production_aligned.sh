@@ -125,15 +125,59 @@ sync_files() {
     success "✓ Project files synced."
 }
 
+setup_environment() {
+    step "Step 5: Setting Up Production Environment"
+    ssh $SSH_USER@$PROD_SERVER "
+        set -e
+        cd '$PROD_PATH'
+        
+        # Create virtual environment if it doesn't exist
+        if [ ! -d 'venv' ]; then
+            echo 'Creating Python virtual environment...'
+            python3 -m venv venv
+        fi
+        
+        # Activate virtual environment and install dependencies
+        source venv/bin/activate
+        echo 'Installing Python dependencies...'
+        cd backend
+        pip install --upgrade pip
+        pip install -r requirements.txt
+        
+        # Verify migration system
+        echo 'Verifying migration system...'
+        python migration_helper.py --compare
+        
+        cd ..
+    " || cleanup_and_exit
+    success "✓ Environment setup completed."
+}
 
 run_migrations() {
     step "Step 6: Running Database Migrations"
     ssh $SSH_USER@$PROD_SERVER "
         set -e
-        cd '$PROD_PATH/backend'
+        cd '$PROD_PATH'
+        if [ -f .env ]; then
+            export \$(grep -v '^#' .env | xargs)
+        fi
+        cd backend
         source ../venv/bin/activate
+        
+        echo 'Checking migration status...'
+        alembic current
+        
+        echo 'Checking for pending migrations...'
+        if alembic check 2>&1 | grep -q 'New upgrade operations detected'; then
+            echo 'Pending migrations detected, generating new migration...'
+            python migration_helper.py --update-migration || echo 'Migration helper completed with warnings'
+        fi
+        
         echo 'Running Alembic migrations...'
         alembic upgrade head
+        
+        echo 'Final migration status:'
+        alembic current
     " || cleanup_and_exit
     success "✓ Database migrations completed."
 }
@@ -144,8 +188,22 @@ start_services() {
         set -e
         cd '$PROD_PATH'
         
+        # Find docker-compose command
+        DOCKER_COMPOSE_CMD=''
+        if command -v docker-compose >/dev/null 2>&1; then
+            DOCKER_COMPOSE_CMD='docker-compose'
+        elif command -v /usr/local/bin/docker-compose >/dev/null 2>&1; then
+            DOCKER_COMPOSE_CMD='/usr/local/bin/docker-compose'
+        elif docker compose version >/dev/null 2>&1; then
+            DOCKER_COMPOSE_CMD='docker compose'
+        else
+            echo 'Error: docker-compose not found'
+            exit 1
+        fi
+        
+        echo \"Using Docker Compose command: \$DOCKER_COMPOSE_CMD\"
         echo 'Building and starting services...'
-        /usr/local/bin/docker-compose up -d --build
+        \$DOCKER_COMPOSE_CMD up -d --build
     " || {
         warning "Service startup failed."
         cleanup_and_exit
@@ -200,6 +258,7 @@ main() {
     git_safety_checks
     backup_production
     sync_files
+    setup_environment
     run_migrations
     start_services
     health_check

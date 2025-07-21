@@ -12,6 +12,7 @@ from app.services.funding_intelligence.vector_intelligence import VectorSearchSe
 from app.models.funding import AfricaIntelligenceItem
 from sqlalchemy.orm import Session
 from sqlalchemy import and_, or_, func
+from app.core.database import get_db
 
 logger = logging.getLogger(__name__)
 

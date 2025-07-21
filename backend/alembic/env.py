@@ -4,6 +4,8 @@ import sys
 
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
+import sqlalchemy as sa
+from sqlalchemy.dialects import postgresql
 
 from alembic import context
 
@@ -13,7 +15,7 @@ backend_dir = os.path.dirname(current_dir)
 sys.path.insert(0, backend_dir)
 
 from app.core.config import settings
-from app.core.database import Base
+from app.core.base import Base
 # Import all models to ensure they're registered
 from app.models import *
 
@@ -31,15 +33,31 @@ if config.config_file_name is not None:
 
 # add your model's MetaData object here
 # for 'autogenerate' support
-# from myapp import mymodel
-# target_metadata = mymodel.Base.metadata
 target_metadata = Base.metadata
 
-# other values from the config, defined by the needs of env.py,
-# can be acquired:
-# my_important_option = config.get_main_option("my_important_option")
-# ... etc.
-
+def get_dialect_specific_metadata():
+    """Get metadata with dialect-specific type conversions"""
+    # Create a copy of the metadata for modification
+    metadata_copy = target_metadata
+    
+    # Get the current database URL to determine dialect
+    url = config.get_main_option("sqlalchemy.url")
+    
+    # If using SQLite, convert PostgreSQL-specific types
+    if url and "sqlite" in url:
+        for table in metadata_copy.tables.values():
+            for column in table.columns:
+                # Convert JSONB to JSON for SQLite compatibility
+                if isinstance(column.type, postgresql.JSONB):
+                    column.type = sa.JSON()
+                # Convert UUID to String for SQLite compatibility
+                elif isinstance(column.type, postgresql.UUID):
+                    column.type = sa.String(36)
+                # Convert ARRAY types to JSON for SQLite compatibility
+                elif hasattr(column.type, '__class__') and 'ARRAY' in str(column.type.__class__):
+                    column.type = sa.JSON()
+    
+    return metadata_copy
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
@@ -51,26 +69,29 @@ def run_migrations_offline() -> None:
 
     Calls to context.execute() here emit the given string to the
     script output.
-
     """
     url = config.get_main_option("sqlalchemy.url")
+    
+    # Get dialect-appropriate metadata
+    metadata = get_dialect_specific_metadata()
+    
     context.configure(
         url=url,
-        target_metadata=target_metadata,
+        target_metadata=metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
+        compare_type=True,
+        compare_server_default=True,
     )
 
     with context.begin_transaction():
         context.run_migrations()
-
 
 def run_migrations_online() -> None:
     """Run migrations in 'online' mode.
 
     In this scenario we need to create an Engine
     and associate a connection with the context.
-
     """
     connectable = engine_from_config(
         config.get_section(config.config_ini_section, {}),
@@ -79,13 +100,20 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
+        # Get dialect-appropriate metadata
+        metadata = get_dialect_specific_metadata()
+        
         context.configure(
-            connection=connection, target_metadata=target_metadata
+            connection=connection, 
+            target_metadata=metadata,
+            compare_type=True,
+            compare_server_default=True,
+            # Include schemas for better migration detection
+            include_schemas=True,
         )
 
         with context.begin_transaction():
             context.run_migrations()
-
 
 if context.is_offline_mode():
     run_migrations_offline()

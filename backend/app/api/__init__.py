@@ -6,7 +6,7 @@ from app.api.endpoints import (
 )
 from app.api.v1.intelligent_search import router as intelligent_search_router
 from app.api.v1.funding_opportunities import router as funding_opportunities_router
-from app.core.database import get_db
+from app.core.database import get_db 
 
 # Create main API router
 api_router = APIRouter()

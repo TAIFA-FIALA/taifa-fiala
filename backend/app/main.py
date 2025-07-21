@@ -6,6 +6,7 @@ import uvicorn
 from app.core.config import settings
 from app.core.database import create_tables
 from app.api import api_router
+from app.api.endpoints import diagnostics as diagnostics_router
 
 # Create FastAPI application
 app = FastAPI(
@@ -27,6 +28,7 @@ app.add_middleware(
 
 # Include API router
 app.include_router(api_router, prefix=settings.API_V1_STR)
+app.include_router(diagnostics_router.router, prefix=f"{settings.API_V1_STR}/diagnostics", tags=["diagnostics"])
 
 @app.on_event("startup")
 async def startup_event():

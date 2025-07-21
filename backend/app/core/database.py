@@ -200,7 +200,6 @@ logger.info("Using Supabase client for all database operations")
 # No SQLAlchemy engine or sessions needed - using Supabase client only
 engine = None
 SessionLocal = None
-Base = None
 
 async def get_db():
     """Dependency to get database client"""

@@ -96,12 +96,26 @@ class Settings(BaseSettings):
     DEEPSEEK_API_KEY: Optional[str] = None
     GEMINI_API_KEY: Optional[str] = None
 
+    # Database connection
+    DB_USER: Optional[str] = os.getenv("DB_USER", "postgres")
+    DB_PASSWORD: Optional[str] = os.getenv("DB_PASSWORD")
+    DB_HOST: Optional[str] = os.getenv("DB_HOST")
+    DB_PORT: Optional[int] = os.getenv("DB_PORT", 5432)
+    DB_NAME: Optional[str] = os.getenv("DB_NAME", "postgres")
+
     # Supabase Configuration
     SUPABASE_URL: Optional[str] = None
     SUPABASE_SERVICE_API_KEY: Optional[str] = None
     SUPABASE_PUBLISHABLE_KEY: Optional[str] = None
     SUPABASE_JWT_SECRET: Optional[str] = None
     SUPABASE_PROJECT_ID: Optional[str] = None
+
+    @property
+    def DATABASE_URL(self) -> str:
+        """Construct database URL for SQLAlchemy"""
+        if all([self.DB_USER, self.DB_PASSWORD, self.DB_HOST, self.DB_PORT, self.DB_NAME]):
+            return f"postgresql://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
+        return "sqlite:///./test.db"  # Fallback for local dev
 
     # Pinecone Configuration
     PINECONE_API_KEY: Optional[str] = None
