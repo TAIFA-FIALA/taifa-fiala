@@ -30,7 +30,6 @@ import threading
 from contextlib import asynccontextmanager
 
 # Import existing components
-from app.services.unified_scraper import UnifiedScraperModule, InputSource, ProcessingPriority
 from app.core.integrated_ingestion_pipeline import IntegratedIngestionPipeline, IngestionMethod, IngestionContext
 
 # Import new pipeline components
@@ -38,7 +37,7 @@ from .monitoring_system import ComprehensiveMonitoringSystem, MetricType
 from .batch_processor import BatchTask, DataSource, BatchStatus
 
 # Crawl4AI imports
-from crawl4ai import AsyncWebCrawler, LLMExtractionStrategy, CrawlerRunConfig, CacheMode
+from crawl4ai import AsyncWebCrawler, LLMExtractionStrategy, CrawlerRunConfig, CacheMode, LLMConfig
 
 logger = logging.getLogger(__name__)
 
@@ -103,12 +102,13 @@ class EnhancedCrawl4AIProcessor:
     Combines existing sophisticated extraction with new scalability features
     """
     
-    def __init__(self, config: Crawl4AIConfig, monitoring_system: ComprehensiveMonitoringSystem):
+    def __init__(self, config: Crawl4AIConfig, monitoring_system: ComprehensiveMonitoringSystem, settings):
         self.config = config
         self.monitoring_system = monitoring_system
+        self.settings = settings
         
         # Initialize existing components
-        self.unified_scraper = UnifiedScraperModule()
+        self.unified_scraper = None
         self.integrated_pipeline = None  # Will be initialized later
         
         # Crawler pool management
@@ -142,8 +142,10 @@ class EnhancedCrawl4AIProcessor:
         """Initialize different extraction strategies for different content types"""
         self.extraction_strategies = {
             'intelligence_item': LLMExtractionStrategy(
-                provider=self.config.llm_provider,
-                api_token=self.config.llm_api_key,
+                llm_config=LLMConfig(
+                    provider=self.config.llm_provider,
+                    api_token=self.config.llm_api_key
+                ),
                 instruction="""
                 Extract comprehensive intelligence item information from this webpage.
                 
@@ -210,8 +212,10 @@ class EnhancedCrawl4AIProcessor:
             ),
             
             'news_article': LLMExtractionStrategy(
-                provider=self.config.llm_provider,
-                api_token=self.config.llm_api_key,
+                llm_config=LLMConfig(
+                    provider=self.config.llm_provider,
+                    api_token=self.config.llm_api_key
+                ),
                 instruction="""
                 Extract news article information related to AI funding in Africa.
                 
@@ -242,8 +246,10 @@ class EnhancedCrawl4AIProcessor:
             ),
             
             'organization_profile': LLMExtractionStrategy(
-                provider=self.config.llm_provider,
-                api_token=self.config.llm_api_key,
+                llm_config=LLMConfig(
+                    provider=self.config.llm_provider,
+                    api_token=self.config.llm_api_key
+                ),
                 instruction="""
                 Extract organization profile information for potential funding sources.
                 
@@ -268,7 +274,6 @@ class EnhancedCrawl4AIProcessor:
         
         try:
             # Initialize unified scraper
-            await self.unified_scraper.initialize()
             
             # Initialize crawler pool
             await self._initialize_crawler_pool()
@@ -1037,11 +1042,6 @@ async def main():
         await processor.initialize()
         
         # Process admin portal request (existing functionality)
-        admin_result = await processor.process_admin_portal_request(
-            "https://www.gatesfoundation.org/grants",
-            "foundation_website"
-        )
-        print(f"Admin portal result: {admin_result}")
         
         # Process high-volume batch (new functionality)
         batch_results = await processor.process_high_volume_batch(

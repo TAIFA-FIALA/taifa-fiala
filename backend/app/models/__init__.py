@@ -4,6 +4,12 @@ Includes all models with relationships and new lookup tables based on competitor
 """
 
 # Import all models to ensure they're registered with SQLAlchemy
+# Import order is important to avoid circular imports
+
+# Import base first
+from app.core.base import Base, metadata
+
+# Then import models
 from .funding import AfricaIntelligenceItem
 from .organization import Organization
 from .lookups import FundingType, AIDomain, GeographicScope, CommunityUser
@@ -20,7 +26,8 @@ from .validation import (
     ModuleHealth, ContentFingerprint, SourceQuality
 )
 
-# Export all models for easy importing
+# This will ensure all models are imported and registered with SQLAlchemy
+# before creating any database tables
 __all__ = [
     # Core models (enhanced)
     "AfricaIntelligenceItem",
@@ -28,18 +35,20 @@ __all__ = [
     
     # New lookup models
     "FundingType",
-    "AIDomain", 
+    "AIDomain",
     "GeographicScope",
     "CommunityUser",
     
-    # Existing models (maintain compatibility)
-    "DataSource",
-    "RFP",
-    
-    # Legacy alias
+    # Domain models
     "DomainAlias",
     
-    # Equity analytics models
+    # Source tracking
+    "DataSource",
+    
+    # RFP model
+    "RFP",
+    
+    # Equity and inclusion models
     "GenderFundingData",
     "UnderrepresentedGroup",
     "InclusionMetric",
@@ -49,7 +58,7 @@ __all__ = [
     "CollaborationSuggestion",
     "SuggestedOpportunity",
     
-    # ETL Pipeline models
+    # Validation and monitoring
     "ValidationResult",
     "DuplicateDetection",
     "ProcessingJob",

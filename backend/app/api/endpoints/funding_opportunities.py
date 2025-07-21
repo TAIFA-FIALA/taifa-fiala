@@ -8,7 +8,7 @@ from app.core.database import get_db
 from app.models import AfricaIntelligenceItem, Organization, AIDomain, FundingType, GeographicScope
 from app.schemas.funding import (
     AfricaIntelligenceItemResponse, AfricaIntelligenceItemCreate, AfricaIntelligenceItemUpdate,
-    GrantFundingSpecific, InvestmentFundingSpecific
+    GrantFundingSpecific, InvestmentFundingSpecific, FundingOpportunityCardResponse
 )
 from app.services.funding_intelligence.vector_intelligence import FundingIntelligenceVectorDB
 

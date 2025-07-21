@@ -30,7 +30,7 @@ logger = logging.getLogger(__name__)
 class SupabaseConfig(BaseModel):
     """Configuration for Supabase client"""
     url: str = Field(default_factory=lambda: os.getenv("SUPABASE_URL", ""))
-    key: str = Field(default_factory=lambda: os.getenv("SUPABASE_KEY", ""))
+    key: str = Field(default_factory=lambda: os.getenv("SUPABASE_SERVICE_API_KEY", ""))
     
     @property
     def is_valid(self) -> bool:

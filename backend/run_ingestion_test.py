@@ -27,7 +27,21 @@ async def run_master_pipeline_test():
     print("=" * 60)
     
     try:
-        # Import the master pipeline
+
+        # Load environment variables from backend/.env file
+        from dotenv import load_dotenv
+        import os
+        dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
+        load_dotenv(dotenv_path=dotenv_path)
+
+        # Load environment variables from backend/.env file
+        from dotenv import load_dotenv
+        import os
+        dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
+        load_dotenv(dotenv_path=dotenv_path)
+
+        # Import the master pipeline and settings
+        from app.core.config import settings
         from app.services.data_ingestion.master_pipeline import MasterDataIngestionPipeline, PipelineConfig
         from app.services.data_ingestion.batch_processor import BatchConfig
         from app.services.data_ingestion.monitoring_system import MonitoringConfig
@@ -50,13 +64,13 @@ async def run_master_pipeline_test():
             batch_processing_config=BatchConfig(
                 max_workers=10,
                 batch_size=50,
-                retry_attempts=3,
+                max_retries=3,
                 retry_delay=5.0
             ),
             monitoring_config=MonitoringConfig(
-                enable_alerts=True,
-                alert_threshold=5.0,
-                metrics_retention_hours=168
+                prometheus_enabled=True,
+                pipeline_error_threshold=5.0,
+                metrics_retention_days=7  # 168 hours
             ),
             # CRITICAL: Enrichment configuration
             enrichment_config={
@@ -68,15 +82,14 @@ async def run_master_pipeline_test():
                 'enrichment_interval_hours': 12
             },
             enable_scheduled_jobs=False,  # Manual control
-            database_url=os.getenv('DATABASE_URL', ''),
-            supabase_url=os.getenv('SUPABASE_URL', ''),
-            supabase_key=os.getenv('SUPABASE_KEY', '')
+            supabase_url=settings.SUPABASE_URL,
+            supabase_key=settings.SUPABASE_SERVICE_API_KEY,
         )
         
         print("✅ Configuration created with enrichment enabled")
         
         # Initialize master pipeline
-        pipeline = MasterDataIngestionPipeline(config)
+        pipeline = MasterDataIngestionPipeline(config, settings)
         print("✅ Master pipeline initialized")
         
         # Check enrichment components

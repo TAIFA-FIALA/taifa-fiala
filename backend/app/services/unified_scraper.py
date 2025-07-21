@@ -56,7 +56,8 @@ class UnifiedScraperModule:
     - Method 3: Automated discovery (Serper + processing)
     """
     
-    def __init__(self):
+    def __init__(self, settings):
+        self.settings = settings
         self.crawl4ai_client = None
         self.serper_client = None
         self.db_connector = None
@@ -88,7 +89,7 @@ class UnifiedScraperModule:
                 logger.warning("⚠️  SERPER_DEV_API_KEY not found - automated discovery disabled")
             
             # Initialize database connector
-            self.db_connector = DatabaseConnector()
+            self.db_connector = DatabaseConnector(supabase_client=self.crawl4ai_client.db_manager.supabase, settings=self.settings)
             await self.db_connector.initialize()
             logger.info("✅ Database connector initialized")
             

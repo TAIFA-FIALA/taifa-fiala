@@ -74,6 +74,9 @@ class DataSource:
     headers: Dict[str, str] = field(default_factory=dict)
     auth: Optional[Dict[str, str]] = None
     
+    def __lt__(self, other):
+        return self.priority.value < other.priority.value
+
     def __post_init__(self):
         if isinstance(self.source_type, str):
             self.source_type = SourceType(self.source_type)
@@ -165,31 +168,13 @@ class HighVolumeDataPipeline:
     async def _initialize_db_connections(self):
         """Initialize database connection pools"""
         try:
-            # Initialize PostgreSQL/Supabase connection pool
-            db_url = os.getenv('DATABASE_URL')
-            if db_url:
-                # Convert SQLAlchemy URL format to asyncpg format
-                if db_url.startswith('postgresql+asyncpg://'):
-                    db_url = db_url.replace('postgresql+asyncpg://', 'postgresql://')
-                elif db_url.startswith('postgresql+asyncpg://'):
-                    db_url = db_url.replace('postgresql+asyncpg://', 'postgres://')
-                
-                self.db_pool = await asyncpg.create_pool(
-                    db_url,
-                    min_size=10,
-                    max_size=50,
-                    command_timeout=60
-                )
-                logger.info("Database connection pool initialized")
-            
             # Initialize Supabase client
-            from supabase import create_client
+            from supabase import create_client, Client
             supabase_url = os.getenv('SUPABASE_URL')
-            supabase_key = os.getenv('SUPABASE_SERVICE_KEY')
+            supabase_key = os.getenv('SUPABASE_SERVICE_API_KEY')
             
-            if supabase_url and supabase_key:
-                self.supabase_client = create_client(supabase_url, supabase_key)
-                logger.info("Supabase client initialized")
+            self.supabase_client: Client = create_client(supabase_url, supabase_key)
+            logger.info("Supabase client initialized")
         
         except Exception as e:
             logger.error(f"Database initialization failed: {e}")
@@ -772,12 +757,19 @@ class HighVolumeDataPipeline:
     async def _store_items(self, items: List[Dict[str, Any]], source: DataSource):
         """Store collected items in database"""
         try:
-            if self.db_pool:
-                async with self.db_pool.acquire() as conn:
-                    # Batch insert for efficiency
-                    for batch in self._batch_items(items, self.batch_size):
-                        await self._batch_insert(conn, batch)
-                        self.stats.total_items_stored += len(batch)
+            if self.supabase_client:
+                for item in items:
+                    # Map item to the africa_intelligence_feed schema
+                    insert_data = {
+                        'title': item.get('title'),
+                        'description': item.get('content'),
+                        'source_url': item.get('url'),
+                        'source_type': item.get('source_type'),
+                        'collected_at': item.get('collected_at'),
+                        'keywords': item.get('keywords')
+                    }
+                    data, count = self.supabase_client.table('africa_intelligence_feed').upsert(insert_data).execute()
+                    self.stats.total_items_stored += 1
             
         except Exception as e:
             logger.error(f"Error storing items: {e}")
@@ -790,33 +782,8 @@ class HighVolumeDataPipeline:
     
     async def _batch_insert(self, conn, batch: List[Dict[str, Any]]):
         """Batch insert items into database"""
-        try:
-            # Insert into raw_content table for now
-            insert_query = """
-            INSERT INTO raw_content (title, content, url, published_at, author, source_name, source_type, collected_at, keywords)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-            ON CONFLICT (url) DO UPDATE SET
-                collected_at = EXCLUDED.collected_at,
-                content = EXCLUDED.content
-            """
-            
-            for item in batch:
-                await conn.execute(
-                    insert_query,
-                    item.get('title', ''),
-                    item.get('content', ''),
-                    item.get('url', ''),
-                    item.get('published_at', ''),
-                    item.get('author', ''),
-                    item.get('source_name', ''),
-                    item.get('source_type', ''),
-                    item.get('collected_at', ''),
-                    json.dumps(item.get('keywords', []))
-                )
-            
-        except Exception as e:
-            logger.error(f"Batch insert error: {e}")
-            raise
+        # This method is no longer used with Supabase client, but kept for reference
+        pass
     
     async def stop_pipeline(self):
         """Stop the data pipeline"""

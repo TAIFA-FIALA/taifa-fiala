@@ -372,7 +372,7 @@ async def search_opportunities(
     deadline_before: Optional[str] = Query(None, description="Deadline before date (ISO format)"),
     funding_type: Optional[int] = Query(None, description="Funding type ID"),
     geographic_focus: Optional[str] = Query(None, description="Geographic focus area"),
-    db: Session = Depends(get_db_session)
+    db: Session = Depends(get_db)
 ):
     """
     Intelligent search for funding opportunities using filtered vector search

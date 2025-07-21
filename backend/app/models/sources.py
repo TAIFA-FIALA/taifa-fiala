@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, Float
 from sqlalchemy.sql import func
 
-from app.core.database import Base
+from app.core.base import Base
 
 class DataSource(Base):
     """Data sources for automated collection"""

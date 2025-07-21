@@ -14,25 +14,15 @@ logger = logging.getLogger(__name__)
 class DatabaseConnector:
     """Database connector with DeepSeek AI parsing fallback"""
     
-    def __init__(self, database_url: str):
-        load_dotenv()
-        self.database_url = database_url
-        self.deepseek_api_key = os.getenv("DEEPSEEK_API_KEY")
-        self.pool = None
+    def __init__(self, supabase_client, settings):
+        self.supabase = supabase_client
+        self.settings = settings
+        self.deepseek_api_key = settings.DEEPSEEK_API_KEY
         self.deepseek_session = None
-        
+
     async def initialize(self):
-        """Initialize database connection pool and DeepSeek session"""
+        """Initialize DeepSeek session"""
         try:
-            # Initialize database pool
-            self.pool = await asyncpg.create_pool(
-                self.database_url,
-                min_size=2,
-                max_size=10,
-                command_timeout=30
-            )
-            logger.info("✅ Database connection pool initialized")
-            
             # Initialize DeepSeek session
             if self.deepseek_api_key:
                 self.deepseek_session = aiohttp.ClientSession(
@@ -45,139 +35,77 @@ class DatabaseConnector:
                 logger.info("✅ DeepSeek AI session initialized")
             else:
                 logger.warning("⚠️  DeepSeek API key not found - AI parsing disabled")
-                
-            await self._ensure_tables_exist()
-            
         except Exception as e:
             logger.error(f"❌ Failed to initialize database connector: {e}")
             raise
-    
+
     async def close(self):
-        """Close database pool and DeepSeek session"""
-        if self.pool:
-            await self.pool.close()
+        """Close DeepSeek session"""
         if self.deepseek_session:
             await self.deepseek_session.close()
-    
-    async def _ensure_tables_exist(self):
-        """Ensure required tables exist"""
-        async with self.pool.acquire() as conn:
-            # Create opportunities table if it doesn't exist
-            await conn.execute("""
-                CREATE TABLE IF NOT EXISTS africa_intelligence_feed (
-                    id SERIAL PRIMARY KEY,
-                    title TEXT NOT NULL,
-                    description TEXT,
-                    source_url TEXT UNIQUE NOT NULL,
-                    organization_name TEXT,
-                    funding_amount TEXT,
-                    deadline DATE,
-                    application_url TEXT,
-                    
-                    -- Source tracking
-                    source_type TEXT NOT NULL, -- 'rss' or 'serper_search'
-                    source_name TEXT NOT NULL,
-                    search_query TEXT,
-                    
-                    -- Relevance scoring
-                    ai_relevance_score REAL DEFAULT 0.0,
-                    africa_relevance_score REAL DEFAULT 0.0,
-                    funding_relevance_score REAL DEFAULT 0.0,
-                    overall_relevance_score REAL DEFAULT 0.0,
-                    
-                    -- Metadata
-                    content_hash TEXT UNIQUE NOT NULL,
-                    raw_data JSONB,
-                    discovered_date TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-                    last_updated TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-                    
-                    -- Processing flags
-                    parsed_with_ai BOOLEAN DEFAULT FALSE,
-                    verified BOOLEAN DEFAULT FALSE,
-                    active BOOLEAN DEFAULT TRUE
-                );
-                
-                CREATE INDEX IF NOT EXISTS idx_content_hash ON africa_intelligence_feed(content_hash);
-                CREATE INDEX IF NOT EXISTS idx_source_type ON africa_intelligence_feed(source_type);
-                CREATE INDEX IF NOT EXISTS idx_relevance_score ON africa_intelligence_feed(overall_relevance_score);
-                CREATE INDEX IF NOT EXISTS idx_discovered_date ON africa_intelligence_feed(discovered_date);
-            """)
-            
-            logger.info("✅ Database tables verified/created")
-    
-    async def save_opportunities(self, opportunities: List[Dict[str, Any]], source_type: str) -> Dict[str, int]:
-        """Save opportunities to database with duplicate detection"""
+
+    async def save_opportunities(self, opportunities: List[Dict[str, Any]], source_type: str) -> Dict[str, Any]:
+        """Save opportunities to database with duplicate detection using Supabase"""
         results = {
             "saved": 0,
             "duplicates": 0,
             "errors": 0,
-            "ai_parsed": 0
+            "ai_parsed": 0,
+            "opportunity_ids": []
         }
-        
-        async with self.pool.acquire() as conn:
-            for opp in opportunities:
+
+        for opp in opportunities:
+            try:
+                # Check for duplicates by content hash
+                response = self.supabase.table('africa_intelligence_feed').select('id').eq('content_hash', opp.get("content_hash")).execute()
+                if response.data:
+                    results["duplicates"] += 1
+                    continue
+
+                # Try deterministic parsing first
                 try:
-                    # Check for duplicates by content hash
-                    existing = await conn.fetchrow(
-                        "SELECT id FROM africa_intelligence_feed WHERE content_hash = $1",
-                        opp.get("content_hash")
-                    )
-                    
-                    if existing:
-                        results["duplicates"] += 1
-                        continue
-                    
-                    # Try deterministic parsing first
-                    try:
-                        parsed_opp = await self._parse_opportunity_deterministic(opp)
-                        parsed_with_ai = False
-                    except Exception as e:
-                        logger.warning(f"Deterministic parsing failed: {e}")
-                        # Fallback to DeepSeek AI parsing
-                        parsed_opp = await self._parse_opportunity_with_deepseek(opp)
-                        parsed_with_ai = True
-                        results["ai_parsed"] += 1
-                        logger.info("✨ Used DeepSeek AI parsing fallback")
-                    
-                    # Insert opportunity
-                    await conn.execute("""
-                        INSERT INTO africa_intelligence_feed (
-                            title, description, source_url, organization_name,
-                            funding_amount, deadline, application_url,
-                            source_type, source_name, search_query,
-                            ai_relevance_score, africa_relevance_score,
-                            funding_relevance_score, overall_relevance_score,
-                            content_hash, raw_data, parsed_with_ai
-                        ) VALUES (
-                            $1, $2, $3, $4, $5, $6, $7, $8, $9, $10,
-                            $11, $12, $13, $14, $15, $16, $17
-                        )
-                    """, 
-                        parsed_opp["title"],
-                        parsed_opp["description"],
-                        parsed_opp["source_url"],
-                        parsed_opp.get("organization_name"),
-                        parsed_opp.get("funding_amount"),
-                        parsed_opp.get("deadline"),
-                        parsed_opp.get("application_url"),
-                        source_type,
-                        parsed_opp.get("source_name", ""),
-                        parsed_opp.get("search_query", ""),
-                        parsed_opp.get("ai_relevance_score", 0.0),
-                        parsed_opp.get("africa_relevance_score", 0.0), 
-                        parsed_opp.get("funding_relevance_score", 0.0),
-                        parsed_opp.get("overall_relevance_score", 0.0),
-                        parsed_opp["content_hash"],
-                        json.dumps(opp),
-                        parsed_with_ai
-                    )
-                    
-                    results["saved"] += 1
-                    
+                    parsed_opp = await self._parse_opportunity_deterministic(opp)
+                    parsed_with_ai = False
                 except Exception as e:
-                    logger.error(f"Error saving opportunity '{opp.get('title', 'Unknown')}': {e}")
+                    logger.warning(f"Deterministic parsing failed: {e}")
+                    # Fallback to DeepSeek AI parsing
+                    parsed_opp = await self._parse_opportunity_with_deepseek(opp)
+                    parsed_with_ai = True
+                    results["ai_parsed"] += 1
+                    logger.info("✨ Used DeepSeek AI parsing fallback")
+
+                # Insert opportunity
+                insert_data = {
+                    "title": parsed_opp["title"],
+                    "description": parsed_opp["description"],
+                    "source_url": parsed_opp["source_url"],
+                    "organization_name": parsed_opp.get("organization_name"),
+                    "funding_amount": parsed_opp.get("funding_amount"),
+                    "deadline": parsed_opp.get("deadline"),
+                    "application_url": parsed_opp.get("application_url"),
+                    "source_type": source_type,
+                    "source_name": parsed_opp.get("source_name", ""),
+                    "search_query": parsed_opp.get("search_query", ""),
+                    "ai_relevance_score": parsed_opp.get("ai_relevance_score", 0.0),
+                    "africa_relevance_score": parsed_opp.get("africa_relevance_score", 0.0),
+                    "funding_relevance_score": parsed_opp.get("funding_relevance_score", 0.0),
+                    "overall_relevance_score": parsed_opp.get("overall_relevance_score", 0.0),
+                    "content_hash": parsed_opp["content_hash"],
+                    "raw_data": json.dumps(opp),
+                    "parsed_with_ai": parsed_with_ai
+                }
+                response = self.supabase.table('africa_intelligence_feed').insert(insert_data).execute()
+
+                if response.data:
+                    results["saved"] += 1
+                    results["opportunity_ids"].append(response.data[0]['id'])
+                else:
                     results["errors"] += 1
-        
+
+            except Exception as e:
+                logger.error(f"Error saving opportunity '{opp.get('title', 'Unknown')}': {e}")
+                results["errors"] += 1
+
         logger.info(f"💾 Database save results: {results}")
         return results
     

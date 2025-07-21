@@ -78,9 +78,13 @@ class PipelineConfig:
     enable_scheduled_jobs: bool = True
     
     # Database settings
-    database_url: str = ""
     supabase_url: str = ""
     supabase_key: str = ""
+    db_host: Optional[str] = None
+    db_name: Optional[str] = None
+    db_user: Optional[str] = None
+    db_password: Optional[str] = None
+    db_port: int = 5432
     
     # Logging
     log_level: str = "INFO"
@@ -93,8 +97,9 @@ class MasterDataIngestionPipeline:
     Designed for production-scale data collection (10K-100M records)
     """
     
-    def __init__(self, config: PipelineConfig):
+    def __init__(self, config: PipelineConfig, settings):
         self.config = config
+        self.settings = settings
         self.status = PipelineStatus.STOPPED
         self.start_time: Optional[datetime] = None
         
@@ -122,14 +127,15 @@ class MasterDataIngestionPipeline:
         self.crawl4ai_config = Crawl4AIConfig(
             max_concurrent_crawlers=config.enrichment_config.get('crawl4ai_max_workers', 5),
             batch_size=config.enrichment_config.get('crawl4ai_batch_size', 50),
-            llm_api_key=os.getenv('OPENAI_API_KEY', ''),
+            llm_api_key=self.settings.OPENAI_API_KEY,
             relevance_threshold=0.6,
             enable_content_validation=True
         )
         
         self.crawl4ai_processor = EnhancedCrawl4AIProcessor(
-            self.crawl4ai_config, 
-            self.monitoring_system
+            self.crawl4ai_config,
+            self.monitoring_system,
+            settings=self.settings
         )
         
         self.crawl4ai_integration = Crawl4AIMasterPipelineIntegration(
@@ -952,7 +958,7 @@ def create_default_config() -> PipelineConfig:
         enable_scheduled_jobs=True,
         database_url=os.getenv('DATABASE_URL', ''),
         supabase_url=os.getenv('SUPABASE_URL', ''),
-        supabase_key=os.getenv('SUPABASE_SERVICE_KEY', ''),
+        supabase_key=os.getenv('SUPABASE_SERVICE_API_KEY', ''),
         log_level='INFO'
     )
 

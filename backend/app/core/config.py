@@ -2,26 +2,15 @@ from pydantic_settings import BaseSettings
 from typing import List, Optional
 import os
 from urllib.parse import urlparse
+from dotenv import load_dotenv
+from pathlib import Path
+
+# Load .env file from the project root
+load_dotenv(dotenv_path=Path(__file__).parent.parent.parent / '.env')
 
 class Settings(BaseSettings):
     """Application settings from environment variables"""
     
-    # Database - Railway provides DATABASE_URL automatically
-    DATABASE_URL: Optional[str] = None
-    
-    # Parse database URL for individual components (if needed)
-    @property
-    def database_components(self):
-        if self.DATABASE_URL:
-            parsed = urlparse(self.DATABASE_URL)
-            return {
-                "host": parsed.hostname,
-                "port": parsed.port,
-                "database": parsed.path.lstrip('/'),
-                "username": parsed.username,
-                "password": parsed.password
-            }
-        return {}
     
     # Redis (optional for Railway)
     REDIS_URL: Optional[str] = None
@@ -37,10 +26,6 @@ class Settings(BaseSettings):
     DEBUG: bool = True
     LOG_LEVEL: str = "INFO"
     
-    # Railway-specific settings
-    RAILWAY_DEPLOYMENT_ID: Optional[str] = None
-    RAILWAY_ENVIRONMENT_NAME: Optional[str] = None
-    RAILWAY_SERVICE_NAME: Optional[str] = None
     
     # CORS Configuration - Production-ready
     @property
@@ -113,7 +98,7 @@ class Settings(BaseSettings):
 
     # Supabase Configuration
     SUPABASE_URL: Optional[str] = None
-    SUPABASE_API_KEY: Optional[str] = None
+    SUPABASE_SERVICE_API_KEY: Optional[str] = None
     SUPABASE_PUBLISHABLE_KEY: Optional[str] = None
     SUPABASE_JWT_SECRET: Optional[str] = None
     SUPABASE_PROJECT_ID: Optional[str] = None
@@ -174,31 +159,8 @@ class Settings(BaseSettings):
         return "./logs"
     
     class Config:
-        env_file = ".env"
         case_sensitive = True
         extra = "ignore"
 
-# Create settings instance
+
 settings = Settings()
-
-# Ensure data directories exist
-os.makedirs(settings.DATA_DIR, exist_ok=True)
-os.makedirs(settings.LOGS_DIR, exist_ok=True)
-
-# Validation for production
-if settings.ENVIRONMENT == "production":
-    required_vars = ["DATABASE_URL", "SECRET_KEY"]
-    missing_vars = [var for var in required_vars if not getattr(settings, var, None)]
-    
-    if missing_vars:
-        raise ValueError(f"Missing required environment variables for production: {missing_vars}")
-    
-    # Warn about missing optional but recommended vars
-    recommended_vars = ["SERPER_DEV_API_KEY", "OPENAI_API_KEY"]
-    missing_recommended = [var for var in recommended_vars if not getattr(settings, var, None)]
-    
-    if missing_recommended:
-        import logging
-        logger = logging.getLogger(__name__)
-        logger.warning(f"Missing recommended environment variables: {missing_recommended}")
-

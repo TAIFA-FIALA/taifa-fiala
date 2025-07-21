@@ -11,7 +11,7 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
-from app.core.database import Base
+from app.core.base import Base
 
 class ValidationResult(Base):
     """Validation results for intelligence feed"""

@@ -3,7 +3,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from datetime import datetime
 
-from app.core.database import Base
+from app.core.base import Base
 
 
 # Association tables

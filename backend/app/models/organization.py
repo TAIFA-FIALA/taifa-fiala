@@ -2,12 +2,12 @@ from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, Numeric
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
-from app.core.database import Base
+from app.core.base import Base, metadata
 
 # Junction table for organization geographic focus
 organization_geographic_focus = Table(
     'organization_geographic_focus',
-    Base.metadata,
+    metadata,
     Column('organization_id', Integer, ForeignKey('organizations.id', ondelete='CASCADE'), primary_key=True),
     Column('geographic_scope_id', Integer, ForeignKey('geographic_scopes.id', ondelete='CASCADE'), primary_key=True)
 )

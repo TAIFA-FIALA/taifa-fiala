@@ -5,28 +5,45 @@ from decimal import Decimal
 
 class AfricaIntelligenceItemBase(BaseModel):
     """Base schema for intelligence feed"""
-    title: str
+    title: Optional[str] = None
     description: Optional[str] = None
-    # Funding amount fields
-    amount: Optional[Decimal] = None  # Legacy compatibility
     amount_min: Optional[Decimal] = None
     amount_max: Optional[Decimal] = None
-    amount_exact: Optional[Decimal] = None
-    currency: str = "USD"
-    amount_usd: Optional[Decimal] = None
-    # Timing fields
-    deadline: Optional[datetime] = None
-    announcement_date: Optional[datetime] = None
-    start_date: Optional[datetime] = None
-    status: str = "active"
-    # Contact and general info
-    source_url: Optional[str] = None
-    application_url: Optional[str] = None
-    contact_info: Optional[str] = None
-    geographical_scopes: Optional[List[str]] = None
-    eligibility_criteria: Optional[str] = None
     application_deadline: Optional[datetime] = None
-    max_funding_period_months: Optional[int] = None
+    application_url: Optional[str] = None
+    eligibility_criteria: Optional[dict] = None
+    ai_domains: Optional[dict] = None
+    geographic_scopes: Optional[dict] = None
+    funding_type_id: Optional[int] = None
+    provider_organization_id: Optional[int] = None
+    recipient_organization_id: Optional[int] = None
+    grant_reporting_requirements: Optional[str] = None
+    grant_duration_months: Optional[int] = None
+    grant_renewable: Optional[bool] = None
+    equity_percentage: Optional[float] = None
+    valuation_cap: Optional[Decimal] = None
+    interest_rate: Optional[float] = None
+    expected_roi: Optional[float] = None
+    status: Optional[str] = None
+    additional_resources: Optional[dict] = None
+    equity_focus_details: Optional[dict] = None
+    women_focus: Optional[bool] = None
+    underserved_focus: Optional[bool] = None
+    youth_focus: Optional[bool] = None
+    funding_type: Optional[str] = None
+    funding_amount: Optional[str] = None
+    application_process: Optional[str] = None
+    contact_information: Optional[str] = None
+    additional_notes: Optional[str] = None
+    source_url: Optional[str] = None
+    source_type: Optional[str] = None
+    collected_at: Optional[datetime] = None
+    keywords: Optional[dict] = None
+    content_category: Optional[str] = 'general'
+    relevance_score: Optional[Decimal] = 0.5
+    ai_extracted: Optional[bool] = False
+    geographic_focus: Optional[str] = None
+    sector_tags: Optional[List[str]] = None
 
 
 class GrantFundingSpecific(BaseModel):
@@ -192,24 +209,12 @@ class AfricaIntelligenceItemResponse(AfricaIntelligenceItemBase):
 
 class AfricaIntelligenceItemList(BaseModel):
     """Schema for paginated intelligence item lists"""
-    items: List[AfricaIntelligenceItemResponse]
+    items: List[AfricaIntelligenceItemBase]
     total: int
     page: int
     per_page: int
     has_next: bool
     has_prev: bool
-    
-    # Organization relationships
-    provider_organization_id: Optional[int] = None
-    recipient_organization_id: Optional[int] = None
-    
-    # Classification
-    funding_type_id: Optional[int] = None
-    
-    # Enhanced type-specific fields
-    grant_specific: Optional[GrantFundingSpecific] = None
-    investment_specific: Optional[InvestmentFundingSpecific] = None
-    prize_specific: Optional[PrizeFundingSpecific] = None
 
 class OrganizationBase(BaseModel):
     """Enhanced base schema for organizations"""
@@ -307,7 +312,7 @@ class AfricaIntelligenceItemResponse(AfricaIntelligenceItemBase):
     # Enhanced type-specific data
     grant_specific: Optional[GrantFundingSpecific] = None
     investment_specific: Optional[InvestmentFundingSpecific] = None
-    prize_specific: Optional[PrizeFundingSpecific] = None
+    prize_specific: Optional[GrantFundingSpecific] = None
     is_grant: bool = False
     is_investment: bool = False
     is_prize: bool = False

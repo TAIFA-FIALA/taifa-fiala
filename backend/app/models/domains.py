@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, Text, ForeignKey
 from sqlalchemy.orm import relationship
 
-from app.core.database import Base
+from app.core.base import Base
 
 class AIDomain(Base):
     """AI domains and focus areas"""

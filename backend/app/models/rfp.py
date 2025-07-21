@@ -3,7 +3,7 @@ from sqlalchemy.sql import func
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relationship
 
-from app.core.database import Base
+from app.core.base import Base
 
 class RFP(Base):
     """Request for Proposals (RFP) opportunities"""

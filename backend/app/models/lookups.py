@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, Foreign
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
-from app.core.database import Base
+from app.core.base import Base
 
 class FundingType(Base):
     """Types of intelligence feed (Grant, Prize, Scholarship, Investment, etc.)"""

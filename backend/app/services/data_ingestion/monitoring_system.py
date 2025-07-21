@@ -407,30 +407,39 @@ class MetricsCollector:
             if metric.metric_type == MetricType.COUNTER:
                 if metric.name not in self.prometheus_counters:
                     self.prometheus_counters[metric.name] = Counter(
-                        metric.name.replace('-', '_'), 
+                        metric.name.replace('-', '_'),
                         metric.description,
                         list(metric.tags.keys())
                     )
-                self.prometheus_counters[metric.name].labels(**metric.tags).inc(metric.value)
-            
+                if metric.tags:
+                    self.prometheus_counters[metric.name].labels(**metric.tags).inc(metric.value)
+                else:
+                    self.prometheus_counters[metric.name].inc(metric.value)
+
             elif metric.metric_type == MetricType.GAUGE:
                 if metric.name not in self.prometheus_gauges:
                     self.prometheus_gauges[metric.name] = Gauge(
-                        metric.name.replace('-', '_'), 
+                        metric.name.replace('-', '_'),
                         metric.description,
                         list(metric.tags.keys())
                     )
-                self.prometheus_gauges[metric.name].labels(**metric.tags).set(metric.value)
-            
+                if metric.tags:
+                    self.prometheus_gauges[metric.name].labels(**metric.tags).set(metric.value)
+                else:
+                    self.prometheus_gauges[metric.name].set(metric.value)
+
             elif metric.metric_type == MetricType.HISTOGRAM:
                 if metric.name not in self.prometheus_histograms:
                     self.prometheus_histograms[metric.name] = Histogram(
-                        metric.name.replace('-', '_'), 
+                        metric.name.replace('-', '_'),
                         metric.description,
                         list(metric.tags.keys())
                     )
-                self.prometheus_histograms[metric.name].labels(**metric.tags).observe(metric.value)
-                
+                if metric.tags:
+                    self.prometheus_histograms[metric.name].labels(**metric.tags).observe(metric.value)
+                else:
+                    self.prometheus_histograms[metric.name].observe(metric.value)
+
         except Exception as e:
             logger.error(f"Error updating Prometheus metric: {e}")
     
