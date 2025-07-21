@@ -9,7 +9,6 @@ import traceback
 from app.core.config import settings
 from app.core.database import create_tables
 from app.api import api_router
-from app.core.database import get_db
 
 # Create FastAPI application
 app = FastAPI(

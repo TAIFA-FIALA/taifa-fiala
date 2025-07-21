@@ -5,6 +5,7 @@ from app.api.endpoints import (
     user_submissions, admin_scraping, automated_discovery, equity_analyses, stakeholder_reports, data_ingestion
 )
 from app.api.v1.intelligent_search import router as intelligent_search_router
+from app.api.v1.funding_opportunities import router as funding_opportunities_router
 from app.core.database import get_db
 
 # Create main API router
@@ -15,6 +16,13 @@ api_router.include_router(
     africa_intelligence_feed.router,
     prefix="/funding-opportunities",
     tags=["funding-opportunities"]
+)
+
+# New funding opportunities management endpoints
+api_router.include_router(
+    funding_opportunities_router,
+    prefix="/api/v1/funding-opportunities",
+    tags=["funding-opportunities-management"]
 )
 
 api_router.include_router(
