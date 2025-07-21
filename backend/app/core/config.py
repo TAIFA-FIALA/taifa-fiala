@@ -42,13 +42,7 @@ class Settings(BaseSettings):
                 "https://www.fiala-afrique.com",
                 "https://api.taifa-fiala.net"
             ])
-            
-            # Add Railway app domains
-            if self.RAILWAY_SERVICE_NAME:
-                origins.extend([
-                    f"https://{self.RAILWAY_SERVICE_NAME}.up.railway.app",
-                    "https://*.up.railway.app"
-                ])
+        
         else:
             # Development origins
             origins.extend([
@@ -88,11 +82,7 @@ class Settings(BaseSettings):
     
     # External APIs
     OPENAI_API_KEY: Optional[str] = None
-    SERPER_DEV_API_KEY: Optional[str] = None
-    DEEPL_API_KEY: Optional[str] = None
-    AZURE_TRANSLATOR_KEY: Optional[str] = None
-    AZURE_TRANSLATOR_REGION: Optional[str] = None
-    GOOGLE_TRANSLATE_API_KEY: Optional[str] = None
+    SERPER_API_KEY: Optional[str] = None
     DEEPSEEK_API_KEY: Optional[str] = None
     GEMINI_API_KEY: Optional[str] = None
 
@@ -105,7 +95,7 @@ class Settings(BaseSettings):
 
     # Supabase Configuration
     SUPABASE_URL: Optional[str] = None
-    SUPABASE_SERVICE_API_KEY: Optional[str] = None
+    SUPABASE_API_KEY: Optional[str] = None
     SUPABASE_PUBLISHABLE_KEY: Optional[str] = None
     SUPABASE_JWT_SECRET: Optional[str] = None
     SUPABASE_PROJECT_ID: Optional[str] = None
@@ -124,8 +114,6 @@ class Settings(BaseSettings):
     
     # Webhook URLs
     N8N_WEBHOOK_URL: Optional[str] = None
-    SLACK_WEBHOOK_URL: Optional[str] = None
-    DISCORD_WEBHOOK_URL: Optional[str] = None
     
     # Feature Flags
     ENABLE_TRANSLATION_QUEUE: bool = True
