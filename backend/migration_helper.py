@@ -338,7 +338,7 @@ class MigrationHelper:
         latest_revision = self._get_latest_revision()
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
         
-        migration_template = f'''"""
+        migration_template = '''"""
 {migration_name}
 
 Revision ID: {revision_id}
@@ -362,7 +362,14 @@ def upgrade() -> None:
 def downgrade() -> None:
     """Downgrade database schema"""
     {downgrade_ops_str}
-'''
+'''.format(
+            migration_name=migration_name,
+            revision_id=revision_id,
+            latest_revision=latest_revision,
+            current_time=current_time,
+            upgrade_ops_str=upgrade_ops_str,
+            downgrade_ops_str=downgrade_ops_str
+        )
         
         return migration_template
     
