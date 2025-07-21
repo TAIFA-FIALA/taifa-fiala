@@ -1,10 +1,7 @@
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from fastapi.encoders import jsonable_encoder
-import uvicorn
-import json
-import traceback
+import uvicorn      
 
 from app.core.config import settings
 from app.core.database import create_tables

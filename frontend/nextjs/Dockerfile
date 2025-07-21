@@ -1,32 +1,23 @@
-# Next.js Frontend Dockerfile for Railway
+# Use an official Node.js runtime as a parent image
 FROM node:18-alpine
 
-# Set working directory
+# Set the working directory in the container
 WORKDIR /app
 
-# Copy package files
+# Copy package.json and package-lock.json
 COPY package*.json ./
 
 # Install dependencies
-RUN npm ci --only=production && npm cache clean --force
+RUN npm install
 
-# Copy source code
+# Copy the rest of the frontend application
 COPY . .
 
-# Set environment variables
-ENV NODE_ENV=production
-ENV PORT=3000
-ENV NEXT_TELEMETRY_DISABLED=1
-
-# Build the application
+# Build the Next.js application
 RUN npm run build
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=30s --start-period=10s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost:$PORT/ || exit 1
+# Expose port 3000
+EXPOSE 3000
 
-# Expose port
-EXPOSE $PORT
-
-# Start the application
+# Start the Next.js application
 CMD ["npm", "start"]

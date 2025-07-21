@@ -2,22 +2,27 @@ version: '3.8'
 
 services:
   backend:
-    build: 
+    build:
       context: ./backend
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
-    environment:
-      - DATABASE_URL=${DATABASE_URL}
-      - REDIS_URL=redis://redis:6379
-      - ENVIRONMENT=development
-      - SECRET_KEY=your-secret-key-change-in-production
+    env_file:
+      - ./backend/.env
     volumes:
       - ./backend:/app
-      - ./data_collectors:/app/data_collectors
-    depends_on:
-      - redis
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  frontend:
+    build:
+      context: ./frontend/nextjs
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend/nextjs:/app
+      - /app/node_modules
+      - /app/.next
 
   streamlit:
     build:
@@ -25,54 +30,5 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8501:8501"
-    environment:
-      - BACKEND_URL=http://backend:8000
     volumes:
       - ./frontend/streamlit_app:/app
-    depends_on:
-      - backend
-    command: streamlit run app.py --server.port=8501 --server.address=0.0.0.0
-
-  nextjs:
-    build:
-      context: ./frontend/nextjs_dashboard
-      dockerfile: Dockerfile
-    ports:
-      - "3000:3000"
-    environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:8000
-    volumes:
-      - ./frontend/nextjs_dashboard:/app
-      - /app/node_modules
-    depends_on:
-      - backend
-    command: npm run dev
-
-  redis:
-    image: redis:7-alpine
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
-
-  data_collector:
-    build:
-      context: ./data_collectors
-      dockerfile: Dockerfile
-    environment:
-      - DATABASE_URL=${DATABASE_URL}
-      - REDIS_URL=redis://redis:6379
-      - BACKEND_URL=http://backend:8000
-    volumes:
-      - ./data_collectors:/app
-    depends_on:
-      - backend
-      - redis
-    command: python main.py
-
-volumes:
-  redis_data:
-
-networks:
-  default:
-    name: ai-africa-funding-network
