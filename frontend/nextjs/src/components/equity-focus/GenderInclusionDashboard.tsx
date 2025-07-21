@@ -50,11 +50,11 @@ interface FeaturedFounder {
   name: string;
   organization: string;
   funding_received: number;
-  image_url: string;
   country: string;
   sector: string;
   story_snippet: string;
   link: string;
+  image_url: string;
 }
 
 interface GenderInclusionDashboardProps {
@@ -72,75 +72,39 @@ export default function GenderInclusionDashboard({ className = '' }: GenderInclu
     const fetchData = async () => {
       try {
         setLoading(true);
-        // In production, replace with actual API endpoints
-        const [genderRes, trendRes, foundersRes] = await Promise.all([
-          fetch('http://localhost:8000/api/v1/analytics/gender-distribution'),
-          fetch('http://localhost:8000/api/v1/analytics/inclusion-trends'),
-          fetch('http://localhost:8000/api/v1/analytics/featured-founders')
-        ]);
-        
-        if (!genderRes.ok || !trendRes.ok || !foundersRes.ok) {
-          throw new Error(`HTTP error when fetching data`);
-        }
-        
-        const genderData = await genderRes.json();
-        const trendData = await trendRes.json();
-        const foundersData = await foundersRes.json();
-        
-        setGenderData(genderData);
-        setTrendData(trendData);
-        setFeaturedFounders(foundersData);
-      } catch (error) {
-        console.error('Failed to fetch inclusion data:', error);
-        setError('Failed to load inclusion data.');
-        
+        // Using fallback data since we've removed the API endpoints
         // Fallback data for demonstration
         setGenderData([
           { gender: 'Male-led', funding_percentage: 82, project_count: 412 },
           { gender: 'Female-led', funding_percentage: 12, project_count: 38 },
-          { gender: 'Mixed teams', funding_percentage: 16, project_count: 85 },
+          { gender: 'Joint-led', funding_percentage: 6, project_count: 24 }
         ]);
         
         setTrendData([
-          { year: 2020, female_led_percentage: 1.2, youth_led_percentage: 5.8, rural_percentage: 0.9 },
-          { year: 2021, female_led_percentage: 1.5, youth_led_percentage: 7.2, rural_percentage: 1.1 },
-          { year: 2022, female_led_percentage: 1.7, youth_led_percentage: 8.5, rural_percentage: 1.4 },
-          { year: 2023, female_led_percentage: 1.9, youth_led_percentage: 10.1, rural_percentage: 1.8 },
-          { year: 2024, female_led_percentage: 2.0, youth_led_percentage: 12.4, rural_percentage: 2.3 },
+          { year: 2020, female_led_percentage: 8, youth_led_percentage: 15, rural_percentage: 22 },
+          { year: 2021, female_led_percentage: 10, youth_led_percentage: 18, rural_percentage: 25 },
+          { year: 2022, female_led_percentage: 11, youth_led_percentage: 20, rural_percentage: 28 },
+          { year: 2023, female_led_percentage: 12, youth_led_percentage: 22, rural_percentage: 30 },
+          { year: 2024, female_led_percentage: 14, youth_led_percentage: 24, rural_percentage: 32 }
         ]);
         
         setFeaturedFounders([
           {
-            name: "Aisha Pandor",
-            organization: "SweepSouth",
-            funding_received: 7000000,
-            image_url: "https://placeholder.co/400",
-            country: "South Africa",
-            sector: "AI Services",
-            story_snippet: "Co-founded SweepSouth, an online platform connecting domestic workers with homeowners.",
-            link: "/founders/aisha-pandor"
+            name: 'Amina J. Mohammed',
+            organization: 'Green Energy Africa',
+            funding_received: 1500000,
+            country: 'Nigeria',
+            sector: 'Renewable Energy',
+            story_snippet: 'Pioneering solar solutions for rural communities...',
+            link: '#',
+            image_url: 'https://via.placeholder.com/150'
           },
-          {
-            name: "Charlette N'Guessan",
-            organization: "BACE Group",
-            funding_received: 250000,
-            image_url: "https://placeholder.co/400",
-            country: "Ghana",
-            sector: "AI Facial Recognition",
-            story_snippet: "First woman to win the Royal Academy of Engineering's Africa Prize for Engineering Innovation.",
-            link: "/founders/charlette-nguessan"
-          },
-          {
-            name: "Moulaye Taboure",
-            organization: "Afrikrea",
-            funding_received: 2500000,
-            image_url: "https://placeholder.co/400",
-            country: "Ivory Coast",
-            sector: "E-commerce",
-            story_snippet: "Founded the leading African e-commerce platform for African designers and makers.",
-            link: "/founders/moulaye-taboure"
-          }
+          // Add more sample founders as needed
         ]);
+        
+      } catch (error) {
+        console.error('Failed to load inclusion data:', error);
+        setError('Failed to load inclusion data.');
       } finally {
         setLoading(false);
       }
