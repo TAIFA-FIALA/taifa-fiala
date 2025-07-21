@@ -259,7 +259,7 @@ main() {
     backup_production
     sync_files
     setup_environment
-    run_migrations
+    # run_migrations
     start_services
     health_check
 
