@@ -431,28 +431,60 @@ class MasterDataIngestionPipeline:
             logger.error(f"Error scheduling news collection: {e}")
     
     async def _process_rss_data(self, batch_data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """Process RSS data batch WITH ENRICHMENT (Stage 1 -> 2 -> 3)"""
+        """Process RSS data batch WITH ENHANCED EXTRACTION (Stage 1 -> 2 -> 3)"""
         try:
-            # STAGE 1: Run RSS pipeline (Volume collection)
-            logger.info("STAGE 1: Starting RSS data collection...")
-            stats = await self.rss_pipeline.process_funding_intelligence(
-                search_mode="comprehensive",
-                processing_mode="batch"
-            )
+            # Import enhanced ETL integration
+            from ..etl.enhanced_etl_integration import EnhancedMasterPipelineWrapper
             
-            # STAGE 2 & 3: Enrich sparse RSS data with Crawl4AI and serper-dev
-            logger.info("STAGE 2 & 3: Starting enrichment of RSS data...")
-            enrichment_results = await self._enrich_rss_data(stats)
+            # Create enhanced wrapper
+            enhanced_wrapper = EnhancedMasterPipelineWrapper(self)
+            
+            # STAGE 1: Run enhanced RSS collection with extraction
+            logger.info("STAGE 1: Starting enhanced RSS data collection...")
+            enhanced_results = await enhanced_wrapper.enhanced_rss_collection()
+            
+            # STAGE 2 & 3: Additional enrichment if needed
+            if enhanced_results.get('enhanced_opportunities', 0) > 0:
+                logger.info("STAGE 2 & 3: Enhanced extraction completed successfully")
+                enrichment_results = {
+                    'enhanced_extraction_applied': True,
+                    'opportunities_processed': enhanced_results.get('enhanced_opportunities', 0),
+                    'enhanced_stats': enhanced_results.get('enhanced_stats', {})
+                }
+            else:
+                # Fallback to original enrichment if enhanced extraction failed
+                logger.info("STAGE 2 & 3: Falling back to original enrichment...")
+                stats = await self.rss_pipeline.process_funding_intelligence(
+                    search_mode="comprehensive",
+                    processing_mode="batch"
+                )
+                enrichment_results = await self._enrich_rss_data(stats)
             
             return [{
                 'success': True, 
-                'stats': stats,
+                'enhanced_results': enhanced_results,
                 'enrichment_results': enrichment_results
             }]
             
         except Exception as e:
-            logger.error(f"Error processing RSS data: {e}")
-            return [{'success': False, 'error': str(e)}]
+            logger.error(f"Error processing RSS data with enhanced extraction: {e}")
+            # Fallback to original processing
+            try:
+                logger.info("Falling back to original RSS processing...")
+                stats = await self.rss_pipeline.process_funding_intelligence(
+                    search_mode="comprehensive",
+                    processing_mode="batch"
+                )
+                enrichment_results = await self._enrich_rss_data(stats)
+                return [{
+                    'success': True, 
+                    'stats': stats,
+                    'enrichment_results': enrichment_results,
+                    'fallback_used': True
+                }]
+            except Exception as fallback_error:
+                logger.error(f"Fallback RSS processing also failed: {fallback_error}")
+                return [{'success': False, 'error': str(e), 'fallback_error': str(fallback_error)}]
     
     async def _process_web_scraping_data(self, batch_data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Process web scraping data batch"""

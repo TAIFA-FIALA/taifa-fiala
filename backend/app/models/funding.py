@@ -44,19 +44,58 @@ class AfricaIntelligenceItem(Base):
     funding_type_id = Column(Integer, ForeignKey('funding_types.id'), index=True)
     status = Column(String(20), default='open', index=True)  # open, closed, under_review
     funding_amount = Column(Text)  # Keep as text for flexibility
+    
+    # Enhanced funding amount fields to support all three funding patterns
+    total_funding_pool = Column(Float, nullable=True)  # Total funding available for disbursement
+    funding_type = Column(String(20), default='per_project_range', index=True)  # total_pool, per_project_exact, per_project_range
+    min_amount_per_project = Column(Float, nullable=True)  # Minimum funding per project
+    max_amount_per_project = Column(Float, nullable=True)  # Maximum funding per project
+    exact_amount_per_project = Column(Float, nullable=True)  # Fixed amount per project
+    estimated_project_count = Column(Integer, nullable=True)  # Expected number of projects to fund
+    project_count_range = Column(JSONB, nullable=True)  # Range of projects: {"min": int, "max": int}
+    
+    # Legacy amount fields for backward compatibility
     amount_min = Column(Float, nullable=True)  # Minimum funding amount (numeric)
     amount_max = Column(Float, nullable=True)  # Maximum funding amount (numeric)
     amount_exact = Column(Float, nullable=True)  # Exact amount if specified
     currency = Column(String(10), default='USD', index=True)  # USD, EUR, GBP, etc.
+    
+    # Enhanced timing and process fields
     deadline = Column(Date)
     deadline_urgency = Column(String(10), index=True)  # Computed: urgent, moderate, low, expired, unknown
+    application_deadline_type = Column(String(20), default='fixed', index=True)  # rolling, fixed, multiple_rounds
+    announcement_date = Column(Date)
+    funding_start_date = Column(Date)
+    project_duration = Column(String(100))  # Expected project timeline
+    
+    # Enhanced application and selection process
+    application_process = Column(Text)  # How to apply
+    selection_criteria = Column(JSONB)  # What they're looking for (JSON array)
+    
+    # Enhanced targeting and focus areas
+    target_audience = Column(JSONB)  # Who can apply (startups, researchers, etc.) - JSON array
+    ai_subsectors = Column(JSONB)  # Specific AI focus areas - JSON array
+    development_stage = Column(JSONB)  # Early stage, growth stage, etc. - JSON array
+    collaboration_required = Column(Boolean, nullable=True)  # Must involve partnerships
+    gender_focused = Column(Boolean, nullable=True)  # Women-focused initiatives
+    youth_focused = Column(Boolean, nullable=True)  # Youth-specific programs
+    
+    # Enhanced reporting and compliance
+    reporting_requirements = Column(JSONB)  # Ongoing obligations - JSON array
     
     # Grant-specific fields
-    reporting_requirements = Column(Text)  # Required for grants
+    grant_reporting_requirements = Column(Text)  # Required for grants - legacy field
     grant_duration_months = Column(Integer)  # Duration of grant funding
-    renewable = Column(Boolean, default=False)  # Can the grant be renewed?
+    grant_renewable = Column(Boolean, default=False)  # Can the grant be renewed?
     no_strings_attached = Column(Boolean)  # True if no ownership or repayment required
     project_based = Column(Boolean, default=True)  # Is funding for specific project vs general ops?
+    
+    # Enhanced grant-specific fields
+    interim_reporting_required = Column(Boolean, nullable=True)
+    final_report_required = Column(Boolean, nullable=True)
+    financial_reporting_frequency = Column(String(20))  # monthly, quarterly, annually
+    intellectual_property_rights = Column(Text)
+    publication_requirements = Column(Text)
     
     # Investment-specific fields
     equity_percentage = Column(Float)  # % of equity required for investment
@@ -66,6 +105,21 @@ class AfricaIntelligenceItem(Base):
     investor_rights = Column(Text)  # Special rights requested by investors
     post_investment_support = Column(Text)  # Mentoring, network, etc.
     expected_roi = Column(Float)  # Expected return on investment percentage
+    
+    # Enhanced investment-specific fields
+    liquidation_preference = Column(Text)
+    board_representation = Column(Boolean, nullable=True)
+    anti_dilution_protection = Column(Text)
+    drag_along_rights = Column(Boolean, nullable=True)
+    tag_along_rights = Column(Boolean, nullable=True)
+    
+    # Prize and competition-specific fields
+    competition_phases = Column(JSONB)  # List of competition phases
+    judging_criteria = Column(JSONB)  # List of judging criteria
+    submission_format = Column(Text)
+    presentation_required = Column(Boolean, nullable=True)
+    team_size_limit = Column(Integer)
+    intellectual_property_ownership = Column(Text)
     
     # Community and quality features
     community_rating = Column(Numeric(2,1), index=True)  # 1.0-5.0 rating

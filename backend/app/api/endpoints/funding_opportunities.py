@@ -27,14 +27,14 @@ except Exception as e:
 # Core Intelligence Item Endpoints (from funding.py)
 #
 
-@router.get("/", response_model=List[AfricaIntelligenceItemResponse])
+@router.get("/", response_model=List[FundingOpportunityCardResponse])
 async def get_africa_intelligence_feed(
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=1000),
     status: Optional[str] = Query(None),
     min_amount: Optional[float] = Query(None, ge=0),
     max_amount: Optional[float] = Query(None, ge=0),
-    currency: Optional[str] = Query("USD"),
+    currency: Optional[str] = "USD",
     deadline_after: Optional[datetime] = Query(None),
     deadline_before: Optional[datetime] = Query(None),
     organization_id: Optional[int] = Query(None),
@@ -43,17 +43,17 @@ async def get_africa_intelligence_feed(
     requires_equity: Optional[bool] = Query(None, description="Filter for opportunities requiring equity"),
     db: AsyncSession = Depends(get_db)
 ):
-    """Get intelligence feed with optional filtering"""
+    """Get intelligence feed with optional filtering, formatted for FundingOpportunityCard"""
     # Check if db is a Supabase client or SQLAlchemy session
-    query = db.table('africa_intelligence_feed').select('*, funding_types!fk_africa_intelligence_feed_funding_type_id(*)')
+    query = db.table('africa_intelligence_feed').select('*, funding_types!fk_africa_intelligence_feed_funding_type_id(*), organizations!africa_intelligence_feed_organization_id_fkey(*), ai_domains!intelligence_item_ai_domains(*)')
 
     # Apply filters
     if status:
         query = query.filter('status', 'eq', status)
     if min_amount:
-        query = query.or_(f'amount_exact.gte.{min_amount},amount_min.gte.{min_amount}')
+        query = query.or_(f'amount_exact.gte.{min_amount},amount_min.gte.{min_amount},total_funding_pool.gte.{min_amount}')
     if max_amount:
-        query = query.or_(f'amount_exact.lte.{max_amount},amount_max.lte.{max_amount}')
+        query = query.or_(f'amount_exact.lte.{max_amount},amount_max.lte.{max_amount},total_funding_pool.lte.{max_amount}')
     if deadline_after:
         query = query.filter('deadline', 'gte', deadline_after.isoformat())
     if deadline_before:
@@ -64,6 +64,8 @@ async def get_africa_intelligence_feed(
         query = query.filter('funding_types.category', 'eq', funding_type)
     if requires_equity is not None:
         query = query.filter('funding_types.requires_equity', 'eq', requires_equity)
+    if ai_domain:
+        query = query.filter('ai_domains.name', 'ilike', f'%{ai_domain}%')
 
     # Execute query with pagination
     response = query.range(skip, skip + limit - 1).execute()
@@ -72,27 +74,57 @@ async def get_africa_intelligence_feed(
     # Prepare responses with type-specific data
     results = []
     for opp in opportunities:
-        # Extract funding_type details
-        funding_type_data = opp.get('funding_types')
-        funding_category = funding_type_data.get('category', 'other') if funding_type_data else 'other'
-        is_grant = funding_category == 'grant'
-        is_investment = funding_category == 'investment'
-
-        # Prepare base data for response
+        # Handle organization info
+        organization_data = opp.get('organizations', {})
+        organization_name = organization_data.get('name') if organization_data else opp.get('organization_name', 'Unknown')
+        
+        # Handle AI domains
+        ai_domains = opp.get('ai_domains', [])
+        ai_domain_names = [domain.get('name') for domain in ai_domains if domain.get('name')]
+        
+        # Handle funding type data
+        funding_type_data = opp.get('funding_types', {})
+        funding_category = funding_type_data.get('category', 'other')
+        
+        # Prepare response data for FundingOpportunityCard
         response_data = {
+            # Core fields
             "id": opp.get("id"),
             "title": opp.get("title"),
             "description": opp.get("description"),
-            "amount": opp.get("amount"),
-            "amount_min": opp.get("amount_min"),
-            "amount_max": opp.get("amount_max"),
-            "amount_exact": opp.get("amount_exact"),
-            "currency": opp.get("currency"),
-            "amount_usd": opp.get("amount_usd"),
+            "organization": organization_name,
+            "details_url": opp.get("source_url"),
+            "sector": ai_domain_names[0] if ai_domain_names else "Other",
+            "country": opp.get("country", "Multiple"),
+            "region": opp.get("region"),
             "deadline": opp.get("deadline"),
+            "status": opp.get("status", "open"),
+            
+            # Enhanced funding fields
+            "total_funding_pool": float(opp.get("total_funding_pool")) if opp.get("total_funding_pool") is not None else None,
+            "funding_type": opp.get("funding_type", "per_project_range"),
+            "min_amount_per_project": float(opp.get("min_amount_per_project")) if opp.get("min_amount_per_project") is not None else None,
+            "max_amount_per_project": float(opp.get("max_amount_per_project")) if opp.get("max_amount_per_project") is not None else None,
+            "exact_amount_per_project": float(opp.get("exact_amount_per_project")) if opp.get("exact_amount_per_project") is not None else None,
+            "estimated_project_count": opp.get("estimated_project_count"),
+            "project_count_range": opp.get("project_count_range"),
+            "currency": opp.get("currency", "USD"),
+            
+            # Application & process information
+            "application_process": opp.get("application_process"),
+            "selection_criteria": opp.get("selection_criteria") or [],
+            "application_deadline_type": opp.get("application_deadline_type", "fixed"),
             "announcement_date": opp.get("announcement_date"),
             "start_date": opp.get("start_date"),
+            "funding_start_date": opp.get("funding_start_date"),
+            "project_duration": opp.get("project_duration"),
             "status": opp.get("status"),
+            
+            # Enhanced application and selection process
+            "application_process": opp.get("application_process"),
+            "selection_criteria": opp.get("selection_criteria"),
+            
+            # Contact and URLs
             "source_url": opp.get("source_url"),
             "application_url": opp.get("application_url"),
             "contact_info": opp.get("contact_info"),
@@ -100,10 +132,21 @@ async def get_africa_intelligence_feed(
             "eligibility_criteria": opp.get("eligibility_criteria"),
             "application_deadline": opp.get("application_deadline"),
             "max_funding_period_months": opp.get("max_funding_period_months"),
+            
+            # Enhanced targeting and focus areas
+            "target_audience": opp.get("target_audience"),
+            "ai_subsectors": opp.get("ai_subsectors"),
+            "development_stage": opp.get("development_stage"),
+            "collaboration_required": opp.get("collaboration_required"),
+            "gender_focused": opp.get("gender_focused"),
+            "youth_focused": opp.get("youth_focused"),
+            "reporting_requirements": opp.get("reporting_requirements"),
+            
+            # Metadata
             "created_at": opp.get("created_at"),
             "updated_at": opp.get("updated_at"),
             "last_checked": opp.get("last_checked"),
-            "source_organization": opp.get("source_organization"), # Assuming this is already a dict if joined
+            "source_organization": opp.get("source_organization"),
             "provider_organization": opp.get("provider_organization"),
             "recipient_organization": opp.get("recipient_organization"),
             "ai_domains": opp.get("ai_domains", []),
@@ -689,15 +732,37 @@ async def search_africa_intelligence_feed(
             "title": opp.get("title"),
             "description": opp.get("description"),
             "amount": opp.get("amount"),
+            
+            # Enhanced funding fields
+            "total_funding_pool": opp.get("total_funding_pool"),
+            "funding_type": opp.get("funding_type", "per_project_range"),
+            "min_amount_per_project": opp.get("min_amount_per_project"),
+            "max_amount_per_project": opp.get("max_amount_per_project"),
+            "exact_amount_per_project": opp.get("exact_amount_per_project"),
+            "estimated_project_count": opp.get("estimated_project_count"),
+            "project_count_range": opp.get("project_count_range"),
+            
+            # Legacy amount fields for backward compatibility
             "amount_min": opp.get("amount_min"),
             "amount_max": opp.get("amount_max"),
             "amount_exact": opp.get("amount_exact"),
             "currency": opp.get("currency"),
             "amount_usd": opp.get("amount_usd"),
+            
+            # Enhanced timing and process fields
             "deadline": opp.get("deadline"),
+            "application_deadline_type": opp.get("application_deadline_type", "fixed"),
             "announcement_date": opp.get("announcement_date"),
             "start_date": opp.get("start_date"),
+            "funding_start_date": opp.get("funding_start_date"),
+            "project_duration": opp.get("project_duration"),
             "status": opp.get("status"),
+            
+            # Enhanced application and selection process
+            "application_process": opp.get("application_process"),
+            "selection_criteria": opp.get("selection_criteria"),
+            
+            # Contact and URLs
             "source_url": opp.get("source_url"),
             "application_url": opp.get("application_url"),
             "contact_info": opp.get("contact_info"),
@@ -705,10 +770,21 @@ async def search_africa_intelligence_feed(
             "eligibility_criteria": opp.get("eligibility_criteria"),
             "application_deadline": opp.get("application_deadline"),
             "max_funding_period_months": opp.get("max_funding_period_months"),
+            
+            # Enhanced targeting and focus areas
+            "target_audience": opp.get("target_audience"),
+            "ai_subsectors": opp.get("ai_subsectors"),
+            "development_stage": opp.get("development_stage"),
+            "collaboration_required": opp.get("collaboration_required"),
+            "gender_focused": opp.get("gender_focused"),
+            "youth_focused": opp.get("youth_focused"),
+            "reporting_requirements": opp.get("reporting_requirements"),
+            
+            # Metadata
             "created_at": opp.get("created_at"),
             "updated_at": opp.get("updated_at"),
             "last_checked": opp.get("last_checked"),
-            "source_organization": opp.get("source_organization"), # Assuming this is already a dict if joined
+            "source_organization": opp.get("source_organization"),
             "provider_organization": opp.get("provider_organization"),
             "recipient_organization": opp.get("recipient_organization"),
             "ai_domains": opp.get("ai_domains", []),

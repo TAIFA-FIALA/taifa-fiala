@@ -176,16 +176,51 @@ class RSSMonitor:
         pass
     
     async def _save_opportunities(self, opportunities: List[Dict[str, Any]]):
-        """Save opportunities to database"""
-        from database.connector import DatabaseConnector
-        import os
-        database_url = os.getenv("DATABASE_URL")
-        db_connector = DatabaseConnector(database_url)
-        await db_connector.initialize()
+        """Save opportunities to database with enhanced extraction"""
         try:
-            await db_connector.save_opportunities(opportunities, "rss")
-        finally:
-            await db_connector.close()
+            # Import enhanced ETL integration
+            from backend.app.services.etl.enhanced_etl_integration import EnhancedETLIntegrator, EnhancedETLConfig, ETLDataSource
+            
+            # Create enhanced ETL integrator
+            config = EnhancedETLConfig(
+                enable_enhanced_extraction=True,
+                enable_field_validation=True,
+                enable_data_enrichment=True,
+                min_relevance_score=0.5  # Lower threshold for RSS feeds
+            )
+            integrator = EnhancedETLIntegrator(config)
+            
+            # Process opportunities with enhanced extraction
+            enhanced_opportunities = await integrator.process_rss_data_enhanced(opportunities)
+            
+            logger.info(f"Enhanced extraction applied to {len(opportunities)} RSS items, "
+                       f"resulted in {len(enhanced_opportunities)} enhanced opportunities")
+            
+            # Fallback to original database connector if enhanced processing fails
+            if not enhanced_opportunities:
+                logger.warning("Enhanced extraction failed, falling back to original database connector")
+                from database.connector import DatabaseConnector
+                import os
+                database_url = os.getenv("DATABASE_URL")
+                db_connector = DatabaseConnector(database_url)
+                await db_connector.initialize()
+                try:
+                    await db_connector.save_opportunities(opportunities, "rss")
+                finally:
+                    await db_connector.close()
+            
+        except Exception as e:
+            logger.error(f"Enhanced extraction failed: {e}, falling back to original database connector")
+            # Fallback to original database connector
+            from database.connector import DatabaseConnector
+            import os
+            database_url = os.getenv("DATABASE_URL")
+            db_connector = DatabaseConnector(database_url)
+            await db_connector.initialize()
+            try:
+                await db_connector.save_opportunities(opportunities, "rss")
+            finally:
+                await db_connector.close()
     
     def _generate_content_hash(self, content: str) -> str:
         """Generate hash for content deduplication"""

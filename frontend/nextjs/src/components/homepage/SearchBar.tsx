@@ -10,7 +10,7 @@ export default function SearchBar() {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const query = formData.get('query') as string;
-    router.push(`/funding?query=${encodeURIComponent(query)}`);
+    router.push(`/funding?q=${encodeURIComponent(query)}`);
   };
 
   return (
