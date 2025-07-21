@@ -9,7 +9,7 @@ export default function MethodologyPage() {
       subtitle: "Volume",
       description: "Custom-curated RSS feeds from 200+ funding organizations across Africa and internationally",
       metrics: ["85-90% capture rate", "500-800 daily opportunities", "15-30 min polling"],
-      color: "amber",
+      color: "#F0A621",
       icon: <Globe className="h-8 w-8" />
     },
     {
@@ -18,7 +18,7 @@ export default function MethodologyPage() {
       subtitle: "Depth",
       description: "Intelligent web scraping to retrieve comprehensive funding details from source websites",
       metrics: ["Smart navigation", "Multi-format support", "95% uptime"],
-      color: "emerald",
+      color: "'#F0A621",
       icon: <Search className="h-8 w-8" />
     },
     {
@@ -27,7 +27,7 @@ export default function MethodologyPage() {
       subtitle: "Precision",
       description: "Targeted Google searches to fill critical data gaps for high-relevance opportunities",
       metrics: ["≥70% relevance targeting", "90% field completion", "Smart extraction"],
-      color: "orange",
+      color: "#5F763B'",
       icon: <Zap className="h-8 w-8" />
     }
   ];
