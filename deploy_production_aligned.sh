@@ -6,7 +6,7 @@
 # --- Configuration ---
 PROD_SERVER="100.75.201.24"
 SSH_USER="jforrest"
-PROD_PATH="/Users/jforrest/production/ai-africa-funding-tracker"
+PROD_PATH="/Users/jforrest/production/TAIFA-FIALA"
 LOCAL_PATH="$(pwd)"
 VENV_PATH="$PROD_PATH/venv"
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
@@ -114,6 +114,7 @@ sync_files() {
     info "Syncing project files to production server..."
     rsync -avz --progress \
         --exclude 'venv' \
+        --exclude '.venv' \
         --exclude 'node_modules' \
         --exclude 'logs' \
         --exclude '.git' \
