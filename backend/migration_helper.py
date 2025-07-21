@@ -332,12 +332,18 @@ class MigrationHelper:
         ['{fk.parent.name}'], ['{fk.column.name}']
     )""")
         
+        # Format the migration template without f-string issues
+        upgrade_ops_str = ''.join(upgrade_ops)
+        downgrade_ops_str = '\n'.join(reversed(downgrade_ops))
+        latest_revision = self._get_latest_revision()
+        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
+        
         migration_template = f'''"""
 {migration_name}
 
 Revision ID: {revision_id}
-Revises: {self._get_latest_revision()}
-Create Date: {datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")}
+Revises: {latest_revision}
+Create Date: {current_time}
 
 """
 from alembic import op
@@ -346,16 +352,16 @@ from sqlalchemy.dialects import sqlite
 
 # revision identifiers, used by Alembic.
 revision = '{revision_id}'
-down_revision = '{self._get_latest_revision()}'
+down_revision = '{latest_revision}'
 branch_labels = None
 depends_on = None
 
 def upgrade() -> None:
-    """Upgrade database schema"""{''.join(upgrade_ops)}
+    """Upgrade database schema"""{upgrade_ops_str}
 
 def downgrade() -> None:
     """Downgrade database schema"""
-{''.join(reversed(downgrade_ops))}
+    {downgrade_ops_str}
 '''
         
         return migration_template
