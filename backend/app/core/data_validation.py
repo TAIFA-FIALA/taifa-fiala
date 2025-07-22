@@ -15,10 +15,10 @@ from datetime import datetime, timedelta
 from dataclasses import dataclass, field
 from enum import Enum
 import uuid
-import openai
 import re
 from urllib.parse import urlparse
 import hashlib
+from app.core.llm_provider import get_smart_llm_provider, TaskType
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -141,7 +141,7 @@ class DataValidationEngine:
     
     def __init__(self, config: ValidationConfig):
         self.config = config
-        self.openai_client = openai.AsyncOpenAI()
+        self.smart_llm_provider = get_smart_llm_provider()
         self.logger = logging.getLogger(__name__)
         
         # Validation caches
@@ -303,7 +303,7 @@ class DataValidationEngine:
             return {'is_duplicate': False}
     
     async def _ai_content_validation(self, raw_data: Dict[str, Any], source_type: str) -> Dict[str, Any]:
-        """AI-powered content validation and extraction"""
+        """AI-powered content validation and extraction using smart provider routing"""
         try:
             prompt = f"""
             Analyze this intelligence item data and validate its legitimacy and relevance for African AI development:
@@ -317,28 +317,24 @@ class DataValidationEngine:
             3. Funding amount and currency
             4. Application deadline (standardized format)
             5. Eligibility criteria
-            6. Geographic focus (Africa relevance)
-            7. Sector focus (AI/Tech relevance)
-            8. Application process
-            9. Contact information
-            10. Legitimacy assessment
-            11. Relevance score for African AI (0-1)
-            12. Completeness score (0-1)
-            13. Overall confidence (0-1)
+            6. Application URL or contact information
+            7. Geographic focus (countries/regions)
+            8. AI/Tech relevance score (0-1)
+            9. Overall legitimacy assessment
             
-            Return JSON with validated data and assessment scores.
-            Focus on accuracy and flag any concerns.
+            Return JSON with extracted data and validation_confidence (0-1).
             """
             
-            response = await self.openai_client.chat.completions.create(
-                model=self.config.ai_model,
-                messages=[{"role": "user", "content": prompt}],
+            messages = [{"role": "user", "content": prompt}]
+            
+            response = await self.smart_llm_provider.chat_completion(
+                task_type=TaskType.VALIDATION,
+                messages=messages,
                 max_tokens=self.config.max_tokens,
-                temperature=self.config.temperature,
-                timeout=self.config.validation_timeout
+                temperature=self.config.temperature
             )
             
-            ai_result = json.loads(response.choices[0].message.content)
+            ai_result = json.loads(response.content)
             
             return {
                 'validated_data': ai_result,

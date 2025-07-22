@@ -3,7 +3,7 @@ from fastapi import APIRouter
 from app.api.endpoints import (
     africa_intelligence_feed, organizations, domains, sources, analytics, search, rfp, source_validation,
     user_submissions, admin_scraping, automated_discovery, equity_analyses, stakeholder_reports, data_ingestion,
-    etl_monitoring
+    etl_monitoring, notifications, balance_monitoring
 )
 from app.api.v1.intelligent_search import router as intelligent_search_router
 from app.api.v1.funding_opportunities import router as funding_opportunities_router
@@ -120,4 +120,16 @@ api_router.include_router(
     stakeholder_reports.router,
     prefix="/reports",
     tags=["stakeholder-reports"]
+)
+
+# Enhanced notification system for monitoring alerts
+api_router.include_router(
+    notifications.router,
+    tags=["notifications"]
+)
+
+# Account balance monitoring for LLM providers
+api_router.include_router(
+    balance_monitoring.router,
+    tags=["balance-monitoring"]
 )

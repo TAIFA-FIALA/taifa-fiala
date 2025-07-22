@@ -1,9 +1,16 @@
 'use client';
 
-import { TrendingUp, AlertTriangle, DollarSign, Briefcase, Target, BarChart3, PieChart, MapPin } from 'lucide-react';
+import { TrendingUp, AlertTriangle, DollarSign, Briefcase, Target, BarChart3, PieChart, MapPin, Globe, Users, Shield, Heart, Calendar } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart as RechartsPieChart, Pie, Cell, Line, ComposedChart, Area, AreaChart } from 'recharts';
 
 import React from 'react';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'African AI Funding Landscape | TAIFA-FIALA',
+  description: 'Comprehensive analysis of AI funding across Africa (2019-2024). Discover funding patterns, geographic concentration, and sector distribution in African AI development.',
+  keywords: 'African AI funding, venture capital Africa, AI investment landscape, African startups, technology funding Africa',
+};
 
 // Data structures for the report
 interface FundingMetric {
@@ -71,26 +78,45 @@ const regionalGapsData = [
 // Components for visual storytelling
 
 const MetricCard: React.FC<{ metric: FundingMetric }> = ({ metric }) => (
-  <div className={`bg-white p-6 rounded-xl border-l-4 ${metric.color} shadow-lg hover:shadow-xl transition-shadow`}>
+  <div className={`bg-white/80 backdrop-blur-sm p-8 rounded-2xl border-l-4 ${metric.color} shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 animate-fadeInUp`}>
     <div className="flex items-center justify-between">
       <div>
-        <div className="text-3xl font-bold text-gray-900 mb-1">{metric.value}</div>
-        <div className="text-sm text-gray-600">{metric.label}</div>
+        <div className="text-4xl font-bold text-taifa-primary mb-2">{metric.value}</div>
+        <div className="text-sm text-taifa-muted font-medium">{metric.label}</div>
+        {metric.trend && (
+          <div className={`inline-flex items-center mt-2 px-2 py-1 rounded-full text-xs font-medium ${
+            metric.trend === 'up' ? 'bg-green-100 text-green-800' : 
+            metric.trend === 'down' ? 'bg-red-100 text-red-800' : 
+            'bg-gray-100 text-gray-800'
+          }`}>
+            <TrendingUp className={`h-3 w-3 mr-1 ${
+              metric.trend === 'down' ? 'rotate-180' : ''
+            }`} />
+            {metric.trend}
+          </div>
+        )}
       </div>
-      <div className="text-3xl text-gray-400">{metric.icon}</div>
+      <div className="text-4xl text-taifa-secondary/60">{metric.icon}</div>
     </div>
   </div>
 );
 
 const CountryCard: React.FC<{ country: CountryFunding; rank: number }> = ({ country, rank }) => (
-  <div className="bg-white p-4 rounded-lg border border-taifa-border hover:border-taifa-primary transition-colors">
-    <div className="flex items-center justify-between mb-2">
-      <span className="text-lg font-semibold text-taifa-primary">#{rank} {country.country}</span>
-      <MapPin className="h-5 w-5 text-taifa-secondary" />
+  <div className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl border border-taifa-secondary/20 hover:border-taifa-primary hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+    <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center">
+        <div className="w-8 h-8 bg-taifa-primary/10 rounded-full flex items-center justify-center mr-3 border border-taifa-primary/20">
+          <span className="text-sm font-bold text-taifa-primary">#{rank}</span>
+        </div>
+        <span className="text-lg font-semibold text-taifa-primary">{country.country}</span>
+      </div>
+      <MapPin className="h-6 w-6 text-taifa-secondary" />
     </div>
-    <div className="text-2xl font-bold text-taifa-accent mb-1">{country.amount}</div>
+    <div className="text-3xl font-bold text-taifa-accent mb-2">{country.amount}</div>
     {country.avgPerStartup && (
-      <div className="text-sm text-taifa-muted">Avg: {country.avgPerStartup}/startup</div>
+      <div className="text-sm text-taifa-muted font-medium bg-taifa-yellow/10 px-3 py-1 rounded-full inline-block">
+        Avg: {country.avgPerStartup}/startup
+      </div>
     )}
   </div>
 );
@@ -111,20 +137,47 @@ const SectorBar: React.FC<{ sector: SectorData }> = ({ sector }) => (
 );
 
 const AlertCard: React.FC<{ title: string; metric: string; description: string; severity: 'high' | 'medium' | 'low' }> = ({ title, metric, description, severity }) => {
-  const severityColors = {
-    high: 'border-red-500 bg-red-50',
-    medium: 'border-yellow-500 bg-yellow-50',
-    low: 'border-blue-500 bg-blue-50'
+  const severityConfig = {
+    high: {
+      borderColor: 'border-red-500',
+      bgColor: 'bg-gradient-to-br from-red-50 to-red-100',
+      textColor: 'text-red-800',
+      iconBg: 'bg-red-100',
+      iconBorder: 'border-red-200',
+      icon: <AlertTriangle className="h-5 w-5 text-red-600" />
+    },
+    medium: {
+      borderColor: 'border-yellow-500',
+      bgColor: 'bg-gradient-to-br from-yellow-50 to-yellow-100',
+      textColor: 'text-yellow-800',
+      iconBg: 'bg-yellow-100',
+      iconBorder: 'border-yellow-200',
+      icon: <AlertTriangle className="h-5 w-5 text-yellow-600" />
+    },
+    low: {
+      borderColor: 'border-green-500',
+      bgColor: 'bg-gradient-to-br from-green-50 to-green-100',
+      textColor: 'text-green-800',
+      iconBg: 'bg-green-100',
+      iconBorder: 'border-green-200',
+      icon: <Shield className="h-5 w-5 text-green-600" />
+    }
   };
-  
+
+  const config = severityConfig[severity];
+
   return (
-    <div className={`p-4 rounded-lg border-l-4 ${severityColors[severity]}`}>
-      <div className="flex items-center mb-2">
-        <AlertTriangle className="h-5 w-5 text-red-600 mr-2" />
-        <h4 className="font-semibold text-gray-800">{title}</h4>
+    <div className={`p-6 rounded-2xl border-l-4 ${config.borderColor} ${config.bgColor} shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1`}>
+      <div className="flex justify-between items-start mb-4">
+        <div className="flex items-center">
+          <div className={`w-10 h-10 ${config.iconBg} rounded-full flex items-center justify-center mr-3 border ${config.iconBorder}`}>
+            {config.icon}
+          </div>
+          <h4 className={`font-bold text-lg ${config.textColor}`}>{title}</h4>
+        </div>
+        <span className={`text-3xl font-bold ${config.textColor}`}>{metric}</span>
       </div>
-      <div className="text-2xl font-bold text-gray-900 mb-1">{metric}</div>
-      <p className="text-sm text-gray-600">{description}</p>
+      <p className={`text-sm leading-relaxed ${config.textColor}/80 ml-13`}>{description}</p>
     </div>
   );
 };
@@ -175,76 +228,130 @@ export default function FundingLandscapePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-taifa-light">
+    <div className="min-h-screen bg-gradient-to-br from-taifa-yellow/5 via-white to-taifa-secondary/5">
       {/* Hero Section */}
-      <header className="bg-white shadow-sm border-b border-taifa-border">
-        <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+      <header className="bg-gradient-to-br from-taifa-primary via-taifa-secondary to-taifa-olive relative overflow-hidden">
+        <div className="absolute inset-0 bg-black/10"></div>
+        <div className="relative max-w-7xl mx-auto py-20 px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-4xl font-bold text-taifa-primary mb-2">
-              African AI Funding Landscape
+            <div className="inline-flex items-center px-4 py-2 bg-white/20 border border-white/30 rounded-full text-sm font-medium text-white mb-6 animate-fadeInUp">
+              <BarChart3 className="h-4 w-4 mr-2" />
+              Comprehensive Analysis
+            </div>
+            <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 animate-fadeInUp" style={{ animationDelay: '0.1s' }}>
+              African AI Funding
+              <span className="block text-taifa-yellow">Landscape</span>
             </h1>
-            <p className="text-xl text-taifa-muted">2019-2024 Analysis</p>
+            <p className="text-xl text-taifa-yellow mb-8 max-w-3xl mx-auto animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
+              Comprehensive analysis revealing funding patterns, geographic concentration, and sector distribution across Africa (2019-2024)
+            </p>
+            
+            {/* Key Statistics */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto animate-fadeInUp" style={{ animationDelay: '0.3s' }}>
+              <div className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl border border-white/20">
+                <div className="text-3xl font-bold text-white mb-2">$800M+</div>
+                <div className="text-taifa-yellow text-sm">Total AI Funding</div>
+              </div>
+              <div className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl border border-white/20">
+                <div className="text-3xl font-bold text-white mb-2">54</div>
+                <div className="text-taifa-yellow text-sm">African Countries</div>
+              </div>
+              <div className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl border border-white/20">
+                <div className="text-3xl font-bold text-white mb-2">83%</div>
+                <div className="text-taifa-yellow text-sm">Concentrated in 4 Countries</div>
+              </div>
+            </div>
           </div>
         </div>
       </header>
 
       {/* Key Metrics Dashboard */}
-      <section className="py-8">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center px-4 py-2 bg-taifa-secondary/10 border border-taifa-secondary/20 rounded-full text-sm font-medium text-taifa-secondary mb-6 animate-fadeInUp">
+              <DollarSign className="h-4 w-4 mr-2" />
+              Key Insights
+            </div>
+            <h2 className="text-4xl font-bold text-taifa-primary mb-4 animate-fadeInUp" style={{ animationDelay: '0.1s' }}>Funding Overview</h2>
+            <p className="text-lg text-taifa-muted max-w-3xl mx-auto animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
+              Critical metrics revealing the current state of AI investment across the African continent
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
             {keyMetrics.map((metric, index) => (
-              <MetricCard key={index} metric={metric} />
+              <div key={index} style={{ animationDelay: `${0.3 + index * 0.1}s` }}>
+                <MetricCard metric={metric} />
+              </div>
             ))}
           </div>
         </div>
       </section>
 
       {/* Geographic Concentration Story */}
-      <section className="py-8">
+      <section className="py-20 bg-gradient-to-br from-taifa-accent/5 to-taifa-olive/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white rounded-xl p-8 shadow-lg mb-12">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">Geographic Concentration Crisis</h2>
-              <p className="text-gray-600">The &quot;Big Four&quot; dominate while regions are left behind</p>
+          <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-12 shadow-2xl mb-16 border border-taifa-secondary/10">
+            <div className="text-center mb-12">
+              <div className="inline-flex items-center px-4 py-2 bg-red-100 border border-red-200 rounded-full text-sm font-medium text-red-800 mb-6 animate-fadeInUp">
+                <AlertTriangle className="h-4 w-4 mr-2" />
+                Critical Issue
+              </div>
+              <h2 className="text-4xl font-bold text-taifa-primary mb-4 animate-fadeInUp" style={{ animationDelay: '0.1s' }}>Geographic Concentration Crisis</h2>
+              <p className="text-xl text-taifa-muted max-w-3xl mx-auto animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
+                The "Big Four" countries dominate AI funding while entire regions are systematically left behind
+              </p>
             </div>
             
-            <div className="grid md:grid-cols-2 gap-8">
-              <div>
-                <h3 className="text-xl font-semibold mb-6 flex items-center">
-                  <TrendingUp className="mr-2 h-6 w-6 text-green-600" />
-                  Top Funded Countries
-                </h3>
-                <div className="space-y-4">
+            <div className="grid md:grid-cols-2 gap-12">
+              <div className="animate-fadeInUp" style={{ animationDelay: '0.3s' }}>
+                <div className="flex items-center mb-8">
+                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mr-4 border border-green-200">
+                    <TrendingUp className="h-6 w-6 text-green-600" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-taifa-primary">Top Funded Countries</h3>
+                </div>
+                <div className="space-y-6">
                   {topCountries.map((country, index) => (
-                    <CountryCard key={country.country} country={country} rank={index + 1} />
+                    <div key={country.country} style={{ animationDelay: `${0.4 + index * 0.1}s` }} className="animate-fadeInUp">
+                      <CountryCard country={country} rank={index + 1} />
+                    </div>
                   ))}
                 </div>
               </div>
               
-              <div>
-                <h3 className="text-xl font-semibold mb-6 flex items-center">
-                  <AlertTriangle className="mr-2 h-6 w-6 text-red-600" />
-                  Critical Gaps
-                </h3>
-                <div className="space-y-4">
-                  <AlertCard 
-                    title="Central Africa"
-                    metric="<$20M"
-                    description="Entire region with 180M+ people severely underfunded"
-                    severity="high"
-                  />
-                  <AlertCard 
-                    title="Gender Disparity"
-                    metric="$48M"
-                    description="Female founders received lowest funding since 2019"
-                    severity="high"
-                  />
-                  <AlertCard 
-                    title="Strategy Gap"
-                    metric="39 Countries"
-                    description="Still lack national AI strategies"
-                    severity="medium"
-                  />
+              <div className="animate-fadeInUp" style={{ animationDelay: '0.3s' }}>
+                <div className="flex items-center mb-8">
+                  <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mr-4 border border-red-200">
+                    <AlertTriangle className="h-6 w-6 text-red-600" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-taifa-primary">Critical Gaps</h3>
+                </div>
+                <div className="space-y-6">
+                  <div className="animate-fadeInUp" style={{ animationDelay: '0.4s' }}>
+                    <AlertCard 
+                      title="Central Africa"
+                      metric="<$20M"
+                      description="Entire region with 180M+ people severely underfunded"
+                      severity="high"
+                    />
+                  </div>
+                  <div className="animate-fadeInUp" style={{ animationDelay: '0.5s' }}>
+                    <AlertCard 
+                      title="Gender Disparity"
+                      metric="$48M"
+                      description="Female founders received lowest funding since 2019"
+                      severity="high"
+                    />
+                  </div>
+                  <div className="animate-fadeInUp" style={{ animationDelay: '0.6s' }}>
+                    <AlertCard 
+                      title="Strategy Gap"
+                      metric="39 Countries"
+                      description="Still lack national AI strategies"
+                      severity="medium"
+                    />
+                  </div>
                 </div>
               </div>
             </div>

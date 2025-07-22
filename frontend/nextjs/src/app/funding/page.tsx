@@ -3,6 +3,8 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { format } from 'date-fns';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
+import { getApiUrl, API_ENDPOINTS } from '@/lib/api-config';
 
 interface FundingOpportunity {
   id: number;
@@ -54,8 +56,8 @@ function FundingPageContent() {
     const fetchInitialData = async () => {
       try {
         const [orgsRes, countriesRes] = await Promise.all([
-          fetch('http://localhost:8000/api/v1/organizations/'),
-          fetch('http://localhost:8000/api/v1/organizations/countries'),
+          fetch(getApiUrl(API_ENDPOINTS.organizations)),
+          fetch(getApiUrl(API_ENDPOINTS.organizationsCountries)),
         ]);
 
         if (!orgsRes.ok) throw new Error(`HTTP error! status: ${orgsRes.status} for organizations`);

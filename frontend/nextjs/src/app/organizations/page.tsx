@@ -1,8 +1,10 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { Search, Filter, MapPin, Globe, Users, TrendingUp } from 'lucide-react';
+import { getApiUrl, API_ENDPOINTS } from '@/lib/api-config';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Scrollbar, A11y } from 'swiper/modules';
 
@@ -34,7 +36,7 @@ export default function OrganizationsPage() {
     async function getOrganizations() {
       try {
         setLoading(true);
-        const res = await fetch('http://localhost:8000/api/v1/organizations/');
+        const res = await fetch(getApiUrl(API_ENDPOINTS.organizations));
         if (!res.ok) {
           throw new Error(`HTTP error! status: ${res.status}`);
         }

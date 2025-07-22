@@ -19,19 +19,76 @@ from typing import Dict, List, Optional, Any, Union
 from datetime import datetime, timedelta
 from dataclasses import dataclass
 import uuid
-from celery import Celery
-from celery.exceptions import Retry
+import time
 import requests
 from crawl4ai import AsyncWebCrawler
 from crawl4ai.extraction_strategy import LLMExtractionStrategy
-import openai
-
-from .etl_architecture import ETLTask, PipelineStage, Priority, ProcessingResult
-from .queue_manager import RedisQueueManager, RateLimitManager
+from app.core.llm_provider import get_smart_llm_provider, TaskType, validate_content, check_relevance
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+# =============================================================================
+# LIGHTWEIGHT RATE LIMITING
+# =============================================================================
+
+class SimpleRateLimiter:
+    """Simple in-memory rate limiter for API calls"""
+    
+    def __init__(self):
+        self._calls = {}
+    
+    def can_make_request(self, resource: str, max_calls: int, window_seconds: int = 60) -> bool:
+        """Check if we can make a request within rate limits"""
+        now = time.time()
+        
+        if resource not in self._calls:
+            self._calls[resource] = []
+        
+        # Remove old calls outside the window
+        self._calls[resource] = [call_time for call_time in self._calls[resource] 
+                                if now - call_time < window_seconds]
+        
+        # Check if we're under the limit
+        if len(self._calls[resource]) < max_calls:
+            self._calls[resource].append(now)
+            return True
+        
+        return False
+    
+    def wait_time(self, resource: str, window_seconds: int = 60) -> float:
+        """Get time to wait before next request is allowed"""
+        if resource not in self._calls or not self._calls[resource]:
+            return 0.0
+        
+        oldest_call = min(self._calls[resource])
+        wait_time = window_seconds - (time.time() - oldest_call)
+        return max(0.0, wait_time)
+
+# Global rate limiter instance
+rate_limiter = SimpleRateLimiter()
+
+# Simple cache for external API results
+_serper_cache = {}
+_crawl4ai_cache = {}
+_cache_ttl = 3600  # 1 hour
+
+def _cleanup_cache():
+    """Clean up expired cache entries"""
+    now = time.time()
+    
+    # Clean Serper cache
+    expired_keys = [k for k, (_, timestamp) in _serper_cache.items() 
+                   if now - timestamp > _cache_ttl]
+    for key in expired_keys:
+        del _serper_cache[key]
+    
+    # Clean Crawl4AI cache
+    expired_keys = [k for k, (_, timestamp) in _crawl4ai_cache.items() 
+                   if now - timestamp > _cache_ttl]
+    for key in expired_keys:
+        del _crawl4ai_cache[key]
 
 # =============================================================================
 # SPECIALIZED DATA INGESTION TASKS
@@ -51,11 +108,6 @@ class IngestionResult:
 
 class AIValidationConfig:
     """Configuration for AI-powered validation"""
-    
-    # OpenAI Configuration
-    OPENAI_MODEL = "gpt-4o-mini"
-    MAX_TOKENS = 4000
-    TEMPERATURE = 0.1
     
     # Confidence Thresholds
     AUTO_APPROVE_THRESHOLD = 0.85
@@ -456,31 +508,86 @@ async def process_crawl4ai_task(task: ETLTask) -> IngestionResult:
 # =============================================================================
 
 async def _check_ai_relevance(content: str, title: str) -> Dict[str, Any]:
-    """Check relevance using AI with fast response"""
+    """Check relevance using AI with smart provider routing"""
     try:
-        client = openai.AsyncOpenAI()
-        
-        prompt = AIValidationConfig.RELEVANCE_SCORING_PROMPT.format(
-            content=f"Title: {title}\nContent: {content[:1000]}"
-        )
-        
-        response = await client.chat.completions.create(
-            model=AIValidationConfig.OPENAI_MODEL,
-            messages=[{"role": "user", "content": prompt}],
-            max_tokens=200,
-            temperature=0.1
-        )
-        
-        result = json.loads(response.choices[0].message.content)
+        # Use the convenience function which automatically routes to optimal provider
+        result = await check_relevance(title, content)
         return result
         
     except Exception as e:
         logger.error(f"AI relevance check failed: {e}")
         return {"relevance_score": 0.5, "reasoning": "AI check failed"}
 
-async def _extract_with_crawl4ai(url: str, context: str, extraction_type: str = 'intelligence_item') -> Dict[str, Any]:
-    """Extract content using Crawl4AI with AI processing"""
+async def _validate_user_submission(submission_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Validate user submission with AI using smart provider routing"""
     try:
+        provider = get_smart_llm_provider()
+        
+        prompt = f"""
+        Validate this user-submitted intelligence item:
+        
+        Data: {json.dumps(submission_data, indent=2)}
+        
+        Check for:
+        1. Completeness of required fields
+        2. Legitimacy indicators
+        3. Relevance to African AI funding
+        4. Potential red flags
+        
+        Return JSON with confidence_score (0-1) and validation notes.
+        """
+        
+        messages = [{"role": "user", "content": prompt}]
+        
+        response = await provider.chat_completion(
+            task_type=TaskType.VALIDATION,
+            messages=messages,
+            max_tokens=500,
+            temperature=0.1
+        )
+        
+        result = json.loads(response.content)
+        return result
+        
+    except Exception as e:
+        logger.error(f"User submission validation failed: {e}")
+        return {"confidence_score": 0.5, "notes": "Validation failed"}
+
+async def _validate_extracted_content(extracted_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Validate extracted content with AI using smart provider routing"""
+    try:
+        # Use the smart LLM provider with automatic DeepSeek/OpenAI routing
+        content_json = json.dumps(extracted_data, indent=2)
+        result = await validate_content(content_json, "ETL extracted content validation")
+        
+        return result
+        
+    except Exception as e:
+        logger.error(f"Content validation failed: {e}")
+        return {"confidence_score": 0.5, "notes": "Validation failed"}
+
+async def _extract_with_crawl4ai(url: str, context: str, extraction_type: str = 'intelligence_item') -> Dict[str, Any]:
+    """Extract content using Crawl4AI with AI processing and rate limiting"""
+    try:
+        # Check cache first
+        cache_key = f"crawl4ai:{hash(url)}:{extraction_type}"
+        now = time.time()
+        
+        if cache_key in _crawl4ai_cache:
+            cached_result, timestamp = _crawl4ai_cache[cache_key]
+            if now - timestamp < _cache_ttl:
+                logger.debug(f"Using cached Crawl4AI result for URL: {url[:50]}...")
+                return cached_result
+        
+        # Check rate limit (reasonable limit for web scraping)
+        if not rate_limiter.can_make_request("crawl4ai", max_calls=30, window_seconds=60):
+            wait_time = rate_limiter.wait_time("crawl4ai", window_seconds=60)
+            logger.warning(f"Crawl4AI rate limit reached. Waiting {wait_time:.1f} seconds")
+            await asyncio.sleep(min(wait_time, 10))  # Cap wait time at 10 seconds
+        
+        # Clean up cache periodically
+        if len(_crawl4ai_cache) > 100:  # Arbitrary threshold
+            _cleanup_cache()
         async with AsyncWebCrawler(verbose=False) as crawler:
             # Custom extraction strategy for intelligence feed
             extraction_strategy = LLMExtractionStrategy(
@@ -539,17 +646,24 @@ async def _extract_with_crawl4ai(url: str, context: str, extraction_type: str = 
             
             if result.success:
                 extracted_data = json.loads(result.extracted_content)
-                return {
+                
+                result_data = {
                     'success': True,
                     'data': extracted_data,
                     'confidence_score': extracted_data.get('confidence_score', 0.7),
                     'raw_content': result.markdown[:5000]  # Truncate for storage
                 }
+                
+                # Cache the result
+                _crawl4ai_cache[cache_key] = (result_data, now)
+                return result_data
             else:
-                return {
+                error_result = {
                     'success': False,
                     'error': f"Crawl4AI extraction failed: {result.error_message}"
                 }
+                # Don't cache errors, but return them
+                return error_result
                 
     except Exception as e:
         logger.error(f"Crawl4AI extraction failed: {e}")
@@ -558,75 +672,25 @@ async def _extract_with_crawl4ai(url: str, context: str, extraction_type: str = 
             'error': str(e)
         }
 
-async def _validate_user_submission(submission_data: Dict[str, Any]) -> Dict[str, Any]:
-    """Validate user submission with AI"""
-    try:
-        client = openai.AsyncOpenAI()
-        
-        prompt = f"""
-        Validate this user-submitted intelligence item:
-        
-        Data: {json.dumps(submission_data, indent=2)}
-        
-        Check for:
-        1. Completeness of required fields
-        2. Legitimacy indicators
-        3. Relevance to African AI funding
-        4. Potential red flags
-        
-        Return JSON with confidence_score (0-1) and validation notes.
-        """
-        
-        response = await client.chat.completions.create(
-            model=AIValidationConfig.OPENAI_MODEL,
-            messages=[{"role": "user", "content": prompt}],
-            max_tokens=500,
-            temperature=0.1
-        )
-        
-        result = json.loads(response.choices[0].message.content)
-        return result
-        
-    except Exception as e:
-        logger.error(f"User submission validation failed: {e}")
-        return {"confidence_score": 0.5, "notes": "Validation failed"}
-
-async def _validate_extracted_content(extracted_data: Dict[str, Any]) -> Dict[str, Any]:
-    """Validate extracted content with AI"""
-    try:
-        client = openai.AsyncOpenAI()
-        
-        prompt = f"""
-        Validate this extracted intelligence item data:
-        
-        Data: {json.dumps(extracted_data, indent=2)}
-        
-        Assess:
-        1. Data quality and completeness
-        2. Legitimacy of the opportunity
-        3. Relevance for African AI development
-        4. Confidence in extraction accuracy
-        
-        Return JSON with confidence_score (0-1) and validation notes.
-        """
-        
-        response = await client.chat.completions.create(
-            model=AIValidationConfig.OPENAI_MODEL,
-            messages=[{"role": "user", "content": prompt}],
-            max_tokens=500,
-            temperature=0.1
-        )
-        
-        result = json.loads(response.choices[0].message.content)
-        return result
-        
-    except Exception as e:
-        logger.error(f"Content validation failed: {e}")
-        return {"confidence_score": 0.5, "notes": "Validation failed"}
-
 async def _execute_serper_search(query: str, search_type: str = 'search') -> Dict[str, Any]:
-    """Execute Serper search with error handling"""
+    """Execute Serper search with rate limiting and caching"""
     try:
+        # Check cache first
+        cache_key = f"serper:{hash(query)}:{search_type}"
+        now = time.time()
+        
+        if cache_key in _serper_cache:
+            cached_result, timestamp = _serper_cache[cache_key]
+            if now - timestamp < _cache_ttl:
+                logger.debug(f"Using cached Serper result for query: {query[:50]}...")
+                return cached_result
+        
+        # Check rate limit (Serper allows 100 requests/hour for free tier)
+        if not rate_limiter.can_make_request("serper_api", max_calls=90, window_seconds=3600):
+            wait_time = rate_limiter.wait_time("serper_api", window_seconds=3600)
+            logger.warning(f"Serper API rate limit reached. Waiting {wait_time:.1f} seconds")
+            await asyncio.sleep(min(wait_time, 60))  # Cap wait time at 1 minute
+        
         import os
         api_key = os.getenv('SERPER_API_KEY')
         
@@ -649,7 +713,9 @@ async def _execute_serper_search(query: str, search_type: str = 'search') -> Dic
         response = requests.post(url, json=payload, headers=headers, timeout=30)
         
         if response.status_code == 200:
-            return {'success': True, 'data': response.json()}
+            result = {'success': True, 'data': response.json()}
+            _serper_cache[cache_key] = (result, now)
+            return result
         else:
             return {'success': False, 'error': f'Serper API error: {response.status_code}'}
             

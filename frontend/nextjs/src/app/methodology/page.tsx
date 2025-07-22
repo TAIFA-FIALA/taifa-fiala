@@ -1,5 +1,12 @@
 import React from 'react';
 import { Database, Search, Globe, Zap, Users, TrendingUp, CheckCircle, ArrowRight, Code, Server, Monitor, Shield } from 'lucide-react';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Technical Methodology & Architecture | TAIFA-FIALA',
+  description: 'Comprehensive technical documentation of TAIFA-FIALA\'s three-stage AI funding intelligence pipeline: RSS aggregation, intelligent scraping, and targeted enrichment for African AI funding opportunities.',
+  keywords: ['AI funding', 'African technology', 'data pipeline', 'funding intelligence', 'methodology', 'technical architecture'],
+};
 
 export default function MethodologyPage() {
   const stages = [
@@ -9,8 +16,11 @@ export default function MethodologyPage() {
       subtitle: "Volume",
       description: "Custom-curated RSS feeds from 200+ funding organizations across Africa and internationally",
       metrics: ["85-90% capture rate", "500-800 daily opportunities", "15-30 min polling"],
-      color: "#F0A621",
-      icon: <Globe className="h-8 w-8" />
+      icon: <Globe/>,
+      colorClass: "taifa-accent",
+      borderClass: "border-l-taifa-accent",
+      bgClass: "bg-taifa-accent/10",
+      textClass: "text-taifa-accent"
     },
     {
       number: "02", 
@@ -18,8 +28,11 @@ export default function MethodologyPage() {
       subtitle: "Depth",
       description: "Intelligent web scraping to retrieve comprehensive funding details from source websites",
       metrics: ["Smart navigation", "Multi-format support", "95% uptime"],
-      color: "'#F0A621",
-      icon: <Search className="h-8 w-8" />
+      icon: <Search/>,
+      colorClass: "taifa-secondary",
+      borderClass: "border-l-taifa-secondary",
+      bgClass: "bg-taifa-secondary/10",
+      textClass: "text-taifa-secondary"
     },
     {
       number: "03",
@@ -27,37 +40,49 @@ export default function MethodologyPage() {
       subtitle: "Precision",
       description: "Targeted Google searches to fill critical data gaps for high-relevance opportunities",
       metrics: ["≥70% relevance targeting", "90% field completion", "Smart extraction"],
-      color: "#5F763B'",
-      icon: <Zap className="h-8 w-8" />
+      icon: <Zap/>,
+      colorClass: "taifa-olive",
+      borderClass: "border-l-taifa-olive",
+      bgClass: "bg-taifa-olive/10",
+      textClass: "text-taifa-olive"
     }
   ];
 
   const techStack = [
     {
       category: "Backend",
-      icon: <Server className="h-6 w-6" />,
+      icon: <Server/>,
       technologies: ["PostgreSQL with spatial extensions", "FastAPI async processing", "Python ML pipeline", "Crawl4AI automation"],
-      color: "bg-blue-50 border-blue-200"
+      colorClass: "taifa-primary",
+      bgClass: "bg-taifa-primary/5",
+      borderClass: "border-taifa-primary",
+      textClass: "text-taifa-primary"
     },
     {
       category: "Frontend", 
-      icon: <Monitor className="h-6 w-6" />,
+      icon: <Monitor/>,
       technologies: ["Next.js 14 with TypeScript", "Recharts visualization", "Tailwind CSS design system", "React Server Components"],
-      color: "bg-green-50 border-green-200"
+      colorClass: "taifa-accent",
+      bgClass: "bg-taifa-accent/5",
+      borderClass: "border-taifa-accent",
+      textClass: "text-taifa-accent"
     },
     {
       category: "Infrastructure",
-      icon: <Shield className="h-6 w-6" />,
+      icon: <Shield/>,
       technologies: ["Docker containerization", "OAuth 2.0 security", "Real-time monitoring", "Horizontal scaling"],
-      color: "bg-purple-50 border-purple-200"
+      colorClass: "taifa-secondary",
+      bgClass: "bg-taifa-secondary/5",
+      borderClass: "border-taifa-secondary",
+      textClass: "text-taifa-secondary"
     }
   ];
 
   const qualityMetrics = [
-    { label: "Field Completion", target: "90%+", current: "87%", color: "text-emerald-700" },
-    { label: "Accuracy Rate", target: "95%+", current: "96%", color: "text-blue-700" },
-    { label: "Max Latency", target: "24h", current: "18h", color: "text-amber-700" },
-    { label: "Country Coverage", target: "54", current: "54", color: "text-orange-700" }
+    { label: "Field Completion", target: "90%+", current: "87%", textClass: "text-taifa-secondary", borderClass: "border-taifa-secondary/20" },
+    { label: "Accuracy Rate", target: "95%+", current: "96%", textClass: "text-taifa-primary", borderClass: "border-taifa-primary/20" },
+    { label: "Max Latency", target: "24h", current: "18h", textClass: "text-taifa-accent", borderClass: "border-taifa-accent/20" },
+    { label: "Country Coverage", target: "54", current: "54", textClass: "text-taifa-olive", borderClass: "border-taifa-olive/20" }
   ];
 
   const futurePhases = [
@@ -85,213 +110,207 @@ export default function MethodologyPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-taifa-light">
+    <div className="min-h-screen bg-gradient-to-b from-taifa-light via-white to-taifa-light">
       {/* Hero Section */}
-      <section className="bg-white border-b border-taifa-border">
-        <div className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h1 className="text-4xl font-bold text-taifa-primary mb-4">
-              Technical Methodology & Architecture
-            </h1>
-            <p className="text-xl text-taifa-muted max-w-3xl mx-auto">
-              Sophisticated three-stage pipeline combining automated aggregation, intelligent scraping, 
-              and targeted enrichment for comprehensive African AI funding intelligence
-            </p>
-          </div>
+      <section className="relative bg-gradient-to-br from-white via-taifa-light/30 to-white border-b border-gray-200/50 overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute top-20 left-20 w-32 h-32 bg-taifa-accent rounded-full blur-3xl"></div>
+          <div className="absolute top-40 right-32 w-24 h-24 bg-taifa-secondary rounded-full blur-2xl"></div>
+          <div className="absolute bottom-20 left-1/3 w-28 h-28 bg-taifa-olive rounded-full blur-3xl"></div>
         </div>
-      </section>
-
-      {/* Three-Stage Pipeline */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-taifa-primary mb-4">Three-Stage Data Collection Pipeline</h2>
-            <p className="text-taifa-muted">Volume → Depth → Precision</p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8 mb-12">
-            {stages.map((stage, index) => {
-              const stageColors = [
-                { border: 'border-taifa-accent', bg: 'bg-taifa-light', text: 'text-taifa-accent' },
-                { border: 'border-taifa-secondary', bg: 'bg-taifa-light', text: 'text-taifa-secondary' },
-                { border: 'border-taifa-primary', bg: 'bg-taifa-light', text: 'text-taifa-primary' }
-              ];
-              const colors = stageColors[index];
-              
-              return (
-                <div key={index} className="relative">
-                  <div className={`bg-white p-8 rounded-xl shadow-lg border-l-4 ${colors.border} hover:shadow-xl transition-shadow`}>
-                    <div className="flex items-center mb-4">
-                      <div className={`w-12 h-12 ${colors.bg} ${colors.text} rounded-full flex items-center justify-center mr-4`}>
-                        {stage.icon}
-                      </div>
-                      <div>
-                        <div className={`text-sm font-bold ${colors.text}`}>STAGE {stage.number}</div>
-                        <div className="text-lg font-semibold text-taifa-primary">{stage.title}</div>
-                        <div className={`text-sm font-medium ${colors.text}`}>{stage.subtitle}</div>
-                      </div>
-                    </div>
-                    
-                    <p className="text-taifa-muted mb-6">{stage.description}</p>
-                    
-                    <div className="space-y-2">
-                      {stage.metrics.map((metric, idx) => (
-                        <div key={idx} className="flex items-center text-sm">
-                          <CheckCircle className={`h-4 w-4 ${colors.text} mr-2`} />
-                          <span className="text-taifa-muted">{metric}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  
-                  {index < stages.length - 1 && (
-                    <div className="hidden md:block absolute top-1/2 -right-4 transform -translate-y-1/2">
-                      <ArrowRight className="h-8 w-8 text-taifa-border" />
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Pipeline Flow Diagram */}
-          <div className="bg-white p-8 rounded-xl shadow-lg border border-taifa-border">
-            <h3 className="text-xl font-semibold text-taifa-primary mb-6 text-center">Complete Pipeline Flow</h3>
-            <div className="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0 md:space-x-4">
-              <div className="flex-1 text-center">
-                <div className="w-16 h-16 bg-taifa-light text-taifa-accent rounded-full flex items-center justify-center mx-auto mb-2">
-                  <Database className="h-8 w-8" />
-                </div>
-                <div className="text-sm font-medium text-taifa-primary">200+ RSS Feeds</div>
-                <div className="text-xs text-taifa-muted">15-30 min polling</div>
+        
+        <div className="relative max-w-7xl mx-auto py-24 px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            {/* Enhanced Title with Badge */}
+            <div className="inline-flex items-center px-4 py-2 bg-taifa-accent/10 border border-taifa-accent/20 rounded-full text-sm font-medium text-taifa-accent mb-6 animate-fadeInUp">
+              <Code className="h-4 w-4 mr-2" />
+              Technical Documentation
+            </div>
+            
+            <h1 className="text-6xl md:text-7xl font-bold text-taifa-primary mb-6 animate-fadeInUp leading-tight" style={{ animationDelay: '0.1s' }}>
+              Methodology &
+              <span className="block bg-gradient-to-r from-taifa-accent to-taifa-secondary bg-clip-text text-transparent">
+                Architecture
+              </span>
+            </h1>
+            
+            <p className="text-xl md:text-2xl text-taifa-muted max-w-4xl mx-auto leading-relaxed animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
+              A sophisticated <span className="font-semibold text-taifa-primary">three-stage pipeline</span> combining automated aggregation, 
+              intelligent scraping, and targeted enrichment for comprehensive 
+              <span className="font-semibold text-taifa-accent">African AI funding intelligence</span>.
+            </p>
+            
+            {/* Key Stats */}
+            <div className="flex flex-wrap justify-center gap-8 mt-12 animate-fadeInUp" style={{ animationDelay: '0.3s' }}>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-taifa-accent">200+</div>
+                <div className="text-sm text-taifa-muted font-medium">RSS Sources</div>
               </div>
-              
-              <ArrowRight className="text-taifa-border hidden md:block" />
-              
-              <div className="flex-1 text-center">
-                <div className="w-16 h-16 bg-taifa-light text-taifa-secondary rounded-full flex items-center justify-center mx-auto mb-2">
-                  <Code className="h-8 w-8" />
-                </div>
-                <div className="text-sm font-medium text-taifa-primary">Intelligent Scraping</div>
-                <div className="text-xs text-taifa-muted">Deep content extraction</div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-taifa-secondary">90%+</div>
+                <div className="text-sm text-taifa-muted font-medium">Field Completion</div>
               </div>
-              
-              <ArrowRight className="text-taifa-border hidden md:block" />
-              
-              <div className="flex-1 text-center">
-                <div className="w-16 h-16 bg-taifa-light text-taifa-primary rounded-full flex items-center justify-center mx-auto mb-2">
-                  <Search className="h-8 w-8" />
-                </div>
-                <div className="text-sm font-medium text-taifa-primary">Targeted Search</div>
-                <div className="text-xs text-taifa-muted">Gap filling precision</div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-taifa-olive">54</div>
+                <div className="text-sm text-taifa-muted font-medium">African Countries</div>
               </div>
-              
-              <ArrowRight className="text-taifa-border hidden md:block" />
-              
-              <div className="flex-1 text-center">
-                <div className="w-16 h-16 bg-taifa-light text-taifa-secondary rounded-full flex items-center justify-center mx-auto mb-2">
-                  <CheckCircle className="h-8 w-8" />
-                </div>
-                <div className="text-sm font-medium text-taifa-primary">Complete Dataset</div>
-                <div className="text-xs text-taifa-muted">90%+ field completion</div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-taifa-primary">24h</div>
+                <div className="text-sm text-taifa-muted font-medium">Max Latency</div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Technology Stack */}
-      <section className="py-16 bg-white">
+      {/* Three-Stage Pipeline */}
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-taifa-primary mb-4">Technology Stack</h2>
-            <p className="text-taifa-muted">Modern, scalable architecture built for African AI intelligence</p>
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-taifa-primary mb-4">Three-Stage Data Collection Pipeline</h2>
+            <p className="text-lg text-taifa-muted">Volume → Depth → Precision</p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {techStack.map((stack, index) => {
-              const stackColors = [
-                'bg-taifa-light border-taifa-primary',
-                'bg-taifa-light border-taifa-secondary', 
-                'bg-taifa-light border-taifa-accent'
-              ];
-              return (
-                <div key={index} className={`p-6 rounded-xl border-2 ${stackColors[index]}`}>
-                  <div className="flex items-center mb-4">
-                    <div className="text-taifa-primary">{stack.icon}</div>
-                    <h3 className="text-lg font-semibold text-taifa-primary ml-2">{stack.category}</h3>
+          <div className="grid md:grid-cols-3 gap-10 mb-16">
+            {stages.map((stage, index) => (
+              <div key={index} className="relative group animate-fadeInUp" style={{ animationDelay: `${0.3 + index * 0.1}s` }}>
+                <div className={`bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border-l-4 ${stage.borderClass}`}>
+                  <div className="flex items-center mb-6">
+                    <div className={`w-16 h-16 rounded-full flex items-center justify-center mr-5 border-2 ${stage.bgClass} ${stage.textClass} border-current`}>
+                      {React.cloneElement(stage.icon, { className: "h-8 w-8" })}
+                    </div>
+                    <div>
+                      <div className={`text-sm font-bold ${stage.textClass}`}>STAGE {stage.number}</div>
+                      <div className="text-xl font-semibold text-taifa-primary">{stage.title}</div>
+                      <div className={`text-md font-medium ${stage.textClass}`}>{stage.subtitle}</div>
+                    </div>
                   </div>
-                  <ul className="space-y-2">
-                    {stack.technologies.map((tech, idx) => (
-                      <li key={idx} className="text-sm text-taifa-muted flex items-center">
-                        <div className="w-2 h-2 bg-taifa-border rounded-full mr-2"></div>
-                        {tech}
-                      </li>
+                  
+                  <p className="text-taifa-muted mb-6 h-24">{stage.description}</p>
+                  
+                  <div className="space-y-3">
+                    {stage.metrics.map((metric, idx) => (
+                      <div key={idx} className="flex items-center text-sm">
+                        <CheckCircle className={`h-5 w-5 mr-3 ${stage.textClass}`} />
+                        <span className="text-taifa-muted">{metric}</span>
+                      </div>
                     ))}
-                  </ul>
+                  </div>
                 </div>
-              );
-            })}
+                
+                {index < stages.length - 1 && (
+                  <div className="hidden md:block absolute top-1/2 -right-5 transform -translate-y-1/2 group-hover:scale-125 transition-transform">
+                    <ArrowRight className="h-10 w-10 text-gray-300/50" />
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Pipeline Flow Diagram */}
+          <div className="bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-xl border border-gray-200/50 animate-fadeInUp" style={{ animationDelay: '0.7s' }}>
+            <h3 className="text-2xl font-semibold text-taifa-primary mb-8 text-center">Complete Pipeline Flow</h3>
+            <div className="flex flex-col md:flex-row items-center justify-between space-y-6 md:space-y-0 md:space-x-6">
+              {[
+                { icon: <Database className="h-8 w-8" />, title: "200+ RSS Feeds", subtitle: "15-30 min polling", bgClass: "bg-taifa-accent/10", textClass: "text-taifa-accent", borderClass: "border-taifa-accent" },
+                { icon: <Code className="h-8 w-8" />, title: "Intelligent Scraping", subtitle: "Deep content extraction", bgClass: "bg-taifa-secondary/10", textClass: "text-taifa-secondary", borderClass: "border-taifa-secondary" },
+                { icon: <Search className="h-8 w-8" />, title: "Targeted Search", subtitle: "Gap filling precision", bgClass: "bg-taifa-olive/10", textClass: "text-taifa-olive", borderClass: "border-taifa-olive" },
+                { icon: <CheckCircle className="h-8 w-8" />, title: "Complete Dataset", subtitle: "90%+ field completion", bgClass: "bg-taifa-primary/10", textClass: "text-taifa-primary", borderClass: "border-taifa-primary" }
+              ].map((item, index, arr) => (
+                <React.Fragment key={index}>
+                  <div className="text-center group cursor-pointer">
+                    <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-3 border-2 group-hover:scale-110 transition-transform ${item.bgClass} ${item.textClass} ${item.borderClass}`}>
+                      {item.icon}
+                    </div>
+                    <div className="text-md font-medium text-taifa-primary">{item.title}</div>
+                    <div className="text-sm text-taifa-muted">{item.subtitle}</div>
+                  </div>
+                  {index < arr.length - 1 && <ArrowRight className="text-gray-300/60 hidden md:block" />}
+                </React.Fragment>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Technology Stack */}
+      <section className="py-20 bg-white/80 backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-taifa-primary mb-4">Technology Stack</h2>
+            <p className="text-lg text-taifa-muted">Modern, scalable architecture built for African AI intelligence</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-10">
+            {techStack.map((stack, index) => (
+              <div key={index} className={`p-8 rounded-2xl border-2 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 animate-fadeInUp ${stack.borderClass} ${stack.bgClass}`} style={{ animationDelay: `${0.3 + index * 0.1}s` }}>
+                <div className="flex items-center mb-5">
+                  <div className={stack.textClass}>{React.cloneElement(stack.icon, { className: "h-8 w-8" })}</div>
+                  <h3 className={`text-2xl font-semibold ml-4 ${stack.textClass}`}>{stack.category}</h3>
+                </div>
+                <ul className="space-y-3">
+                  {stack.technologies.map((tech, idx) => (
+                    <li key={idx} className="text-md text-taifa-muted flex items-center">
+                      <div className={`w-2.5 h-2.5 bg-white rounded-full mr-3 border ${stack.borderClass}`}></div>
+                      {tech}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* Quality Metrics */}
-      <section className="py-16">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-taifa-primary mb-4">Data Quality & Performance</h2>
-            <p className="text-taifa-muted">Rigorous validation ensuring reliable intelligence</p>
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-taifa-primary mb-4">Data Quality & Performance</h2>
+            <p className="text-lg text-taifa-muted">Rigorous validation ensuring reliable intelligence</p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {qualityMetrics.map((metric, index) => {
-              const metricColors = [
-                'text-taifa-secondary',
-                'text-taifa-primary', 
-                'text-taifa-accent',
-                'text-taifa-secondary'
-              ];
-              return (
-                <div key={index} className="bg-white p-6 rounded-xl shadow-lg text-center border border-taifa-border">
-                  <div className={`text-3xl font-bold ${metricColors[index]} mb-2`}>
-                    {metric.current}
-                  </div>
-                  <div className="text-sm font-medium text-taifa-primary mb-1">{metric.label}</div>
-                  <div className="text-xs text-taifa-muted">Target: {metric.target}</div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {qualityMetrics.map((metric, index) => (
+              <div key={index} className={`bg-white p-6 rounded-2xl shadow-lg text-center hover:scale-105 transition-transform duration-300 animate-fadeInUp border ${metric.borderClass}`} style={{ animationDelay: `${0.3 + index * 0.1}s` }}>
+                <div className={`text-5xl font-bold mb-2 ${metric.textClass}`}>
+                  {metric.current}
                 </div>
-              );
-            })}
+                <div className="text-md font-medium text-taifa-primary mb-1">{metric.label}</div>
+                <div className="text-sm text-taifa-muted">Target: {metric.target}</div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* Future Roadmap */}
-      <section className="py-16 bg-white">
+      <section className="py-20 bg-white/80 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-taifa-primary mb-4">Development Roadmap</h2>
-            <p className="text-taifa-muted">Building toward AI by Africans, for Africans</p>
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-taifa-primary mb-4">Development Roadmap</h2>
+            <p className="text-lg text-taifa-muted">Building toward AI by Africans, for Africans</p>
           </div>
 
-          <div className="space-y-8">
+          <div className="space-y-10">
             {futurePhases.map((phase, index) => (
-              <div key={index} className="bg-taifa-light p-8 rounded-xl border border-taifa-border">
+              <div key={index} className="bg-gray-50/80 p-8 rounded-2xl border border-gray-200/50 shadow-md hover:shadow-xl transition-shadow duration-300 animate-fadeInUp" style={{ animationDelay: `${0.3 + index * 0.1}s` }}>
                 <div className="flex flex-col md:flex-row items-start">
-                  <div className="md:w-1/3 mb-4 md:mb-0">
-                    <div className="text-sm font-bold text-taifa-accent mb-1">{phase.phase}</div>
-                    <h3 className="text-xl font-semibold text-taifa-primary mb-2">{phase.title}</h3>
-                    <div className="inline-block bg-white text-taifa-primary text-xs px-2 py-1 rounded-full border border-taifa-border">
+                  <div className="md:w-1/3 mb-6 md:mb-0">
+                    <div className="text-md font-bold text-taifa-accent mb-2">{phase.phase}</div>
+                    <h3 className="text-2xl font-semibold text-taifa-primary mb-3">{phase.title}</h3>
+                    <div className="inline-block bg-white text-taifa-primary text-sm px-3 py-1 rounded-full border border-gray-200/80 shadow-sm">
                       {phase.timeline}
                     </div>
                   </div>
                   
                   <div className="md:w-2/3 md:pl-8">
-                    <p className="text-taifa-muted mb-4">{phase.description}</p>
-                    <div className="grid grid-cols-2 gap-3">
+                    <p className="text-taifa-muted mb-5 text-md">{phase.description}</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {phase.features.map((feature, idx) => (
-                        <div key={idx} className="flex items-center text-sm">
-                          <CheckCircle className="h-4 w-4 text-taifa-secondary mr-2" />
+                        <div key={idx} className="flex items-center text-md">
+                          <CheckCircle className="h-5 w-5 text-taifa-accent mr-3" />
                           <span className="text-taifa-muted">{feature}</span>
                         </div>
                       ))}
@@ -305,32 +324,30 @@ export default function MethodologyPage() {
       </section>
 
       {/* Vision Statement */}
-      <section className="py-16" style={{ background: 'linear-gradient(to right, #3E4B59, #5F763B)' }}>
+      <section className="py-24 bg-gradient-to-br from-taifa-primary to-taifa-olive">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold mb-6 text-white">Vision: AI by Africans, for Africans</h2>
-          <p className="text-xl max-w-4xl mx-auto leading-relaxed" style={{ color: '#F0E68C' }}>
-            TAIFA-FIALA&amp;apos;s ultimate goal extends beyond data collection to become the central platform 
+          <h2 className="text-4xl font-bold mb-6 text-white animate-fadeInUp" style={{ animationDelay: '0.1s' }}>Vision: AI by Africans, for Africans</h2>
+          <p className="text-xl max-w-4xl mx-auto leading-relaxed text-taifa-yellow animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
+            TAIFA-FIALA's ultimate goal extends beyond data collection to become the central platform 
             enabling African-led AI development. Through transparent funding intelligence, project amplification, 
-            and ecosystem building, we democratize access to AI development resources and ensure African voices 
-            lead the continent&amp;apos;s AI transformation.
+            and ecosystem building, we democratize access to AI development resources and and ensure African voices 
+            lead the continent's AI transformation.
           </p>
           
-          <div className="mt-12 grid md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <Users className="h-12 w-12 mx-auto mb-4" style={{ color: '#F0A621' }} />
-              <h3 className="text-lg font-semibold mb-2 text-white">For Students</h3>
-              <p className="text-sm" style={{ color: '#F0E68C' }}>Educational resources and funding guidance</p>
-            </div>
-            <div className="text-center">
-              <TrendingUp className="h-12 w-12 mx-auto mb-4" style={{ color: '#F0A621' }} />
-              <h3 className="text-lg font-semibold mb-2 text-white">For Businesses</h3>
-              <p className="text-sm" style={{ color: '#F0E68C' }}>Market intelligence and investment insights</p>
-            </div>
-            <div className="text-center">
-              <Shield className="h-12 w-12 mx-auto mb-4" style={{ color: '#F0A621' }} />
-              <h3 className="text-lg font-semibold mb-2 text-white">For Governments</h3>
-              <p className="text-sm" style={{ color: '#F0E68C' }}>Policy development and strategic planning</p>
-            </div>
+          <div className="mt-16 grid md:grid-cols-3 gap-10">
+            {[
+              { icon: <Users/>, title: "For Students", description: "Educational resources and funding guidance" },
+              { icon: <TrendingUp/>, title: "For Businesses", description: "Market intelligence and investment insights" },
+              { icon: <Shield/>, title: "For Governments", description: "Policy development and strategic planning" }
+            ].map((item, index) => (
+              <div key={index} className="text-center animate-fadeInUp" style={{ animationDelay: `${0.3 + index * 0.1}s` }}>
+                <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-5 border-2 bg-taifa-secondary/20 text-taifa-secondary border-taifa-secondary/50">
+                  {React.cloneElement(item.icon, { className: "h-10 w-10" })}
+                </div>
+                <h3 className="text-xl font-semibold mb-2 text-white">{item.title}</h3>
+                <p className="text-md text-taifa-yellow opacity-80">{item.description}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>

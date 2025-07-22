@@ -4,6 +4,7 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { format } from 'date-fns';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { getApiUrl, API_ENDPOINTS } from '@/lib/api-config';
 import { 
   DollarSign, 
   Clock, 
@@ -74,8 +75,8 @@ function GrantContent() {
     const fetchInitialData = async () => {
       try {
         const [orgsRes, countriesRes] = await Promise.all([
-          fetch('http://localhost:8000/api/v1/organizations/'),
-          fetch('http://localhost:8000/api/v1/organizations/countries'),
+          fetch(getApiUrl(API_ENDPOINTS.organizations)),
+          fetch(getApiUrl(API_ENDPOINTS.organizationsCountries)),
         ]);
 
         if (!orgsRes.ok) throw new Error(`HTTP error! status: ${orgsRes.status} for organizations`);
@@ -120,7 +121,7 @@ function GrantContent() {
       router.push(`/funding/grants?${queryString}`);
 
       try {
-        const res = await fetch(`http://localhost:8000/api/v1/funding-opportunities/?${queryString}`);
+        const res = await fetch(`${getApiUrl(API_ENDPOINTS.fundingOpportunities)}?${queryString}`);
         if (!res.ok) {
           throw new Error(`HTTP error! status: ${res.status}`);
         }

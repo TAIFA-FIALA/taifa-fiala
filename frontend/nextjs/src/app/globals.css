@@ -253,12 +253,6 @@ blockquote cite {
   animation: none !important;
 }
 
-.shadow-lg,
-.shadow-xl {
-  box-shadow: none !important;
-  border: 1px solid var(--border-color);
-}
-
 /* Navigation Pills */
 .nav-pill {
   padding: 0.5em 1em;

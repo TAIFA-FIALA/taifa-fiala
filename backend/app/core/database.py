@@ -202,13 +202,28 @@ engine = None
 SessionLocal = None
 
 def get_db():
-    """Dependency to get database client"""
+    """Dependency to get database client (subject to RLS)"""
     try:
         # Return the Supabase client for all database operations
         yield supabase
     except Exception as e:
         logger.error(f"Error getting database client: {str(e)}")
         raise DatabaseConnectionError("Could not connect to database") from e
+
+def get_admin_db():
+    """Dependency to get administrative database client (bypasses RLS)"""
+    try:
+        # Return the service role Supabase client that can bypass RLS
+        # This should only be used for administrative endpoints like ETL monitoring,
+        # balance monitoring, notifications, etc.
+        from app.core.supabase_client import create_supabase_client
+        admin_client = create_supabase_client(use_service_key=True)
+        if not admin_client:
+            raise DatabaseConnectionError("Could not create admin database client")
+        yield admin_client
+    except Exception as e:
+        logger.error(f"Error getting admin database client: {str(e)}")
+        raise DatabaseConnectionError("Could not connect to admin database") from e
     
 # Alias for backward compatibility
 get_database = get_db

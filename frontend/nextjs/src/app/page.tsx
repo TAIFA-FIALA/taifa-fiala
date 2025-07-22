@@ -3,10 +3,17 @@ import DatabaseGrowthChart from '@/components/homepage/DatabaseGrowthChart';
 import GeographicDistributionMapWrapper from '@/components/homepage/GeographicDistributionMapWrapper';
 import SectorAllocationChart from '@/components/homepage/SectorAllocationChart';
 import GenderEquityDashboard from '@/components/homepage/GenderEquityDashboard';
-import { Database, BarChart3, BookOpen, Users, ChevronRight, Globe, PieChart, TrendingUp } from 'lucide-react';
+import { Database, BarChart3, BookOpen, Users, ChevronRight, Globe, PieChart, TrendingUp, Target, Shield, Heart, ArrowRight } from 'lucide-react';
 import Image from 'next/image';
 import SearchBar from '@/components/homepage/SearchBar';
 import { getApiUrl, API_ENDPOINTS } from '@/lib/api-config';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'TAIFA-FIALA | Tracking AI Funding in Africa',
+  description: 'An independent initiative promoting transparency, equity and accountability in AI research and implementation across all African nations. Real-time tracking of AI funding opportunities.',
+  keywords: 'AI funding Africa, African artificial intelligence, AI transparency, funding opportunities Africa, AI research Africa',
+};
 
 interface AnalyticsSummary {
   total_opportunities?: number;
@@ -52,116 +59,123 @@ export default async function HomePage() {
   const summary = await getAnalyticsSummary();
 
   return (
-    <div className="min-h-screen">
-      {/* Modern Hero Section with Africa Outline */}
-      <section className="relative overflow-hidden py-8 sm:py-12 border-b border-taifa-border">
+    <div className="min-h-screen bg-gradient-to-br from-taifa-yellow/5 via-white to-taifa-secondary/5">
+      {/* Enhanced Hero Section */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-taifa-primary via-taifa-secondary to-taifa-olive">
+        <div className="absolute inset-0 bg-black/10"></div>
+        
         {/* Background Africa Outline */}
-        <div className="absolute inset-0 flex justify-center items-center z-0 opacity-10">
+        <div className="absolute inset-0 flex justify-center items-center z-0 opacity-20">
           <Image 
             src="/Africa-outline-yellow.png" 
             alt="Africa Outline" 
-            width={800} 
-            height={800} 
+            width={1000} 
+            height={1000} 
             className="object-contain"
           />
         </div>
         
-        <div className="max-w-7xl mx-auto text-center px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="relative max-w-7xl mx-auto text-center px-4 sm:px-6 lg:px-8 py-20 z-10">
           {/* Logo and Branding */}
-          <div className="flex justify-center mb-6">
-            <Image 
-              src="/TAIFA-FIALA-Logo_transparent.png" 
-              alt="TAIFA-FIALA Logo" 
-              width={320} 
-              height={400} 
-              className="object-contain"
-            />
+          <div className="flex justify-center mb-8 animate-fadeInUp">
+            <div className="bg-white/10 backdrop-blur-sm p-6 rounded-3xl border border-white/20">
+              <Image 
+                src="/TAIFA-FIALA-Logo_transparent.png" 
+                alt="TAIFA-FIALA Logo" 
+                width={280} 
+                height={350} 
+                className="object-contain"
+              />
+            </div>
           </div>
           
-          <div className="flex text-4xl font-bold justify-center mb-6">
-            Tracking AI Funding in Africa | Financements Pour IA en Afrique
+          <div className="inline-flex items-center px-4 py-2 bg-white/20 border border-white/30 rounded-full text-sm font-medium text-white mb-6 animate-fadeInUp" style={{ animationDelay: '0.1s' }}>
+            <Globe className="h-4 w-4 mr-2" />
+            Independent Initiative
           </div>
           
-          <p className="text-xl text-taifa-muted max-w-3xl mx-auto leading-relaxed mb-10 font-body">
+          <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
+            Tracking AI Funding
+            <span className="block text-taifa-yellow">in Africa</span>
+          </h1>
+          
+          <p className="text-xl text-taifa-yellow max-w-4xl mx-auto leading-relaxed mb-10 animate-fadeInUp" style={{ animationDelay: '0.3s' }}>
             An independent initiative promoting transparency, equity and accountability 
             in AI research and implementation across all African nations.
           </p>
           
-          {/* Search Bar - Centered */}
-          <div className="max-w-2xl mx-auto mb-12">
-            <SearchBar />
+          {/* Key Statistics */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 max-w-5xl mx-auto mb-12 animate-fadeInUp" style={{ animationDelay: '0.4s' }}>
+            <div className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl border border-white/20">
+              <div className="text-3xl font-bold text-white mb-2">{summary?.total_opportunities?.toLocaleString() || '2,467'}</div>
+              <div className="text-taifa-yellow text-sm">Total Opportunities</div>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl border border-white/20">
+              <div className="text-3xl font-bold text-white mb-2">{summary?.active_opportunities?.toLocaleString() || '127'}</div>
+              <div className="text-taifa-yellow text-sm">Active Opportunities</div>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl border border-white/20">
+              <div className="text-3xl font-bold text-white mb-2">${summary?.total_funding_value ? (summary.total_funding_value / 1000000).toFixed(0) : '847'}M</div>
+              <div className="text-taifa-yellow text-sm">Total Funding Value</div>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl border border-white/20">
+              <div className="text-3xl font-bold text-white mb-2">{summary?.unique_organizations?.toLocaleString() || '159'}</div>
+              <div className="text-taifa-yellow text-sm">Organizations</div>
+            </div>
+          </div>
+          
+          {/* Search Bar - Enhanced */}
+          <div className="max-w-2xl mx-auto mb-12 animate-fadeInUp" style={{ animationDelay: '0.5s' }}>
+            <div className="bg-white/10 backdrop-blur-sm p-2 rounded-2xl border border-white/20">
+              <SearchBar />
+            </div>
           </div>
           
           {/* Quick Navigation Links */}
-          <nav className="flex flex-wrap justify-center gap-6 text-base font-medium">
-            <Link href="/funding-landscape" className="text-taifa-primary hover:text-taifa-secondary transition-colors flex items-center gap-2">
-              <BarChart3 className="w-4 h-4 text-taifa-primary" />
+          <nav className="flex flex-wrap justify-center gap-4 animate-fadeInUp" style={{ animationDelay: '0.6s' }}>
+            <Link href="/funding-landscape" className="bg-white/10 backdrop-blur-sm px-6 py-3 rounded-2xl border border-white/20 text-white hover:bg-white/20 transition-all duration-300 flex items-center gap-2 hover:-translate-y-1">
+              <BarChart3 className="w-4 h-4" />
               Funding Landscape
             </Link>
-            <Link href="/methodology" className="text-taifa-primary hover:text-taifa-secondary transition-colors flex items-center gap-2">
-              <Database className="w-4 h-4 text-taifa-primary" />
+            <Link href="/theory-of-change" className="bg-white/10 backdrop-blur-sm px-6 py-3 rounded-2xl border border-white/20 text-white hover:bg-white/20 transition-all duration-300 flex items-center gap-2 hover:-translate-y-1">
+              <Target className="w-4 h-4" />
+              Theory of Change
+            </Link>
+            <Link href="/methodology" className="bg-white/10 backdrop-blur-sm px-6 py-3 rounded-2xl border border-white/20 text-white hover:bg-white/20 transition-all duration-300 flex items-center gap-2 hover:-translate-y-1">
+              <Database className="w-4 h-4" />
               Methodology
             </Link>
-            <Link href="/about" className="text-taifa-primary hover:text-taifa-secondary transition-colors flex items-center gap-2">
-              <Users className="w-4 h-4 text-taifa-primary" />
-              About Us  
+            <Link href="/about" className="bg-white/10 backdrop-blur-sm px-6 py-3 rounded-2xl border border-white/20 text-white hover:bg-white/20 transition-all duration-300 flex items-center gap-2 hover:-translate-y-1">
+              <Users className="w-4 h-4" />
+              About Us
             </Link>
           </nav>
         </div>
       </section>
 
-      {/* Key Metrics Dashboard with Live Chart */}
-      <section id="findings" className="py-12 px-4 sm:px-6 lg:px-8 bg-taifa-light">
-        <div className="max-w-7xl mx-auto">
-          {/* Animated Metric Cards with Color Accents */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-            <div className="bg-gradient-to-br from-white to-taifa-primary/5 p-6 rounded-lg border-l-4 border-taifa-primary shadow-sm hover:shadow-lg hover:scale-105 transition-all duration-300 text-center group">
-              <div className="w-12 h-12 rounded-full bg-taifa-primary/10 flex items-center justify-center mx-auto mb-3 group-hover:bg-taifa-primary/20 transition-colors">
-                <Database className="w-6 h-6" style={{ color: '#3E4B59' }} />
-              </div>
-              <div className="text-2xl font-semibold mb-2" style={{ color: '#3E4B59' }}>
-                {summary?.total_opportunities?.toLocaleString() || '2,467'}
-              </div>
-              <div className="text-sm text-taifa-muted">Total Opportunities</div>
+      {/* Live Data Insights */}
+      <section id="findings" className="py-20 bg-gradient-to-br from-taifa-accent/5 to-taifa-olive/5">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center px-4 py-2 bg-taifa-secondary/10 border border-taifa-secondary/20 rounded-full text-sm font-medium text-taifa-secondary mb-6 animate-fadeInUp">
+              <TrendingUp className="h-4 w-4 mr-2" />
+              Live Data Insights
             </div>
-            <div className="bg-gradient-to-br from-white to-taifa-secondary/5 p-6 rounded-lg border-l-4 border-taifa-secondary shadow-sm hover:shadow-lg hover:scale-105 transition-all duration-300 text-center group">
-              <div className="w-12 h-12 rounded-full bg-taifa-secondary/10 flex items-center justify-center mx-auto mb-3 group-hover:bg-taifa-secondary/20 transition-colors">
-                <TrendingUp className="w-6 h-6" style={{ color: '#F0A621' }} />
-              </div>
-              <div className="text-2xl font-semibold mb-2" style={{ color: '#F0A621' }}>
-                {summary?.active_opportunities?.toLocaleString() || '127'}
-              </div>
-              <div className="text-sm text-taifa-muted">Active Opportunities</div>
-            </div>
-            <div className="bg-gradient-to-br from-white to-taifa-accent/5 p-6 rounded-lg border-l-4 border-taifa-accent shadow-sm hover:shadow-lg hover:scale-105 transition-all duration-300 text-center group">
-              <div className="w-12 h-12 rounded-full bg-taifa-accent/10 flex items-center justify-center mx-auto mb-3 group-hover:bg-taifa-accent/20 transition-colors">
-                <BarChart3 className="w-6 h-6" style={{ color: '#007A56' }} />
-              </div>
-              <div className="text-2xl font-semibold mb-2" style={{ color: '#007A56' }}>
-                ${((summary?.total_funding_value || 847000000) / 1000000).toFixed(0)}M
-              </div>
-              <div className="text-sm text-taifa-muted">Total Funding Tracked</div>
-            </div>
-            <div className="bg-gradient-to-br from-white to-taifa-primary/5 p-6 rounded-lg border-l-4 border-taifa-primary shadow-sm hover:shadow-lg hover:scale-105 transition-all duration-300 text-center group">
-              <div className="w-12 h-12 rounded-full bg-taifa-primary/10 flex items-center justify-center mx-auto mb-3 group-hover:bg-taifa-primary/20 transition-colors">
-                <Users className="w-6 h-6" style={{ color: '#3E4B59' }} />
-              </div>
-              <div className="text-2xl font-semibold mb-2" style={{ color: '#3E4B59' }}>
-                {summary?.unique_organizations?.toLocaleString() || '159'}
-              </div>
-              <div className="text-sm text-taifa-muted">Organizations</div>
-            </div>
+            <h2 className="text-4xl font-bold text-taifa-primary mb-4 animate-fadeInUp" style={{ animationDelay: '0.1s' }}>Real-Time Funding Intelligence</h2>
+            <p className="text-lg text-taifa-muted max-w-3xl mx-auto animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
+              Comprehensive tracking and analysis of AI funding opportunities across the African continent
+            </p>
           </div>
 
-          {/* Standardized Live Database Growth Chart */}
-          <div className="bg-white rounded-lg border border-taifa-border shadow-sm hover:shadow-md transition-shadow p-8 mb-8">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="w-12 h-12 rounded-full bg-taifa-secondary/10 flex items-center justify-center">
-                <Database className="w-6 h-6 text-taifa-secondary" />
+          {/* Enhanced Database Growth Chart */}
+          <div className="bg-white/80 backdrop-blur-sm rounded-3xl border border-taifa-secondary/20 shadow-2xl hover:shadow-3xl transition-all duration-300 p-12 mb-16 animate-fadeInUp" style={{ animationDelay: '0.3s' }}>
+            <div className="flex items-center gap-6 mb-8">
+              <div className="w-16 h-16 rounded-2xl bg-taifa-secondary/10 flex items-center justify-center border border-taifa-secondary/20">
+                <Database className="w-8 h-8 text-taifa-secondary" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-taifa-primary mb-1">Live Intelligence Collection - Database Growth</h2>
-                <p className="text-taifa-muted">Real-time tracking of AI funding opportunities across Africa</p>
+                <h3 className="text-3xl font-bold text-taifa-primary mb-2">Live Intelligence Collection</h3>
+                <p className="text-lg text-taifa-muted">Real-time tracking of AI funding opportunities across Africa</p>
               </div>
             </div>
             <DatabaseGrowthChart />
@@ -317,48 +331,53 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Brief About Us */}
-      <section className="py-12 px-4 sm:px-6 lg:px-8 bg-taifa-light">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-taifa-primary mb-6">About TAIFA-FIALA</h2>
-          <p className="text-xl text-taifa-muted mb-8 leading-relaxed">
-            TAIFA-FIALA is an independent initiative dedicated to promoting transparency, 
-            equity, and accountability in AI funding across Africa. We provide comprehensive 
-            data analysis and insights to support evidence-based decision making in the 
-            African AI ecosystem.
+      {/* Enhanced Mission Section */}
+      <section className="py-20 bg-gradient-to-br from-taifa-primary to-taifa-olive">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="inline-flex items-center px-4 py-2 bg-white/20 border border-white/30 rounded-full text-sm font-medium text-white mb-6 animate-fadeInUp">
+            <Target className="h-4 w-4 mr-2" />
+            Our Mission
+          </div>
+          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 animate-fadeInUp" style={{ animationDelay: '0.1s' }}>Transforming AI Funding</h2>
+          <p className="text-xl text-taifa-yellow leading-relaxed mb-12 max-w-4xl mx-auto animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
+            TAIFA-FIALA is dedicated to promoting transparency, equity, and accountability in AI funding 
+            across Africa. Through comprehensive data collection and analysis, we work to ensure that AI 
+            development serves all Africans, not just a privileged few.
           </p>
           
-          <div className="grid md:grid-cols-3 gap-8 mb-8">
-            <div className="text-center group hover:scale-105 transition-transform duration-300">
-              <div className="w-16 h-16 rounded-full bg-taifa-primary/10 flex items-center justify-center mx-auto mb-4 group-hover:bg-taifa-primary/20 transition-colors">
-                <Database className="w-8 h-8" style={{ color: '#3E4B59' }} />
+          <div className="grid md:grid-cols-3 gap-8 mb-12">
+            <div className="text-center p-8 bg-white/10 backdrop-blur-sm rounded-3xl border border-white/20 hover:bg-white/20 transition-all duration-300 hover:-translate-y-2 animate-fadeInUp" style={{ animationDelay: '0.3s' }}>
+              <div className="w-20 h-20 rounded-2xl bg-white/20 flex items-center justify-center mx-auto mb-6 border border-white/30">
+                <Database className="w-10 h-10 text-white" />
               </div>
-              <h3 className="text-lg font-semibold mb-2" style={{ color: '#3E4B59' }}>Comprehensive Data</h3>
-              <p className="text-taifa-muted">Real-time tracking of AI funding opportunities across all 54 African countries</p>
+              <h3 className="text-xl font-bold mb-4 text-white">Comprehensive Data</h3>
+              <p className="text-taifa-yellow leading-relaxed">Real-time tracking of AI funding opportunities across all 54 African countries</p>
             </div>
-            <div className="text-center group hover:scale-105 transition-transform duration-300">
-              <div className="w-16 h-16 rounded-full bg-taifa-secondary/10 flex items-center justify-center mx-auto mb-4 group-hover:bg-taifa-secondary/20 transition-colors">
-                <Users className="w-8 h-8" style={{ color: '#F0A621' }} />
+            <div className="text-center p-8 bg-white/10 backdrop-blur-sm rounded-3xl border border-white/20 hover:bg-white/20 transition-all duration-300 hover:-translate-y-2 animate-fadeInUp" style={{ animationDelay: '0.4s' }}>
+              <div className="w-20 h-20 rounded-2xl bg-white/20 flex items-center justify-center mx-auto mb-6 border border-white/30">
+                <Shield className="w-10 h-10 text-white" />
               </div>
-              <h3 className="text-lg font-semibold mb-2" style={{ color: '#F0A621' }}>Equity Focus</h3>
-              <p className="text-taifa-muted">Dedicated analysis of gender, geographic, and sectoral disparities in funding</p>
+              <h3 className="text-xl font-bold mb-4 text-white">Equity Focus</h3>
+              <p className="text-taifa-yellow leading-relaxed">Dedicated analysis of gender, geographic, and sectoral disparities in funding</p>
             </div>
-            <div className="text-center group hover:scale-105 transition-transform duration-300">
-              <div className="w-16 h-16 rounded-full bg-taifa-accent/10 flex items-center justify-center mx-auto mb-4 group-hover:bg-taifa-accent/20 transition-colors">
-                <BookOpen className="w-8 h-8" style={{ color: '#007A56' }} />
+            <div className="text-center p-8 bg-white/10 backdrop-blur-sm rounded-3xl border border-white/20 hover:bg-white/20 transition-all duration-300 hover:-translate-y-2 animate-fadeInUp" style={{ animationDelay: '0.5s' }}>
+              <div className="w-20 h-20 rounded-2xl bg-white/20 flex items-center justify-center mx-auto mb-6 border border-white/30">
+                <BookOpen className="w-10 h-10 text-white" />
               </div>
-              <h3 className="text-lg font-semibold mb-2" style={{ color: '#007A56' }}>Open Research</h3>
-              <p className="text-taifa-muted">Transparent methodology and publicly accessible insights for the research community</p>
+              <h3 className="text-xl font-bold mb-4 text-white">Open Research</h3>
+              <p className="text-taifa-yellow leading-relaxed">Transparent methodology and publicly accessible insights for the research community</p>
             </div>
           </div>
           
-          <Link 
-            href="/about" 
-            className="bg-taifa-primary text-white px-8 py-3 rounded-lg font-semibold hover:bg-taifa-secondary transition-colors inline-flex items-center gap-2"
-          >
-            Learn More About Our Mission
-            <ChevronRight className="w-4 h-4" />
-          </Link>
+          <div className="animate-fadeInUp" style={{ animationDelay: '0.6s' }}>
+            <Link 
+              href="/about" 
+              className="bg-white/20 backdrop-blur-sm text-white px-8 py-4 rounded-2xl font-semibold hover:bg-white/30 transition-all duration-300 inline-flex items-center gap-2 border border-white/30 hover:-translate-y-1"
+            >
+              Learn More About Our Mission
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+          </div>
         </div>
       </section>
 
