@@ -1,5 +1,3 @@
-'use client';
-
 import { ArrowDown, Target, Users, Globe, BarChart3, Shield, Heart, Lightbulb, TrendingUp, CheckCircle } from 'lucide-react';
 import React from 'react';
 import { Metadata } from 'next';

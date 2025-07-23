@@ -1,10 +1,7 @@
-'use client';
-
 import { TrendingUp, AlertTriangle, DollarSign, Briefcase, Target, BarChart3, PieChart, MapPin, Globe, Users, Shield, Heart, Calendar } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart as RechartsPieChart, Pie, Cell, Line, ComposedChart, Area, AreaChart } from 'recharts';
-
 import React from 'react';
 import { Metadata } from 'next';
+import FundingCharts from './components/FundingCharts';
 
 export const metadata: Metadata = {
   title: 'African AI Funding Landscape | TAIFA-FIALA',
@@ -183,6 +180,9 @@ const AlertCard: React.FC<{ title: string; metric: string; description: string; 
 };
 
 export default function FundingLandscapePage() {
+  // Colors for charts
+  const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#06B6D4', '#84CC16', '#F97316'];
+
   // Data from the report
   const keyMetrics: FundingMetric[] = [
     {
@@ -417,88 +417,30 @@ export default function FundingLandscapePage() {
             <p className="text-gray-600">Interactive analysis of Africa&amp;apos;s AI funding patterns</p>
           </div>
 
-          {/* Funding by Country Chart */}
-          <div className="bg-white rounded-xl p-8 shadow-lg mb-8">
-            <h3 className="text-2xl font-bold text-gray-900 mb-6">Top Countries by Funding Volume</h3>
-            <ResponsiveContainer width="100%" height={400}>
-              <ComposedChart data={fundingByCountryData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="country" />
-                <YAxis yAxisId="left" orientation="left" />
-                <YAxis yAxisId="right" orientation="right" />
-                <Tooltip 
-                  formatter={(value, name) => [
-                    name === 'funding' ? `$${value}M` : value,
-                    name === 'funding' ? 'Total Funding' : 'Number of Deals'
-                  ]}
-                />
-                <Legend />
-                <Bar yAxisId="left" dataKey="funding" fill="#3B82F6" name="Funding ($M)" />
-                <Line yAxisId="right" type="monotone" dataKey="deals" stroke="#EF4444" strokeWidth={3} name="Deals" />
-              </ComposedChart>
-            </ResponsiveContainer>
-          </div>
+          <FundingCharts 
+            fundingByCountryData={fundingByCountryData}
+            sectorDistributionData={sectorDistributionData}
+            fundingTimelineData={fundingTimelineData}
+            COLORS={COLORS}
+          />
 
-          {/* Sector Distribution and Timeline */}
-          <div className="grid md:grid-cols-2 gap-8 mb-8">
-            <div className="bg-white rounded-xl p-8 shadow-lg">
-              <h3 className="text-2xl font-bold text-gray-900 mb-6">Sector Distribution</h3>
-              <ResponsiveContainer width="100%" height={350}>
-                <RechartsPieChart>
-                  <Pie
-                    data={sectorDistributionData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={(entry) => `${entry.name}: ${entry.value}%`}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                  >
-                    {sectorDistributionData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip formatter={(value) => [`${value}%`, 'Share']} />
-                  <Legend />
-                </RechartsPieChart>
-              </ResponsiveContainer>
-            </div>
-
-            <div className="bg-white rounded-xl p-8 shadow-lg">
-              <h3 className="text-2xl font-bold text-gray-900 mb-6">Funding Growth 2019-2024</h3>
-              <ResponsiveContainer width="100%" height={350}>
-                <AreaChart data={fundingTimelineData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="year" />
-                  <YAxis />
-                  <Tooltip formatter={(value) => [`$${value}M`, '']} />
-                  <Legend />
-                  <Area type="monotone" dataKey="development" stackId="1" stroke="#10B981" fill="#10B981" name="Development Funding" />
-                  <Area type="monotone" dataKey="private" stackId="1" stroke="#3B82F6" fill="#3B82F6" name="Private Investment" />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-
-          {/* Regional Gaps Analysis */}
+          {/* Regional Gaps Analysis - keeping this separate for now */}
           <div className="bg-white rounded-xl p-8 shadow-lg">
             <h3 className="text-2xl font-bold text-gray-900 mb-6">Regional Funding Gaps</h3>
-            <ResponsiveContainer width="100%" height={400}>
-              <BarChart data={regionalGapsData} layout="horizontal">
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis type="number" />
-                <YAxis dataKey="region" type="category" width={100} />
-                <Tooltip 
-                  formatter={(value, name) => [
-                    name === 'funding' ? `$${value}M` : `${value}M people`,
-                    name === 'funding' ? 'Total Funding' : 'Population'
-                  ]}
-                />
-                <Legend />
-                <Bar dataKey="funding" fill="#3B82F6" name="Funding ($M)" />
-              </BarChart>
-            </ResponsiveContainer>
+            <div className="space-y-4">
+              {regionalGapsData.map((region, index) => (
+                <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div>
+                    <h4 className="font-semibold text-gray-900">{region.region}</h4>
+                    <p className="text-sm text-gray-600">{region.population}M people</p>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-2xl font-bold text-blue-600">${region.funding}M</div>
+                    <div className="text-xs text-gray-500">Total Funding</div>
+                  </div>
+                </div>
+              ))}
+            </div>
             <div className="mt-6 p-4 bg-red-50 rounded-lg border-l-4 border-red-500">
               <p className="text-sm text-red-800">
                 <strong>Critical Gap:</strong> Central Africa receives only $18.3M despite 185M population - less than $0.10 per person
