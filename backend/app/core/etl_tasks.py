@@ -24,6 +24,7 @@ import requests
 from crawl4ai import AsyncWebCrawler
 from crawl4ai.extraction_strategy import LLMExtractionStrategy
 from app.core.llm_provider import get_smart_llm_provider, TaskType, validate_content, check_relevance
+from app.core.etl_architecture import ETLTask
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

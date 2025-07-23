@@ -213,14 +213,11 @@ def get_db():
 def get_admin_db():
     """Dependency to get administrative database client (bypasses RLS)"""
     try:
-        # Return the service role Supabase client that can bypass RLS
-        # This should only be used for administrative endpoints like ETL monitoring,
-        # balance monitoring, notifications, etc.
-        from app.core.supabase_client import create_supabase_client
-        admin_client = create_supabase_client(use_service_key=True)
-        if not admin_client:
-            raise DatabaseConnectionError("Could not create admin database client")
-        yield admin_client
+        # The global supabase client is already created with service role key
+        # and can bypass RLS. We can use it directly for admin operations.
+        if not supabase:
+            raise DatabaseConnectionError("Supabase client not initialized")
+        yield supabase
     except Exception as e:
         logger.error(f"Error getting admin database client: {str(e)}")
         raise DatabaseConnectionError("Could not connect to admin database") from e

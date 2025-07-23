@@ -23,6 +23,7 @@ httpx
 requests
 aiohttp
 beautifulsoup4
+crawl4ai
 
 # RSS and Feed Processing
 feedparser

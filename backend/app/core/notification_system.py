@@ -131,13 +131,20 @@ class EnhancedNotificationSystem:
             self.channels['slack'] = NotificationChannel(
                 name="slack",
                 enabled=True,
-                config={
-                    'webhook_url': settings.SLACK_WEBHOOK_URL
-                },
+                config={'webhook_url': settings.SLACK_WEBHOOK_URL},
                 min_level=AlertLevel.WARNING
             )
         
-        # Console logging (always available)
+        # n8n webhook notifications
+        if hasattr(settings, 'N8N_WEBHOOK_URL') and settings.N8N_WEBHOOK_URL:
+            self.channels['n8n'] = NotificationChannel(
+                name="n8n",
+                enabled=True,
+                config={'webhook_url': settings.N8N_WEBHOOK_URL},
+                min_level=AlertLevel.INFO
+            )
+        
+        # Console notifications (always enabled)
         self.channels['console'] = NotificationChannel(
             name="console",
             enabled=True,
@@ -202,6 +209,8 @@ class EnhancedNotificationSystem:
                     await self._send_email_notification(alert, channel)
                 elif channel_name == 'slack':
                     await self._send_slack_notification(alert, channel)
+                elif channel_name == 'n8n':
+                    await self._send_n8n_webhook_notification(alert, channel)
                 elif channel_name == 'console':
                     await self._send_console_notification(alert, channel)
                     
@@ -294,6 +303,43 @@ class EnhancedNotificationSystem:
         
         log_func = log_level_map.get(alert.level, logger.info)
         log_func(f"[{alert.category.value.upper()}] {alert.title}: {alert.message}")
+    
+    async def _send_n8n_webhook_notification(self, alert: Alert, channel: NotificationChannel):
+        """Send n8n webhook notification"""
+        webhook_url = channel.config.get('webhook_url')
+        if not webhook_url:
+            logger.error("n8n webhook URL not configured")
+            return
+        
+        # Create structured payload for n8n
+        payload = {
+            "alert_id": alert.id,
+            "category": alert.category.value,
+            "level": alert.level.value,
+            "title": alert.title,
+            "message": alert.message,
+            "timestamp": alert.timestamp.isoformat(),
+            "data": alert.data,
+            "resolved": alert.resolved,
+            "resolved_at": alert.resolved_at.isoformat() if alert.resolved_at else None,
+            "source": "taifa-fiala-backend",
+            "environment": getattr(settings, 'ENVIRONMENT', 'production')
+        }
+        
+        try:
+            response = requests.post(
+                webhook_url,
+                json=payload,
+                headers={
+                    'Content-Type': 'application/json',
+                    'User-Agent': 'TAIFA-FIALA-Notifications/1.0'
+                },
+                timeout=30
+            )
+            response.raise_for_status()
+            logger.debug(f"n8n webhook notification sent for alert {alert.id}")
+        except Exception as e:
+            logger.error(f"Failed to send n8n webhook notification: {e}")
     
     async def monitor_llm_usage(self) -> List[Alert]:
         """Monitor LLM usage and create alerts if thresholds are exceeded"""

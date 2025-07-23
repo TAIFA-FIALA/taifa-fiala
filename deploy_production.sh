@@ -131,22 +131,21 @@ setup_environment() {
         set -e
         cd '$PROD_PATH'
         
-        # Create virtual environment if it doesn't exist
-        if [ ! -d 'venv' ]; then
-            echo 'Creating Python virtual environment...'
-            python3 -m venv venv
+        # Install Poetry if not available
+        if ! command -v poetry &> /dev/null; then
+            echo 'Installing Poetry...'
+            curl -sSL https://install.python-poetry.org | python3 -
+            export PATH="$HOME/.local/bin:$PATH"
         fi
         
-        # Activate virtual environment and install dependencies
-        source venv/bin/activate
-        echo 'Installing Python dependencies...'
+        # Install backend dependencies with Poetry
+        echo 'Installing Python dependencies with Poetry...'
         cd backend
-        pip install --upgrade pip
-        pip install -r requirements.txt
+        poetry install --only=main --no-dev
         
         # Verify migration system
         echo 'Verifying migration system...'
-        python migration_helper.py --compare
+        poetry run python migration_helper.py --compare
         
         cd ..
     " || cleanup_and_exit
@@ -162,22 +161,21 @@ run_migrations() {
             export \$(grep -v '^#' .env | xargs)
         fi
         cd backend
-        source ../venv/bin/activate
         
         echo 'Checking migration status...'
-        alembic current
+        poetry run alembic current
         
         echo 'Checking for pending migrations...'
-        if alembic check 2>&1 | grep -q 'New upgrade operations detected'; then
+        if poetry run alembic check 2>&1 | grep -q 'New upgrade operations detected'; then
             echo 'Pending migrations detected, generating new migration...'
-            python migration_helper.py --update-migration || echo 'Migration helper completed with warnings'
+            poetry run python migration_helper.py --update-migration || echo 'Migration helper completed with warnings'
         fi
         
         echo 'Running Alembic migrations...'
-        alembic upgrade head
+        poetry run alembic upgrade head
         
         echo 'Final migration status:'
-        alembic current
+        poetry run alembic current
     " || cleanup_and_exit
     success "✓ Database migrations completed."
 }
