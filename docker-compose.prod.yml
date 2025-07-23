@@ -15,19 +15,17 @@ services:
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     restart: unless-stopped
 
-  # Frontend services commented out for initial deployment
-  # Uncomment once backend is working
-  # frontend:
-  #   build:
-  #     context: ./frontend/nextjs
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - "3020:3000"
-  #   volumes:
-  #     - ./frontend/nextjs:/app
-  #     - /app/node_modules
-  #     - /app/.next
-  #   restart: unless-stopped
+  frontend:
+    build:
+      context: ./frontend/nextjs
+      dockerfile: Dockerfile
+    ports:
+      - "3020:3000"
+    volumes:
+      - ./frontend/nextjs:/app
+      - /app/node_modules
+      - /app/.next
+    restart: unless-stopped
 
   # streamlit:
   #   build:
