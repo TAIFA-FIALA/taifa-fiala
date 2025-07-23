@@ -134,6 +134,22 @@ setup_environment() {
         # Set PATH to include common Docker installation locations
         export PATH=\"/usr/local/bin:/opt/homebrew/bin:\$PATH\"
         
+        # Unlock keychain for Docker authentication (may require sudo)
+        echo 'Unlocking keychain for Docker authentication...'
+        sudo security -v unlock-keychain ~/Library/Keychains/login.keychain-db || {
+            echo 'Keychain unlock failed. Trying without sudo...'
+            security -v unlock-keychain ~/Library/Keychains/login.keychain-db || echo 'Keychain unlock failed, continuing anyway...'
+        }
+        
+        # Ensure Docker daemon is running and accessible
+        echo 'Checking Docker daemon status...'
+        if ! docker info > /dev/null 2>&1; then
+            echo 'ERROR: Docker daemon not accessible.'
+            echo 'Please ensure Docker Desktop is running on the Mac-mini.'
+            exit 1
+        fi
+        echo 'Docker daemon is accessible.'
+        
         # Check if Docker is available
         if ! command -v docker &> /dev/null; then
             echo 'Docker not found. Please install Docker on the production server.'
