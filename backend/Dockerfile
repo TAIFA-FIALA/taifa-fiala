@@ -15,7 +15,7 @@ COPY pyproject.toml poetry.lock* ./
 RUN poetry config virtualenvs.create false
 
 # Install dependencies
-RUN poetry install --only=main
+RUN poetry install --only=main --no-root
 
 # Copy the rest of the backend application into the container at /app/backend
 COPY . .
