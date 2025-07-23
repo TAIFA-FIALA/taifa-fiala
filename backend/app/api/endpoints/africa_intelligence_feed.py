@@ -17,6 +17,6 @@ except ImportError:
         from app.api.endpoints.funding_opportunities import router
     except ImportError:
         # Try absolute import with backend prefix
-        from backend.app.api.endpoints.funding_opportunities import router
+        from app.api.endpoints.funding_opportunities import router
 
 # This maintains backward compatibility while using the unified implementation

@@ -6,13 +6,11 @@ This module integrates Pinecone vector database indexing into the ETL pipeline,
 specifically focusing on processing data from various sources and providing semantic search capabilities.
 """
 
-import os
-import asyncio
 import logging
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any
 from datetime import datetime
 
-from pinecone import ServerlessSpec
+# Note: ServerlessSpec is deprecated, using dict spec instead
 from dotenv import load_dotenv
 
 from ..etl_architecture import ETLTask, PipelineStage, Priority, ProcessingResult

@@ -14,7 +14,7 @@ import hashlib
 from dataclasses import dataclass, field
 
 # Vector and embedding imports
-from pinecone import ServerlessSpec
+# Note: ServerlessSpec is deprecated, using dict spec instead
 import openai
 from openai import OpenAI
 
@@ -102,10 +102,12 @@ class FundingIntelligenceVectorDB:
                     name=self.index_name,
                     dimension=self.dimension,
                     metric=self.metric,
-                    spec=ServerlessSpec(
-                        cloud='aws',
-                        region='us-east-1'
-                    )
+                    spec={
+                        "serverless": {
+                            "cloud": "aws",
+                            "region": "us-east-1"
+                        }
+                    }
                 )
                 
                 # Wait for index to be ready

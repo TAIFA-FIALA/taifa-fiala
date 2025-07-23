@@ -12,9 +12,8 @@ Architecture:
 - Real-time indexing through ETL pipeline integration
 """
 
-import asyncio
 import logging
-from typing import Dict, List, Optional, Any, Tuple
+from typing import Dict, List, Optional, Any
 from datetime import datetime
 from dataclasses import dataclass, field
 from enum import Enum
@@ -23,7 +22,7 @@ import hashlib
 import numpy as np
 from concurrent.futures import ThreadPoolExecutor
 import openai
-from pinecone import ServerlessSpec
+# Note: ServerlessSpec is deprecated, using dict spec instead
 
 from app.core.pinecone_client import get_pinecone_client
 from app.core.etl_architecture import ETLTask, PipelineStage, ProcessingResult
@@ -155,10 +154,12 @@ class VectorDatabaseManager:
                 name=self.config.index_name,
                 dimension=self.config.dimension,
                 metric=self.config.metric,
-                spec=ServerlessSpec(
-                    cloud='aws',
-                    region=self.config.pinecone_environment
-                )
+                spec={
+                    "serverless": {
+                        "cloud": "aws",
+                        "region": self.config.pinecone_environment
+                    }
+                }
             )
             
             self.logger.info(f"Created Pinecone index: {self.config.index_name}")

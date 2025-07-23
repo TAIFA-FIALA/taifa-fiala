@@ -14,21 +14,18 @@ Based on architecture review recommendations focusing on:
 - Local innovation hubs
 """
 
-import asyncio
 import logging
-from typing import Dict, List, Optional, Any, Tuple
+from typing import Dict, List, Optional, Any
 from datetime import datetime
 from dataclasses import dataclass, field
 from enum import Enum
-import json
-from urllib.parse import urljoin, urlparse
 
 # Use relative import when running within the app package
 try:
     from app.core.multilingual_search import SupportedLanguage
 # Use absolute import when running from project root
 except ImportError:
-    from backend.app.core.multilingual_search import SupportedLanguage
+    from app.core.multilingual_search import SupportedLanguage
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

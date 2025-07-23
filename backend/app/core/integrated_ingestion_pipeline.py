@@ -15,13 +15,10 @@ This module connects all the pieces together into a cohesive pipeline.
 
 import asyncio
 import logging
-from typing import Dict, List, Optional, Any, Tuple
+from typing import Dict, List, Optional, Any
 from datetime import datetime
 from dataclasses import dataclass, field
 from enum import Enum
-import json
-import hashlib
-import uuid
 from concurrent.futures import ThreadPoolExecutor
 
 # Handle both relative and absolute imports
@@ -29,7 +26,7 @@ try:
     from app.core.etl_architecture import ETLTask, PipelineStage, ProcessingResult
 except ImportError:
     try:
-        from backend.app.core.etl_architecture import ETLTask, PipelineStage, ProcessingResult
+        from app.core.etl_architecture import ETLTask, PipelineStage, ProcessingResult
     except ImportError:
         # For relative imports within the same package
         from .etl_architecture import ETLTask, PipelineStage, ProcessingResult
@@ -38,7 +35,7 @@ try:
     from app.core.equity_aware_classifier import EquityAwareContentClassifier, ClassificationResult
 except ImportError:
     try:
-        from backend.app.core.equity_aware_classifier import EquityAwareContentClassifier, ClassificationResult
+        from app.core.equity_aware_classifier import EquityAwareContentClassifier, ClassificationResult
     except ImportError:
         from .equity_aware_classifier import EquityAwareContentClassifier, ClassificationResult
 
@@ -47,7 +44,7 @@ try:
     from app.core.vector_database import VectorDatabaseManager, VectorETLProcessor
 except ImportError:
     try:
-        from backend.app.core.vector_database import VectorDatabaseManager, VectorETLProcessor
+        from app.core.vector_database import VectorDatabaseManager, VectorETLProcessor
     except ImportError:
         from .vector_database import VectorDatabaseManager, VectorETLProcessor
 
@@ -56,7 +53,7 @@ try:
     from app.core.bias_monitoring import BiasMonitoringEngine
 except ImportError:
     try:
-        from backend.app.core.bias_monitoring import BiasMonitoringEngine
+        from app.core.bias_monitoring import BiasMonitoringEngine
     except ImportError:
         from .bias_monitoring import BiasMonitoringEngine
 
@@ -65,7 +62,7 @@ try:
     from app.core.multilingual_search import MultilingualSearchEngine
 except ImportError:
     try:
-        from backend.app.core.multilingual_search import MultilingualSearchEngine
+        from app.core.multilingual_search import MultilingualSearchEngine
     except ImportError:
         from .multilingual_search import MultilingualSearchEngine
 
@@ -74,7 +71,7 @@ try:
     from app.core.priority_data_sources import PriorityDataSourceRegistry
 except ImportError:
     try:
-        from backend.app.core.priority_data_sources import PriorityDataSourceRegistry
+        from app.core.priority_data_sources import PriorityDataSourceRegistry
     except ImportError:
         from .priority_data_sources import PriorityDataSourceRegistry
 
@@ -83,7 +80,7 @@ try:
     from app.core.source_quality_scoring import SourceQualityScorer
 except ImportError:
     try:
-        from backend.app.core.source_quality_scoring import SourceQualityScorer
+        from app.core.source_quality_scoring import SourceQualityScorer
     except ImportError:
         from .source_quality_scoring import SourceQualityScorer
 
@@ -92,7 +89,7 @@ try:
     from app.core.enhanced_duplicate_detection import EnhancedDuplicateDetector
 except ImportError:
     try:
-        from backend.app.core.enhanced_duplicate_detection import EnhancedDuplicateDetector
+        from app.core.enhanced_duplicate_detection import EnhancedDuplicateDetector
     except ImportError:
         from .enhanced_duplicate_detection import EnhancedDuplicateDetector
 
@@ -101,7 +98,7 @@ try:
     from app.models.funding import AfricaIntelligenceItem
 except ImportError:
     try:
-        from backend.app.models.funding import AfricaIntelligenceItem
+        from app.models.funding import AfricaIntelligenceItem
     except ImportError:
         try:
             from ..models.funding import AfricaIntelligenceItem
@@ -113,7 +110,7 @@ try:
     from app.models.validation import ValidationResult, ContentFingerprint
 except ImportError:
     try:
-        from backend.app.models.validation import ValidationResult, ContentFingerprint
+        from app.models.validation import ValidationResult, ContentFingerprint
     except ImportError:
         from .validation import ValidationResult, ContentFingerprint
 
@@ -121,7 +118,7 @@ try:
     from app.core.database import get_db
 except ImportError:
     try:
-        from backend.app.core.database import get_db
+        from app.core.database import get_db
     except ImportError:
         from .database import get_db
 

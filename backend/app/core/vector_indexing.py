@@ -13,7 +13,7 @@ import logging
 from typing import Dict, List, Any, Optional
 from datetime import datetime
 
-from pinecone import ServerlessSpec
+# Note: ServerlessSpec is deprecated, using dict spec instead
 
 
 from .etl_architecture import ETLTask, PipelineStage, Priority, ProcessingResult

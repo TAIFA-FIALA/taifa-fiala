@@ -13,7 +13,7 @@ import logging
 from typing import Dict, List, Any, Optional, Tuple
 from datetime import datetime
 
-from pinecone import ServerlessSpec
+# Note: ServerlessSpec is deprecated, using dict spec instead
 from pinecone.core.client.models import QueryResponse
 
 from app.core.pinecone_client import get_pinecone_client
@@ -54,10 +54,12 @@ class VectorDBIntegration:
                     name=self.config.index_name,
                     dimension=self.config.dimension,
                     metric=self.config.metric,
-                    spec=ServerlessSpec(
-                        cloud=self.config.cloud,
-                        region=self.config.region
-                    ),
+                    spec={
+                        "serverless": {
+                            "cloud": self.config.cloud,
+                            "region": self.config.region
+                        }
+                    },
                     metadata_config={
                         "indexed": list(self.config.equity_metadata_fields)[:5]  # Pinecone limits indexed fields
                     }
