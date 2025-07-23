@@ -166,13 +166,13 @@ setup_environment() {
         echo 'Stopping existing containers...'
         docker-compose -f docker-compose.prod.yml down || docker compose -f docker-compose.prod.yml down || echo 'No existing containers to stop'
         
-        # Build and start containers (backend only for now)
-        echo 'Building and starting Docker containers (backend only)...'
+        # Build and start containers (backend and frontend)
+        echo 'Building and starting Docker containers (backend and frontend)...'
         docker-compose -f docker-compose.prod.yml up -d --build || docker compose -f docker-compose.prod.yml up -d --build
         
-        # Wait for backend to be ready
-        echo 'Waiting for backend to be ready...'
-        sleep 10
+        # Wait for services to be ready
+        echo 'Waiting for services to be ready...'
+        sleep 15
         
         # Verify migration system inside container
         echo 'Verifying migration system...'
