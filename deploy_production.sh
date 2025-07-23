@@ -136,14 +136,30 @@ setup_environment() {
             echo 'Installing Poetry...'
             # Use pip installation method to avoid symlink/venv issues on macOS
             python3 -m pip install --user poetry
-            export PATH="$HOME/.local/bin:$PATH"
+            
+            # Set PATH to include user Python bin directory
+            PYTHON_VERSION=\$(python3 -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")
+            export PATH="\$HOME/Library/Python/\$PYTHON_VERSION/bin:\$HOME/.local/bin:\$PATH"
+            
             # Verify installation
             if ! command -v poetry &> /dev/null; then
-                echo 'Poetry installation failed, trying alternative method...'
-                # Fallback: install in current Python environment
-                python3 -m pip install poetry
+                echo 'Poetry installation failed, checking alternative locations...'
+                # Try to find poetry in common locations
+                if [ -f "\$HOME/Library/Python/\$PYTHON_VERSION/bin/poetry" ]; then
+                    echo 'Found poetry in user Python directory'
+                    export PATH="\$HOME/Library/Python/\$PYTHON_VERSION/bin:\$PATH"
+                elif [ -f "\$HOME/.local/bin/poetry" ]; then
+                    echo 'Found poetry in .local/bin'
+                    export PATH="\$HOME/.local/bin:\$PATH"
+                else
+                    echo 'Poetry not found after installation. Deployment may fail.'
+                fi
             fi
         fi
+        
+        # Ensure PATH is set for subsequent commands
+        PYTHON_VERSION=\$(python3 -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")
+        export PATH="\$HOME/Library/Python/\$PYTHON_VERSION/bin:\$HOME/.local/bin:\$PATH"
         
         # Install backend dependencies with Poetry
         echo 'Installing Python dependencies with Poetry...'
