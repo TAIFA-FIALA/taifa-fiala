@@ -134,8 +134,15 @@ setup_environment() {
         # Install Poetry if not available
         if ! command -v poetry &> /dev/null; then
             echo 'Installing Poetry...'
-            curl -sSL https://install.python-poetry.org | python3 -
+            # Use pip installation method to avoid symlink/venv issues on macOS
+            python3 -m pip install --user poetry
             export PATH="$HOME/.local/bin:$PATH"
+            # Verify installation
+            if ! command -v poetry &> /dev/null; then
+                echo 'Poetry installation failed, trying alternative method...'
+                # Fallback: install in current Python environment
+                python3 -m pip install poetry
+            fi
         fi
         
         # Install backend dependencies with Poetry
