@@ -83,7 +83,7 @@ async def run_master_pipeline_test():
             },
             enable_scheduled_jobs=False,  # Manual control
             supabase_url=settings.SUPABASE_URL,
-            supabase_key=settings.SUPABASE_SERVICE_API_KEY,
+            supabase_key=settings.SUPABASE_API_KEY,
         )
         
         print("✅ Configuration created with enrichment enabled")

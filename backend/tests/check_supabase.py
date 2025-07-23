@@ -13,7 +13,7 @@ def test_supabase_connection():
     
     # Get Supabase credentials
     supabase_url = os.getenv("SUPABASE_PROJECT_URL")
-    supabase_key = os.getenv("SUPABASE_SERVICE_API_KEY")
+    supabase_key = os.getenv("SUPABASE_API_KEY")
     
     if not supabase_url or not supabase_key:
         logger.error("Supabase URL or API key not found in environment variables")

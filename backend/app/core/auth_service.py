@@ -17,7 +17,7 @@ class AuthService:
     
     def __init__(self):
         self.supabase_url = os.environ.get('SUPABASE_PROJECT_URL')
-        self.service_key = os.environ.get('SUPABASE_SERVICE_API_KEY')  # JWT service key bypasses RLS
+        self.service_key = os.environ.get('SUPABASE_API_KEY')  # JWT service key bypasses RLS
         self.anon_key = os.environ.get('SUPABASE_PUBLISHABLE_KEY')  # Anon key respects RLS
         
         # Create service client (bypasses RLS for backend operations)

@@ -988,7 +988,7 @@ def create_default_config() -> PipelineConfig:
         max_concurrent_jobs=10,
         enable_scheduled_jobs=True,
         supabase_url=os.getenv('SUPABASE_URL', ''),
-        supabase_key=os.getenv('SUPABASE_SERVICE_API_KEY', ''),
+        supabase_key=os.getenv('SUPABASE_API_KEY', ''),
         **db_config,  # Unpack the database configuration
         log_level='INFO',
         log_file='logs/master_pipeline.log'

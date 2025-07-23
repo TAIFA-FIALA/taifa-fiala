@@ -13,7 +13,7 @@ load_dotenv()
 
 # API configuration
 BASE_URL = "http://localhost:8000"  # Update if your API runs on a different URL
-API_KEY = os.getenv("SUPABASE_SERVICE_API_KEY")
+API_KEY = os.getenv("SUPABASE_API_KEY")
 
 async def test_create_opportunity():
     """Test creating a new funding opportunity through the API"""
