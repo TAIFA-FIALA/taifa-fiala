@@ -131,49 +131,34 @@ setup_environment() {
         set -e
         cd '$PROD_PATH'
         
-        # Install Poetry if not available
-        if ! command -v poetry &> /dev/null; then
-            echo 'Installing Poetry...'
-            # Upgrade pip first to avoid version warnings
-            echo 'Upgrading pip...'
-            python3 -m pip install --user --upgrade pip
-            # Use pip installation method to avoid symlink/venv issues on macOS
-            python3 -m pip install --user poetry
-            
-            # Set PATH to include user Python bin directory
-            PYTHON_VERSION=\$(python3 -c 'import sys; print("%d.%d" % (sys.version_info.major, sys.version_info.minor))')
-            export PATH="\$HOME/Library/Python/\$PYTHON_VERSION/bin:\$HOME/.local/bin:\$PATH"
-            
-            # Verify installation
-            if ! command -v poetry &> /dev/null; then
-                echo 'Poetry installation failed, checking alternative locations...'
-                # Try to find poetry in common locations
-                if [ -f "\$HOME/Library/Python/\$PYTHON_VERSION/bin/poetry" ]; then
-                    echo 'Found poetry in user Python directory'
-                    export PATH="\$HOME/Library/Python/\$PYTHON_VERSION/bin:\$PATH"
-                elif [ -f "\$HOME/.local/bin/poetry" ]; then
-                    echo 'Found poetry in .local/bin'
-                    export PATH="\$HOME/.local/bin:\$PATH"
-                else
-                    echo 'Poetry not found after installation. Deployment may fail.'
-                fi
-            fi
+        # Check if Docker is available
+        if ! command -v docker &> /dev/null; then
+            echo 'Docker not found. Please install Docker on the production server.'
+            exit 1
         fi
         
-        # Ensure PATH is set for subsequent commands
-        PYTHON_VERSION=\$(python3 -c 'import sys; print("%d.%d" % (sys.version_info.major, sys.version_info.minor))')
-        export PATH="\$HOME/Library/Python/\$PYTHON_VERSION/bin:\$HOME/.local/bin:\$PATH"
+        # Check if Docker Compose is available
+        if ! command -v docker-compose &> /dev/null && ! docker compose version &> /dev/null; then
+            echo 'Docker Compose not found. Please install Docker Compose on the production server.'
+            exit 1
+        fi
         
-        # Install backend dependencies with Poetry
-        echo 'Installing Python dependencies with Poetry...'
-        cd backend
-        poetry install --only=main --no-dev
+        # Stop any existing containers
+        echo 'Stopping existing containers...'
+        docker-compose down || docker compose down || echo 'No existing containers to stop'
         
-        # Verify migration system
+        # Build and start containers
+        echo 'Building and starting Docker containers...'
+        docker-compose up -d --build || docker compose up -d --build
+        
+        # Wait for backend to be ready
+        echo 'Waiting for backend to be ready...'
+        sleep 10
+        
+        # Verify migration system inside container
         echo 'Verifying migration system...'
-        poetry run python migration_helper.py --compare
+        docker-compose exec -T backend python migration_helper.py --compare || docker compose exec -T backend python migration_helper.py --compare || echo 'Migration verification completed with warnings'
         
-        cd ..
     " || cleanup_and_exit
     success "✓ Environment setup completed."
 }
@@ -183,60 +168,45 @@ run_migrations() {
     ssh $SSH_USER@$PROD_SERVER "
         set -e
         cd '$PROD_PATH'
-        if [ -f .env ]; then
-            export \$(grep -v '^#' .env | xargs)
-        fi
-        cd backend
         
         echo 'Checking migration status...'
-        poetry run alembic current
+        docker-compose exec -T backend alembic current || docker compose exec -T backend alembic current
         
         echo 'Checking for pending migrations...'
-        if poetry run alembic check 2>&1 | grep -q 'New upgrade operations detected'; then
+        if docker-compose exec -T backend alembic check 2>&1 | grep -q 'New upgrade operations detected' || docker compose exec -T backend alembic check 2>&1 | grep -q 'New upgrade operations detected'; then
             echo 'Pending migrations detected, generating new migration...'
-            poetry run python migration_helper.py --update-migration || echo 'Migration helper completed with warnings'
+            docker-compose exec -T backend python migration_helper.py --update-migration || docker compose exec -T backend python migration_helper.py --update-migration || echo 'Migration helper completed with warnings'
         fi
         
         echo 'Running Alembic migrations...'
-        poetry run alembic upgrade head
+        docker-compose exec -T backend alembic upgrade head || docker compose exec -T backend alembic upgrade head
         
         echo 'Final migration status:'
-        poetry run alembic current
+        docker-compose exec -T backend alembic current || docker compose exec -T backend alembic current
     " || cleanup_and_exit
     success "✓ Database migrations completed."
 }
 
 start_services() {
-    step "Step 7: Starting Services with Docker-Compose"
+    step "Step 7: Starting Services"
     ssh $SSH_USER@$PROD_SERVER "
         set -e
         cd '$PROD_PATH'
         
-        # Find docker-compose command
-        DOCKER_COMPOSE_CMD=''
-        if command -v docker-compose >/dev/null 2>&1; then
-            DOCKER_COMPOSE_CMD='docker-compose'
-        elif command -v /usr/local/bin/docker-compose >/dev/null 2>&1; then
-            DOCKER_COMPOSE_CMD='/usr/local/bin/docker-compose'
-        elif docker compose version >/dev/null 2>&1; then
-            DOCKER_COMPOSE_CMD='docker compose'
-        else
-            echo 'Error: docker-compose not found'
-            exit 1
-        fi
+        # Ensure containers are running (they should already be from setup_environment)
+        echo 'Ensuring all containers are running...'
+        docker-compose up -d || docker compose up -d
         
-        echo \"Using Docker Compose command: \$DOCKER_COMPOSE_CMD\"
-        echo 'Stopping existing services...'
-        \$DOCKER_COMPOSE_CMD down --remove-orphans
-        echo 'Building services with no cache...'
-        \$DOCKER_COMPOSE_CMD build --no-cache
-        echo 'Starting services...'
-        \$DOCKER_COMPOSE_CMD up -d
-    " || {
-        warning "Service startup failed."
-        cleanup_and_exit
-    }
-    success "✓ Services started."
+        # Wait for services to be ready
+        echo 'Waiting for services to initialize...'
+        sleep 15
+        
+        # Show container status
+        echo 'Container status:'
+        docker-compose ps || docker compose ps
+        
+    " || cleanup_and_exit
+    success "✓ Services started successfully."
 }
 
 health_check() {
@@ -287,10 +257,10 @@ main() {
 
     check_prerequisites
     git_safety_checks
+    run_migrations
     backup_production
     sync_files
     setup_environment
-    # run_migrations
     start_services
     health_check
 

@@ -1,15 +1,21 @@
 # Use an official Python runtime as a parent image
-# Change from python:3.9 to python:3.10 or newer
-FROM python:3.10-slim
+# Using Python 3.12 to match development environment and satisfy pyproject.toml requirements
+FROM python:3.12-slim
 
 # Set the working directory in the container
 WORKDIR /app/backend
 
-# Copy the requirements file into the container
-COPY requirements.txt .
+# Install Poetry
+RUN pip install --no-cache-dir poetry
 
-# Install any needed packages specified in requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+# Copy poetry files
+COPY pyproject.toml poetry.lock* ./
+
+# Configure poetry: Don't create virtual env (we're already in container)
+RUN poetry config virtualenvs.create false
+
+# Install dependencies
+RUN poetry install --only=main --no-dev
 
 # Copy the rest of the backend application into the container at /app/backend
 COPY . .
