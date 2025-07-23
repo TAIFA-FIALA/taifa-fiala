@@ -49,6 +49,32 @@ check_prerequisites() {
         exit 1
     fi
 
+    info "Checking 1Password login status..."
+    if command -v op >/dev/null 2>&1; then
+        if ! op account list >/dev/null 2>&1; then
+            error "1Password CLI is not signed in."
+            warning "Please run 'op signin' or ensure 1Password app is logged in."
+            exit 1
+        fi
+        success "✓ 1Password is logged in."
+    else
+        warning "1Password CLI not found, skipping 1Password check."
+    fi
+
+    info "Checking SSH agent status..."
+    if [ -z "$SSH_AUTH_SOCK" ]; then
+        error "SSH agent is not running or not accessible."
+        warning "Please ensure SSH agent is running and 1Password SSH agent is enabled."
+        exit 1
+    fi
+    
+    if ! ssh-add -l >/dev/null 2>&1; then
+        error "No SSH keys are loaded in the SSH agent."
+        warning "Please ensure 1Password is logged in and SSH keys are available."
+        exit 1
+    fi
+    success "✓ SSH agent is running with keys loaded."
+
     info "Testing SSH connection to Mac-mini..."
     if ! ssh -o ConnectTimeout=10 $SSH_USER@$PROD_SERVER 'echo "SSH connection successful"' >/dev/null 2>&1; then
         error "Cannot connect to Mac-mini server $PROD_SERVER"
