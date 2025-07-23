@@ -148,11 +148,11 @@ setup_environment() {
         
         # Stop any existing containers
         echo 'Stopping existing containers...'
-        docker-compose down || docker compose down || echo 'No existing containers to stop'
+        docker-compose -f docker-compose.prod.yml down || docker compose -f docker-compose.prod.yml down || echo 'No existing containers to stop'
         
-        # Build and start containers
-        echo 'Building and starting Docker containers...'
-        docker-compose up -d --build || docker compose up -d --build
+        # Build and start containers (backend only for now)
+        echo 'Building and starting Docker containers (backend only)...'
+        docker-compose -f docker-compose.prod.yml up -d --build || docker compose -f docker-compose.prod.yml up -d --build
         
         # Wait for backend to be ready
         echo 'Waiting for backend to be ready...'
@@ -167,30 +167,29 @@ setup_environment() {
 }
 
 run_migrations() {
-    step "Step 6: Running Database Migrations"
-    ssh $SSH_USER@$PROD_SERVER "
-        set -e
-        cd '$PROD_PATH'
-        
-        # Set PATH to include common Docker installation locations
-        export PATH=\"/usr/local/bin:/opt/homebrew/bin:\$PATH\"
-        
-        echo 'Checking migration status...'
-        docker-compose exec -T backend alembic current || docker compose exec -T backend alembic current
-        
-        echo 'Checking for pending migrations...'
-        if docker-compose exec -T backend alembic check 2>&1 | grep -q 'New upgrade operations detected' || docker compose exec -T backend alembic check 2>&1 | grep -q 'New upgrade operations detected'; then
-            echo 'Pending migrations detected, generating new migration...'
-            docker-compose exec -T backend python migration_helper.py --update-migration || docker compose exec -T backend python migration_helper.py --update-migration || echo 'Migration helper completed with warnings'
-        fi
-        
-        echo 'Running Alembic migrations...'
-        docker-compose exec -T backend alembic upgrade head || docker compose exec -T backend alembic upgrade head
-        
-        echo 'Final migration status:'
-        docker-compose exec -T backend alembic current || docker compose exec -T backend alembic current
-    " || cleanup_and_exit
-    success "✓ Database migrations completed."
+    step "Step 3: Running Local Database Migrations"
+    info "Running migrations locally to ensure SQLite DB is up-to-date before deployment..."
+    
+    cd backend
+    
+    echo 'Checking local migration status...'
+    poetry run alembic current
+    
+    echo 'Checking for pending migrations...'
+    if poetry run alembic check 2>&1 | grep -q 'New upgrade operations detected'; then
+        echo 'Pending migrations detected, generating new migration...'
+        poetry run python migration_helper.py --update-migration || echo 'Migration helper completed with warnings'
+    fi
+    
+    echo 'Running local Alembic migrations...'
+    poetry run alembic upgrade head
+    
+    echo 'Final local migration status:'
+    poetry run alembic current
+    
+    cd ..
+    
+    success "✓ Local database migrations completed."
 }
 
 start_services() {
@@ -204,7 +203,7 @@ start_services() {
         
         # Ensure containers are running (they should already be from setup_environment)
         echo 'Ensuring all containers are running...'
-        docker-compose up -d || docker compose up -d
+        docker-compose -f docker-compose.prod.yml up -d || docker compose -f docker-compose.prod.yml up -d
         
         # Wait for services to be ready
         echo 'Waiting for services to initialize...'
@@ -212,7 +211,7 @@ start_services() {
         
         # Show container status
         echo 'Container status:'
-        docker-compose ps || docker compose ps
+        docker-compose -f docker-compose.prod.yml ps || docker compose -f docker-compose.prod.yml ps
         
     " || cleanup_and_exit
     success "✓ Services started successfully."
