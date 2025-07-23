@@ -124,7 +124,7 @@ function InvestmentContent() {
       router.push(`/funding/investments?${queryString}`);
 
       try {
-        const res = await fetch(`${getApiUrl(API_ENDPOINTS.fundingOpportunities)}?${queryString}`);
+        const res = await fetch(`${getApiUrl(API_ENDPOINTS.fundingAnnouncements)}?${queryString}`);
         if (!res.ok) {
           throw new Error(`HTTP error! status: ${res.status}`);
         }

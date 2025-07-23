@@ -47,7 +47,7 @@ export default function FundingLifecycleSupport({ className = '' }: FundingLifec
         // In production, replace with actual API endpoints
         const [stagesRes, oppsRes, collabRes] = await Promise.all([
           fetch('http://localhost:8000/api/v1/analytics/funding-stages'),
-          fetch(`http://localhost:8000/api/v1/opportunities/stage-matching?stage=${selectedStage}`),
+          fetch(`http://localhost:8000/api/v1/announcements/stage-matching?stage=${selectedStage}`),
           fetch('http://localhost:8000/api/v1/analytics/collaboration-suggestions')
         ]);
         

@@ -1,4 +1,4 @@
-import { FundingOpportunity } from './funding';
+import { FundingAnnouncement } from './funding';
 
 // Types for search functionality
 export interface SearchFilters {
@@ -36,7 +36,7 @@ export interface SearchResultsProps {
 }
 
 export interface SearchResultsState {
-  opportunities: FundingOpportunity[];
+  opportunities: FundingAnnouncement[];
   total: number;
   currentPage: number;
   totalPages: number;

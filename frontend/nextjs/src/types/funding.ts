@@ -1,4 +1,4 @@
-export interface FundingOpportunity {
+export interface FundingAnnouncement {
   id: number;
   title: string;
   description: string;
@@ -41,6 +41,12 @@ export interface FundingOpportunity {
   link?: string;
   contact_email?: string;
   application_url?: string;
+  source_url?: string;
+  
+  // Registration requirements
+  requires_registration?: boolean;
+  registration_url?: string;
+  registration_deadline?: string;
   
   // Categories and domains
   categories?: string;
@@ -85,7 +91,6 @@ export interface FundingOpportunity {
   created_at?: string;
   last_checked?: string;
   confidence_score?: number;
-  source_url?: string;
   
   // Additional metadata
   eligibility_criteria?: string;

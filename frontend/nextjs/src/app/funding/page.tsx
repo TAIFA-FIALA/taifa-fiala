@@ -99,7 +99,7 @@ function FundingPageContent() {
       router.push(`/funding?${queryString}`);
 
       try {
-        const res = await fetch(`http://localhost:8000/api/v1/intelligent-search/opportunities?${queryString}`);
+        const res = await fetch(`http://localhost:8000/api/v1/intelligent-search/announcements?${queryString}`);
         if (!res.ok) {
           throw new Error(`HTTP error! status: ${res.status}`);
         }

@@ -6,15 +6,15 @@ import {
   Users, TrendingUp, Award, ChevronDown, ChevronUp,
   Globe, Brain, Shield, AlertCircle, UserCheck, GraduationCap, Home
 } from 'lucide-react';
-import { FundingOpportunity } from '@/types/funding';
+import { FundingAnnouncement } from '@/types/funding';
 
-interface OpportunityCardProps {
-  opportunity: FundingOpportunity;
+interface AnnouncementCardProps {
+  announcement: FundingAnnouncement;
   searchMode: 'discover' | 'explore';
   onViewDetails?: (id: number) => void;
 }
 
-export default function OpportunityCard({ opportunity, searchMode }: OpportunityCardProps) {
+export default function AnnouncementCard({ announcement, searchMode }: AnnouncementCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [showEquityDetails, setShowEquityDetails] = useState(false);
 
@@ -31,14 +31,14 @@ export default function OpportunityCard({ opportunity, searchMode }: Opportunity
   };
 
   const getFundingAmountDisplay = () => {
-    if (opportunity.amount_exact) {
-      return formatAmount(opportunity.amount_exact, opportunity.currency);
-    } else if (opportunity.amount_min && opportunity.amount_max) {
-      return `${formatAmount(opportunity.amount_min, opportunity.currency)} - ${formatAmount(opportunity.amount_max, opportunity.currency)}`;
-    } else if (opportunity.amount_min) {
-      return `${formatAmount(opportunity.amount_min, opportunity.currency)}+`;
-    } else if (opportunity.amount_max) {
-      return `Up to ${formatAmount(opportunity.amount_max, opportunity.currency)}`;
+    if (announcement.amount_exact) {
+      return formatAmount(announcement.amount_exact, announcement.currency);
+    } else if (announcement.amount_min && announcement.amount_max) {
+      return `${formatAmount(announcement.amount_min, announcement.currency)} - ${formatAmount(announcement.amount_max, announcement.currency)}`;
+    } else if (announcement.amount_min) {
+      return `${formatAmount(announcement.amount_min, announcement.currency)}+`;
+    } else if (announcement.amount_max) {
+      return `Up to ${formatAmount(announcement.amount_max, announcement.currency)}`;
     }
     return 'Amount not specified';
   };
@@ -60,9 +60,9 @@ export default function OpportunityCard({ opportunity, searchMode }: Opportunity
   };
 
   const getEquityScore = () => {
-    if (!opportunity.equity_score) return null;
+    if (!announcement.equity_score) return null;
     
-    const score = opportunity.equity_score;
+    const score = announcement.equity_score;
     let color = 'text-[#1F2A44]';
     let bgColor = 'bg-[#A0A0A0] bg-opacity-20';
     
@@ -93,9 +93,9 @@ export default function OpportunityCard({ opportunity, searchMode }: Opportunity
   };
 
   const getDaysUntilDeadline = () => {
-    if (!opportunity.deadline) return null;
+    if (!announcement.deadline) return null;
     
-    const deadline = new Date(opportunity.deadline);
+    const deadline = new Date(announcement.deadline);
     const today = new Date();
     const diffTime = deadline.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -113,19 +113,19 @@ export default function OpportunityCard({ opportunity, searchMode }: Opportunity
         <div className="flex items-start justify-between mb-3">
           <div className="flex-1">
             <h3 className="text-xl font-bold text-[#1F2A44] mb-2 line-clamp-2">
-              {opportunity.title}
+              {announcement.title}
             </h3>
             
             <div className="flex items-center space-x-4 mb-3">
               {/* Status Badge */}
-              <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(opportunity.status)}`}>
-                {opportunity.status}
+              <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(announcement.status)}`}>
+                {announcement.status}
               </span>
               
               {/* Funding Type */}
-              {opportunity.funding_type && (
+              {announcement.funding_type && (
                 <span className="px-3 py-1 bg-[#4B9CD3] bg-opacity-20 text-[#1F2A44] rounded-full text-xs font-medium">
-                  {opportunity.funding_type.name}
+                  {announcement.funding_type.name}
                 </span>
               )}
               
@@ -157,10 +157,10 @@ export default function OpportunityCard({ opportunity, searchMode }: Opportunity
               <div className="text-lg font-semibold text-green-600">
                 {getFundingAmountDisplay()}
               </div>
-              {opportunity.funding_type?.requires_equity && (
+              {announcement.funding_type?.requires_equity && (
                 <div className="text-xs text-gray-500">
-                  {opportunity.investment_specific?.equity_percentage && 
-                    `${opportunity.investment_specific.equity_percentage}% equity required`
+                  {announcement.investment_specific?.equity_percentage && 
+                    `${announcement.investment_specific.equity_percentage}% equity required`
                   }
                 </div>
               )}
@@ -168,12 +168,12 @@ export default function OpportunityCard({ opportunity, searchMode }: Opportunity
           </div>
 
           {/* Deadline */}
-          {opportunity.deadline && (
+          {announcement.deadline && (
             <div className="flex items-center space-x-2">
               <Calendar className="w-5 h-5 text-blue-600" />
               <div>
                 <div className="text-sm font-medium text-gray-900">
-                  {formatDate(opportunity.deadline)}
+                  {formatDate(announcement.deadline)}
                 </div>
                 <div className="text-xs text-gray-500">Application deadline</div>
               </div>
@@ -182,17 +182,17 @@ export default function OpportunityCard({ opportunity, searchMode }: Opportunity
         </div>
 
         {/* Organization */}
-        {opportunity.provider_organization && (
+        {announcement.provider_organization && (
           <div className="flex items-center space-x-2 mb-4">
             <Building className="w-5 h-5 text-purple-600" />
             <div>
               <div className="text-sm font-medium text-gray-900">
-                {opportunity.provider_organization.name}
+                {announcement.provider_organization.name}
               </div>
               <div className="text-xs text-gray-500">
-                {opportunity.provider_organization.type}
-                {opportunity.provider_organization.country && 
-                  ` • ${opportunity.provider_organization.country}`
+                {announcement.provider_organization.type}
+                {announcement.provider_organization.country && 
+                  ` • ${announcement.provider_organization.country}`
                 }
               </div>
             </div>
@@ -201,20 +201,20 @@ export default function OpportunityCard({ opportunity, searchMode }: Opportunity
 
         {/* Description */}
         <p className="text-gray-600 text-sm line-clamp-3 mb-4">
-          {opportunity.description}
+          {announcement.description}
         </p>
 
         {/* Tags */}
         <div className="flex flex-wrap gap-2 mb-4">
           {/* AI Domains */}
-          {opportunity.ai_domains?.slice(0, 3).map((domain) => (
+          {announcement.ai_domains?.slice(0, 3).map((domain) => (
             <span key={domain.id} className="px-2 py-1 bg-indigo-100 text-indigo-800 rounded-full text-xs">
               {domain.name}
             </span>
           ))}
           
           {/* Geographic Scope */}
-          {opportunity.geographic_scope_names?.slice(0, 2).map((scope) => (
+          {announcement.geographic_scope_names?.slice(0, 2).map((scope) => (
             <span key={scope} className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs flex items-center space-x-1">
               <Globe className="w-3 h-3" />
               <span>{scope}</span>
@@ -222,7 +222,7 @@ export default function OpportunityCard({ opportunity, searchMode }: Opportunity
           ))}
           
           {/* Inclusion Indicators */}
-          {opportunity.inclusion_indicators?.slice(0, 2).map((indicator) => (
+          {announcement.inclusion_indicators?.slice(0, 2).map((indicator) => (
             <span key={indicator} className="px-2 py-1 bg-pink-100 text-pink-800 rounded-full text-xs flex items-center space-x-1">
               <Users className="w-3 h-3" />
               <span>{indicator}</span>
@@ -231,29 +231,29 @@ export default function OpportunityCard({ opportunity, searchMode }: Opportunity
         </div>
 
         {/* Equity Focus Indicators */}
-        {(opportunity.underserved_focus || opportunity.women_focus || opportunity.youth_focus || opportunity.rural_focus) && (
+        {(announcement.underserved_focus || announcement.women_focus || announcement.youth_focus || announcement.rural_focus) && (
           <div className="flex items-center space-x-3 mb-4">
             <Shield className="w-4 h-4 text-blue-600" />
             <div className="flex space-x-2">
-              {opportunity.underserved_focus && (
+              {announcement.underserved_focus && (
                 <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded flex items-center space-x-1">
                   <Globe className="w-3 h-3" />
                   <span>Underserved Focus</span>
                 </span>
               )}
-              {opportunity.women_focus && (
+              {announcement.women_focus && (
                 <span className="text-xs bg-pink-100 text-pink-800 px-2 py-1 rounded flex items-center space-x-1">
                   <UserCheck className="w-3 h-3" />
                   <span>Women-Led</span>
                 </span>
               )}
-              {opportunity.youth_focus && (
+              {announcement.youth_focus && (
                 <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded flex items-center space-x-1">
                   <GraduationCap className="w-3 h-3" />
                   <span>Youth-Focused</span>
                 </span>
               )}
-              {opportunity.rural_focus && (
+              { announcement.rural_focus && (
                 <span className="text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded flex items-center space-x-1">
                   <Home className="w-3 h-3" />
                   <span>Rural</span>
@@ -271,29 +271,29 @@ export default function OpportunityCard({ opportunity, searchMode }: Opportunity
             {/* Left Column */}
             <div className="space-y-4">
               {/* Grant-specific details */}
-              {opportunity.grant_specific && (
+              {announcement.grant_specific && (
                 <div>
                   <h4 className="font-semibold text-gray-900 mb-2 flex items-center space-x-2">
                     <Award className="w-4 h-4" />
                     <span>Grant Details</span>
                   </h4>
                   <div className="space-y-2 text-sm">
-                    {opportunity.grant_specific.duration_months && (
+                    {announcement.grant_specific.duration_months && (
                       <div className="flex justify-between">
                         <span className="text-gray-600">Duration:</span>
-                        <span className="font-medium">{opportunity.grant_specific.duration_months} months</span>
+                        <span className="font-medium">{announcement.grant_specific.duration_months} months</span>
                       </div>
                     )}
-                    {opportunity.grant_specific.renewable !== undefined && (
+                    {announcement.grant_specific.renewable !== undefined && (
                       <div className="flex justify-between">
                         <span className="text-gray-600">Renewable:</span>
-                        <span className="font-medium">{opportunity.grant_specific.renewable ? 'Yes' : 'No'}</span>
+                        <span className="font-medium">{announcement.grant_specific.renewable ? 'Yes' : 'No'}</span>
                       </div>
                     )}
-                    {opportunity.grant_specific.project_based !== undefined && (
+                    {announcement.grant_specific.project_based !== undefined && (
                       <div className="flex justify-between">
                         <span className="text-gray-600">Project-based:</span>
-                        <span className="font-medium">{opportunity.grant_specific.project_based ? 'Yes' : 'No'}</span>
+                        <span className="font-medium">{announcement.grant_specific.project_based ? 'Yes' : 'No'}</span>
                       </div>
                     )}
                   </div>
@@ -301,29 +301,29 @@ export default function OpportunityCard({ opportunity, searchMode }: Opportunity
               )}
 
               {/* Investment-specific details */}
-              {opportunity.investment_specific && (
+              {announcement.investment_specific && (
                 <div>
                   <h4 className="font-semibold text-gray-900 mb-2 flex items-center space-x-2">
                     <TrendingUp className="w-4 h-4" />
                     <span>Investment Details</span>
                   </h4>
                   <div className="space-y-2 text-sm">
-                    {opportunity.investment_specific.equity_percentage && (
+                    {announcement.investment_specific.equity_percentage && (
                       <div className="flex justify-between">
                         <span className="text-gray-600">Equity Required:</span>
-                        <span className="font-medium">{opportunity.investment_specific.equity_percentage}%</span>
+                        <span className="font-medium">{announcement.investment_specific.equity_percentage}%</span>
                       </div>
                     )}
-                    {opportunity.investment_specific.valuation_cap && (
+                    {announcement.investment_specific.valuation_cap && (
                       <div className="flex justify-between">
                         <span className="text-gray-600">Valuation Cap:</span>
-                        <span className="font-medium">{formatAmount(opportunity.investment_specific.valuation_cap)}</span>
+                        <span className="font-medium">{formatAmount(announcement.investment_specific.valuation_cap)}</span>
                       </div>
                     )}
-                    {opportunity.investment_specific.expected_roi && (
+                    {announcement.investment_specific.expected_roi && (
                       <div className="flex justify-between">
                         <span className="text-gray-600">Expected ROI:</span>
-                        <span className="font-medium">{opportunity.investment_specific.expected_roi}%</span>
+                        <span className="font-medium">{announcement.investment_specific.expected_roi}%</span>
                       </div>
                     )}
                   </div>
@@ -337,22 +337,22 @@ export default function OpportunityCard({ opportunity, searchMode }: Opportunity
                   <span>Timeline</span>
                 </h4>
                 <div className="space-y-2 text-sm">
-                  {opportunity.announcement_date && (
+                  {announcement.announcement_date && (
                     <div className="flex justify-between">
                       <span className="text-gray-600">Announced:</span>
-                      <span className="font-medium">{formatDate(opportunity.announcement_date)}</span>
+                      <span className="font-medium">{formatDate(announcement.announcement_date)}</span>
                     </div>
                   )}
-                  {opportunity.start_date && (
+                  {announcement.start_date && (
                     <div className="flex justify-between">
                       <span className="text-gray-600">Start Date:</span>
-                      <span className="font-medium">{formatDate(opportunity.start_date)}</span>
+                      <span className="font-medium">{formatDate(announcement.start_date)}</span>
                     </div>
                   )}
-                  {opportunity.deadline && (
+                  {announcement.deadline && (
                     <div className="flex justify-between">
                       <span className="text-gray-600">Deadline:</span>
-                      <span className="font-medium">{formatDate(opportunity.deadline)}</span>
+                      <span className="font-medium">{formatDate(announcement.deadline)}</span>
                     </div>
                   )}
                 </div>
@@ -362,14 +362,14 @@ export default function OpportunityCard({ opportunity, searchMode }: Opportunity
             {/* Right Column */}
             <div className="space-y-4">
               {/* All AI Domains */}
-              {opportunity.ai_domains && opportunity.ai_domains.length > 0 && (
+              {announcement.ai_domains && announcement.ai_domains.length > 0 && (
                 <div>
                   <h4 className="font-semibold text-gray-900 mb-2 flex items-center space-x-2">
                     <Brain className="w-4 h-4" />
                     <span>AI Domains</span>
                   </h4>
                   <div className="flex flex-wrap gap-2">
-                    {opportunity.ai_domains.map((domain) => (
+                    {announcement.ai_domains.map((domain) => (
                       <span key={domain.id} className="px-2 py-1 bg-indigo-100 text-indigo-800 rounded-full text-xs">
                         {domain.name}
                       </span>
@@ -379,14 +379,14 @@ export default function OpportunityCard({ opportunity, searchMode }: Opportunity
               )}
 
               {/* Geographic Coverage */}
-              {opportunity.geographic_scope_names && opportunity.geographic_scope_names.length > 0 && (
+              {announcement.geographic_scope_names && announcement.geographic_scope_names.length > 0 && (
                 <div>
                   <h4 className="font-semibold text-gray-900 mb-2 flex items-center space-x-2">
                     <MapPin className="w-4 h-4" />
                     <span>Geographic Coverage</span>
                   </h4>
                   <div className="flex flex-wrap gap-2">
-                    {opportunity.geographic_scope_names.map((scope) => (
+                    {announcement.geographic_scope_names.map((scope) => (
                       <span key={scope} className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
                         {scope}
                       </span>
@@ -396,14 +396,14 @@ export default function OpportunityCard({ opportunity, searchMode }: Opportunity
               )}
 
               {/* Bias Flags */}
-              {opportunity.bias_flags && opportunity.bias_flags.length > 0 && (
+              {announcement.bias_flags && announcement.bias_flags.length > 0 && (
                 <div>
                   <h4 className="font-semibold text-gray-900 mb-2 flex items-center space-x-2">
                     <AlertCircle className="w-4 h-4 text-yellow-600" />
                     <span>Bias Analysis</span>
                   </h4>
                   <div className="space-y-1">
-                    {opportunity.bias_flags.map((flag: string, index: number) => (
+                    {announcement.bias_flags.map((flag: string, index: number) => (
                       <div key={index} className="text-xs text-yellow-700 bg-yellow-50 px-2 py-1 rounded">
                         {flag}
                       </div>
@@ -417,14 +417,14 @@ export default function OpportunityCard({ opportunity, searchMode }: Opportunity
                 <div>
                   <h4 className="font-semibold text-gray-900 mb-2">Metadata</h4>
                   <div className="space-y-1 text-xs text-gray-600">
-                    {opportunity.created_at && (
-                      <div>Added: {formatDate(opportunity.created_at)}</div>
+                    {announcement.created_at && (
+                      <div>Added: {formatDate(announcement.created_at)}</div>
                     )}
-                    {opportunity.last_checked && (
-                      <div>Last checked: {formatDate(opportunity.last_checked)}</div>
+                    {announcement.last_checked && (
+                      <div>Last checked: {formatDate(announcement.last_checked)}</div>
                     )}
-                    {opportunity.confidence_score && (
-                      <div>Confidence: {(opportunity.confidence_score * 100).toFixed(0)}%</div>
+                    {announcement.confidence_score && (
+                      <div>Confidence: {(announcement.confidence_score * 100).toFixed(0)}%</div>
                     )}
                   </div>
                 </div>
@@ -458,21 +458,42 @@ export default function OpportunityCard({ opportunity, searchMode }: Opportunity
           </div>
           
           <div className="flex items-center space-x-2">
-            {opportunity.application_url && (
+            {/* Registration-aware application button */}
+            {announcement.application_url && (
               <a
-                href={opportunity.application_url}
+                href={announcement.application_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center space-x-2"
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center space-x-2 ${
+                  announcement.requires_registration
+                    ? 'bg-orange-600 hover:bg-orange-700 text-white'
+                    : 'bg-blue-600 hover:bg-blue-700 text-white'
+                }`}
               >
-                <span>Apply Now</span>
+                <span>
+                  {announcement.requires_registration ? 'Register to Apply' : 'Apply Now'}
+                </span>
                 <ExternalLink className="w-4 h-4" />
               </a>
             )}
             
-            {opportunity.source_url && (
+            {/* Registration portal link if separate from application */}
+            {announcement.requires_registration && announcement.registration_url && announcement.registration_url !== announcement.application_url && (
               <a
-                href={opportunity.source_url}
+                href={announcement.registration_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center space-x-2"
+              >
+                <UserCheck className="w-4 h-4" />
+                <span>Register First</span>
+                <ExternalLink className="w-4 h-4" />
+              </a>
+            )}
+            
+            {announcement.source_url && (
+              <a
+                href={announcement.source_url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="border border-gray-300 text-gray-700 hover:bg-gray-50 px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center space-x-2"

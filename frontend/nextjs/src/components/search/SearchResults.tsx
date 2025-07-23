@@ -6,8 +6,8 @@ import {
   SortAsc, SortDesc, Filter, Download, Share2,
   Calendar, DollarSign, Scale, Target, Clock, Building2
 } from 'lucide-react';
-import OpportunityCard from './OpportunityCard';
-import { FundingOpportunity } from '@/types/funding';
+import AnnouncementCard from './AnnouncementCard';
+import { FundingAnnouncement } from '@/types/funding';
 import { SearchResultsProps, SearchResultsState } from '@/types/search';
 
 export default function SearchResults({ searchMode, filters, loading, onLoadMore }: SearchResultsProps) {
@@ -36,7 +36,7 @@ export default function SearchResults({ searchMode, filters, loading, onLoadMore
   ];
 
   // Mock data for demonstration
-  const mockOpportunities: FundingOpportunity[] = [
+  const mockAnnouncements: FundingAnnouncement[] = [
     {
       id: 1,
       title: "AI for Healthcare Innovation Grant",
@@ -137,28 +137,28 @@ export default function SearchResults({ searchMode, filters, loading, onLoadMore
     // Simulate API call
     const fetchResults = async () => {
       // In real implementation, this would fetch from API based on filters
-      const filteredOpportunities = mockOpportunities.filter(opp => {
-        if (searchMode === 'discover' && opp.status !== 'active') return false;
-        if (filters.funding_type && opp.funding_type?.category !== filters.funding_type) return false;
-        if (filters.underserved_focus && !opp.underserved_focus) return false;
-        if (filters.women_focus && !opp.women_focus) return false;
-        if (filters.youth_focus && !opp.youth_focus) return false;
-        if (filters.rural_focus && !opp.rural_focus) return false;
-        if (filters.min_amount && opp.amount_exact && opp.amount_exact < filters.min_amount) return false;
-        if (filters.max_amount && opp.amount_exact && opp.amount_exact > filters.max_amount) return false;
+      const filteredAnnouncements = mockAnnouncements.filter((announcement: FundingAnnouncement) => {
+        if (searchMode === 'discover' && announcement.status !== 'active') return false;
+        if (filters.funding_type && announcement.funding_type?.category !== filters.funding_type) return false;
+        if (filters.underserved_focus && !announcement.underserved_focus) return false;
+        if (filters.women_focus && !announcement.women_focus) return false;
+        if (filters.youth_focus && !announcement.youth_focus) return false;
+        if (filters.rural_focus && !announcement.rural_focus) return false;
+        if (filters.min_amount && announcement.amount_exact && announcement.amount_exact < filters.min_amount) return false;
+        if (filters.max_amount && announcement.amount_exact && announcement.amount_exact > filters.max_amount) return false;
         return true;
       });
 
       setState(prev => ({
         ...prev,
-        opportunities: filteredOpportunities,
-        total: filteredOpportunities.length,
-        totalPages: Math.ceil(filteredOpportunities.length / prev.perPage)
+        opportunities: filteredAnnouncements,
+        total: filteredAnnouncements.length,
+        totalPages: Math.ceil(filteredAnnouncements.length / prev.perPage)
       }));
     };
 
     fetchResults();
-  }, [searchMode, filters, mockOpportunities]);
+  }, [searchMode, filters, mockAnnouncements]);
 
   const handleSort = (sortBy: string) => {
     setState(prev => ({
@@ -348,12 +348,12 @@ export default function SearchResults({ searchMode, filters, loading, onLoadMore
             ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' 
             : 'space-y-4'
         }>
-          {displayedOpportunities.map((opportunity) => (
-            <OpportunityCard
-              key={opportunity.id}
-              opportunity={opportunity}
+          {displayedOpportunities.map((announcement) => (
+            <AnnouncementCard
+              key={announcement.id}
+              announcement={announcement}
               searchMode={searchMode}
-              onViewDetails={(id) => console.log('View details for', id)}
+              onViewDetails={(id: number) => console.log('View details for', id)}
             />
           ))}
         </div>
