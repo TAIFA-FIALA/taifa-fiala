@@ -84,7 +84,7 @@ const MetricCard: React.FC<{ metric: FundingMetric }> = ({ metric }) => (
           <div className={`inline-flex items-center mt-2 px-2 py-1 rounded-full text-xs font-medium ${
             metric.trend === 'up' ? 'bg-green-100 text-green-800' : 
             metric.trend === 'down' ? 'bg-red-100 text-red-800' : 
-            'bg-gray-100 text-gray-800'
+            'bg-taifa-muted/10 text-taifa-muted'
           }`}>
             <TrendingUp className={`h-3 w-3 mr-1 ${
               metric.trend === 'down' ? 'rotate-180' : ''
@@ -121,8 +121,8 @@ const CountryCard: React.FC<{ country: CountryFunding; rank: number }> = ({ coun
 const SectorBar: React.FC<{ sector: SectorData }> = ({ sector }) => (
   <div className="mb-4">
     <div className="flex justify-between items-center mb-2">
-      <span className="text-sm font-medium text-gray-700">{sector.sector}</span>
-      <span className="text-sm text-gray-500">{sector.percentage}%</span>
+      <span className="text-sm font-medium text-taifa-primary">{sector.sector}</span>
+      <span className="text-sm text-taifa-muted">{sector.percentage}%</span>
     </div>
     <div className="w-full bg-gray-200 rounded-full h-3">
       <div 
@@ -364,7 +364,7 @@ export default function FundingLandscapePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-8">
             <div className="bg-white rounded-xl p-8 shadow-lg">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+              <h2 className="text-2xl font-bold text-taifa-primary mb-6 flex items-center">
                 <PieChart className="mr-3 h-7 w-7 text-blue-600" />
                 Sector Distribution
               </h2>
@@ -381,27 +381,27 @@ export default function FundingLandscapePage() {
             </div>
 
             <div className="bg-white rounded-xl p-8 shadow-lg">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+              <h2 className="text-2xl font-bold text-taifa-primary mb-6 flex items-center">
                 <BarChart3 className="mr-3 h-7 w-7 text-purple-600" />
                 Major Initiatives
               </h2>
               <div className="space-y-6">
                 <div className="border-l-4 border-blue-500 pl-4">
                   <div className="text-2xl font-bold text-blue-600">CAD $100M+</div>
-                  <div className="text-sm text-gray-700">AI4D Africa Program Expansion</div>
-                  <div className="text-xs text-gray-500 mt-1">Scaled from CAD $20M base</div>
+                  <div className="text-sm text-taifa-primary">AI4D Africa Program Expansion</div>
+                  <div className="text-xs text-taifa-muted mt-1">Scaled from CAD $20M base</div>
                 </div>
                 
                 <div className="border-l-4 border-green-500 pl-4">
                   <div className="text-2xl font-bold text-green-600">CAD $130M</div>
-                  <div className="text-sm text-gray-700">AI4D Funders Collaborative</div>
-                  <div className="text-xs text-gray-500 mt-1">Coordinated development funding</div>
+                  <div className="text-sm text-taifa-primary">AI4D Funders Collaborative</div>
+                  <div className="text-xs text-taifa-muted mt-1">Coordinated development funding</div>
                 </div>
                 
                 <div className="border-l-4 border-purple-500 pl-4">
                   <div className="text-2xl font-bold text-purple-600">$641M</div>
-                  <div className="text-sm text-gray-700">Private Sector Investment</div>
-                  <div className="text-xs text-gray-500 mt-1">2022-2023 period alone</div>
+                  <div className="text-sm text-taifa-primary">Private Sector Investment</div>
+                  <div className="text-xs text-taifa-muted mt-1">2022-2023 period alone</div>
                 </div>
               </div>
             </div>
@@ -413,8 +413,8 @@ export default function FundingLandscapePage() {
       <section className="py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Funding Landscape Deep Dive</h2>
-            <p className="text-gray-600">Interactive analysis of Africa&amp;apos;s AI funding patterns</p>
+            <h2 className="text-3xl font-bold text-taifa-primary mb-4">Funding Landscape Deep Dive</h2>
+            <p className="text-taifa-muted">Interactive analysis of Africa&apos;s AI funding patterns</p>
           </div>
 
           <FundingCharts 
@@ -426,17 +426,17 @@ export default function FundingLandscapePage() {
 
           {/* Regional Gaps Analysis - keeping this separate for now */}
           <div className="bg-white rounded-xl p-8 shadow-lg">
-            <h3 className="text-2xl font-bold text-gray-900 mb-6">Regional Funding Gaps</h3>
+            <h3 className="text-2xl font-bold text-taifa-primary mb-6">Regional Funding Gaps</h3>
             <div className="space-y-4">
               {regionalGapsData.map((region, index) => (
                 <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                   <div>
-                    <h4 className="font-semibold text-gray-900">{region.region}</h4>
-                    <p className="text-sm text-gray-600">{region.population}M people</p>
+                    <h4 className="font-semibold text-taifa-primary">{region.region}</h4>
+                    <p className="text-sm text-taifa-muted">{region.population}M people</p>
                   </div>
                   <div className="text-right">
                     <div className="text-2xl font-bold text-blue-600">${region.funding}M</div>
-                    <div className="text-xs text-gray-500">Total Funding</div>
+                    <div className="text-xs text-taifa-muted">Total Funding</div>
                   </div>
                 </div>
               ))}

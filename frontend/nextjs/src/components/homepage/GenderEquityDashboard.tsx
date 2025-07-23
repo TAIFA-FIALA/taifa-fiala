@@ -264,16 +264,7 @@ const GenderEquityDashboard = () => {
                 barGap={barGap}
                 barSize={barSize}
               >
-                <defs>
-                  <linearGradient id="femaleGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor={CHART_COLORS.female} stopOpacity={0.8} />
-                    <stop offset="95%" stopColor={CHART_COLORS.femaleLight} stopOpacity={0.8} />
-                  </linearGradient>
-                  <linearGradient id="maleGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor={CHART_COLORS.male} stopOpacity={0.8} />
-                    <stop offset="95%" stopColor={CHART_COLORS.maleLight} stopOpacity={0.8} />
-                  </linearGradient>
-                </defs>
+
                 
                 <CartesianGrid 
                   vertical={false} 
@@ -331,14 +322,14 @@ const GenderEquityDashboard = () => {
                   yAxisId="left" 
                   dataKey="female" 
                   name="Female Founders" 
-                  fill="url(#femaleGradient)" 
+                  fill={CHART_COLORS.female}
                   radius={[4, 4, 0, 0]}
                 />
                 <Bar 
                   yAxisId="left" 
                   dataKey="male" 
                   name="Male Founders" 
-                  fill="url(#maleGradient)" 
+                  fill={CHART_COLORS.male}
                   radius={[4, 4, 0, 0]}
                 />
                 <Line 
