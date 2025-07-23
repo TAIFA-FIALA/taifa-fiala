@@ -71,6 +71,8 @@ class ETLStageStats(BaseModel):
     items_per_minute: float = 0.0
     last_processed_at: Optional[datetime] = None
     stage_specific_metrics: Dict[str, Any] = {}
+    # Smart prioritization metrics (Stage 1 RSS only)
+    smart_prioritization: Optional[Dict[str, Any]] = None
 
 class ETLOverallStats(BaseModel):
     """Overall ETL pipeline statistics"""
@@ -884,9 +886,57 @@ async def reset_llm_usage_stats():
         logger.error(f"Failed to reset LLM usage stats: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to reset usage statistics: {str(e)}")
 
+@router.get("/smart-prioritization", response_model=Dict[str, Any])
+async def get_smart_prioritization_metrics(db = Depends(get_admin_db)):
+    """
+    Get detailed smart RSS feed prioritization metrics
+    
+    Returns comprehensive metrics about adaptive feed scheduling including:
+    - Performance tier distribution (high/medium/low performers)
+    - Top performing sources with priority scores
+    - Adaptive interval statistics
+    - Source-level success rates and productivity metrics
+    """
+    try:
+        pipeline = get_pipeline_instance()
+        if not pipeline:
+            raise HTTPException(status_code=503, detail="Pipeline not available")
+        
+        # Get high-volume pipeline for smart prioritization stats
+        high_volume_pipeline = getattr(pipeline, 'high_volume_pipeline', None)
+        if not high_volume_pipeline:
+            return {
+                "error": "Smart prioritization not available",
+                "reason": "High-volume pipeline not initialized",
+                "available_features": ["basic_etl_stats", "llm_usage", "balance_monitoring"]
+            }
+        
+        # Get comprehensive smart prioritization statistics
+        smart_stats = high_volume_pipeline.get_smart_prioritization_stats()
+        
+        # Add additional real-time metrics
+        current_time = datetime.utcnow()
+        smart_stats.update({
+            "timestamp": current_time.isoformat(),
+            "total_sources": len(high_volume_pipeline.sources),
+            "active_sources": len([s for s in high_volume_pipeline.sources if s.enabled]),
+            "sources_due_for_check": len([s for s in high_volume_pipeline.sources if s.should_check_now()]),
+            "queue_status": {
+                "source_queue_size": high_volume_pipeline.source_queue.qsize(),
+                "processing_queue_size": high_volume_pipeline.processing_queue.qsize()
+            },
+            "monitoring_active": high_volume_pipeline.is_running
+        })
+        
+        return smart_stats
+        
+    except Exception as e:
+        logger.error(f"Failed to get smart prioritization metrics: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to get metrics: {str(e)}")
+
 @router.get("/dashboard", response_model=ETLDashboard)
 async def get_etl_dashboard(db = Depends(get_admin_db)):
-    """Get comprehensive ETL dashboard with pipeline stats, LLM usage, and notifications"""
+    """Get comprehensive ETL dashboard with pipeline stats, LLM usage, notifications, and smart prioritization"""
     try:
         # Get existing ETL stats
         pipeline_stats = await get_live_etl_stats(db)
@@ -968,13 +1018,31 @@ async def get_etl_dashboard(db = Depends(get_admin_db)):
             recent_alerts=recent_alerts
         )
         
+        # Get smart prioritization metrics if available
+        smart_prioritization_summary = None
+        try:
+            smart_metrics = await get_smart_prioritization_metrics(db)
+            if "error" not in smart_metrics:
+                smart_prioritization_summary = {
+                    "high_performers": smart_metrics.get("performance_tiers", {}).get("high_performers", 0),
+                    "medium_performers": smart_metrics.get("performance_tiers", {}).get("medium_performers", 0),
+                    "low_performers": smart_metrics.get("performance_tiers", {}).get("low_performers", 0),
+                    "avg_success_rate": smart_metrics.get("average_metrics", {}).get("success_rate", 0),
+                    "fastest_interval": smart_metrics.get("adaptive_intervals", {}).get("fastest_interval", 60),
+                    "slowest_interval": smart_metrics.get("adaptive_intervals", {}).get("slowest_interval", 60),
+                    "sources_due_for_check": smart_metrics.get("sources_due_for_check", 0)
+                }
+        except Exception as e:
+            logger.debug(f"Smart prioritization metrics not available: {e}")
+        
         # Generate real-time metrics
         real_time_metrics = {
             "current_time": datetime.utcnow().isoformat(),
             "system_health": "critical" if critical_alerts > 0 else "warning" if warning_alerts > 0 else "operational",
             "active_processes": sum(1 for stage in pipeline_stats.stage_stats if stage.status == ProcessingStatus.RUNNING),
             "total_opportunities_processed": pipeline_stats.total_opportunities_in_db,
-            "pipeline_uptime_hours": pipeline_stats.total_processing_time_hours
+            "pipeline_uptime_hours": pipeline_stats.total_processing_time_hours,
+            "smart_prioritization": smart_prioritization_summary
         }
         
         # Generate system health summary

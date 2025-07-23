@@ -57,7 +57,7 @@ class Priority(Enum):
 
 @dataclass
 class DataSource:
-    """Configuration for a data source"""
+    """Configuration for a data source with smart prioritization"""
     name: str
     url: str
     source_type: SourceType
@@ -74,14 +74,122 @@ class DataSource:
     headers: Dict[str, str] = field(default_factory=dict)
     auth: Optional[Dict[str, str]] = None
     
+    # Smart prioritization fields
+    items_collected_total: int = 0
+    items_collected_last_24h: int = 0
+    quality_score: float = 0.0  # 0.0 to 1.0 based on content relevance
+    response_time_avg: float = 0.0  # Average response time in seconds
+    last_successful_items: int = 0  # Items from last successful collection
+    consecutive_failures: int = 0
+    base_check_interval: int = 60  # Original interval for reset calculations
+    
     def __lt__(self, other):
-        return self.priority.value < other.priority.value
+        # Prioritize by dynamic score instead of just static priority
+        return self.get_dynamic_priority_score() > other.get_dynamic_priority_score()
 
     def __post_init__(self):
         if isinstance(self.source_type, str):
             self.source_type = SourceType(self.source_type)
         if isinstance(self.priority, str):
             self.priority = Priority(self.priority)
+        self.base_check_interval = self.check_interval_minutes
+    
+    def get_success_rate(self) -> float:
+        """Calculate success rate (0.0 to 1.0)"""
+        total_attempts = self.success_count + self.error_count
+        if total_attempts == 0:
+            return 0.5  # Neutral score for new sources
+        return self.success_count / total_attempts
+    
+    def get_productivity_score(self) -> float:
+        """Calculate productivity score based on items collected per attempt"""
+        if self.success_count == 0:
+            return 0.0
+        return self.items_collected_total / self.success_count
+    
+    def get_dynamic_priority_score(self) -> float:
+        """Calculate dynamic priority score for smart scheduling"""
+        success_rate = self.get_success_rate()
+        productivity = min(self.get_productivity_score() / 10.0, 1.0)  # Normalize to 0-1
+        quality = self.quality_score
+        recency_bonus = min(self.items_collected_last_24h / 50.0, 1.0)  # Bonus for recent activity
+        
+        # Penalty for consecutive failures
+        failure_penalty = max(0.0, 1.0 - (self.consecutive_failures * 0.2))
+        
+        # Base priority weight (higher priority = higher weight)
+        priority_weight = (5 - self.priority.value) / 4.0  # Convert 1-4 to 1.0-0.25
+        
+        # Composite score
+        score = (
+            success_rate * 0.3 +      # 30% success rate
+            productivity * 0.25 +     # 25% productivity
+            quality * 0.2 +           # 20% content quality
+            recency_bonus * 0.15 +    # 15% recent activity
+            priority_weight * 0.1     # 10% base priority
+        ) * failure_penalty
+        
+        return min(score, 1.0)
+    
+    def calculate_adaptive_interval(self) -> int:
+        """Calculate adaptive check interval based on performance"""
+        score = self.get_dynamic_priority_score()
+        
+        # High-performing sources: check more frequently
+        if score >= 0.8:
+            return max(5, int(self.base_check_interval * 0.2))  # 5x more frequent
+        elif score >= 0.6:
+            return max(10, int(self.base_check_interval * 0.4))  # 2.5x more frequent
+        elif score >= 0.4:
+            return max(15, int(self.base_check_interval * 0.6))  # 1.7x more frequent
+        elif score >= 0.2:
+            return self.base_check_interval  # Normal frequency
+        else:
+            # Poor performing sources: check less frequently
+            return min(240, int(self.base_check_interval * 2.0))  # 2x less frequent
+    
+    def update_performance_metrics(self, success: bool, items_collected: int = 0, 
+                                 response_time: float = 0.0, quality_score: float = 0.0):
+        """Update performance metrics after each collection attempt"""
+        if success:
+            self.success_count += 1
+            self.consecutive_failures = 0
+            self.last_successful_items = items_collected
+            self.items_collected_total += items_collected
+            self.items_collected_last_24h += items_collected
+            
+            # Update quality score (moving average)
+            if quality_score > 0:
+                if self.quality_score == 0:
+                    self.quality_score = quality_score
+                else:
+                    self.quality_score = (self.quality_score * 0.8) + (quality_score * 0.2)
+        else:
+            self.error_count += 1
+            self.consecutive_failures += 1
+        
+        # Update response time (moving average)
+        if response_time > 0:
+            if self.response_time_avg == 0:
+                self.response_time_avg = response_time
+            else:
+                self.response_time_avg = (self.response_time_avg * 0.8) + (response_time * 0.2)
+        
+        # Update adaptive interval
+        self.check_interval_minutes = self.calculate_adaptive_interval()
+        self.last_check = datetime.now()
+    
+    def reset_daily_metrics(self):
+        """Reset daily metrics (call this daily)"""
+        self.items_collected_last_24h = 0
+    
+    def should_check_now(self) -> bool:
+        """Determine if this source should be checked now based on adaptive interval"""
+        if not self.enabled or self.last_check is None:
+            return True
+        
+        time_since_last = (datetime.now() - self.last_check).total_seconds() / 60
+        return time_since_last >= self.check_interval_minutes
 
 
 @dataclass
@@ -477,29 +585,48 @@ class HighVolumeDataPipeline:
         logger.info(f"Pipeline started with {len(self.workers)} workers")
     
     def _source_monitor_worker(self):
-        """Worker thread that monitors sources and schedules collection"""
+        """Smart worker thread that monitors sources and schedules collection based on performance"""
+        last_daily_reset = datetime.now().date()
+        
         while not self.stop_event.is_set():
             try:
                 current_time = datetime.now()
                 
-                for source in self.sources:
-                    if not source.enabled:
-                        continue
-                    
-                    # Check if it's time to collect from this source
-                    if (source.last_check is None or 
-                        current_time - source.last_check >= timedelta(minutes=source.check_interval_minutes)):
-                        
-                        # Add to priority queue
-                        priority = source.priority.value
-                        self.source_queue.put((priority, current_time, source))
-                        source.last_check = current_time
+                # Reset daily metrics if it's a new day
+                if current_time.date() > last_daily_reset:
+                    logger.info("Resetting daily metrics for all sources")
+                    for source in self.sources:
+                        source.reset_daily_metrics()
+                    last_daily_reset = current_time.date()
                 
-                # Sleep for a bit before checking again
-                time.sleep(10)
+                # Sort sources by dynamic priority score (highest first)
+                active_sources = [s for s in self.sources if s.enabled]
+                active_sources.sort(key=lambda s: s.get_dynamic_priority_score(), reverse=True)
+                
+                sources_scheduled = 0
+                for source in active_sources:
+                    # Use smart scheduling logic
+                    if source.should_check_now():
+                        # Calculate dynamic priority for queue ordering
+                        dynamic_priority = 1.0 - source.get_dynamic_priority_score()  # Lower value = higher priority
+                        
+                        self.source_queue.put((dynamic_priority, current_time, source))
+                        sources_scheduled += 1
+                        
+                        # Log high-priority scheduling
+                        if source.get_dynamic_priority_score() >= 0.7:
+                            logger.info(f"High-priority source scheduled: {source.name} "
+                                       f"(score: {source.get_dynamic_priority_score():.2f}, "
+                                       f"interval: {source.check_interval_minutes}min)")
+                
+                if sources_scheduled > 0:
+                    logger.debug(f"Scheduled {sources_scheduled} sources for collection")
+                
+                # Sleep for a bit before checking again (shorter for more responsive scheduling)
+                time.sleep(5)
                 
             except Exception as e:
-                logger.error(f"Source monitor error: {e}")
+                logger.error(f"Smart source monitor error: {e}")
                 time.sleep(30)
     
     def _data_processor_worker(self):
@@ -623,12 +750,19 @@ class HighVolumeDataPipeline:
         self.rate_limiters[domain] = time.time()
     
     async def _collect_rss_data(self, source: DataSource) -> List[Dict[str, Any]]:
-        """Collect data from RSS feed"""
+        """Collect data from RSS feed with smart performance tracking"""
+        start_time = time.time()
+        
         try:
             # Use feedparser for RSS parsing
             feed = feedparser.parse(source.url)
             
+            if hasattr(feed, 'status') and feed.status >= 400:
+                raise Exception(f"HTTP {feed.status} error")
+            
             items = []
+            quality_scores = []
+            
             for entry in feed.entries:
                 # Extract relevant data
                 item = {
@@ -643,19 +777,83 @@ class HighVolumeDataPipeline:
                     'keywords': source.keywords
                 }
                 
-                # Filter by keywords if specified
+                # Calculate content quality score
+                quality_score = self._calculate_content_quality(item, source.keywords)
+                quality_scores.append(quality_score)
+                
+                # Filter by keywords and quality threshold
                 if source.keywords:
                     content_text = (item['title'] + ' ' + item['content']).lower()
-                    if any(keyword.lower() in content_text for keyword in source.keywords):
+                    if any(keyword.lower() in content_text for keyword in source.keywords) and quality_score >= 0.3:
                         items.append(item)
                 else:
-                    items.append(item)
+                    if quality_score >= 0.2:  # Lower threshold for general feeds
+                        items.append(item)
+            
+            # Calculate performance metrics
+            response_time = time.time() - start_time
+            avg_quality = sum(quality_scores) / len(quality_scores) if quality_scores else 0.0
+            
+            # Update source performance metrics
+            source.update_performance_metrics(
+                success=True,
+                items_collected=len(items),
+                response_time=response_time,
+                quality_score=avg_quality
+            )
+            
+            logger.info(f"RSS collection success: {source.name} - {len(items)} items, "
+                       f"quality: {avg_quality:.2f}, time: {response_time:.2f}s, "
+                       f"next check in: {source.check_interval_minutes}min")
             
             return items
             
         except Exception as e:
-            logger.error(f"RSS collection error for {source.name}: {e}")
+            response_time = time.time() - start_time
+            
+            # Update source performance metrics for failure
+            source.update_performance_metrics(
+                success=False,
+                response_time=response_time
+            )
+            
+            logger.error(f"RSS collection error for {source.name}: {e} "
+                        f"(failures: {source.consecutive_failures}, "
+                        f"next check in: {source.check_interval_minutes}min)")
             return []
+    
+    def _calculate_content_quality(self, item: Dict[str, Any], keywords: List[str]) -> float:
+        """Calculate content quality score (0.0 to 1.0)"""
+        score = 0.0
+        title = item.get('title', '').lower()
+        content = item.get('content', '').lower()
+        combined_text = title + ' ' + content
+        
+        # Base score for having content
+        if title and content:
+            score += 0.3
+        elif title or content:
+            score += 0.1
+        
+        # Keyword relevance scoring
+        if keywords:
+            keyword_matches = sum(1 for keyword in keywords if keyword.lower() in combined_text)
+            score += min(keyword_matches * 0.2, 0.4)  # Max 0.4 for keyword matches
+        
+        # Content length scoring (reasonable length indicates quality)
+        content_length = len(combined_text)
+        if 100 <= content_length <= 2000:
+            score += 0.2
+        elif content_length > 50:
+            score += 0.1
+        
+        # Funding/AI specific terms bonus
+        funding_terms = ['funding', 'investment', 'grant', 'ai', 'artificial intelligence', 
+                        'startup', 'venture', 'capital', 'africa', 'technology']
+        funding_matches = sum(1 for term in funding_terms if term in combined_text)
+        score += min(funding_matches * 0.05, 0.1)  # Max 0.1 bonus
+        
+        return min(score, 1.0)
     
     async def _collect_news_api_data(self, source: DataSource) -> List[Dict[str, Any]]:
         """Collect data from News API"""
@@ -806,7 +1004,9 @@ class HighVolumeDataPipeline:
         logger.info("Pipeline stopped")
     
     def get_stats(self) -> Dict[str, Any]:
-        """Get pipeline statistics"""
+        """Get comprehensive pipeline statistics including smart prioritization metrics"""
+        smart_stats = self.get_smart_prioritization_stats()
+        
         return {
             'total_sources': self.stats.total_sources,
             'active_sources': self.stats.active_sources,
@@ -820,6 +1020,55 @@ class HighVolumeDataPipeline:
             'queue_sizes': {
                 'source_queue': self.source_queue.qsize(),
                 'processing_queue': self.processing_queue.qsize()
+            },
+            'smart_prioritization': smart_stats
+        }
+    
+    def get_smart_prioritization_stats(self) -> Dict[str, Any]:
+        """Get detailed smart prioritization statistics"""
+        if not self.sources:
+            return {}
+        
+        # Calculate performance tiers
+        high_performers = [s for s in self.sources if s.get_dynamic_priority_score() >= 0.7]
+        medium_performers = [s for s in self.sources if 0.4 <= s.get_dynamic_priority_score() < 0.7]
+        low_performers = [s for s in self.sources if s.get_dynamic_priority_score() < 0.4]
+        
+        # Calculate average metrics
+        total_sources = len(self.sources)
+        avg_success_rate = sum(s.get_success_rate() for s in self.sources) / total_sources
+        avg_quality_score = sum(s.quality_score for s in self.sources) / total_sources
+        avg_productivity = sum(s.get_productivity_score() for s in self.sources) / total_sources
+        
+        # Find top performers
+        top_sources = sorted(self.sources, key=lambda s: s.get_dynamic_priority_score(), reverse=True)[:5]
+        
+        return {
+            'performance_tiers': {
+                'high_performers': len(high_performers),
+                'medium_performers': len(medium_performers),
+                'low_performers': len(low_performers)
+            },
+            'average_metrics': {
+                'success_rate': round(avg_success_rate, 3),
+                'quality_score': round(avg_quality_score, 3),
+                'productivity_score': round(avg_productivity, 2)
+            },
+            'top_performers': [
+                {
+                    'name': source.name,
+                    'priority_score': round(source.get_dynamic_priority_score(), 3),
+                    'success_rate': round(source.get_success_rate(), 3),
+                    'check_interval': source.check_interval_minutes,
+                    'items_collected': source.items_collected_total,
+                    'quality_score': round(source.quality_score, 3)
+                }
+                for source in top_sources
+            ],
+            'adaptive_intervals': {
+                'fastest_interval': min(s.check_interval_minutes for s in self.sources),
+                'slowest_interval': max(s.check_interval_minutes for s in self.sources),
+                'average_interval': sum(s.check_interval_minutes for s in self.sources) / total_sources
             }
         }
 

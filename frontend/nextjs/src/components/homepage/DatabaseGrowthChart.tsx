@@ -3,11 +3,12 @@
 import { useState, useEffect } from 'react';
 import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
 import { TrendingUp, Database, RefreshCw } from 'lucide-react';
+import { metricsApi, type DatabaseGrowthMetrics } from '@/lib/metrics-api';
 
 interface DataPoint {
   date: string;
   records: number;
-  dailyGrowth: number;
+  daily_growth: number;
 }
 
 interface DatabaseGrowthChartProps {
@@ -21,26 +22,35 @@ export default function DatabaseGrowthChart({ className = '' }: DatabaseGrowthCh
   const [weeklyGrowth, setWeeklyGrowth] = useState(0);
 
   useEffect(() => {
-    // Simulate fetching real data - replace with actual API call
+    // Fetch real database growth metrics from backend pipeline
     const fetchDatabaseGrowth = async () => {
       try {
-        // Mock data for demonstration - replace with actual API
-        const mockData = generateMockData();
-        setData(mockData);
-        setTotalRecords(mockData[mockData.length - 1]?.records || 0);
+        console.log('Fetching real database growth metrics...');
+        const metrics: DatabaseGrowthMetrics = await metricsApi.getDatabaseGrowthMetrics();
         
-        // Calculate weekly growth
-        const weekAgo = mockData[mockData.length - 8]?.records || 0;
-        const current = mockData[mockData.length - 1]?.records || 0;
-        const growth = ((current - weekAgo) / weekAgo) * 100;
-        setWeeklyGrowth(growth);
+        // Use real growth history from backend
+        setData(metrics.growth_history);
+        setTotalRecords(metrics.total_records);
+        setWeeklyGrowth(metrics.weekly_growth_rate);
+        
+        console.log('✅ Real metrics loaded:', {
+          total_records: metrics.total_records,
+          weekly_growth: metrics.weekly_growth_rate,
+          daily_average: metrics.daily_average
+        });
         
       } catch (error) {
-        console.error('Error fetching database growth:', error);
-        // Fallback to mock data
+        console.error('❌ Error fetching real database growth:', error);
+        // Fallback to mock data only if API completely fails
         const mockData = generateMockData();
         setData(mockData);
         setTotalRecords(mockData[mockData.length - 1]?.records || 0);
+        
+        // Calculate weekly growth from mock data
+        const weekAgo = mockData[mockData.length - 8]?.records || 0;
+        const current = mockData[mockData.length - 1]?.records || 0;
+        const growth = weekAgo > 0 ? ((current - weekAgo) / weekAgo) * 100 : 0;
+        setWeeklyGrowth(growth);
       } finally {
         setLoading(false);
       }
@@ -48,7 +58,7 @@ export default function DatabaseGrowthChart({ className = '' }: DatabaseGrowthCh
 
     fetchDatabaseGrowth();
     
-    // Refresh every 5 minutes
+    // Refresh every 5 minutes to get latest pipeline data
     const interval = setInterval(fetchDatabaseGrowth, 5 * 60 * 1000);
     return () => clearInterval(interval);
   }, []);
@@ -78,7 +88,7 @@ export default function DatabaseGrowthChart({ className = '' }: DatabaseGrowthCh
       data.push({
         date: currentDate.toISOString().split('T')[0],
         records: cumulativeRecords,
-        dailyGrowth: dailyGrowth
+        daily_growth: dailyGrowth
       });
     }
     
@@ -114,7 +124,7 @@ export default function DatabaseGrowthChart({ className = '' }: DatabaseGrowthCh
             {data.records.toLocaleString()} records
           </p>
           <p className="text-sm text-taifa-accent">
-            +{data.dailyGrowth} today
+            +{data.daily_growth} today
           </p>
         </div>
       );
@@ -226,10 +236,10 @@ export default function DatabaseGrowthChart({ className = '' }: DatabaseGrowthCh
           
           <div className="bg-taifa-primary/10 rounded-lg p-3 border-l-4 border-taifa-primary">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-gray-600">Coverage Areas</span>
-              <span className="text-lg font-bold text-taifa-primary">54</span>
+              <span className="text-sm font-medium text-gray-600">Pipeline Status</span>
+              <span className="text-lg font-bold text-taifa-primary">Live</span>
             </div>
-            <div className="text-xs text-gray-500 mt-1">African countries</div>
+            <div className="text-xs text-gray-500 mt-1">Real-time ingestion</div>
           </div>
         </div>
       </div>

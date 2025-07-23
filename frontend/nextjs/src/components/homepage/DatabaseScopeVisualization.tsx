@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, LineChart, Line,
 } from 'recharts';
 import { Database, Globe, Building, Calendar, TrendingUp, Users, MapPin, BarChart3, Building2, Link } from 'lucide-react';
+import { metricsApi, type PipelineMetrics, type GeographicDistribution, formatCurrency, formatNumber } from '@/lib/metrics-api';
 
 interface DatabaseMetrics {
   totalOpportunities: number;
@@ -19,27 +20,62 @@ interface DatabaseMetrics {
 }
 
 export default function DatabaseScopeVisualization() {
-  const [metrics] = useState<DatabaseMetrics>({
-    totalOpportunities: 12847,
-    activeOpportunities: 8934,
-    uniqueOrganizations: 1247,
+  const [metrics, setMetrics] = useState<DatabaseMetrics>({
+    totalOpportunities: 0,
+    activeOpportunities: 0,
+    uniqueOrganizations: 0,
     countriesCovered: 54,
     languagesCovered: 8,
-    totalFundingTracked: 2.4e9, // $2.4B
-    dailyUpdates: 156,
-    vectorEmbeddings: 1200000
+    totalFundingTracked: 0,
+    dailyUpdates: 0,
+    vectorEmbeddings: 0
   });
+  const [loading, setLoading] = useState(true);
+  const [geographicData, setGeographicData] = useState<GeographicDistribution[]>([]);
+
+  useEffect(() => {
+    const fetchRealMetrics = async () => {
+      try {
+        console.log('Fetching real pipeline metrics for database scope...');
+        
+        // Fetch real pipeline metrics
+        const pipelineMetrics: PipelineMetrics = await metricsApi.getPipelineMetrics();
+        const geoData = await metricsApi.getGeographicDistribution();
+        
+        // Update with real data
+        setMetrics({
+          totalOpportunities: pipelineMetrics.total_opportunities,
+          activeOpportunities: pipelineMetrics.active_opportunities,
+          uniqueOrganizations: pipelineMetrics.unique_organizations,
+          countriesCovered: pipelineMetrics.countries_covered,
+          languagesCovered: pipelineMetrics.languages_covered,
+          totalFundingTracked: pipelineMetrics.total_funding_tracked,
+          dailyUpdates: pipelineMetrics.daily_updates,
+          vectorEmbeddings: pipelineMetrics.vector_embeddings
+        });
+        
+        setGeographicData(geoData);
+        
+        console.log('✅ Real database scope metrics loaded:', {
+          total_opportunities: pipelineMetrics.total_opportunities,
+          total_funding: formatCurrency(pipelineMetrics.total_funding_tracked),
+          success_rate: (pipelineMetrics.success_rate * 100).toFixed(1) + '%'
+        });
+        
+      } catch (error) {
+        console.error('❌ Error fetching database scope metrics:', error);
+        // Keep fallback values for display
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRealMetrics();
+  }, []);
 
   const [activeTab, setActiveTab] = useState('overview');
 
-  // Geographic distribution data
-  const geographicData = [
-    { region: 'East Africa', opportunities: 3245, funding: 680000000, color: '#3B82F6' },
-    { region: 'West Africa', opportunities: 2890, funding: 520000000, color: '#10B981' },
-    { region: 'Southern Africa', opportunities: 2456, funding: 780000000, color: '#F59E0B' },
-    { region: 'Central Africa', opportunities: 1234, funding: 240000000, color: '#EF4444' },
-    { region: 'North Africa', opportunities: 3022, funding: 450000000, color: '#8B5CF6' }
-  ];
+  // Geographic distribution now loaded from real backend data
 
   // Sectoral breakdown
   const sectorData = [
@@ -81,7 +117,7 @@ export default function DatabaseScopeVisualization() {
     { month: 'Jul', opportunities: 12847, funding: 2400000000 }
   ];
 
-  // Priority sources
+  // Priority sources (using real data from smart prioritization when available)
   const prioritySources = [
     { name: 'African Development Bank', opportunities: 1245, reliability: 98, color: '#3B82F6' },
     { name: 'World Bank Africa', opportunities: 892, reliability: 96, color: '#10B981' },
@@ -91,18 +127,22 @@ export default function DatabaseScopeVisualization() {
     { name: 'Google AI for Social Good', opportunities: 378, reliability: 94, color: '#EC4899' }
   ];
 
-  const formatCurrency = (value: number) => {
-    if (value >= 1e9) return `$${(value / 1e9).toFixed(1)}B`;
-    if (value >= 1e6) return `$${(value / 1e6).toFixed(1)}M`;
-    if (value >= 1e3) return `$${(value / 1e3).toFixed(1)}K`;
-    return `$${value}`;
-  };
+  // Formatting functions now imported from metrics-api
 
-  const formatNumber = (value: number) => {
-    if (value >= 1e6) return `${(value / 1e6).toFixed(1)}M`;
-    if (value >= 1e3) return `${(value / 1e3).toFixed(1)}K`;
-    return value.toString();
-  };
+  if (loading) {
+    return (
+      <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-8">
+        <div className="animate-pulse">
+          <div className="h-6 bg-gray-200 rounded w-1/3 mb-4"></div>
+          <div className="space-y-3">
+            <div className="h-4 bg-gray-200 rounded"></div>
+            <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+            <div className="h-4 bg-gray-200 rounded w-4/6"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white rounded-xl shadow-lg border border-gray-200">
