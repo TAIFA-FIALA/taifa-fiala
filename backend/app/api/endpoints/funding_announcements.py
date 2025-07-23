@@ -8,7 +8,7 @@ from app.core.database import get_db
 from app.models import AfricaIntelligenceItem, Organization, AIDomain, FundingType, GeographicScope
 from app.schemas.funding import (
     AfricaIntelligenceItemResponse, AfricaIntelligenceItemCreate, AfricaIntelligenceItemUpdate,
-    GrantFundingSpecific, InvestmentFundingSpecific, FundingOpportunityCardResponse
+    GrantFundingSpecific, InvestmentFundingSpecific, FundingAnnouncementCardResponse
 )
 from app.services.funding_intelligence.vector_intelligence import FundingIntelligenceVectorDB
 
@@ -27,7 +27,7 @@ except Exception as e:
 # Core Intelligence Item Endpoints (from funding.py)
 #
 
-@router.get("/", response_model=List[FundingOpportunityCardResponse])
+@router.get("/", response_model=List[FundingAnnouncementCardResponse])
 async def get_africa_intelligence_feed(
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=1000),

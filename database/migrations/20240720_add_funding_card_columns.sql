@@ -1,5 +1,5 @@
--- Migration to add all required columns for FundingOpportunityCard
--- Handles existing columns gracefully
+-- Migration to add all required columns for FundingAnnouncementCard
+-- Handles existing columns gracefully      
 
 -- Add renewable column if it doesn't exist
 DO $$

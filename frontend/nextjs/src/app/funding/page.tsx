@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { getApiUrl, API_ENDPOINTS } from '@/lib/api-config';
 
-interface FundingOpportunity {
+interface FundingAnnouncement {
   id: number;
   title: string;
   description: string;
@@ -32,7 +32,7 @@ function FundingPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [opportunities, setOpportunities] = useState<FundingOpportunity[]>([]);
+  const [opportunities, setOpportunities] = useState<FundingAnnouncement[]>([]);
   const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [countries, setCountries] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(true);

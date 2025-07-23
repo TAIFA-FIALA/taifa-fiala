@@ -453,8 +453,8 @@ class SearchResponse(BaseModel):
     related_opportunities: Optional[List[AfricaIntelligenceItemResponse]] = None
 
 # Funding Opportunity Card Schema
-class FundingOpportunityCardResponse(AfricaIntelligenceItemResponse):
-    """Schema for FundingOpportunityCard component with all required fields"""
+class FundingAnnouncementCardResponse(AfricaIntelligenceItemResponse):
+    """Schema for FundingAnnouncementCard component with all required fields"""
     # Core fields
     organization: str
     is_active: bool = True

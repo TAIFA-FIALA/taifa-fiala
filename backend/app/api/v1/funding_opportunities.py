@@ -20,7 +20,7 @@ class EnrichmentStatus(str, Enum):
     COMPLETED = "completed"
     FAILED = "failed"
 
-class FundingOpportunityBase(BaseModel):
+class FundingAnnouncementBase(BaseModel):
     id: int
     title: str
     source: Optional[str] = None
@@ -32,8 +32,8 @@ class FundingOpportunityBase(BaseModel):
     created_at: datetime
     updated_at: datetime
 
-class FundingOpportunityListResponse(BaseModel):
-    items: List[FundingOpportunityBase]
+class FundingAnnouncementListResponse(BaseModel):
+    items: List[FundingAnnouncementBase]
     total: int
     limit: int
     offset: int
@@ -77,7 +77,7 @@ async def get_enrichment_status(record_id: int, supabase: SupabaseClient) -> Enr
         return EnrichmentStatus.NOT_STARTED
 
 # API Endpoints
-@router.get("/", response_model=FundingOpportunityListResponse)
+@router.get("/", response_model=FundingAnnouncementListResponse)
 async def list_funding_opportunities(
     limit: int = Query(10, ge=1, le=100),
     offset: int = Query(0, ge=0),
@@ -125,12 +125,12 @@ async def list_funding_opportunities(
         raise HTTPException(status_code=500, detail="Error fetching funding opportunities")
 
 @router.get("/{record_id}", response_model=Dict[str, Any])
-async def get_funding_opportunity(
+async def get_funding_announcement(
     record_id: int,
     supabase: SupabaseClient = Depends(get_supabase_client)
 ):
     """
-    Get details of a specific funding opportunity.
+    Get details of a specific funding announcement.
     """
     try:
         result = supabase.table('africa_intelligence_feed')\
@@ -160,7 +160,7 @@ async def trigger_enrichment(
     supabase: SupabaseClient = Depends(get_supabase_client)
 ):
     """
-    Trigger enrichment for a specific funding opportunity.
+    Trigger enrichment for a specific fundingannouncement.
     """
     try:
         # Check if record exists

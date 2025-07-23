@@ -37,8 +37,8 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass
-class FundingOpportunity:
-    """Simplified funding opportunity structure for testing"""
+class FundingAnnouncement:
+    """Simplified funding announcement structure for testing"""
     title: str
     description: str
     source_url: str
@@ -118,7 +118,7 @@ class DeduplicationTester:
             except Exception as e:
                 logger.warning(f"Could not load semantic model: {e}")
     
-    def add_existing_opportunity(self, opportunity: FundingOpportunity):
+    def add_existing_opportunity(self, opportunity: FundingAnnouncement):
         """Add an opportunity to our simulated database"""
         self.existing_opportunities.append(opportunity)
     
@@ -153,7 +153,7 @@ class DeduplicationTester:
         
         return {'is_duplicate': False, 'match_type': 'no_url_match'}
     
-    def check_content_duplicate(self, opportunity: FundingOpportunity) -> Dict[str, Any]:
+    def check_content_duplicate(self, opportunity: FundingAnnouncement) -> Dict[str, Any]:
         """Check for content-based duplicates"""
         new_hash = self.content_hasher.hash(
             opportunity.title, 
@@ -193,7 +193,7 @@ class DeduplicationTester:
         
         return {'is_duplicate': False, 'match_type': 'no_content_match'}
     
-    def check_semantic_duplicate(self, opportunity: FundingOpportunity) -> Dict[str, Any]:
+    def check_semantic_duplicate(self, opportunity: FundingAnnouncement) -> Dict[str, Any]:
         """Check for semantic duplicates using embeddings"""
         if not self.semantic_model:
             return {'is_duplicate': False, 'match_type': 'no_semantic_check'}
@@ -245,7 +245,7 @@ class DeduplicationTester:
         
         return dot_product / (norm1 * norm2)
     
-    def check_metadata_duplicate(self, opportunity: FundingOpportunity) -> Dict[str, Any]:
+    def check_metadata_duplicate(self, opportunity: FundingAnnouncement) -> Dict[str, Any]:
         """Check for metadata-based duplicates"""
         if not opportunity.organization:
             return {'is_duplicate': False, 'match_type': 'no_metadata_check'}
@@ -266,7 +266,7 @@ class DeduplicationTester:
         
         return {'is_duplicate': False, 'match_type': 'no_metadata_match'}
     
-    def comprehensive_duplicate_check(self, opportunity: FundingOpportunity) -> Dict[str, Any]:
+    def comprehensive_duplicate_check(self, opportunity: FundingAnnouncement) -> Dict[str, Any]:
         """Run all deduplication checks"""
         logger.info(f"🔍 Checking for duplicates: {opportunity.title[:50]}...")
         
@@ -344,21 +344,21 @@ async def test_deduplication_strategies():
     
     # Add some existing opportunities to our "database"
     existing_opportunities = [
-        FundingOpportunity(
+        FundingAnnouncement(
             title="AI Innovation Grant 2024",
             description="Funding for AI startups in Africa",
             source_url="https://techfoundation.org/grants/ai-innovation",
             organization="Tech Foundation",
             amount=100000
         ),
-        FundingOpportunity(
+        FundingAnnouncement(
             title="African Tech Accelerator Program",
             description="Supporting technology entrepreneurs across Africa",
             source_url="https://accelerator.africa/program",
             organization="African Accelerator",
             amount=50000
         ),
-        FundingOpportunity(
+        FundingAnnouncement(
             title="Startup Funding Initiative",
             description="Early-stage funding for innovative startups",
             source_url="https://startup-fund.com/apply",
@@ -375,7 +375,7 @@ async def test_deduplication_strategies():
     # Test cases
     test_cases = [
         # Case 1: Exact duplicate (same URL)
-        FundingOpportunity(
+        FundingAnnouncement(
             title="AI Innovation Grant 2024",
             description="Funding for AI startups in Africa",
             source_url="https://techfoundation.org/grants/ai-innovation",
@@ -384,7 +384,7 @@ async def test_deduplication_strategies():
         ),
         
         # Case 2: Same URL with tracking parameters
-        FundingOpportunity(
+        FundingAnnouncement(
             title="AI Innovation Grant 2024",
             description="Funding for AI startups in Africa",
             source_url="https://techfoundation.org/grants/ai-innovation?utm_source=newsletter&utm_campaign=funding",
@@ -393,7 +393,7 @@ async def test_deduplication_strategies():
         ),
         
         # Case 3: Similar title, different URL
-        FundingOpportunity(
+        FundingAnnouncement(
             title="AI Innovation Grant Program 2024",
             description="Funding for artificial intelligence startups in Africa",
             source_url="https://different-site.com/ai-grants",
@@ -402,7 +402,7 @@ async def test_deduplication_strategies():
         ),
         
         # Case 4: Completely different opportunity
-        FundingOpportunity(
+        FundingAnnouncement(
             title="Blockchain Development Fund",
             description="Supporting blockchain innovation in emerging markets",
             source_url="https://blockchain-fund.org/apply",
@@ -411,7 +411,7 @@ async def test_deduplication_strategies():
         ),
         
         # Case 5: Same organization, similar amount
-        FundingOpportunity(
+        FundingAnnouncement(
             title="Advanced AI Research Grant",
             description="Research funding for advanced AI projects",
             source_url="https://research-grants.org/ai",

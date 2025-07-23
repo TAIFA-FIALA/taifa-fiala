@@ -7,7 +7,7 @@ Successfully implemented comprehensive enhancements to the AI Africa Funding Tra
 
 ### 1. Enhanced Frontend Components
 
-**File:** `/frontend/nextjs/src/components/search/FundingOpportunityCard.tsx`
+**File:** `/frontend/nextjs/src/components/search/FundingAnnouncementCard.tsx`
 
 **Key Enhancements:**
 - **Three Funding Pattern Support**: 
@@ -33,7 +33,7 @@ Successfully implemented comprehensive enhancements to the AI Africa Funding Tra
 **File:** `/backend/app/schemas/funding.py`
 
 **New Schema Classes:**
-- `FundingOpportunityBaseSchema`: Comprehensive base schema
+- `FundingAnnouncementBaseSchema`: Comprehensive base schema
 - `GrantFundingSpecific`: Enhanced grant-specific fields
 - `InvestmentFundingSpecific`: Enhanced investment fields  
 - `PrizeFundingSpecific`: New prize/competition fields

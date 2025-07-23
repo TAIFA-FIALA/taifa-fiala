@@ -3,7 +3,7 @@ import { Clock, MapPin, Users, Award, DollarSign, Calendar, Building, Target, Al
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 
-interface FundingOpportunityBaseProps {
+interface FundingAnnouncementBaseProps {
   id: string;
   title: string;
   organization: string;
@@ -47,27 +47,27 @@ interface FundingOpportunityBaseProps {
 }
 
 // Type definitions for the three funding patterns
-interface TotalFundingProps extends FundingOpportunityBaseProps {
+interface TotalFundingProps extends FundingAnnouncementBaseProps {
   fundingType: 'total_pool';
   totalFundingPool: number;
   estimatedProjectCount?: number;
   projectCountRange?: { min: number; max: number };
 }
 
-interface ExactFundingProps extends FundingOpportunityBaseProps {
+interface ExactFundingProps extends FundingAnnouncementBaseProps {
   fundingType: 'per_project_exact';
   exactAmountPerProject: number;
 }
 
-interface RangeFundingProps extends FundingOpportunityBaseProps {
+interface RangeFundingProps extends FundingAnnouncementBaseProps {
   fundingType: 'per_project_range';
   minAmountPerProject: number;
   maxAmountPerProject: number;
 }
 
-type FundingOpportunityCardProps = TotalFundingProps | ExactFundingProps | RangeFundingProps;
+type FundingAnnouncementCardProps = TotalFundingProps | ExactFundingProps | RangeFundingProps;
 
-export function FundingOpportunityCard(props: FundingOpportunityCardProps) {
+export function FundingAnnouncementCard(props: FundingAnnouncementCardProps) {
   const {
     id,
     title,
