@@ -199,6 +199,9 @@ start_services() {
         set -e
         cd '$PROD_PATH'
         
+        # Set PATH to include common Docker installation locations
+        export PATH=\"/usr/local/bin:/opt/homebrew/bin:\$PATH\"
+        
         # Ensure containers are running (they should already be from setup_environment)
         echo 'Ensuring all containers are running...'
         docker-compose up -d || docker compose up -d
