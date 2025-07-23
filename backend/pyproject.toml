@@ -78,6 +78,7 @@ kombu = "^5.3.0"
 # Logging and Monitoring
 structlog = "^23.2.0"
 python-json-logger = "^2.0.0"
+prometheus-client = "^0.19.0"
 
 # External APIs (installed via requests/httpx)
 
