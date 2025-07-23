@@ -131,6 +131,9 @@ setup_environment() {
         set -e
         cd '$PROD_PATH'
         
+        # Set PATH to include common Docker installation locations
+        export PATH=\"/usr/local/bin:/opt/homebrew/bin:\$PATH\"
+        
         # Check if Docker is available
         if ! command -v docker &> /dev/null; then
             echo 'Docker not found. Please install Docker on the production server.'
@@ -168,6 +171,9 @@ run_migrations() {
     ssh $SSH_USER@$PROD_SERVER "
         set -e
         cd '$PROD_PATH'
+        
+        # Set PATH to include common Docker installation locations
+        export PATH=\"/usr/local/bin:/opt/homebrew/bin:\$PATH\"
         
         echo 'Checking migration status...'
         docker-compose exec -T backend alembic current || docker compose exec -T backend alembic current
