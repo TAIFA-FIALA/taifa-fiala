@@ -134,11 +134,14 @@ setup_environment() {
         # Install Poetry if not available
         if ! command -v poetry &> /dev/null; then
             echo 'Installing Poetry...'
+            # Upgrade pip first to avoid version warnings
+            echo 'Upgrading pip...'
+            python3 -m pip install --user --upgrade pip
             # Use pip installation method to avoid symlink/venv issues on macOS
             python3 -m pip install --user poetry
             
             # Set PATH to include user Python bin directory
-            PYTHON_VERSION=\$(python3 -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")
+            PYTHON_VERSION=\$(python3 -c "import sys; print(str(sys.version_info.major) + '.' + str(sys.version_info.minor))")
             export PATH="\$HOME/Library/Python/\$PYTHON_VERSION/bin:\$HOME/.local/bin:\$PATH"
             
             # Verify installation
@@ -158,7 +161,7 @@ setup_environment() {
         fi
         
         # Ensure PATH is set for subsequent commands
-        PYTHON_VERSION=\$(python3 -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")
+        PYTHON_VERSION=\$(python3 -c "import sys; print(str(sys.version_info.major) + '.' + str(sys.version_info.minor))")
         export PATH="\$HOME/Library/Python/\$PYTHON_VERSION/bin:\$HOME/.local/bin:\$PATH"
         
         # Install backend dependencies with Poetry
