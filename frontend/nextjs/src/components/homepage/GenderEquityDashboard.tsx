@@ -24,14 +24,14 @@ import {
   TrendingDown
 } from 'lucide-react';
 
-// TAIFA color scheme for charts
+// TAIFA color scheme for charts - using Tailwind config values
 const CHART_COLORS = {
-  female: '#F0A621',    // TAIFA golden yellow
-  male: '#3E4B59',      // TAIFA primary dark blue-gray
-  femaleLight: '#BA4D00', // TAIFA dark orange
-  maleLight: '#5F763B',   // TAIFA olive green
-  gridLine: '#E5E7EB',
-  text: '#1F2937'
+  female: '#A62E2E',      // taifa-red - consistent with Tailwind config
+  male: '#3E4B59',        // taifa-primary - for contrast/differentiation
+  femaleLight: '#A62E2E', // taifa-red - consistent with Tailwind config
+  maleLight: '#6B7280',   // taifa-muted - for lighter male representation
+  gridLine: '#F2F2F2',    // taifa-border - consistent with Tailwind config
+  text: '#3E4B59'         // taifa-primary - consistent with Tailwind config
 } as const;
 
 // Data type definitions
@@ -163,6 +163,13 @@ const GenderEquityDashboard = () => {
   const barGap = dimensions.isMobile ? 4 : 8;
 
   useEffect(() => {
+    // In development mode, skip artificial loading delay
+    if (process.env.NODE_ENV === 'development') {
+      setIsLoading(false);
+      return;
+    }
+    
+    // In production, keep brief loading animation
     const timer = setTimeout(() => {
       setIsLoading(false);
     }, 1000);

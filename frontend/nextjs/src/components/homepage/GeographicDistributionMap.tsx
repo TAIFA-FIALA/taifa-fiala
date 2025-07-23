@@ -195,6 +195,8 @@ const GeographicDistributionMap = () => {
               defaultCenter={AFRICA_CENTER}
               defaultZoom={DEFAULT_ZOOM}
               attribution={false}
+              mouseEvents={false}
+              touchEvents={false}
             >
               {/* Render African countries with color-coding based on funding data */}
               {countryPolygons.map((country, index) => {
@@ -219,7 +221,7 @@ const GeographicDistributionMap = () => {
                         <div
                           className="absolute rounded-full opacity-70 cursor-pointer"
                           style={{
-                            backgroundColor: fillColor,
+                            backgroundColor: '#F0A621', // taifa-secondary
                             width: `${Math.max(20, countryData.percentageTotal * 3)}px`,
                             height: `${Math.max(20, countryData.percentageTotal * 3)}px`,
                             top: '50%',

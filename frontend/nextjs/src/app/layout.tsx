@@ -45,7 +45,7 @@ export default function RootLayout({
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
               <div>
                 <h3 className="text-lg font-bold text-navy mb-3">TAIFA-FIALA</h3>
-                <p className="text-sm">Democratizing access to AI funding across Africa through bilingual, real-time opportunity discovery.</p>
+                <p className="text-sm">Democratizing access to AI funding across Africa through data-driven transparency, equity and accountability.</p>
               </div>
               <div>
                 <h4 className="font-semibold text-navy mb-3">Platform</h4>
@@ -66,9 +66,9 @@ export default function RootLayout({
               <div>
                 <h4 className="font-semibold text-white mb-3">Connect</h4>
                 <ul className="space-y-2 text-sm">
-                  <li><a href="https://github.com/drjforrest/taifa" className="hover:text-yellow-300 transition-colors duration-300 ease-in-out">GitHub</a></li>
+                  <li><a href="https://github.com/taifa-fiala" className="hover:text-yellow-300 transition-colors duration-300 ease-in-out">GitHub</a></li>
                   <li><Link href="/about#contact" className="hover:text-yellow-300 transition-colors duration-300 ease-in-out">Contact</Link></li>
-                  <li><span className="text-xs">New Data Sources • Daily Updates</span></li>
+                  <li><span className="text-xs">New Updates • Daily</span></li>
                 </ul>
               </div>
             </div>

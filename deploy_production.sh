@@ -275,8 +275,7 @@ health_check() {
         echo 'Checking FastAPI backend...'
         curl --silent --fail http://localhost:8000/health > /dev/null && echo -e '${GREEN}✓ Backend is healthy.${NC}' || echo -e '${RED}✗ Backend health check failed.${NC}'
 
-        echo 'Checking Streamlit app...'
-        curl --silent --fail http://localhost:8501 > /dev/null && echo -e '${GREEN}✓ Streamlit is healthy.${NC}' || echo -e '${RED}✗ Streamlit health check failed.${NC}'
+
     "
 }
 

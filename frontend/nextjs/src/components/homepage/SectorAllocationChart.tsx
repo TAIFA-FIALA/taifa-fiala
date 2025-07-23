@@ -130,7 +130,7 @@ const SectorAllocationChart = () => {
             <Bar 
               dataKey="currentAllocation" 
               name="Current Allocation"
-              fill="#3E4B59"
+              fill="#007A56" // taifa-accent
               radius={[4, 4, 0, 0]}
             />
             

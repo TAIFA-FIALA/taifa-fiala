@@ -22,6 +22,17 @@ export default function DatabaseGrowthChart({ className = '' }: DatabaseGrowthCh
   const [weeklyGrowth, setWeeklyGrowth] = useState(0);
 
   useEffect(() => {
+    // In development mode, immediately use mock data without API calls
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🚀 Using development mock data for database growth (no API calls)');
+      const mockData = generateMockData();
+      setData(mockData);
+      setTotalRecords(2847);
+      setWeeklyGrowth(12.5);
+      setLoading(false);
+      return;
+    }
+
     // Fetch real database growth metrics from backend pipeline
     const fetchDatabaseGrowth = async () => {
       try {

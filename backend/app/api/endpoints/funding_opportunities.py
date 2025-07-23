@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List, Optional
 from datetime import datetime
 import logging
+from supabase import Client
 
 from app.core.database import get_db
 from app.models import AfricaIntelligenceItem, Organization, AIDomain, FundingType, GeographicScope
@@ -41,7 +41,7 @@ async def get_africa_intelligence_feed(
     ai_domain: Optional[str] = Query(None),
     funding_type: Optional[str] = Query(None, description="Filter by funding type category: 'grant', 'investment', 'prize', or 'other'"),
     requires_equity: Optional[bool] = Query(None, description="Filter for opportunities requiring equity"),
-    db: AsyncSession = Depends(get_db)
+    db = Depends(get_db)
 ):
     """Get intelligence feed with optional filtering, formatted for FundingOpportunityCard"""
     # Check if db is a Supabase client or SQLAlchemy session
