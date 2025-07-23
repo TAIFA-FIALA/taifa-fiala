@@ -3,7 +3,7 @@ import DatabaseGrowthChart from '@/components/homepage/DatabaseGrowthChart';
 import GeographicDistributionMapWrapper from '@/components/homepage/GeographicDistributionMapWrapper';
 import SectorAllocationChart from '@/components/homepage/SectorAllocationChart';
 import GenderEquityDashboard from '@/components/homepage/GenderEquityDashboard';
-import { Database, BarChart3, BookOpen, Users, ChevronRight, Globe, PieChart, TrendingUp, Target, Shield, Heart, ArrowRight } from 'lucide-react';
+import { TrendingUp, Users, BarChart3, Database, Target, Shield, BookOpen, ArrowRight } from 'lucide-react';
 import Image from 'next/image';
 import SearchBar from '@/components/homepage/SearchBar';
 import { getApiUrl, API_ENDPOINTS } from '@/lib/api-config';
@@ -22,76 +22,7 @@ interface AnalyticsSummary {
   unique_organizations?: number;
 }
 
-async function getAnalyticsSummary(): Promise<AnalyticsSummary | null> {
-  // In development mode, immediately return placeholder data without API calls
-  if (process.env.NODE_ENV === 'development') {
-    console.log('🚀 Using development placeholder data (no API calls)');
-    return {
-      total_opportunities: 2847,
-      active_opportunities: 23,
-      total_funding_value: 2419950000, // $2.42B
-      unique_organizations: 342
-    };
-  }
-
-  try {
-    // First try the equity analyses endpoint
-    const endpoint = API_ENDPOINTS.equityAnalysesSummary;
-    const url = getApiUrl(endpoint);
-    console.log('Fetching analytics summary from:', url);
-    
-    const res = await fetch(url, {
-      next: { revalidate: 300 } // Revalidate every 5 minutes
-    });
-    
-    console.log('Response status:', res.status);
-    
-    if (!res.ok) {
-      const errorText = await res.text();
-      console.error('Error response:', errorText);
-      throw new Error(`HTTP error! status: ${res.status}, response: ${errorText}`);
-    }
-    
-    const data = await res.json();
-    console.log('Analytics summary data:', data);
-    return data;
-  } catch (error) {
-    console.error("Failed to fetch analytics summary:", error);
-    
-    // Fallback: Try to get real metrics from ETL monitoring dashboard
-    try {
-      console.log('Attempting fallback to ETL monitoring dashboard...');
-      const dashboardUrl = getApiUrl('/api/v1/etl-monitoring/dashboard');
-      const dashboardRes = await fetch(dashboardUrl, {
-        next: { revalidate: 300 }
-      });
-      
-      if (dashboardRes.ok) {
-        const dashboardData = await dashboardRes.json();
-        const pipelineStats = dashboardData.pipeline_status;
-        
-        console.log('✅ Using real ETL metrics for homepage');
-        return {
-          total_opportunities: pipelineStats.total_opportunities_in_db || 0,
-          active_opportunities: pipelineStats.opportunities_added_today || 0,
-          total_funding_value: (pipelineStats.total_opportunities_in_db || 0) * 850000, // Avg $850k per opportunity
-          unique_organizations: Math.round((pipelineStats.total_opportunities_in_db || 0) * 0.12) // Estimate 12% unique orgs
-        };
-      }
-    } catch (fallbackError) {
-      console.error('Fallback to ETL monitoring also failed:', fallbackError);
-    }
-    
-    // Final fallback to realistic demo data
-    console.log('Using fallback demo data for homepage');
-    return {
-      total_opportunities: 2847,
-      active_opportunities: 23,
-      total_funding_value: 2419950000, // $2.42B
-      unique_organizations: 342
-    };
-  }
-}
+// getAnalyticsSummary function removed - was unused and causing loading issues
 
 export default function HomePage() {
   // Use fallback data during build to avoid API calls
@@ -183,26 +114,26 @@ export default function HomePage() {
 
           {/* KPI Metrics Above Database Growth */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12 animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
-            <div className="bg-taifa-accent/90 backdrop-blur-sm p-6 rounded-2xl border border-taifa-secondary/20 shadow-lg hover:animate-pulse hover:shadow-xl">
-              <div className="text-white text-3xl font-bold text-taifa-primary mb-2">{summary?.total_opportunities?.toLocaleString() || '2,467'}</div>
-              <div className="text-taifa-light text-sm font-medium">Total Opportunities</div>
+            <div className="bg-white p-6 rounded-2xl border-2 border-taifa-accent shadow-lg hover:shadow-xl transition-shadow">
+              <div className="text-taifa-accent text-3xl font-bold mb-2">{summary?.total_opportunities?.toLocaleString() || '2,847'}</div>
+              <div className="text-taifa-accent text-sm font-medium">Announcements</div>
             </div>
-            <div className="bg-taifa-orange/90 backdrop-blur-sm p-6 rounded-2xl border border-taifa-secondary/20 shadow-lg hover:animate-pulse hover:shadow-xl">
-              <div className="text-white text-3xl font-bold text-taifa-secondary mb-2">{summary?.active_opportunities?.toLocaleString() || '127'}</div>
-              <div className="text-taifa-light text-sm font-medium">Active Opportunities</div>
+            <div className="bg-white p-6 rounded-2xl border-2 border-taifa-orange shadow-lg hover:shadow-xl transition-shadow">
+              <div className="text-taifa-orange text-3xl font-bold mb-2">{summary?.active_opportunities?.toLocaleString() || '23'}</div>
+              <div className="text-taifa-orange text-sm font-medium">Active Opportunities</div>
             </div>
-            <div className="bg-taifa-secondary/90 backdrop-blur-sm p-6 rounded-2xl border border-taifa-secondary/20 shadow-lg hover:animate-pulse hover:shadow-xl">
-              <div className="text-white text-3xl font-bold text-taifa-accent mb-2">${summary?.total_funding_value ? (summary.total_funding_value / 1000000).toFixed(0) : '847'}M</div>
-              <div className="text-taifa-light text-sm font-medium">Total Funding Value</div>
+            <div className="bg-taifa-secondary p-6 rounded-2xl border-2 border-taifa-secondary shadow-lg hover:shadow-xl transition-shadow">
+              <div className="text-white text-3xl font-bold mb-2">${summary?.total_funding_value ? (summary.total_funding_value / 1000000000).toFixed(1) : '2.4'}B</div>
+              <div className="text-white text-sm font-medium">Total Funding Value</div>
             </div>
-            <div className="bg-taifa-red/90 backdrop-blur-sm p-6 rounded-2xl border border-taifa-secondary/20 shadow-lg hover:animate-pulse hover:shadow-xl">
-              <div className="text-white text-3xl font-bold text-taifa-olive mb-2">{summary?.unique_organizations?.toLocaleString() || '159'}</div>
-              <div className="text-taifa-light text-sm font-medium">Organizations</div>
+            <div className="bg-taifa-red p-6 rounded-2xl border-2 border-taifa-red shadow-lg hover:shadow-xl transition-shadow">
+              <div className="text-white text-3xl font-bold mb-2">{summary?.unique_organizations?.toLocaleString() || '342'}</div>
+              <div className="text-white text-sm font-medium">Organizations</div>
             </div>
           </div>
 
           {/* Enhanced Database Growth Chart */}
-          <div className="bg-white/80 backdrop-blur-sm rounded-3xl border border-taifa-secondary/20 shadow-2xl hover:shadow-3xl transition-all duration-300 p-12 mb-16 animate-fadeInUp" style={{ animationDelay: '0.3s' }}>
+          <div className="bg-white/80 backdrop-blur-sm rounded-3xl border border-taifa-secondary/20 shadow-2xl hover:shadow-3xl transition-all duration-300 px-8 py-6 mb-16 animate-fadeInUp" style={{ animationDelay: '0.3s' }}>
             <div className="flex items-center gap-6 mb-8">
               <div className="w-16 h-16 rounded-2xl bg-taifa-secondary/10 flex items-center justify-center border border-taifa-secondary/20">
                 <Database className="w-8 h-8 text-taifa-secondary" />
@@ -240,23 +171,23 @@ export default function HomePage() {
           {/* Issue 1: Geographic Concentration */}
           <div className="mb-12">
             <div className="bg-white p-8 rounded-lg border border-taifa-border shadow-sm hover:shadow-md transition-shadow relative">
-              {/* Numbered Icon in top-left corner */}
-              <div className="absolute -top-6 -left-6 z-10">
-                <Image 
-                  src="/number-1.png" 
-                  alt="Number 1" 
-                  width={150} 
-                  height={150} 
-                  className="object-contain"
-                />
-              </div>
-              
-              {/* Header aligned with numbered image */}
-              <div className="ml-16 mb-6">
-                <h3 className="text-2xl font-bold text-taifa-primary mb-1">
-                  Geographic Concentration
-                </h3>
-                <p className="text-taifa-muted text-md">Tracking funding distribution across African regions</p>
+              {/* Header with numbered icon aligned horizontally */}
+              <div className="flex items-center gap-6 mb-6">
+                <div className="flex-shrink-0">
+                  <Image 
+                    src="/number-1.png" 
+                    alt="Number 1" 
+                    width={120} 
+                    height={120} 
+                    className="object-contain"
+                  />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-2xl font-bold text-taifa-primary mb-1">
+                    Geographic Concentration
+                  </h3>
+                  <p className="text-taifa-muted text-md">Tracking funding distribution across African regions</p>
+                </div>
               </div>
               
               {/* Geographic Distribution Map */}
@@ -275,23 +206,23 @@ export default function HomePage() {
           {/* Issue 2: Sectoral Misalignment */}
           <div className="mb-12">
             <div className="bg-white p-8 rounded-lg border border-taifa-border shadow-sm hover:shadow-md transition-shadow relative">
-              {/* Numbered Icon in top-left corner */}
-              <div className="absolute -top-6 -left-6 z-10">
-                <Image 
-                  src="/number-2.png" 
-                  alt="Number 2" 
-                  width={150} 
-                  height={150} 
-                  className="object-contain"
-                />
-              </div>
-              
-              {/* Header aligned with numbered image */}
-              <div className="ml-16 mb-6">
-                <h3 className="text-2xl font-bold text-taifa-primary mb-1">
-                  Sectoral Funding Misalignment
-                </h3>
-                <p className="text-taifa-muted text-md">Analyzing funding allocation vs development priorities</p>
+              {/* Header with numbered icon aligned horizontally */}
+              <div className="flex items-center gap-6 mb-6">
+                <div className="flex-shrink-0">
+                  <Image 
+                    src="/number-2.png" 
+                    alt="Number 2" 
+                    width={120} 
+                    height={120} 
+                    className="object-contain"
+                  />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-2xl font-bold text-taifa-primary mb-1">
+                    Sectoral Misalignment
+                  </h3>
+                  <p className="text-taifa-muted text-md">Comparing funding allocation with development priorities</p>
+                </div>
               </div>
                 
                 {/* Sector Allocation Chart */}
@@ -314,23 +245,23 @@ export default function HomePage() {
           {/* Issue 3: Gender Disparity */}
           <div className="mb-12">
             <div className="bg-white p-8 rounded-lg border border-taifa-border shadow-sm hover:shadow-md transition-shadow relative">
-              {/* Numbered Icon in top-left corner */}
-              <div className="absolute -top-6 -left-6 z-10">
-                <Image 
-                  src="/number-3.png" 
-                  alt="Number 3" 
-                  width={150} 
-                  height={150} 
-                  className="object-contain"
-                />
-              </div>
-              
-              {/* Header aligned with numbered image */}
-              <div className="ml-16 mb-6">
-                <h3 className="text-2xl font-bold text-taifa-primary mb-1">
-                  Gender Disparity
-                </h3>
-                <p className="text-taifa-muted text-md">Monitoring gender equity in AI funding and leadership</p>
+              {/* Header with numbered icon aligned horizontally */}
+              <div className="flex items-center gap-6 mb-6">
+                <div className="flex-shrink-0">
+                  <Image 
+                    src="/number-3.png" 
+                    alt="Number 3" 
+                    width={120} 
+                    height={120} 
+                    className="object-contain"
+                  />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-2xl font-bold text-taifa-primary mb-1">
+                    Gender Disparity
+                  </h3>
+                  <p className="text-taifa-muted text-md">Monitoring gender equity in AI funding and leadership</p>
+                </div>
               </div>
                 
                 {/* Enhanced Gender Equity Dashboard */}
@@ -378,10 +309,10 @@ export default function HomePage() {
               <p className="text-taifa-primary leading-relaxed">Dedicated analysis of gender, geographic, and sectoral disparities in funding</p>
             </div>
             <div className="text-center p-8 bg-white/10 backdrop-blur-sm rounded-3xl border border-white/20 hover:bg-white/20 transition-all duration-300 hover:-translate-y-2 animate-fadeInUp" style={{ animationDelay: '0.5s' }}>
-              <div className="w-20 h-20 rounded-2xl bg-taifa-accent/20 flex items-center justify-center mx-auto mb-6 border border-taifa-accent/30">
-                <BookOpen className="w-10 h-10 text-taifa-accent" />
+              <div className="w-20 h-20 rounded-2xl bg-taifa-red/20 flex items-center justify-center mx-auto mb-6 border border-taifa-red/30">
+                <BookOpen className="w-10 h-10 text-taifa-red" />
               </div>
-              <h3 className="text-xl font-bold mb-4 text-taifa-accent">Open Research</h3>
+              <h3 className="text-xl font-bold mb-4 text-taifa-red">Open Research</h3>
               <p className="text-taifa-primary leading-relaxed">Transparent methodology and publicly accessible insights for the research community</p>
             </div>
           </div>
@@ -397,49 +328,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
-      {/* CACHED CONTENT FOR FUTURE USE
-      
-      // AI Funding Landscape Dashboard
-      <section className="py-12 px-4 sm:px-6 lg:px-8 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-2xl font-display text-gray-900 mb-8 flex items-center gap-3">
-            <BarChart3 className="w-6 h-6 text-taifa-primary" />
-            AI Funding Landscape Dashboard
-          </h2>
-          
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Geographic Distribution</h3>
-              <GeographicDistributionMap />
-            </div>
-            
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Sector Allocation vs Development Needs</h3>
-              <SectorAllocationChart />
-            </div>
-          </div>
-          
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Data Collection Progress</h3>
-            <DatabaseGrowthChart />
-          </div>
-        </div>
-      </section>
-
-      // Equity & Inclusion Analysis Hub
-      <section className="py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-2xl font-display text-gray-900 mb-8 flex items-center gap-3">
-            <Users className="w-6 h-6 text-taifa-primary" />
-            Equity & Inclusion Analysis Hub
-          </h2>
-          
-          <EquityMetricsDashboard />
-        </div>
-      </section>
-      
-      */}
     </div>
   );
 }

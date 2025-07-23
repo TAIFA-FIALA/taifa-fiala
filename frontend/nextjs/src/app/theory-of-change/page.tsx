@@ -1,6 +1,7 @@
 import { ArrowDown, Target, Users, Globe, BarChart3, Shield, Heart, Lightbulb, TrendingUp, CheckCircle } from 'lucide-react';
 import React from 'react';
 import { Metadata } from 'next';
+import Image from 'next/image';
 
 export const metadata: Metadata = {
   title: 'Theory of Change | TAIFA-FIALA',
@@ -109,15 +110,26 @@ export default function TheoryOfChangePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-taifa-yellow/5 via-white to-taifa-secondary/5">
       {/* Hero Section */}
-      <header className="bg-gradient-to-br from-taifa-primary via-taifa-secondary to-taifa-olive relative overflow-hidden">
+      <header className="bg-taifa-yellow relative overflow-hidden">
         <div className="absolute inset-0 bg-black/10"></div>
         <div className="relative max-w-7xl mx-auto py-20 px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <div className="inline-flex items-center px-4 py-2 bg-white/20 border border-white/30 rounded-full text-sm font-medium text-white mb-6 animate-fadeInUp">
+            {/* Logo */}
+            <div className="mb-8 animate-fadeInUp">
+              <Image 
+                src="/taifa-logo.png" 
+                alt="TAIFA-FIALA Logo" 
+                width={120} 
+                height={120} 
+                className="mx-auto" 
+              />
+            </div>
+            
+            <div className="inline-flex items-center px-4 py-2 bg-white/20 border border-taifa-primary/30 rounded-full text-sm font-medium text-white mb-6 animate-fadeInUp" style={{ animationDelay: '0.075s' }}>
               <Target className="h-4 w-4 mr-2" />
               Strategic Framework
             </div>
-            <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 animate-fadeInUp" style={{ animationDelay: '0.1s' }}>
+            <h1 className="text-5xl md:text-6xl font-bold text-taifa-primary mb-6 animate-fadeInUp" style={{ animationDelay: '0.1s' }}>
               Theory of
               <span className="block text-taifa-yellow">Change</span>
             </h1>
@@ -156,7 +168,7 @@ export default function TheoryOfChangePage() {
               Strategic Pathway
             </div>
             <h2 className="text-4xl font-bold text-taifa-primary mb-4 animate-fadeInUp" style={{ animationDelay: '0.1s' }}>
-              From Data to Transformation
+              Our Theory of Change
             </h2>
             <p className="text-lg text-taifa-muted max-w-3xl mx-auto animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
               A systematic approach to creating lasting change in African AI funding through evidence-based intervention
@@ -202,7 +214,7 @@ export default function TheoryOfChangePage() {
                             <div className="grid md:grid-cols-2 gap-3">
                               {stage.outcomes.map((outcome, outcomeIndex) => (
                                 <div key={outcomeIndex} className="flex items-start gap-3">
-                                  <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                                  <CheckCircle className="h-5 w-5 text-taifa-accent flex-shrink-0 mt-0.5" />
                                   <span className="text-sm text-taifa-muted leading-relaxed">{outcome}</span>
                                 </div>
                               ))}

@@ -16,13 +16,7 @@ const inter = Inter({
   display: "swap",
 });
 
-
-
-export const metadata: Metadata = {
-  title: "TAIFA-FIALA | AI Funding Tracker for Africa",
-  description: "A platform tracking AI funding opportunities across Africa. Fresh data daily, semantic search, data visualizations.",
-  keywords: "AI funding, Africa, Rwanda, grants, artificial intelligence, French, English, bilingual",
-};
+// Metadata removed from layout - should be defined in individual pages to avoid Next.js 14 conflicts
 
 export default function RootLayout({
   children,

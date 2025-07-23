@@ -215,44 +215,44 @@ const GenderEquityDashboard = () => {
     <div className="space-y-6">
       {/* Animated Metric Cards with Color Accents */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div className="bg-gradient-to-br from-white to-taifa-primary/5 p-6 rounded-lg border-l-4 border-taifa-primary shadow-sm hover:shadow-lg hover:scale-105 transition-all duration-300 text-center group">
-          <div className="w-12 h-12 rounded-full bg-taifa-primary/10 flex items-center justify-center mx-auto mb-3 group-hover:bg-taifa-primary/20 transition-colors">
-            <DollarSign className="w-6 h-6 text-taifa-primary" />
+        <div className="bg-gradient-to-br from-white to-taifa-red/5 p-6 rounded-lg border-l-4 border-taifa-red shadow-sm hover:shadow-lg hover:scale-105 transition-all duration-300 text-center group">
+          <div className="w-12 h-12 rounded-full bg-taifa-red/10 flex items-center justify-center mx-auto mb-3 group-hover:bg-taifa-red/20 transition-colors">
+            <DollarSign className="w-6 h-6 text-taifa-red" />
           </div>
-          <div className="text-2xl font-semibold text-taifa-primary mb-2">
+          <div className="text-2xl font-semibold text-taifa-red mb-2">
             {Math.round((totalFundingWomen / (totalFundingWomen + totalFundingMen)) * 100)}%
           </div>
           <div className="text-sm text-taifa-muted">Female Funding Share</div>
-          <div className="text-xs text-taifa-primary mt-1">across {genderTimelineData.length} years</div>
+          <div className="text-xs text-taifa-red mt-1">across {genderTimelineData.length} years</div>
         </div>
 
-        <div className="bg-gradient-to-br from-white to-taifa-secondary/5 p-6 rounded-lg border-l-4 border-taifa-secondary shadow-sm hover:shadow-lg hover:scale-105 transition-all duration-300 text-center group">
-          <div className="w-12 h-12 rounded-full bg-taifa-secondary/10 flex items-center justify-center mx-auto mb-3 group-hover:bg-taifa-secondary/20 transition-colors">
-            <DollarSign className="w-6 h-6 text-taifa-secondary" />
+        <div className="bg-gradient-to-br from-white to-taifa-red/5 p-6 rounded-lg border-l-4 border-taifa-red shadow-sm hover:shadow-lg hover:scale-105 transition-all duration-300 text-center group">
+          <div className="w-12 h-12 rounded-full bg-taifa-red/10 flex items-center justify-center mx-auto mb-3 group-hover:bg-taifa-red/20 transition-colors">
+            <DollarSign className="w-6 h-6 text-taifa-red" />
           </div>
-          <div className="text-2xl font-semibold text-taifa-secondary mb-2">$48M</div>
+          <div className="text-2xl font-semibold text-taifa-red mb-2">$48M</div>
           <div className="text-sm text-taifa-muted mb-1">Female founder funding</div>
-          <div className="text-xs text-taifa-secondary">Only 12% of total funding</div>
+          <div className="text-xs text-taifa-red">Only 12% of total funding</div>
         </div>
         
-        <div className="bg-gradient-to-br from-white to-taifa-accent/5 p-6 rounded-lg border-l-4 border-taifa-accent shadow-sm hover:shadow-lg hover:scale-105 transition-all duration-300 text-center group">
-          <div className="w-12 h-12 rounded-full bg-taifa-accent/10 flex items-center justify-center mx-auto mb-3 group-hover:bg-taifa-accent/20 transition-colors">
-            <TrendingDown className="w-6 h-6 text-taifa-accent" />
+        <div className="bg-gradient-to-br from-white to-taifa-red/5 p-6 rounded-lg border-l-4 border-taifa-red shadow-sm hover:shadow-lg hover:scale-105 transition-all duration-300 text-center group">
+          <div className="w-12 h-12 rounded-full bg-taifa-red/10 flex items-center justify-center mx-auto mb-3 group-hover:bg-taifa-red/20 transition-colors">
+            <TrendingDown className="w-6 h-6 text-taifa-red" />
           </div>
-          <div className="text-2xl font-semibold text-taifa-accent mb-2">6 years</div>
+          <div className="text-2xl font-semibold text-taifa-red mb-2">6 years</div>
           <div className="text-sm text-taifa-muted mb-1">Declining trend</div>
-          <div className="text-xs text-taifa-accent">Since 2019 peak of 22.3%</div>
+          <div className="text-xs text-taifa-red">Since 2019 peak of 22.3%</div>
         </div>
         
-        <div className="bg-gradient-to-br from-white to-taifa-primary/5 p-6 rounded-lg border-l-4 border-taifa-primary shadow-sm hover:shadow-lg hover:scale-105 transition-all duration-300 text-center group">
-          <div className="w-12 h-12 rounded-full bg-taifa-primary/10 flex items-center justify-center mx-auto mb-3 group-hover:bg-taifa-primary/20 transition-colors">
-            <svg className="w-6 h-6 text-taifa-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="bg-gradient-to-br from-white to-taifa-red/5 p-6 rounded-lg border-l-4 border-taifa-red shadow-sm hover:shadow-lg hover:scale-105 transition-all duration-300 text-center group">
+          <div className="w-12 h-12 rounded-full bg-taifa-red/10 flex items-center justify-center mx-auto mb-3 group-hover:bg-taifa-red/20 transition-colors">
+            <svg className="w-6 h-6 text-taifa-red" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
             </svg>
           </div>
-          <div className="text-2xl font-semibold text-taifa-primary mb-2">4.2x</div>
+          <div className="text-2xl font-semibold text-taifa-red mb-2">4.2x</div>
           <div className="text-sm text-taifa-muted mb-1">Funding gap</div>
-          <div className="text-xs text-taifa-primary">Less than male-led startups</div>
+          <div className="text-xs text-taifa-red">Less than male-led startups</div>
         </div>
       </div>
 
