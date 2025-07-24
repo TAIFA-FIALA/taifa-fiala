@@ -313,13 +313,13 @@ start_services() {
         echo 'Starting FastAPI backend...'
         cd '$PROD_PATH'
         export PYTHONPATH='$PROD_PATH:$PYTHONPATH'
-        nohup uvicorn backend.main:app --host 0.0.0.0 --port 8020 --reload > logs/backend.log 2>&1 &
+        nohup '$VENV_PATH/bin/python' -m uvicorn backend.main:app --host 0.0.0.0 --port 8020 --reload > logs/backend.log 2>&1 &
         BACKEND_PID=\$!
         echo \"Backend started with PID: \$BACKEND_PID\"
         
         # Start Streamlit dashboard
         echo 'Starting Streamlit dashboard...'
-        nohup '$VENV_PATH/bin/python' -m streamlit run backend/dashboard.py --server.port 8501 --server.address 0.0.0.0 > logs/streamlit.log 2>&1 &
+        nohup '$VENV_PATH/bin/python' -m streamlit run run_dashboard.py --server.port 8501 --server.address 0.0.0.0 > logs/streamlit.log 2>&1 &
         STREAMLIT_PID=\$!
         echo \"Streamlit started with PID: \$STREAMLIT_PID\"
         
@@ -327,9 +327,19 @@ start_services() {
         echo 'Starting Next.js frontend...'
         cd frontend/nextjs
         
-        # Use full npm path
-        NPM_PATH="/usr/local/opt/node@22/bin/npm"
-        if [ -f "\$NPM_PATH" ]; then
+        # Check for Node.js and npm availability
+        if command -v npm >/dev/null 2>&1; then
+            echo 'Using system npm'
+            nohup npm start -- --port 3020 > ../../logs/frontend.log 2>&1 &
+            FRONTEND_PID=\$!
+            echo "Frontend started with PID: \$FRONTEND_PID"
+        elif [ -f '/usr/local/opt/node@22/bin/npm' ]; then
+            echo 'Using Homebrew npm'
+            export PATH='/usr/local/opt/node@22/bin:$PATH'
+            nohup /usr/local/opt/node@22/bin/npm start -- --port 3020 > ../../logs/frontend.log 2>&1 &
+            FRONTEND_PID=\$!
+            echo "Frontend started with PID: \$FRONTEND_PID"
+        else
             nohup \$NPM_PATH start -- --port 3020 > ../../logs/frontend.log 2>&1 &
             FRONTEND_PID=\$!
             echo \"Frontend started with PID: \$FRONTEND_PID\"
