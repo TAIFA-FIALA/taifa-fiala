@@ -232,15 +232,34 @@ setup_environment() {
         pip install --upgrade pip
         pip install -r requirements.txt
         
+        # Ensure Streamlit is installed
+        echo 'Installing Streamlit...'
+        pip install streamlit
+        
         # Build Next.js frontend
         echo 'Building Next.js frontend...'
         cd ../frontend/nextjs
         
+        # Check for Node.js and npm
+        if command -v node >/dev/null 2>&1; then
+            echo 'Using system Node.js'
+            NODE_CMD='node'
+            NPM_CMD='npm'
+        elif [ -f '/usr/local/opt/node@22/bin/node' ]; then
+            echo 'Using Node.js v22 from Homebrew'
+            export PATH='/usr/local/opt/node@22/bin:$PATH'
+            NODE_CMD='/usr/local/opt/node@22/bin/node'
+            NPM_CMD='/usr/local/opt/node@22/bin/npm'
+        else
+            echo 'Error: Node.js not found'
+            exit 1
+        fi
+        
         # Install Node.js dependencies
-        npm install
+        $NPM_CMD install
         
         # Build the frontend
-        npm run build
+        $NPM_CMD run build
         
         echo 'Environment setup completed successfully'
     "
@@ -293,6 +312,7 @@ start_services() {
         # Start FastAPI backend
         echo 'Starting FastAPI backend...'
         cd '$PROD_PATH'
+        export PYTHONPATH='$PROD_PATH:$PYTHONPATH'
         nohup uvicorn backend.main:app --host 0.0.0.0 --port 8020 --reload > logs/backend.log 2>&1 &
         BACKEND_PID=\$!
         echo \"Backend started with PID: \$BACKEND_PID\"
