@@ -37,5 +37,5 @@ services:
       - ./backend:/app/backend
     environment:
       - PYTHONPATH=/app
-    command: streamlit run backend/dashboard.py --server.port=8501 --server.address=0.0.0.0
+    command: streamlit run run_dashboard.py --server.port=8501 --server.address=0.0.0.0
     restart: unless-stopped
