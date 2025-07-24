@@ -281,28 +281,74 @@ run_migrations() {
 }
 
 start_services() {
-    step "Step 7: Starting Services"
+    step "Step 6: Starting Services"
+    
     ssh $SSH_USER@$PROD_SERVER "
-        set -e
         cd '$PROD_PATH'
+        source '$VENV_PATH/bin/activate'
         
-        # Set PATH to include common Docker installation locations
-        export PATH=\"/usr/local/bin:/opt/homebrew/bin:\$PATH\"
+        # Create logs directory if it doesn't exist
+        mkdir -p logs
         
-        # Ensure containers are running (they should already be from setup_environment)
-        echo 'Ensuring all containers are running...'
-        docker-compose -f docker-compose.prod.yml up -d || docker compose -f docker-compose.prod.yml up -d
+        # Start FastAPI backend
+        echo 'Starting FastAPI backend...'
+        cd backend
+        nohup uvicorn main:app --host 0.0.0.0 --port 8020 --reload > ../logs/backend.log 2>&1 &
+        BACKEND_PID=\$!
+        echo \"Backend started with PID: \$BACKEND_PID\"
         
-        # Wait for services to be ready
+        # Start Streamlit dashboard
+        echo 'Starting Streamlit dashboard...'
+        nohup streamlit run dashboard.py --server.port 8501 --server.address 0.0.0.0 > ../logs/streamlit.log 2>&1 &
+        STREAMLIT_PID=\$!
+        echo \"Streamlit started with PID: \$STREAMLIT_PID\"
+        
+        # Start Next.js frontend
+        echo 'Starting Next.js frontend...'
+        cd ../frontend/nextjs
+        nohup npm start -- --port 3020 > ../../logs/frontend.log 2>&1 &
+        FRONTEND_PID=\$!
+        echo \"Frontend started with PID: \$FRONTEND_PID\"
+        
+        # Wait for services to initialize
         echo 'Waiting for services to initialize...'
-        sleep 15
+        sleep 10
         
-        # Show container status
-        echo 'Container status:'
-        docker-compose -f docker-compose.prod.yml ps || docker compose -f docker-compose.prod.yml ps
+        # Check if processes are still running
+        echo 'Verifying service status...'
+        if kill -0 \$BACKEND_PID 2>/dev/null; then
+            echo '✓ Backend process is running'
+        else
+            echo '✗ Backend process failed to start'
+            tail -20 ../logs/backend.log
+        fi
         
-    " || cleanup_and_exit
-    success "✓ Services started successfully."
+        if kill -0 \$STREAMLIT_PID 2>/dev/null; then
+            echo '✓ Streamlit process is running'
+        else
+            echo '✗ Streamlit process failed to start'
+            tail -20 ../logs/streamlit.log
+        fi
+        
+        if kill -0 \$FRONTEND_PID 2>/dev/null; then
+            echo '✓ Frontend process is running'
+        else
+            echo '✗ Frontend process failed to start'
+            tail -20 ../../logs/frontend.log
+        fi
+        
+        # Show running processes
+        echo 'Current service processes:'
+        ps aux | grep -E '(uvicorn|streamlit|node.*next)' | grep -v grep || echo 'No matching processes found'
+    "
+    
+    if [ $? -eq 0 ]; then
+        success "✓ Services started successfully."
+    else
+        error "Failed to start services."
+        rollback_deployment
+        exit 1
+    fi
 }
 
 health_check() {
