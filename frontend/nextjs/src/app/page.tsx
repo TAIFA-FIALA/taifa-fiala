@@ -163,7 +163,7 @@ export default function HomePage() {
                 />
                3 Issues of Equity in AI Funding
               </span>
-              <p className="text-lg text-taifa-muted">We conducted a rapid review of the AI funding lanscape to obtain estimated baseline values.</p>
+              <p className="text-lg text-taifa-muted">The African AI funding ecosystem has experienced unprecedented growth from 2019-2024, with total commitments exceeding $800 million across multiple funding streams. We conducted a rapid review of the AI funding lanscape to obtain estimated baseline values.</p>
               <span className="absolute -left-4 -top-6 text-8xl font-black text-taifa-border -z-10">•••</span>
             </span>
           </h2>

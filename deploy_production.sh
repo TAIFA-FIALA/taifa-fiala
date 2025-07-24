@@ -138,6 +138,15 @@ backup_production() {
 sync_files() {
     step "Step 4: Syncing Project Files"
     info "Syncing project files to production server..."
+    
+    # Verify .env files exist locally before sync
+    info "Checking for .env files locally..."
+    if [ -f "backend/.env" ]; then
+        info "✓ Found backend/.env locally"
+    else
+        warning "⚠ backend/.env not found locally!"
+    fi
+    
     rsync -avz --progress \
         --exclude 'venv' \
         --exclude '.venv' \
@@ -147,7 +156,25 @@ sync_files() {
         --exclude '.idea' \
         --exclude '__pycache__' \
         --exclude '*.pyc' \
+        --include 'backend/.env' \
+        --include '*/.env' \
+        --include '.env' \
         "$LOCAL_PATH/" "$SSH_USER@$PROD_SERVER:$PROD_PATH/" || cleanup_and_exit
+    
+    # Verify .env files were synced to remote
+    info "Verifying .env files were synced to remote server..."
+    ssh $SSH_USER@$PROD_SERVER "
+        cd '$PROD_PATH'
+        if [ -f 'backend/.env' ]; then
+            echo '✓ backend/.env found on remote server'
+            echo 'File size:' \$(wc -c < 'backend/.env') 'bytes'
+        else
+            echo '⚠ backend/.env NOT found on remote server!'
+            echo 'Contents of backend directory:'
+            ls -la backend/ || echo 'backend directory not found'
+        fi
+    "
+    
     success "✓ Project files synced."
 }
 
@@ -188,9 +215,97 @@ setup_environment() {
             exit 1
         fi
         
-        # Stop any existing containers
+        # Stop any existing containers more aggressively
         echo 'Stopping existing containers...'
-        docker-compose -f docker-compose.prod.yml down || docker compose -f docker-compose.prod.yml down || echo 'No existing containers to stop'
+        
+        # Try compose commands first
+        docker-compose -f docker-compose.prod.yml down 2>/dev/null || \
+        docker compose -f docker-compose.prod.yml down 2>/dev/null || \
+        echo 'No compose file or containers found, trying direct container cleanup...'
+        
+        # Stop and remove any taifa-fiala containers directly
+        echo 'Cleaning up any remaining taifa-fiala containers...'
+        CONTAINERS=\$(docker ps -aq --filter name=taifa-fiala)
+        if [ ! -z "$CONTAINERS" ]; then
+            echo 'Found containers to clean up:'
+            docker ps -a --filter name=taifa-fiala
+            docker stop $CONTAINERS 2>/dev/null || echo 'Some containers already stopped'
+            docker rm $CONTAINERS 2>/dev/null || echo 'Some containers already removed'
+        else
+            echo 'No taifa-fiala containers found'
+        fi
+        
+        # Targeted port cleanup - only target our specific ports
+        echo 'Performing targeted port cleanup for ports 3020 and 8020...'
+        
+        # Function to identify and stop containers using specific ports
+        cleanup_port() {
+            local port=\$1
+            echo \"Checking port \$port...\"
+            
+            if lsof -i:\$port >/dev/null 2>&1; then
+                echo \"Port \$port is in use:\"
+                lsof -i:\$port
+                
+                # Check if it's a Docker container
+                PORT_PROCESSES=\$(lsof -ti:\$port)
+                for pid in \$PORT_PROCESSES; do
+                    # Get process info
+                    PROCESS_INFO=\$(ps -p \$pid -o comm= 2>/dev/null || echo \"unknown\")
+                    
+                    # If it's a Docker container, try to identify and stop it gracefully
+                    if echo \"\$PROCESS_INFO\" | grep -q docker; then
+                        echo \"Found Docker process \$pid using port \$port\"
+                        
+                        # Try to find the container ID from the process
+                        CONTAINER_ID=\$(docker ps --format \"table {{.ID}}\\t{{.Ports}}\" | grep \":\$port-\" | awk '{print \$1}' | head -1)
+                        
+                        if [ ! -z \"\$CONTAINER_ID\" ]; then
+                            echo \"Stopping container \$CONTAINER_ID using port \$port\"
+                            docker stop \$CONTAINER_ID 2>/dev/null || echo \"Failed to stop container gracefully\"
+                            docker rm \$CONTAINER_ID 2>/dev/null || echo \"Failed to remove container\"
+                        else
+                            echo \"Could not identify container, killing process \$pid\"
+                            kill -9 \$pid 2>/dev/null || echo \"Failed to kill process \$pid\"
+                        fi
+                    else
+                        echo \"Non-Docker process \$pid (\$PROCESS_INFO) using port \$port, killing it\"
+                        kill -9 \$pid 2>/dev/null || echo \"Failed to kill process \$pid\"
+                    fi
+                done
+                
+                sleep 2
+                
+                # Verify port is now free
+                if lsof -i:\$port >/dev/null 2>&1; then
+                    echo \"WARNING: Port \$port is still in use after cleanup attempt\"
+                    lsof -i:\$port
+                    return 1
+                else
+                    echo \"✓ Port \$port is now available\"
+                    return 0
+                fi
+            else
+                echo \"✓ Port \$port is already available\"
+                return 0
+            fi
+        }
+        
+        # Clean up our target ports
+        cleanup_port 3020
+        PORT_3020_STATUS=\$?
+        
+        cleanup_port 8020
+        PORT_8020_STATUS=\$?
+        
+        # Only fail if we absolutely cannot free the ports
+        if [ \$PORT_3020_STATUS -ne 0 ] || [ \$PORT_8020_STATUS -ne 0 ]; then
+            echo 'ERROR: Could not free required ports for deployment'
+            echo 'You may need to manually stop conflicting services'
+            exit 1
+        fi
+        
+        echo 'All required ports are now available for deployment'
         
         # Build and start containers (backend and frontend)
         echo 'Building and starting Docker containers (backend and frontend)...'

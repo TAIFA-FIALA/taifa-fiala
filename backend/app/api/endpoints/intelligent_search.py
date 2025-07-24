@@ -7,6 +7,8 @@ from fastapi import APIRouter, Query, HTTPException, Depends
 from typing import List, Optional, Dict, Any
 from datetime import datetime, timedelta
 import logging
+from sqlalchemy.orm import Session
+from sqlalchemy import and_, or_, func
 
 from app.services.funding_intelligence.vector_intelligence import VectorSearchService
 from app.models.funding import AfricaIntelligenceItem

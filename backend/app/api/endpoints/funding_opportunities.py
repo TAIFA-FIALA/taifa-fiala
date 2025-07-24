@@ -85,6 +85,8 @@ async def get_africa_intelligence_feed(
         # Handle funding type data
         funding_type_data = opp.get('funding_types', {})
         funding_category = funding_type_data.get('category', 'other')
+        is_grant = funding_category == 'grant'
+        is_investment = funding_category == 'investment'
         
         # Prepare response data for FundingAnnouncementCard
         response_data = {
@@ -199,7 +201,7 @@ async def get_africa_intelligence_feed(
 @router.get("/{opportunity_id}", response_model=AfricaIntelligenceItemResponse)
 async def get_intelligence_item(
     opportunity_id: int,
-    db: AsyncSession = Depends(get_db)
+    db = Depends(get_db)
 ):
     """Get a specific intelligence item by ID"""
     opportunity = db.query(AfricaIntelligenceItem).filter(AfricaIntelligenceItem.id == opportunity_id).first()
@@ -305,7 +307,7 @@ async def get_intelligence_item(
 @router.post("/", response_model=AfricaIntelligenceItemResponse)
 async def create_intelligence_item(
     opportunity: AfricaIntelligenceItemCreate,
-    db: AsyncSession = Depends(get_db)
+    db = Depends(get_db)
 ):
     """Create a new intelligence item"""
     if hasattr(db, 'table'): # Supabase client
@@ -499,7 +501,7 @@ async def get_grants(
     renewable: Optional[bool] = Query(None, description="Filter for renewable grants"),
     project_based: Optional[bool] = Query(None, description="Filter for project-based grants"),
     min_duration: Optional[int] = Query(None, description="Minimum grant duration in months"),
-    db: AsyncSession = Depends(get_db)
+    db = Depends(get_db)
 ):
     """Get grant intelligence feed with specialized filters"""
     if hasattr(db, 'table'): # Supabase client
@@ -592,7 +594,7 @@ async def get_investments(
     limit: int = Query(50, ge=1, le=500),
     max_equity: Optional[float] = Query(None, description="Maximum equity percentage required"),
     min_valuation_cap: Optional[float] = Query(None, description="Minimum valuation cap"),
-    db: AsyncSession = Depends(get_db)
+    db = Depends(get_db)
 ):
     """Get investment intelligence feed with specialized filters"""
     if hasattr(db, 'table'): # Supabase client
@@ -684,7 +686,7 @@ async def search_africa_intelligence_feed(
     q: str = Query(..., description="Search query"),
     limit: int = Query(10, ge=1, le=100),
     funding_type: Optional[str] = Query(None, description="Limit search to specific funding type: 'grant', 'investment', etc."),
-    db: AsyncSession = Depends(get_db)
+    db = Depends(get_db)
 ):
     """Search intelligence feed by title or description"""
     if hasattr(db, 'table'):  # Supabase client
@@ -843,7 +845,7 @@ async def get_stage_matched_opportunities(
     stage: str = Query(None, description="Funding stage to match (e.g., 'Pre-seed', 'Seed', 'Series A')"),
     domain: str = Query(None, description="AI domain to filter by"),
     country: str = Query(None, description="Country to filter by"),
-    db: AsyncSession = Depends(get_db)
+    db = Depends(get_db)
 ):
     """
     Get intelligence feed matched to a specific stage and optionally filtered by domain and country.
@@ -1036,7 +1038,7 @@ async def get_stage_matched_opportunities(
 #
 
 @router.get("/geographic-availability")
-async def get_geographic_availability(db: AsyncSession = Depends(get_db)):
+async def get_geographic_availability(db = Depends(get_db)):
     """
     Get intelligence feed availability by geographic region
     This endpoint helps users understand which regions have available funding
@@ -1061,7 +1063,7 @@ async def get_geographic_availability(db: AsyncSession = Depends(get_db)):
 
 
 @router.get("/domain-funding")
-async def get_domain_funding(db: AsyncSession = Depends(get_db)):
+async def get_domain_funding(db = Depends(get_db)):
     """
     Get intelligence feed by AI domain
     This endpoint helps users understand which AI domains receive the most funding
