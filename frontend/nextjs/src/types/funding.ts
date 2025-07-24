@@ -98,6 +98,9 @@ export interface FundingAnnouncement {
   selection_criteria?: string;
 }
 
+// Backward compatibility alias
+export type FundingOpportunity = FundingAnnouncement;
+
 export interface AfricaIntelligenceItem {
   id: number;
   title: string;
