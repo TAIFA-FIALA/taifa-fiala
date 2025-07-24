@@ -352,23 +352,79 @@ start_services() {
 }
 
 health_check() {
-    step "Step 8: Performing Health Checks"
-    info "Waiting for services to initialize..."
-    sleep 30
-    info "Checking service health..."
-
+    step "Step 7: Health Check"
+    
+    info "Waiting for services to fully initialize..."
+    sleep 15
+    
     ssh $SSH_USER@$PROD_SERVER "
-        echo 'Checking Docker container status...'
-        $DOCKER_COMPOSE_CMD ps
-
-        echo 'Checking Next.js frontend...'
-        curl --silent --fail http://localhost:3020 > /dev/null && echo -e '${GREEN}✓ Frontend is healthy.${NC}' || echo -e '${RED}✗ Frontend health check failed.${NC}'
+        echo 'Performing health checks...'
         
-        echo 'Checking FastAPI backend...'
-        curl --silent --fail http://localhost:8020/health > /dev/null && echo -e '${GREEN}✓ Backend is healthy.${NC}' || echo -e '${RED}✗ Backend health check failed.${NC}'
-
-
+        # Check if processes are running
+        echo 'Checking process status...'
+        BACKEND_RUNNING=\$(ps aux | grep -v grep | grep 'uvicorn.*main:app' | wc -l)
+        STREAMLIT_RUNNING=\$(ps aux | grep -v grep | grep 'streamlit run' | wc -l)
+        FRONTEND_RUNNING=\$(ps aux | grep -v grep | grep 'node.*next' | wc -l)
+        
+        echo \"Backend processes: \$BACKEND_RUNNING\"
+        echo \"Streamlit processes: \$STREAMLIT_RUNNING\"
+        echo \"Frontend processes: \$FRONTEND_RUNNING\"
+        
+        # Check HTTP endpoints
+        echo 'Testing HTTP endpoints...'
+        
+        # Test FastAPI backend
+        echo 'Checking FastAPI backend health...'
+        if curl --silent --fail --max-time 10 http://localhost:8020/health > /dev/null; then
+            echo '✓ Backend is healthy and responding'
+        else
+            echo '✗ Backend health check failed'
+            echo 'Backend logs (last 10 lines):'
+            tail -10 '$PROD_PATH/logs/backend.log' 2>/dev/null || echo 'No backend logs found'
+        fi
+        
+        # Test Streamlit dashboard
+        echo 'Checking Streamlit dashboard...'
+        if curl --silent --fail --max-time 10 http://localhost:8501 > /dev/null; then
+            echo '✓ Streamlit dashboard is responding'
+        else
+            echo '✗ Streamlit dashboard health check failed'
+            echo 'Streamlit logs (last 10 lines):'
+            tail -10 '$PROD_PATH/logs/streamlit.log' 2>/dev/null || echo 'No streamlit logs found'
+        fi
+        
+        # Test Next.js frontend
+        echo 'Checking Next.js frontend...'
+        if curl --silent --fail --max-time 10 http://localhost:3020 > /dev/null; then
+            echo '✓ Frontend is responding'
+        else
+            echo '✗ Frontend health check failed'
+            echo 'Frontend logs (last 10 lines):'
+            tail -10 '$PROD_PATH/logs/frontend.log' 2>/dev/null || echo 'No frontend logs found'
+        fi
+        
+        # Show port status
+        echo 'Port status:'
+        for port in 8020 8501 3020; do
+            if lsof -i:\$port >/dev/null 2>&1; then
+                echo \"✓ Port \$port is in use (service running)\"
+            else
+                echo \"✗ Port \$port is not in use (service may be down)\"
+            fi
+        done
+        
+        # Final service summary
+        echo 'Service Summary:'
+        ps aux | grep -E '(uvicorn|streamlit|node.*next)' | grep -v grep | while read line; do
+            echo \"  \$line\"
+        done
     "
+    
+    if [ $? -eq 0 ]; then
+        success "✓ Health check completed."
+    else
+        warning "Health check completed with some issues. Check logs for details."
+    fi
 }
 
 rollback_deployment() {
