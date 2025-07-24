@@ -292,23 +292,31 @@ start_services() {
         
         # Start FastAPI backend
         echo 'Starting FastAPI backend...'
-        cd backend
-        nohup uvicorn main:app --host 0.0.0.0 --port 8020 --reload > ../logs/backend.log 2>&1 &
+        cd '$PROD_PATH'
+        nohup uvicorn backend.main:app --host 0.0.0.0 --port 8020 --reload > logs/backend.log 2>&1 &
         BACKEND_PID=\$!
         echo \"Backend started with PID: \$BACKEND_PID\"
         
         # Start Streamlit dashboard
         echo 'Starting Streamlit dashboard...'
-        nohup streamlit run dashboard.py --server.port 8501 --server.address 0.0.0.0 > ../logs/streamlit.log 2>&1 &
+        nohup '$VENV_PATH/bin/python' -m streamlit run backend/dashboard.py --server.port 8501 --server.address 0.0.0.0 > logs/streamlit.log 2>&1 &
         STREAMLIT_PID=\$!
         echo \"Streamlit started with PID: \$STREAMLIT_PID\"
         
         # Start Next.js frontend
         echo 'Starting Next.js frontend...'
-        cd ../frontend/nextjs
-        nohup npm start -- --port 3020 > ../../logs/frontend.log 2>&1 &
-        FRONTEND_PID=\$!
-        echo \"Frontend started with PID: \$FRONTEND_PID\"
+        cd frontend/nextjs
+        
+        # Use full npm path
+        NPM_PATH="/usr/local/opt/node@22/bin/npm"
+        if [ -f "\$NPM_PATH" ]; then
+            nohup \$NPM_PATH start -- --port 3020 > ../../logs/frontend.log 2>&1 &
+            FRONTEND_PID=\$!
+            echo \"Frontend started with PID: \$FRONTEND_PID\"
+        else
+            echo '✗ Cannot start frontend: npm not found at expected path'
+            FRONTEND_PID=''
+        fi
         
         # Wait for services to initialize
         echo 'Waiting for services to initialize...'
@@ -320,21 +328,24 @@ start_services() {
             echo '✓ Backend process is running'
         else
             echo '✗ Backend process failed to start'
-            tail -20 ../logs/backend.log
+            echo 'Backend logs (last 20 lines):'
+            tail -20 '$PROD_PATH/logs/backend.log' 2>/dev/null || echo 'No backend logs found'
         fi
         
         if kill -0 \$STREAMLIT_PID 2>/dev/null; then
             echo '✓ Streamlit process is running'
         else
             echo '✗ Streamlit process failed to start'
-            tail -20 ../logs/streamlit.log
+            echo 'Streamlit logs (last 20 lines):'
+            tail -20 '$PROD_PATH/logs/streamlit.log' 2>/dev/null || echo 'No streamlit logs found'
         fi
         
-        if kill -0 \$FRONTEND_PID 2>/dev/null; then
+        if [ -n "\$FRONTEND_PID" ] && kill -0 \$FRONTEND_PID 2>/dev/null; then
             echo '✓ Frontend process is running'
         else
             echo '✗ Frontend process failed to start'
-            tail -20 ../../logs/frontend.log
+            echo 'Frontend logs (last 20 lines):'
+            tail -20 '$PROD_PATH/logs/frontend.log' 2>/dev/null || echo 'No frontend logs found'
         fi
         
         # Show running processes
