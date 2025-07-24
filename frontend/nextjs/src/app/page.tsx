@@ -6,7 +6,6 @@ import GenderEquityDashboard from '@/components/homepage/GenderEquityDashboard';
 import { TrendingUp, Users, BarChart3, Database, Target, Shield, BookOpen, ArrowRight } from 'lucide-react';
 import Image from 'next/image';
 import SearchBar from '@/components/homepage/SearchBar';
-import { getApiUrl, API_ENDPOINTS } from '@/lib/api-config';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {

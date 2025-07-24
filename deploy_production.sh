@@ -180,147 +180,78 @@ sync_files() {
 
 setup_environment() {
     step "Step 5: Setting Up Production Environment"
+    
     ssh $SSH_USER@$PROD_SERVER "
-        set -e
         cd '$PROD_PATH'
         
-        # Set PATH to include common Docker installation locations
-        export PATH=\"/usr/local/bin:/opt/homebrew/bin:\$PATH\"
+        # Stop existing services cleanly
+        echo 'Stopping existing services...'
+        pkill -f 'uvicorn.*main:app' || echo 'No FastAPI process found'
+        pkill -f 'streamlit run' || echo 'No Streamlit process found'
+        pkill -f 'next.*start' || echo 'No Next.js process found'
         
-        # Unlock keychain for Docker authentication (may require sudo)
-        echo 'Unlocking keychain for Docker authentication...'
-        sudo security -v unlock-keychain ~/Library/Keychains/login.keychain-db || {
-            echo 'Keychain unlock failed. Trying without sudo...'
-            security -v unlock-keychain ~/Library/Keychains/login.keychain-db || echo 'Keychain unlock failed, continuing anyway...'
-        }
+        # Wait for processes to stop gracefully
+        sleep 3
         
-        # Ensure Docker daemon is running and accessible
-        echo 'Checking Docker daemon status...'
-        if ! docker info > /dev/null 2>&1; then
-            echo 'ERROR: Docker daemon not accessible.'
-            echo 'Please ensure Docker Desktop is running on the Mac-mini.'
-            exit 1
-        fi
-        echo 'Docker daemon is accessible.'
-        
-        # Check if Docker is available
-        if ! command -v docker &> /dev/null; then
-            echo 'Docker not found. Please install Docker on the production server.'
-            exit 1
-        fi
-        
-        # Check if Docker Compose is available
-        if ! command -v docker-compose &> /dev/null && ! docker compose version &> /dev/null; then
-            echo 'Docker Compose not found. Please install Docker Compose on the production server.'
-            exit 1
-        fi
-        
-        # Stop any existing containers more aggressively
-        echo 'Stopping existing containers...'
-        
-        # Try compose commands first
-        docker-compose -f docker-compose.prod.yml down 2>/dev/null || \
-        docker compose -f docker-compose.prod.yml down 2>/dev/null || \
-        echo 'No compose file or containers found, trying direct container cleanup...'
-        
-        # Stop and remove any taifa-fiala containers directly
-        echo 'Cleaning up any remaining taifa-fiala containers...'
-        CONTAINERS=\$(docker ps -aq --filter name=taifa-fiala)
-        if [ ! -z "$CONTAINERS" ]; then
-            echo 'Found containers to clean up:'
-            docker ps -a --filter name=taifa-fiala
-            docker stop $CONTAINERS 2>/dev/null || echo 'Some containers already stopped'
-            docker rm $CONTAINERS 2>/dev/null || echo 'Some containers already removed'
-        else
-            echo 'No taifa-fiala containers found'
-        fi
-        
-        # Targeted port cleanup - only target our specific ports
-        echo 'Performing targeted port cleanup for ports 3020 and 8020...'
-        
-        # Function to identify and stop containers using specific ports
-        cleanup_port() {
-            local port=\$1
-            echo \"Checking port \$port...\"
-            
+        # Verify ports are available
+        echo 'Checking port availability...'
+        for port in 8020 8501 3020; do
             if lsof -i:\$port >/dev/null 2>&1; then
-                echo \"Port \$port is in use:\"
-                lsof -i:\$port
+                echo \"WARNING: Port \$port still in use, attempting to free it...\"
+                PID=\$(lsof -ti:\$port)
+                if [ -n \"\$PID\" ]; then
+                    echo \"Killing process \$PID on port \$port\"
+                    kill -9 \$PID 2>/dev/null || echo \"Failed to kill process \$PID\"
+                    sleep 2
+                fi
                 
-                # Check if it's a Docker container
-                PORT_PROCESSES=\$(lsof -ti:\$port)
-                for pid in \$PORT_PROCESSES; do
-                    # Get process info
-                    PROCESS_INFO=\$(ps -p \$pid -o comm= 2>/dev/null || echo \"unknown\")
-                    
-                    # If it's a Docker container, try to identify and stop it gracefully
-                    if echo \"\$PROCESS_INFO\" | grep -q docker; then
-                        echo \"Found Docker process \$pid using port \$port\"
-                        
-                        # Try to find the container ID from the process
-                        CONTAINER_ID=\$(docker ps --format \"table {{.ID}}\\t{{.Ports}}\" | grep \":\$port-\" | awk '{print \$1}' | head -1)
-                        
-                        if [ ! -z \"\$CONTAINER_ID\" ]; then
-                            echo \"Stopping container \$CONTAINER_ID using port \$port\"
-                            docker stop \$CONTAINER_ID 2>/dev/null || echo \"Failed to stop container gracefully\"
-                            docker rm \$CONTAINER_ID 2>/dev/null || echo \"Failed to remove container\"
-                        else
-                            echo \"Could not identify container, killing process \$pid\"
-                            kill -9 \$pid 2>/dev/null || echo \"Failed to kill process \$pid\"
-                        fi
-                    else
-                        echo \"Non-Docker process \$pid (\$PROCESS_INFO) using port \$port, killing it\"
-                        kill -9 \$pid 2>/dev/null || echo \"Failed to kill process \$pid\"
-                    fi
-                done
-                
-                sleep 2
-                
-                # Verify port is now free
+                # Final check
                 if lsof -i:\$port >/dev/null 2>&1; then
-                    echo \"WARNING: Port \$port is still in use after cleanup attempt\"
+                    echo \"ERROR: Port \$port is still in use after cleanup\"
                     lsof -i:\$port
-                    return 1
+                    exit 1
                 else
                     echo \"✓ Port \$port is now available\"
-                    return 0
                 fi
             else
-                echo \"✓ Port \$port is already available\"
-                return 0
+                echo \"✓ Port \$port is available\"
             fi
-        }
+        done
         
-        # Clean up our target ports
-        cleanup_port 3020
-        PORT_3020_STATUS=\$?
-        
-        cleanup_port 8020
-        PORT_8020_STATUS=\$?
-        
-        # Only fail if we absolutely cannot free the ports
-        if [ \$PORT_3020_STATUS -ne 0 ] || [ \$PORT_8020_STATUS -ne 0 ]; then
-            echo 'ERROR: Could not free required ports for deployment'
-            echo 'You may need to manually stop conflicting services'
-            exit 1
+        # Set up Python virtual environment
+        echo 'Setting up Python virtual environment...'
+        if [ ! -d '$VENV_PATH' ]; then
+            python3 -m venv '$VENV_PATH'
         fi
         
-        echo 'All required ports are now available for deployment'
+        source '$VENV_PATH/bin/activate'
         
-        # Build and start containers (backend and frontend)
-        echo 'Building and starting Docker containers (backend and frontend)...'
-        docker-compose -f docker-compose.prod.yml up -d --build || docker compose -f docker-compose.prod.yml up -d --build
+        # Install/update Python dependencies
+        echo 'Installing Python dependencies...'
+        cd backend
+        pip install --upgrade pip
+        pip install -r requirements.txt
         
-        # Wait for services to be ready
-        echo 'Waiting for services to be ready...'
-        sleep 15
+        # Build Next.js frontend
+        echo 'Building Next.js frontend...'
+        cd ../frontend/nextjs
         
-        # Verify migration system inside container
-        echo 'Verifying migration system...'
-        docker-compose exec -T backend python migration_helper.py --compare || docker compose exec -T backend python migration_helper.py --compare || echo 'Migration verification completed with warnings'
+        # Install Node.js dependencies
+        npm install
         
-    " || cleanup_and_exit
-    success "✓ Environment setup completed."
+        # Build the frontend
+        npm run build
+        
+        echo 'Environment setup completed successfully'
+    "
+    
+    if [ $? -eq 0 ]; then
+        success "✓ Environment setup completed."
+    else
+        error "Environment setup failed."
+        rollback_deployment
+        exit 1
+    fi
 }
 
 run_migrations() {
@@ -388,7 +319,7 @@ health_check() {
         curl --silent --fail http://localhost:3020 > /dev/null && echo -e '${GREEN}✓ Frontend is healthy.${NC}' || echo -e '${RED}✗ Frontend health check failed.${NC}'
         
         echo 'Checking FastAPI backend...'
-        curl --silent --fail http://localhost:8000/health > /dev/null && echo -e '${GREEN}✓ Backend is healthy.${NC}' || echo -e '${RED}✗ Backend health check failed.${NC}'
+        curl --silent --fail http://localhost:8020/health > /dev/null && echo -e '${GREEN}✓ Backend is healthy.${NC}' || echo -e '${RED}✗ Backend health check failed.${NC}'
 
 
     "
@@ -432,9 +363,9 @@ main() {
     success "=== Deployment Complete ==="
     info "Deployment tag: ${DEPLOY_TAG}"
     info "Branch deployed: ${CURRENT_BRANCH} ${CURRENT_COMMIT}"
-    warning "Backend FastAPI running on: http://${PROD_SERVER}:8000"
+    warning "Backend FastAPI running on: http://${PROD_SERVER}:8020"
     warning "Streamlit Dashboard running on: http://${PROD_SERVER}:8501"
-    warning "API Documentation: http://${PROD_SERVER}:8000/docs"
+    warning "API Documentation: http://${PROD_SERVER}:8020/docs"
     warning "Next.js frontend running on: http://${PROD_SERVER}:3020"
     echo
     info "Useful commands:"
