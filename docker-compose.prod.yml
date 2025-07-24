@@ -12,7 +12,7 @@ services:
       - ./data_connectors:/app/data_connectors
     environment:
       - PYTHONPATH=/app
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    command: uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload
     restart: unless-stopped
 
   frontend:
@@ -27,12 +27,15 @@ services:
       - /app/.next
     restart: unless-stopped
 
-  # streamlit:
-  #   build:
-  #     context: ./frontend/streamlit_app
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - "8501:8501"
-  #   volumes:
-  #     - ./frontend/streamlit_app:/app
-  #   restart: unless-stopped
+  streamlit:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./backend:/app/backend
+    environment:
+      - PYTHONPATH=/app
+    command: streamlit run backend/dashboard.py --server.port=8501 --server.address=0.0.0.0
+    restart: unless-stopped
