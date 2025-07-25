@@ -111,14 +111,17 @@ git_safety_checks() {
         exit 1
     fi
 
+    # Check for uncommitted changes (both staged and unstaged)
     if [ -n "$(git status --porcelain)" ]; then
-        warning "You have uncommitted changes."
-        git status --porcelain
+        warning "You have uncommitted changes:"
+        git status --short
         read -p "Do you want to continue anyway? (y/N) " -n 1 -r; echo
         if [[ ! $REPLY =~ ^[Yy]$ ]]; then
             warning "Deployment cancelled. Please commit or stash your changes."
             exit 1
         fi
+    else
+        info "Working directory is clean."
     fi
 
     CURRENT_BRANCH=$(git branch --show-current)
@@ -127,6 +130,13 @@ git_safety_checks() {
     info "Deploying branch: ${CURRENT_BRANCH} ${CURRENT_COMMIT}"
 
     info "Creating deployment tag: ${DEPLOY_TAG}"
+    
+    # Delete existing tag if it exists
+    if git tag -l | grep -q "^${DEPLOY_TAG}$"; then
+        warning "Tag ${DEPLOY_TAG} already exists, deleting it..."
+        git tag -d "$DEPLOY_TAG"
+    fi
+    
     git tag "$DEPLOY_TAG" || cleanup_and_exit
     success "✓ Git checks passed and tag created."
 }
