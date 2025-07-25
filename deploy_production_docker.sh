@@ -239,8 +239,16 @@ main() {
     echo "╚══════════════════════════════════════════════════════════════╝"
     echo -e "${NC}"
     
+    # Set up error handling
+    trap cleanup_and_exit SIGINT SIGTERM
+    
+    check_prerequisites
+    git_safety_checks
+    run_local_migrations
+    backup_production
     check_docker
     sync_code
+    sync_env_files
     stop_services
     start_services
     health_check
