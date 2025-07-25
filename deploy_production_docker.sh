@@ -231,13 +231,46 @@ check_docker() {
             echo '✗ Docker Compose not found at $DOCKER_COMPOSE_PATH'
             exit 1
         fi
+        
+        # Check if Docker daemon is running
+        echo 'Checking Docker daemon status...'
+        if ! $DOCKER_PATH ps >/dev/null 2>&1; then
+            echo '⚠ Docker daemon is not running, attempting to start...'
+            
+            # Try to start Docker Desktop on macOS
+            if [ -d '/Applications/Docker.app' ]; then
+                echo 'Starting Docker Desktop...'
+                open -a Docker
+                
+                # Wait for Docker to start (up to 60 seconds)
+                echo 'Waiting for Docker daemon to start...'
+                for i in {1..60}; do
+                    if $DOCKER_PATH ps >/dev/null 2>&1; then
+                        echo '✓ Docker daemon is now running'
+                        break
+                    fi
+                    if [ \$i -eq 60 ]; then
+                        echo '✗ Docker daemon failed to start within 60 seconds'
+                        echo 'Please start Docker Desktop manually and try again'
+                        exit 1
+                    fi
+                    sleep 1
+                done
+            else
+                echo '✗ Docker Desktop not found and daemon is not running'
+                echo 'Please start Docker manually and try again'
+                exit 1
+            fi
+        else
+            echo '✓ Docker daemon is running'
+        fi
     "
     
     if [ $? -eq 0 ]; then
-        success "✓ Docker environment verified."
+        success "✓ Docker environment verified and daemon is running."
     else
         error "Docker environment check failed."
-        exit 1
+        cleanup_and_exit
     fi
 }
 
