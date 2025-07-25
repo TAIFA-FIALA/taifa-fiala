@@ -40,9 +40,172 @@ step() {
     echo -e "\n${BLUE}=== $1 ===${NC}"
 }
 
+cleanup_and_exit() {
+    error "Deployment failed."
+    if [ -n "$DEPLOY_TAG" ]; then
+        warning "Cleaning up deployment tag: $DEPLOY_TAG"
+        git tag -d "$DEPLOY_TAG" 2>/dev/null
+    fi
+    exit 1
+}
+
+# Function to check prerequisites
+check_prerequisites() {
+    step "Step 1: Verifying Prerequisites"
+    
+    if [ ! -f "backend/app/main.py" ]; then
+        error "Project files not found. Please run this script from the project root."
+        exit 1
+    fi
+
+    info "Checking 1Password login status..."
+    if command -v op >/dev/null 2>&1; then
+        if ! op account list >/dev/null 2>&1; then
+            error "1Password CLI is not signed in."
+            warning "Please run 'op signin' or ensure 1Password app is logged in."
+            exit 1
+        fi
+        success "✓ 1Password is logged in."
+    else
+        warning "1Password CLI not found, skipping 1Password check."
+    fi
+
+    info "Checking SSH agent status..."
+    if [ -z "$SSH_AUTH_SOCK" ]; then
+        error "SSH agent is not running or not accessible."
+        warning "Please ensure SSH agent is running and 1Password SSH agent is enabled."
+        exit 1
+    fi
+    
+    if ! ssh-add -l >/dev/null 2>&1; then
+        error "No SSH keys are loaded in the SSH agent."
+        warning "Please ensure 1Password is logged in and SSH keys are available."
+        exit 1
+    fi
+    success "✓ SSH agent is running with keys loaded."
+
+    info "Testing SSH connection to Mac-mini..."
+    if ! ssh -o ConnectTimeout=10 $SSH_USER@$PROD_SERVER 'echo "SSH connection successful"' >/dev/null 2>&1; then
+        error "Cannot connect to Mac-mini server $PROD_SERVER"
+        warning "Please check your SSH configuration and Tailscale connection."
+        exit 1
+    fi
+    success "✓ SSH connection verified."
+
+    info "Checking for required files..."
+    for f in "backend/requirements.txt" "frontend/streamlit_app/app.py" "backend/.env"; do
+        if [ ! -f "$f" ]; then
+            error "$f not found."
+            exit 1
+        fi
+    done
+    success "✓ Required files are present."
+}
+
+# Function to perform git safety checks
+git_safety_checks() {
+    step "Step 2: Performing Git Safety Checks"
+    
+    if ! git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
+        error "Not a git repository."
+        exit 1
+    fi
+
+    if [ -n "$(git status --porcelain)" ]; then
+        warning "You have uncommitted changes."
+        git status --porcelain
+        read -p "Do you want to continue anyway? (y/N) " -n 1 -r; echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            warning "Deployment cancelled. Please commit or stash your changes."
+            exit 1
+        fi
+    fi
+
+    CURRENT_BRANCH=$(git branch --show-current)
+    CURRENT_COMMIT=$(git rev-parse --short HEAD)
+    DEPLOY_TAG="production_${TIMESTAMP}_${CURRENT_COMMIT}"
+    info "Deploying branch: ${CURRENT_BRANCH} ${CURRENT_COMMIT}"
+
+    info "Creating deployment tag: ${DEPLOY_TAG}"
+    git tag "$DEPLOY_TAG" || cleanup_and_exit
+    success "✓ Git checks passed and tag created."
+}
+
+# Function to run local migrations
+run_local_migrations() {
+    step "Step 3: Running Local Database Migrations"
+    
+    info "Running migrations locally to ensure SQLite DB is up-to-date before deployment..."
+    
+    cd backend
+    
+    info "Checking local migration status..."
+    python -m alembic current
+    
+    info "Checking for pending migrations..."
+    if python -m alembic check 2>/dev/null; then
+        info "No pending migrations found."
+    else
+        info "Running local Alembic migrations..."
+        python -m alembic upgrade head
+    fi
+    
+    info "Final local migration status:"
+    python -m alembic current
+    
+    cd ..
+    
+    success "✓ Local database migrations completed."
+}
+
+# Function to create backup
+backup_production() {
+    step "Step 4: Creating Backup on Remote Server"
+    
+    BACKUP_DIR="${PROD_PATH}_backup_${TIMESTAMP}"
+    ssh $SSH_USER@$PROD_SERVER "
+        if [ -d '$PROD_PATH' ]; then
+            echo 'Creating backup...'
+            cp -r '$PROD_PATH' '$BACKUP_DIR'
+            echo 'Backup created at: $BACKUP_DIR'
+        else
+            echo 'No existing deployment found, skipping backup.'
+        fi
+    "
+    
+    if [ $? -eq 0 ]; then
+        success "✓ Backup completed."
+    else
+        error "Backup failed."
+        cleanup_and_exit
+    fi
+}
+
+# Function to sync environment files
+sync_env_files() {
+    step "Step 5: Syncing Environment Files"
+    
+    info "Syncing environment files..."
+    rsync -avz --delete \
+        --exclude='.git' \
+        --exclude='node_modules' \
+        --exclude='__pycache__' \
+        --exclude='venv' \
+        --exclude='backend/venv' \
+        --exclude='.next' \
+        ./backend/.env $SSH_USER@$PROD_SERVER:$PROD_PATH/backend/
+    
+    if [ $? -eq 0 ]; then
+        success "✓ Environment files synced."
+    else
+        error "Environment files sync failed."
+        exit 1
+    fi
+}
+
 # Function to check if Docker is available
 check_docker() {
-    step "Step 1: Checking Docker Installation"
+    step "Step 6: Checking Docker Installation"
     
     ssh $SSH_USER@$PROD_SERVER "
         if [ -f '$DOCKER_PATH' ]; then
@@ -72,7 +235,7 @@ check_docker() {
 
 # Function to sync code to production server
 sync_code() {
-    step "Step 2: Syncing Code to Production Server"
+    step "Step 8: Syncing Code to Production Server"
     
     info "Syncing codebase to $PROD_SERVER..."
     rsync -avz --delete \
@@ -84,7 +247,7 @@ sync_code() {
         --exclude='backend/venv' \
         --exclude='.next' \
         ./ $SSH_USER@$PROD_SERVER:$PROD_PATH/
-    
+
     if [ $? -eq 0 ]; then
         success "✓ Code sync completed."
     else
@@ -95,7 +258,7 @@ sync_code() {
 
 # Function to stop existing services
 stop_services() {
-    step "Step 3: Stopping Existing Services"
+    step "Step 9: Stopping Existing Services"
     
     ssh $SSH_USER@$PROD_SERVER "
         cd '$PROD_PATH'
@@ -124,7 +287,7 @@ stop_services() {
 
 # Function to start services with Docker
 start_services() {
-    step "Step 4: Starting Services with Docker"
+    step "Step 10: Starting Services with Docker"
     
     ssh $SSH_USER@$PROD_SERVER "
         cd '$PROD_PATH'
@@ -158,7 +321,7 @@ start_services() {
 
 # Function to perform health checks
 health_check() {
-    step "Step 5: Health Check"
+    step "Step 11: Health Check"
     
     ssh $SSH_USER@$PROD_SERVER "
         cd '$PROD_PATH'
