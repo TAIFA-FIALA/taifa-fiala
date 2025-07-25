@@ -184,7 +184,8 @@ backup_production() {
     ssh $SSH_USER@$PROD_SERVER "
         if [ -d '$PROD_PATH' ]; then
             echo 'Creating backup...'
-            cp -r '$PROD_PATH' '$BACKUP_DIR'
+            # Use rsync to create backup, excluding problematic directories
+            rsync -av --exclude='.venv' --exclude='venv' --exclude='node_modules' --exclude='__pycache__' --exclude='.git' '$PROD_PATH/' '$BACKUP_DIR/'
             echo 'Backup created at: $BACKUP_DIR'
         else
             echo 'No existing deployment found, skipping backup.'
@@ -208,6 +209,7 @@ sync_env_files() {
         --exclude='.git' \
         --exclude='node_modules' \
         --exclude='__pycache__' \
+        --exclude='.env*' \
         --exclude='venv' \
         --exclude='backend/venv' \
         --exclude='.next' \
@@ -346,6 +348,24 @@ start_services() {
         # Create logs directory
         mkdir -p logs
         
+        # Fix Docker credential helper issue
+        echo 'Configuring Docker credentials...'
+        if [ -f ~/.docker/config.json ]; then
+            # Backup existing config
+            cp ~/.docker/config.json ~/.docker/config.json.backup
+        fi
+        
+        # Create/update Docker config to not use credential helpers for public images
+        mkdir -p ~/.docker
+        cat > ~/.docker/config.json << 'EOF'
+{
+    \"auths\": {},
+    \"credsStore\": \"\"
+}
+EOF
+        
+        echo 'Docker credential configuration updated.'
+        
         # Start all services with Docker Compose
         echo 'Starting services with Docker Compose...'
         $DOCKER_COMPOSE_PATH -f docker-compose.prod.yml up -d --build
@@ -354,6 +374,8 @@ start_services() {
             echo '✓ Docker containers started successfully'
         else
             echo '✗ Failed to start Docker containers'
+            echo 'Docker Compose logs:'
+            $DOCKER_COMPOSE_PATH -f docker-compose.prod.yml logs --tail=20
             exit 1
         fi
         
@@ -363,10 +385,10 @@ start_services() {
     "
     
     if [ $? -eq 0 ]; then
-        success "✓ Services started with Docker."
+        success "✓ Services started successfully."
     else
         error "Failed to start services."
-        exit 1
+        cleanup_and_exit
     fi
 }
 
