@@ -236,7 +236,7 @@ export default function TheoryOfChangePage() {
                 <Heart className="h-10 w-10 text-taifa-white" />
               </div>
               <h3 className="text-3xl font-bold mb-6">Ultimate Vision</h3>
-              <p className="text-xl text-taifa-orange leading-relaxed max-w-4xl mx-auto">
+              <p className="text-xl text-taifa-primary leading-relaxed max-w-4xl mx-auto">
                 A transformed African AI ecosystem where funding flows transparently and equitably, 
                 empowering local innovators and ensuring AI development serves all Africans, 
                 not just a privileged few. This vision drives every aspect of our work and 
