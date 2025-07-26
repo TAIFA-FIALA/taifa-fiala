@@ -163,11 +163,22 @@ EOF
 chmod +x ${DEV_WATCH_DIR}/sync_to_prod.sh
 
 # Create a cron job to run the sync script every minute
+info "Setting up automatic sync to production server..."
 CRON_JOB="* * * * * $(pwd)/${DEV_WATCH_DIR}/sync_to_prod.sh"
 (crontab -l 2>/dev/null | grep -v "sync_to_prod.sh"; echo "$CRON_JOB") | crontab -
 
-echo -e "${GREEN}Local development watch directory set up at ${DEV_WATCH_DIR}${NC}"
-echo -e "${GREEN}Files will be automatically synced to production every minute${NC}"
+# Run the sync script once to ensure it works
+info "Testing sync to production server..."
+${DEV_WATCH_DIR}/sync_to_prod.sh
+if [ $? -eq 0 ]; then
+    success "✓ Initial sync to production server successful."
+else
+    warning "Initial sync to production server failed. Check your SSH connection and try again."
+    warning "You can run the sync script manually: ${DEV_WATCH_DIR}/sync_to_prod.sh"
+fi
+
+success "✓ Local development watch directory set up at ${DEV_WATCH_DIR}"
+success "✓ Files will be automatically synced to production every minute"
 
 # Create backup on remote server
 step "Step 4: Creating Backup on Remote Server"
@@ -219,93 +230,115 @@ scp .env ${PROD_USER}@${PROD_SERVER}:${PROD_DIR}/
 
 # SSH to production server and start the services
 step "Step 7: Starting Services on Production Server"
-ssh ${PROD_USER}@${PROD_SERVER} << EOF
-    cd ${PROD_DIR}
-    
-    # Stop any running containers
-    docker-compose down || true
-    
-    # Start the services with the watcher
-    docker-compose -f docker-compose.watcher.yml up -d
-    
-    # Check if services are running
-    docker-compose ps
+
+if [ "$DOCKER_AVAILABLE" = true ]; then
+    ssh ${PROD_USER}@${PROD_SERVER} << EOF
+        cd ${PROD_DIR}
+        
+        # Stop any running containers
+        docker-compose down || true
+        
+        # Start the services with the watcher
+        docker-compose -f docker-compose.watcher.yml up -d
+        
+        # Check if services are running
+        docker-compose ps
 EOF
+else
+    warning "Skipping Docker container startup as Docker is not available on the remote server."
+    warning "Please install Docker and Docker Compose on the remote server and then run:"
+    warning "  ssh ${PROD_USER}@${PROD_SERVER} 'cd ${PROD_DIR} && docker-compose -f docker-compose.watcher.yml up -d'"
+fi
 
 # Perform health check
 step "Step 8: Performing Health Check"
-info "Waiting for services to initialize..."
-sleep 15
 
-ssh $PROD_USER@$PROD_SERVER "
-    cd ${PROD_DIR}
-    
-    # Check if Docker containers are running
-    echo 'Docker container status:'
-    docker-compose -f docker-compose.watcher.yml ps
-    
-    # Check if all expected containers are running
-    RUNNING_CONTAINERS=\$(docker ps --format '{{.Names}}' | wc -l)
-    if [ \$RUNNING_CONTAINERS -lt 4 ]; then
-        echo '⚠ Warning: Not all containers are running!'
-        docker ps
-        echo 'Container logs:'
-        for container in \$(docker-compose -f docker-compose.watcher.yml ps -q); do
-            echo \"Logs for \$(docker inspect --format='{{.Name}}' \$container | sed 's/^\///')\"
-            docker logs \$container --tail 20
-        done
-    else
-        echo '✓ All containers are running'
-    fi
-    
-    # Check HTTP endpoints
-    echo 'Testing HTTP endpoints...'
-    
-    # Test FastAPI backend
-    if curl --silent --fail --max-time 10 http://localhost:8000/health > /dev/null; then
-        echo '✓ Backend is healthy and responding'
-    else
-        echo '⚠ Backend health check failed'
-        echo 'Backend container logs:'
-        docker logs \$(docker ps -q -f name=backend) --tail 20
-    fi
-    
-    # Test Streamlit dashboard
-    if curl --silent --fail --max-time 10 http://localhost:8501 > /dev/null; then
-        echo '✓ Streamlit dashboard is responding'
-    else
-        echo '⚠ Streamlit dashboard health check failed'
-        echo 'Streamlit container logs:'
-        docker logs \$(docker ps -q -f name=streamlit) --tail 20
-    fi
-    
-    # Test Next.js frontend
-    if curl --silent --fail --max-time 10 http://localhost:3020 > /dev/null; then
-        echo '✓ Frontend is responding'
-    else
-        echo '⚠ Frontend health check failed'
-        echo 'Frontend container logs:'
-        docker logs \$(docker ps -q -f name=frontend) --tail 20
-    fi
-    
-    # Check file watcher service
-    echo 'Checking file watcher service...'
-    if docker ps | grep -q file_watcher; then
-        echo '✓ File watcher service is running'
+if [ "$DOCKER_AVAILABLE" = true ]; then
+    info "Waiting for services to initialize..."
+    sleep 15
+
+    ssh $PROD_USER@$PROD_SERVER "
+        cd ${PROD_DIR}
         
-        # Check if watch directory exists
+        # Check if Docker containers are running
+        echo 'Docker container status:'
+        docker-compose -f docker-compose.watcher.yml ps
+        
+        # Check if all expected containers are running
+        RUNNING_CONTAINERS=\$(docker ps --format '{{.Names}}' | wc -l)
+        if [ \$RUNNING_CONTAINERS -lt 4 ]; then
+            echo '⚠ Warning: Not all containers are running!'
+            docker ps
+            echo 'Container logs:'
+            for container in \$(docker-compose -f docker-compose.watcher.yml ps -q); do
+                echo \"Logs for \$(docker inspect --format='{{.Name}}' \$container | sed 's/^\///')\"
+                docker logs \$container --tail 20
+            done
+        else
+            echo '✓ All containers are running'
+        fi
+        
+        # Check HTTP endpoints
+        echo 'Testing HTTP endpoints...'
+        
+        # Test FastAPI backend
+        if curl --silent --fail --max-time 10 http://localhost:8000/health > /dev/null; then
+            echo '✓ Backend is healthy and responding'
+        else
+            echo '⚠ Backend health check failed'
+            echo 'Backend container logs:'
+            docker logs \$(docker ps -q -f name=backend) --tail 20
+        fi
+        
+        # Test Streamlit dashboard
+        if curl --silent --fail --max-time 10 http://localhost:8501 > /dev/null; then
+            echo '✓ Streamlit dashboard is responding'
+        else
+            echo '⚠ Streamlit dashboard health check failed'
+            echo 'Streamlit container logs:'
+            docker logs \$(docker ps -q -f name=streamlit) --tail 20
+        fi
+        
+        # Test Next.js frontend
+        if curl --silent --fail --max-time 10 http://localhost:3020 > /dev/null; then
+            echo '✓ Frontend is responding'
+        else
+            echo '⚠ Frontend health check failed'
+            echo 'Frontend container logs:'
+            docker logs \$(docker ps -q -f name=frontend) --tail 20
+        fi
+        
+        # Check file watcher service
+        echo 'Checking file watcher service...'
+        if docker ps | grep -q file_watcher; then
+            echo '✓ File watcher service is running'
+            
+            # Check if watch directory exists
+            if [ -d '${PROD_DIR}/data_ingestion' ]; then
+                echo '✓ Data ingestion directory exists'
+                ls -la '${PROD_DIR}/data_ingestion'
+            else
+                echo '⚠ Data ingestion directory does not exist'
+            fi
+        else
+            echo '⚠ File watcher service is not running'
+            echo 'File watcher container logs:'
+            docker logs \$(docker ps -q -f name=file_watcher) --tail 20 || echo 'No file watcher container found'
+        fi
+    "
+else
+    warning "Skipping Docker health check as Docker is not available on the remote server."
+    
+    # Check if data ingestion directory exists
+    ssh $PROD_USER@$PROD_SERVER "
         if [ -d '${PROD_DIR}/data_ingestion' ]; then
             echo '✓ Data ingestion directory exists'
             ls -la '${PROD_DIR}/data_ingestion'
         else
             echo '⚠ Data ingestion directory does not exist'
         fi
-    else
-        echo '⚠ File watcher service is not running'
-        echo 'File watcher container logs:'
-        docker logs \$(docker ps -q -f name=file_watcher) --tail 20 || echo 'No file watcher container found'
-    fi
-"
+    "
+fi
 
 if [ $? -eq 0 ]; then
     success "✓ Health check completed."
@@ -315,8 +348,10 @@ fi
 
 # Create a restart script on the remote server
 step "Step 9: Creating Restart Script"
-ssh $PROD_USER@$PROD_SERVER "
-    cat > ${PROD_DIR}/restart_services.sh << 'EOF'
+
+if [ "$DOCKER_AVAILABLE" = true ]; then
+    ssh $PROD_USER@$PROD_SERVER "
+        cat > ${PROD_DIR}/restart_services.sh << 'EOF'
 #!/bin/bash
 
 # AI Africa Funding Tracker - Service Restart Script
@@ -332,9 +367,38 @@ echo 'Container status:'
 docker-compose -f docker-compose.watcher.yml ps
 EOF
 
-    chmod +x ${PROD_DIR}/restart_services.sh
-    echo 'Restart script created at ${PROD_DIR}/restart_services.sh'
-"
+        chmod +x ${PROD_DIR}/restart_services.sh
+        echo 'Restart script created at ${PROD_DIR}/restart_services.sh'
+    "
+else
+    ssh $PROD_USER@$PROD_SERVER "
+        cat > ${PROD_DIR}/install_docker.sh << 'EOF'
+#!/bin/bash
+
+# Script to install Docker and Docker Compose
+echo 'Installing Docker...'
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
+
+echo 'Installing Docker Compose...'
+sudo apt-get update
+sudo apt-get install -y docker-compose
+
+echo 'Starting services...'
+cd \$(dirname \$0)
+docker-compose -f docker-compose.watcher.yml up -d
+
+echo 'Container status:'
+docker-compose -f docker-compose.watcher.yml ps
+EOF
+
+        chmod +x ${PROD_DIR}/install_docker.sh
+        echo 'Docker installation script created at ${PROD_DIR}/install_docker.sh'
+    "
+    
+    warning "Created install_docker.sh script on the remote server."
+    warning "Run 'ssh ${PROD_USER}@${PROD_SERVER} \"cd ${PROD_DIR} && sudo ./install_docker.sh\"' to install Docker and start services."
+fi
 
 success "✓ Restart script created."
 
@@ -342,10 +406,17 @@ echo
 success "=== Deployment Complete ==="
 info "Deployment tag: ${DEPLOY_TAG}"
 info "Branch deployed: ${CURRENT_BRANCH} ${CURRENT_COMMIT}"
-warning "Backend FastAPI running on: http://${PROD_SERVER}:8000"
-warning "Streamlit Dashboard running on: http://${PROD_SERVER}:8501"
-warning "API Documentation: http://${PROD_SERVER}:8000/docs"
-warning "Next.js frontend running on: http://${PROD_SERVER}:3020"
+
+if [ "$DOCKER_AVAILABLE" = true ]; then
+    warning "Backend FastAPI running on: http://${PROD_SERVER}:8000"
+    warning "Streamlit Dashboard running on: http://${PROD_SERVER}:8501"
+    warning "API Documentation: http://${PROD_SERVER}:8000/docs"
+    warning "Next.js frontend running on: http://${PROD_SERVER}:3020"
+else
+    warning "Docker is not available on the remote server."
+    warning "Please install Docker and Docker Compose to start the services."
+    warning "Run: ssh ${PROD_USER}@${PROD_SERVER} \"cd ${PROD_DIR} && sudo ./install_docker.sh\""
+fi
 echo
 info "File Ingestion:"
 info "Local watch directory: ${DEV_WATCH_DIR}"
@@ -356,6 +427,13 @@ info "2. Files will be automatically synced to production"
 info "3. Check ${DEV_WATCH_DIR}/logs/ for processing logs"
 echo
 info "Useful commands:"
-echo "Check Docker status: ssh $PROD_USER@$PROD_SERVER 'cd $PROD_DIR && docker-compose -f docker-compose.watcher.yml ps'"
-echo "View container logs: ssh $PROD_USER@$PROD_SERVER 'cd $PROD_DIR && docker logs \$(docker ps -q -f name=file_watcher)'"
-echo "Restart services: ssh $PROD_USER@$PROD_SERVER 'cd $PROD_DIR && ./restart_services.sh'"
+if [ "$DOCKER_AVAILABLE" = true ]; then
+    echo "Check Docker status: ssh $PROD_USER@$PROD_SERVER 'cd $PROD_DIR && docker-compose -f docker-compose.watcher.yml ps'"
+    echo "View container logs: ssh $PROD_USER@$PROD_SERVER 'cd $PROD_DIR && docker logs \$(docker ps -q -f name=file_watcher)'"
+    echo "Restart services: ssh $PROD_USER@$PROD_SERVER 'cd $PROD_DIR && ./restart_services.sh'"
+else
+    echo "Install Docker: ssh $PROD_USER@$PROD_SERVER 'cd $PROD_DIR && sudo ./install_docker.sh'"
+    echo "After installing Docker, check status: ssh $PROD_USER@$PROD_SERVER 'cd $PROD_DIR && docker-compose -f docker-compose.watcher.yml ps'"
+fi
+
+echo "Manually sync files: ${DEV_WATCH_DIR}/sync_to_prod.sh"
