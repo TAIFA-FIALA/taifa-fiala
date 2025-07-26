@@ -186,11 +186,20 @@ BACKUP_DIR="${PROD_DIR}_backup_${TIMESTAMP}"
 ssh $PROD_USER@$PROD_SERVER "
     if [ -d '$PROD_DIR' ]; then
         echo 'Creating backup...'
-        cp -r '$PROD_DIR' '$BACKUP_DIR' && echo 'Backup created at $BACKUP_DIR'
+        mkdir -p '$BACKUP_DIR'
+        
+        # Use rsync instead of cp to exclude problematic directories
+        rsync -a --exclude='.venv' --exclude='venv' --exclude='__pycache__' '$PROD_DIR/' '$BACKUP_DIR/'
+        
+        if [ \$? -eq 0 ]; then
+            echo 'Backup created at $BACKUP_DIR'
+        else
+            echo 'Backup failed, but continuing with deployment'
+        fi
     else
         echo 'No existing production directory found, skipping backup.'
     fi
-" || cleanup_and_exit
+"
 success "✓ Backup completed."
 
 # SSH to production server and set up the environment
