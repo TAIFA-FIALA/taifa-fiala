@@ -2,6 +2,7 @@ import { TrendingUp, AlertTriangle, DollarSign, Briefcase, Target, BarChart3, Pi
 import React from 'react';
 import { Metadata } from 'next';
 import FundingCharts from './components/FundingCharts';
+import InteractiveAfricaAIMap from '@/components/analytics/interactive-map';
 
 export const metadata: Metadata = {
   title: 'African AI Funding Landscape: The Two-Track Surge | TAIFA-FIALA',
@@ -463,9 +464,10 @@ export default function FundingLandscapePage() {
           />
         </div>
       </section>
-
+      <InteractiveAfricaAIMap />
       <Components.OutlookSection />
       <Components.ConclusionSection />
+     
     </div>
   );
 }
