@@ -219,17 +219,17 @@ export default function AboutPage() {
               Get In Touch
             </div>
             <h2 className="text-4xl font-bold text-white mb-6 animate-fadeInUp" style={{ animationDelay: '0.1s' }}>Contact & Collaboration</h2>
-            <p className="text-xl text-taifa-yellow mb-8 max-w-3xl mx-auto animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
+            <p className="text-xl text-taifa-orange mb-8 max-w-3xl mx-auto animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
               Partner with us in building transparent, equitable AI development across Africa
             </p>
             
             {/* Funding Statement */}
             <div className="bg-white/10 backdrop-blur-sm p-8 rounded-2xl border border-white/20 max-w-4xl mx-auto mb-12 animate-fadeInUp" style={{ animationDelay: '0.3s' }}>
               <div className="flex items-center justify-center mb-4">
-                <Heart className="h-6 w-6 text-taifa-yellow mr-3" />
+                <Heart className="h-6 w-6 text-taifa-orange mr-3" />
                 <span className="text-lg font-semibold text-white">Self-Supporting Initiative</span>
               </div>
-              <p className="text-taifa-yellow leading-relaxed text-lg">
+              <p className="text-taifa-orange leading-relaxed text-lg">
                 <strong className="text-white">TAIFA-FIALA is currently self-supporting.</strong> If you are interested in helping us 
                 grow our reach and expand our platform to serve more African communities, 
                 please get in touch with us below.
@@ -240,30 +240,30 @@ export default function AboutPage() {
           <div className="grid md:grid-cols-3 gap-8 animate-fadeInUp" style={{ animationDelay: '0.4s' }}>
             <div className="text-center p-8 bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 hover:bg-white/20 transition-all duration-300 hover:-translate-y-2">
               <div className="w-16 h-16 bg-taifa-accent/20 rounded-full flex items-center justify-center mx-auto mb-4 border border-taifa-accent/30">
-                <Mail className="h-8 w-8 text-taifa-yellow" />
+                <Mail className="h-8 w-8 text-taifa-orange" />
               </div>
               <h3 className="font-semibold text-white mb-3 text-lg">General Inquiries</h3>
-              <p className="text-taifa-yellow text-sm leading-relaxed">
+              <p className="text-taifa-orange text-sm leading-relaxed">
                 Research partnerships and collaboration opportunities
               </p>
             </div>
             
             <div className="text-center p-8 bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 hover:bg-white/20 transition-all duration-300 hover:-translate-y-2">
               <div className="w-16 h-16 bg-taifa-secondary/20 rounded-full flex items-center justify-center mx-auto mb-4 border border-taifa-secondary/30">
-                <Users className="h-8 w-8 text-taifa-yellow" />
+                <Users className="h-8 w-8 text-taifa-orange" />
               </div>
               <h3 className="font-semibold text-white mb-3 text-lg">Grant Funding</h3>
-              <p className="text-taifa-yellow text-sm leading-relaxed">
+              <p className="text-taifa-orange text-sm leading-relaxed">
                 Supporting transparent AI development across Africa
               </p>
             </div>
             
             <div className="text-center p-8 bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 hover:bg-white/20 transition-all duration-300 hover:-translate-y-2">
               <div className="w-16 h-16 bg-taifa-olive/20 rounded-full flex items-center justify-center mx-auto mb-4 border border-taifa-olive/30">
-                <ExternalLink className="h-8 w-8 text-taifa-yellow" />
+                <ExternalLink className="h-8 w-8 text-taifa-orange" />
               </div>
               <h3 className="font-semibold text-white mb-3 text-lg">Data Access</h3>
-              <p className="text-taifa-yellow text-sm leading-relaxed">
+              <p className="text-taifa-orange text-sm leading-relaxed">
                 Academic and institutional research partnerships
               </p>
             </div>
@@ -272,13 +272,13 @@ export default function AboutPage() {
           <div className="mt-16 text-center animate-fadeInUp" style={{ animationDelay: '0.5s' }}>
             <div className="bg-white/10 backdrop-blur-sm p-8 rounded-2xl border border-white/20 max-w-4xl mx-auto">
               <div className="flex items-center justify-center mb-4">
-                <Shield className="h-6 w-6 text-taifa-yellow mr-3" />
+                <Shield className="h-6 w-6 text-taifa-orange mr-3" />
                 <span className="text-lg font-semibold text-white">Transparency Note</span>
               </div>
-              <p className="text-taifa-yellow leading-relaxed mb-4">
+              <p className="text-taifa-orange leading-relaxed mb-4">
                 <strong className="text-white">TAIFA-FIALA operates as an independent initiative.</strong>
               </p>
-              <p className="text-sm text-taifa-yellow/80 leading-relaxed">
+              <p className="text-sm text-taifa-orange/80 leading-relaxed">
                 Our funding sources and methodology are fully documented to ensure accountability 
                 in our mission to promote transparency in African AI development.
               </p>

@@ -13,15 +13,15 @@ const geoData = [
 
 const GeographicAnalysis = () => {
   return (
-    <div className="lg:col-span-2 bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+    <div className="lg:col-span-2 bg-taifa-white p-6 rounded-lg shadow-sm border border-gray-200">
       <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-        <Map className="mr-3 h-6 w-6 text-blue-700" />
+        <Map className="mr-3 h-6 w-6 text-taifa-orange" />
         Geographic Distribution
       </h3>
       
       {/* Placeholder for AfricaMap component */}
-      <div className="h-96 bg-gray-100 rounded flex items-center justify-center mb-6">
-        <p className="text-gray-500">Africa Map with Funding Density Placeholder</p>
+      <div className="h-96 bg-taifa-white rounded flex items-center justify-center mb-6">
+        <p className="text-taifa-muted">Africa Map with Funding Density Placeholder</p>
       </div>
 
       {/* Data Table */}
@@ -46,7 +46,7 @@ const GeographicAnalysis = () => {
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-taifa-white divide-y divide-gray-200">
             {geoData.map((row) => (
               <tr key={row.region}>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{row.region}</td>

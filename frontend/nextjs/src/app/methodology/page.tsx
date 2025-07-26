@@ -327,7 +327,7 @@ export default function MethodologyPage() {
       <section className="py-24 bg-gradient-to-br from-taifa-primary to-taifa-olive">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-4xl font-bold mb-6 text-taifa-white animate-fadeInUp" style={{ animationDelay: '0.1s' }}>Vision: AI by Africans, for Africans</h2>
-          <p className="text-xl max-w-4xl mx-auto leading-relaxed text-taifa-yellow animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
+          <p className="text-xl max-w-4xl mx-auto leading-relaxed text-taifa-orange animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
             TAIFA-FIALA's ultimate goal extends beyond data collection to become the central platform 
             enabling African-led AI development. Through transparent funding intelligence, project amplification, 
             and ecosystem building, we democratize access to AI development resources and and ensure African voices 
@@ -345,7 +345,7 @@ export default function MethodologyPage() {
                   {React.cloneElement(item.icon, { className: "h-10 w-10" })}
                 </div>
                 <h3 className="text-xl font-semibold mb-2 text-taifa-white">{item.title}</h3>
-                <p className="text-md text-taifa-yellow opacity-80">{item.description}</p>
+                <p className="text-md text-taifa-orange opacity-80">{item.description}</p>
               </div>
             ))}
           </div>

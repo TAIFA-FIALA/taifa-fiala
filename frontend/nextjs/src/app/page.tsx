@@ -129,7 +129,7 @@ export default function HomePage() {
               <div className="text-taifa-red text-3xl font-bold mb-1">{summary?.unique_organizations?.toLocaleString() || '342'}</div>
               <div className="text-taifa-red text-sm font-medium">Unique Funding Organizations</div>
             </div>
-            <div className="bg-taifa-white p-4 rounded-2xl border-2 border-taifa-yellow shadow-lg hover:shadow-xl transition-shadow">
+            <div className="bg-taifa-white p-4 rounded-2xl border-2 border-taifa-orange shadow-lg hover:shadow-xl transition-shadow">
               <div className="text-taifa-olive text-3xl font-bold mb-1">{summary?.unique_organizations?.toLocaleString() || '342'}</div>
               <div className="text-taifa-olive text-sm font-medium">Unique Organizations Funded</div>
             </div>

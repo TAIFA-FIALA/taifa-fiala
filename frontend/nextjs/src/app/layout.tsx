@@ -44,24 +44,24 @@ export default function RootLayout({
               <div>
                 <h4 className="font-semibold text-navy mb-3">Platform</h4>
                 <ul className="space-y-2 text-sm">
-                  <li><Link href="/funding" className="hover:text-yellow-300 transition-colors duration-300 ease-in-out">Search Funding</Link></li>
-                  <li><Link href="/organizations" className="hover:text-yellow-300 transition-colors duration-300 ease-in-out">Organizations</Link></li>
-                  <li><Link href="/submit-opportunity" className="hover:text-yellow-300 transition-colors duration-300 ease-in-out">Submit Opportunity</Link></li>
+                  <li><Link href="/funding" className="hover:text-taifa-orange transition-colors duration-300 ease-in-out">Search Funding</Link></li>
+                  <li><Link href="/organizations" className="hover:text-taifa-orange transition-colors duration-300 ease-in-out">Organizations</Link></li>
+                  <li><Link href="/submit-opportunity" className="hover:text-taifa-orange transition-colors duration-300 ease-in-out">Submit Opportunity</Link></li>
                 </ul>
               </div>
               <div>
                 <h4 className="font-semibold text-white mb-3">About</h4>
                 <ul className="space-y-2 text-sm">
-                  <li><Link href="/about" className="hover:text-yellow-300 transition-colors duration-300 ease-in-out">Our Mission</Link></li>
-                  <li><Link href="/about#roadmap" className="hover:text-yellow-300 transition-colors duration-300 ease-in-out">Roadmap</Link></li>
-                  <li><Link href="/about#contact" className="hover:text-yellow-300 transition-colors duration-300 ease-in-out">Contact Us</Link></li>
+                  <li><Link href="/about" className="hover:text-taifa-orange transition-colors duration-300 ease-in-out">Our Mission</Link></li>
+                  <li><Link href="/about#roadmap" className="hover:text-taifa-orange transition-colors duration-300 ease-in-out">Roadmap</Link></li>
+                  <li><Link href="/about#contact" className="hover:text-taifa-orange transition-colors duration-300 ease-in-out">Contact Us</Link></li>
                 </ul>
               </div>
               <div>
                 <h4 className="font-semibold text-white mb-3">Connect</h4>
                 <ul className="space-y-2 text-sm">
-                  <li><a href="https://github.com/taifa-fiala" className="hover:text-yellow-300 transition-colors duration-300 ease-in-out">GitHub</a></li>
-                  <li><Link href="/about#contact" className="hover:text-yellow-300 transition-colors duration-300 ease-in-out">Contact</Link></li>
+                  <li><a href="https://github.com/taifa-fiala" className="hover:text-taifa-orange transition-colors duration-300 ease-in-out">GitHub</a></li>
+                  <li><Link href="/about#contact" className="hover:text-taifa-orange transition-colors duration-300 ease-in-out">Contact</Link></li>
                   <li><span className="text-xs">New Updates • Daily</span></li>
                 </ul>
               </div>
