@@ -127,19 +127,17 @@ const countryData: CountryData[] = [
 const AfricaMapSVG: React.FC<{ onCountryClick: (countryId: string) => void, selectedCountry: string | null }> = ({ onCountryClick, selectedCountry }) => {
   return (
     <div className="relative w-full max-w-2xl mx-auto">
-      <svg
-        viewBox="0 0 1000 1000"
-        className="w-full h-auto"
-        style={{ maxHeight: '600px' }}
+      <svg  
+        viewBox="0 0 800660" 
+        className="w-full h-full"
+        style={{ maxHeight: '500px' }}
       >
-        {/* Simplified country paths - using approximate shapes for demonstration */}
-        
         {/* Morocco */}
         <path
           id="morocco"
-          d="M180 120 L280 110 L290 150 L250 180 L180 170 Z"
-          fill={selectedCountry === 'morocco' ? 'var(--taifa-primary)' : 'var(--taifa-light)'}
-          stroke="var(--taifa-border)"
+          d="M180 120 L280 110 L290 130 L285 150 L270 160 L250 155 L230 165 L210 155 L190 140 Z"
+          fill={selectedCountry === 'morocco' ? 'var(--taifa-olive)' : 'var(--taifa-light)'}
+          stroke="var(--taifa-border)" 
           strokeWidth="2"
           className="cursor-pointer hover:fill-taifa-secondary/30 transition-colors duration-200"
           onClick={() => onCountryClick('morocco')}
@@ -148,9 +146,9 @@ const AfricaMapSVG: React.FC<{ onCountryClick: (countryId: string) => void, sele
         {/* Egypt */}
         <path
           id="egypt"
-          d="M380 180 L450 170 L460 220 L420 250 L380 240 Z"
-          fill={selectedCountry === 'egypt' ? 'var(--taifa-orange)' : 'var(--taifa-light)'}
-          stroke="var(--taifa-border)"
+          d="M420 180 L480 175 L485 200 L490 220 L485 240 L470 250 L450 245 L430 235 L420 210 Z"
+          fill={selectedCountry === 'egypt' ? 'var(--taifa-red)' : 'var(--taifa-light)'}
+          stroke="var(--taifa-border)" 
           strokeWidth="2"
           className="cursor-pointer hover:fill-taifa-secondary/30 transition-colors duration-200"
           onClick={() => onCountryClick('egypt')}
@@ -159,9 +157,9 @@ const AfricaMapSVG: React.FC<{ onCountryClick: (countryId: string) => void, sele
         {/* Nigeria */}
         <path
           id="nigeria"
-          d="M250 380 L320 370 L330 420 L290 450 L250 440 Z"
+          d="M250 350 L320 345 L330 360 L335 380 L325 400 L310 410 L290 415 L270 410 L255 395 L245 375 L248 360 Z"
           fill={selectedCountry === 'nigeria' ? 'var(--taifa-accent)' : 'var(--taifa-light)'}
-          stroke="var(--taifa-border)"
+          stroke="var(--taifa-border)" 
           strokeWidth="2"
           className="cursor-pointer hover:fill-taifa-secondary/30 transition-colors duration-200"
           onClick={() => onCountryClick('nigeria')}
@@ -170,9 +168,9 @@ const AfricaMapSVG: React.FC<{ onCountryClick: (countryId: string) => void, sele
         {/* Ghana */}
         <path
           id="ghana"
-          d="M200 410 L240 400 L245 440 L210 450 Z"
-          fill={selectedCountry === 'ghana' ? 'var(--taifa-olive)' : 'var(--taifa-light)'}
-          stroke="var(--taifa-border)"
+          d="M210 400 L240 395 L245 410 L240 425 L225 430 L210 425 L205 410 Z"
+          fill={selectedCountry === 'ghana' ? 'var(--taifa-orange)' : 'var(--taifa-light)'}
+          stroke="var(--taifa-border)" 
           strokeWidth="2"
           className="cursor-pointer hover:fill-taifa-secondary/30 transition-colors duration-200"
           onClick={() => onCountryClick('ghana')}
@@ -181,9 +179,9 @@ const AfricaMapSVG: React.FC<{ onCountryClick: (countryId: string) => void, sele
         {/* Togo */}
         <path
           id="togo"
-          d="M220 430 L235 425 L240 445 L225 450 Z"
-          fill={selectedCountry === 'togo' ? 'var(--taifa-secondary)' : 'var(--taifa-light)'}
-          stroke="var(--taifa-border)"
+          d="M225 430 L240 425 L242 440 L238 450 L230 452 L225 445 Z"
+          fill={selectedCountry === 'togo' ? 'var(--taifa-red)' : 'var(--taifa-light)'}
+          stroke="var(--taifa-border)" 
           strokeWidth="2"
           className="cursor-pointer hover:fill-taifa-secondary/30 transition-colors duration-200"
           onClick={() => onCountryClick('togo')}
@@ -192,9 +190,9 @@ const AfricaMapSVG: React.FC<{ onCountryClick: (countryId: string) => void, sele
         {/* Kenya */}
         <path
           id="kenya"
-          d="M480 420 L530 410 L535 460 L490 470 Z"
+          d="M480 400 L520 395 L525 415 L530 435 L525 450 L515 460 L500 465 L485 460 L475 445 L478 425 L480 405 Z"
           fill={selectedCountry === 'kenya' ? 'var(--taifa-secondary)' : 'var(--taifa-light)'}
-          stroke="var(--taifa-border)"
+          stroke="var(--taifa-border)" 
           strokeWidth="2"
           className="cursor-pointer hover:fill-taifa-secondary/30 transition-colors duration-200"
           onClick={() => onCountryClick('kenya')}
@@ -203,9 +201,9 @@ const AfricaMapSVG: React.FC<{ onCountryClick: (countryId: string) => void, sele
         {/* Rwanda */}
         <path
           id="rwanda"
-          d="M470 450 L485 445 L490 465 L475 470 Z"
+          d="M470 450 L485 445 L490 460 L485 470 L475 472 L470 465 Z"
           fill={selectedCountry === 'rwanda' ? 'var(--taifa-red)' : 'var(--taifa-light)'}
-          stroke="var(--taifa-border)"
+          stroke="var(--taifa-border)" 
           strokeWidth="2"
           className="cursor-pointer hover:fill-taifa-secondary/30 transition-colors duration-200"
           onClick={() => onCountryClick('rwanda')}
@@ -214,9 +212,9 @@ const AfricaMapSVG: React.FC<{ onCountryClick: (countryId: string) => void, sele
         {/* South Africa */}
         <path
           id="south-africa"
-          d="M380 650 L480 640 L490 720 L380 730 Z"
+          d="M350 620 L450 615 L480 625 L490 650 L485 680 L470 700 L450 710 L420 715 L390 710 L365 700 L350 685 L345 665 L348 645 Z"
           fill={selectedCountry === 'south-africa' ? 'var(--taifa-primary)' : 'var(--taifa-light)'}
-          stroke="var(--taifa-border)"
+          stroke="var(--taifa-border)" 
           strokeWidth="2"
           className="cursor-pointer hover:fill-taifa-secondary/30 transition-colors duration-200"
           onClick={() => onCountryClick('south-africa')}
@@ -235,29 +233,27 @@ const AfricaMapSVG: React.FC<{ onCountryClick: (countryId: string) => void, sele
           onClick={() => onCountryClick('mauritius')}
         />
         
-        {/* Rest of Africa outline */}
+        {/* Africa continent outline */}
         <path
-          d="M180 120 Q150 200 160 300 Q170 400 200 500 Q250 600 350 650 L480 640 Q550 620 580 500 Q600 400 580 300 Q560 200 500 150 Q450 100 380 110 L280 110 Z"
+          d="20 Q150 continent 140 140 180 Q135 220 145 260 Q150 300 160 340 Q170 380 185 420 Q200 460 220 500 Q240 540 270 580 Q300 620 340 650 Q380 680 420 700 Q460 720 500 715 Q540 710 570 690 Q590 670 600 640 Q610 600 605 560 Q600 520 590 480 Q580 440 570 400 Q560 360 545 320 Q530 280 510 240 Q490 200 470 170 Q450 140 420 120 Q390 105 360 110 Q330 115 300 115 Q270 115 240 118 Q210 120 180 120 Z"
           fill="none"
           stroke="var(--taifa-muted)"
-          strokeWidth="3"
-          strokeDasharray="5,5"
-          opacity="0.3"
+          strokeWidth="2"
+          strokeDasharray="3,3"
+          opacity="0.4"
         />
         
         {/* Country labels */}
-        <text x="230" y="135" fontSize="12" fill="var(--taifa-muted)" textAnchor="middle" className="pointer-events-none">Morocco</text>
-        <text x="420" y="200" fontSize="12" fill="var(--taifa-muted)" textAnchor="middle" className="pointer-events-none">Egypt</text>
-        <text x="285" y="400" fontSize="12" fill="var(--taifa-muted)" textAnchor="middle" className="pointer-events-none">Nigeria</text>
-        <text x="222" y="425" fontSize="10" fill="var(--taifa-muted)" textAnchor="middle" className="pointer-events-none">Ghana</text>
-        <text x="232" y="445" fontSize="9" fill="var(--taifa-muted)" textAnchor="middle" className="pointer-events-none">Togo</text>
-        <text x="505" y="435" fontSize="12" fill="var(--taifa-muted)" textAnchor="middle" className="pointer-events-none">Kenya</text>
-        <text x="482" y="465" fontSize="10" fill="var(--taifa-muted)" textAnchor="middle" className="pointer-events-none">Rwanda</text>
-        <text x="430" y="695" fontSize="12" fill="var(--taifa-muted)" textAnchor="middle" className="pointer-events-none">South Africa</text>
-        <text x="565" y="690" fontSize="9" fill="var(--taifa-muted)" textAnchor="middle" className="pointer-events-none">Mauritius</text>
-      </svg>
-      
-      {/* Click instruction */}
+        <text x="235" y="140" fontSize="11" fill="var(--taifa-muted)" textAnchor="middle" className="pointer-events-none font-medium">Morocco</text>
+        <text x="450" y="210" fontSize="11" fill="var(--taifa-muted)" textAnchor="middle" className="pointer-events-none font-medium">Egypt</text>
+        <text x="285" y="340" fontSize="11" fill="var(--taifa-muted)" textAnchor="middle" className="pointer-events-none font-medium font-medium">Nigeria</text>
+        <text x="252" y="418" fontSize="11" fill="var(--taifa-muted)" textAnchor="middle" className="pointer-events-none font-medium font-medium">Ghana</text>
+        <text x="232" y="385" fontSize="11" fill="var(--taifa-muted)" textAnchor="middle" className="pointer-events-none font-medium font-medium">Togo</text>
+        <text x="505" y="418" fontSize="11" fill="var(--taifa-muted)" textAnchor="middle" className="pointer-events-none font-medium font-medium">Kenya</text>
+        <text x="482" y="465" fontSize="10" fill="var(--taifa-muted)" textAnchor="middle" className="pointer-eventsnone font-medium font-medium">Rwanda</text>
+        <text x="420" y="670" fontSize="11" fill="var(--taifa-muted)" textAnchor="middle" className="pointer-events-none font-medium font-medium">South Africa</text>
+        <text x="565" y="690" fontSize="9" fill="var(--taifa-muted)" textAnchor="middle" className="pointer-events-none font-medium font-medium">Mauritius</text>
+      </svg>    
       <div className="absolute bottom-4 left-4 bg-taifa-white/90 backdrop-blur-sm px-4 py-2 rounded-lg border border-taifa-border shadow-lg">
         <p className="text-sm text-taifa-muted flex items-center">
           <MapPin className="h-4 w-4 mr-2 text-taifa-secondary" />
@@ -412,3 +408,4 @@ const InteractiveAfricaAIMap: React.FC = () => {
 };
 
 export default InteractiveAfricaAIMap;
+
