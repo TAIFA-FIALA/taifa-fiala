@@ -1,197 +1,131 @@
 #!/bin/bash
 
-# TAIFA-FIALA Service Management Script
-# This script manages the TAIFA-FIALA services on the Mac-mini
+# AI Africa Funding Tracker - Service Restart Script
+# This script restarts all services on the production server
 
-# Colors for output
+# --- Colors ---
 GREEN='\033[0;32m'
 RED='\033[0;31m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-VENV_PATH="$SCRIPT_DIR/venv"
+# --- Helper Functions ---
+info() { printf "${BLUE}%s${NC}\n" "$1"; }
+success() { printf "${GREEN}%s${NC}\n" "$1"; }
+warning() { printf "${YELLOW}%s${NC}\n" "$1"; }
+error() { printf "${RED}%s${NC}\n" "$1"; }
 
-echo -e "${GREEN}=== TAIFA-FIALA Service Management ===${NC}"
+# --- Configuration ---
+VENV_PATH="./venv"
+DATA_INGESTION_PATH="./data_ingestion"
 
-# Function to check if a service is running
-check_service() {
-    local service_name=$1
-    local pid_file=$2
+# Check if Docker is available
+if command -v docker >/dev/null 2>&1 && [ -f "docker-compose.watcher.yml" ]; then
+    DOCKER_AVAILABLE=true
+else
+    DOCKER_AVAILABLE=false
+fi
+
+# Create logs directory if it doesn't exist
+mkdir -p logs
+
+# Stop all running services
+info "Stopping all running services..."
+
+# Stop traditional services
+pkill -f 'uvicorn.*main:app' || echo "No FastAPI process found"
+pkill -f 'streamlit run' || echo "No Streamlit process found"
+pkill -f 'next.*start' || echo "No Next.js process found"
+pkill -f 'file_ingestion_cli watch' || echo "No file watcher process found"
+
+# Stop Docker services if available
+if [ "$DOCKER_AVAILABLE" = true ]; then
+    info "Stopping Docker containers..."
+    docker-compose -f docker-compose.watcher.yml down || echo "No Docker Compose services to stop"
+fi
+
+# Wait for processes to stop gracefully
+sleep 3
+
+# Ask user which deployment method to use
+echo "Choose deployment method:"
+echo "1) Traditional deployment (FastAPI, Streamlit, Next.js as separate processes)"
+echo "2) Docker-based deployment (includes file watcher service)"
+read -p "Enter your choice (1 or 2): " deployment_choice
+
+if [ "$deployment_choice" == "2" ] && [ "$DOCKER_AVAILABLE" = true ]; then
+    # Docker-based deployment
+    info "Starting services with Docker Compose..."
+    docker-compose -f docker-compose.watcher.yml up -d
     
-    if [ -f "$pid_file" ]; then
-        local pid=$(cat "$pid_file")
-        if kill -0 "$pid" 2>/dev/null; then
-            echo -e "${GREEN}✓ $service_name: RUNNING (PID: $pid)${NC}"
-            return 0
-        else
-            echo -e "${RED}✗ $service_name: NOT RUNNING (stale PID file)${NC}"
-            rm -f "$pid_file"
-            return 1
-        fi
+    # Check if services are running
+    info "Docker services status:"
+    docker-compose -f docker-compose.watcher.yml ps
+else
+    # Traditional deployment
+    info "Starting services traditionally..."
+    
+    # Activate virtual environment if it exists
+    if [ -d "$VENV_PATH" ]; then
+        source "$VENV_PATH/bin/activate"
     else
-        echo -e "${RED}✗ $service_name: NOT RUNNING${NC}"
-        return 1
+        warning "Virtual environment not found at $VENV_PATH"
+        warning "Using system Python instead"
     fi
-}
-
-# Function to stop a service
-stop_service() {
-    local service_name=$1
-    local pid_file=$2
     
-    if [ -f "$pid_file" ]; then
-        local pid=$(cat "$pid_file")
-        if kill -0 "$pid" 2>/dev/null; then
-            echo -e "${YELLOW}Stopping $service_name...${NC}"
-            kill "$pid"
-            sleep 2
-            if kill -0 "$pid" 2>/dev/null; then
-                echo -e "${YELLOW}Force stopping $service_name...${NC}"
-                kill -9 "$pid"
-            fi
-            rm -f "$pid_file"
-            echo -e "${GREEN}✓ $service_name stopped${NC}"
-        else
-            echo -e "${YELLOW}$service_name was not running${NC}"
-            rm -f "$pid_file"
-        fi
+    # Start FastAPI backend
+    info "Starting FastAPI backend..."
+    export PYTHONPATH="$(pwd):$PYTHONPATH"
+    nohup python -m uvicorn backend.main:app --host 0.0.0.0 --port 8020 --reload > logs/backend.log 2>&1 &
+    BACKEND_PID=$!
+    echo "Backend started with PID: $BACKEND_PID"
+    
+    # Start Streamlit dashboard
+    info "Starting Streamlit dashboard..."
+    nohup python -m streamlit run run_dashboard.py --server.port 8501 --server.address 0.0.0.0 > logs/streamlit.log 2>&1 &
+    STREAMLIT_PID=$!
+    echo "Streamlit started with PID: $STREAMLIT_PID"
+    
+    # Start Next.js frontend
+    info "Starting Next.js frontend..."
+    cd frontend/nextjs
+    
+    # Check for Node.js and npm availability
+    if command -v npm >/dev/null 2>&1; then
+        echo "Using system npm"
+        nohup npm start -- --port 3020 > ../../logs/frontend.log 2>&1 &
+        FRONTEND_PID=$!
+        echo "Frontend started with PID: $FRONTEND_PID"
     else
-        echo -e "${YELLOW}$service_name was not running${NC}"
+        error "Cannot start frontend: npm not found"
+        FRONTEND_PID=""
     fi
-}
+    
+    # Return to project root
+    cd ../..
+    
+    # Start file watcher service
+    info "Starting file watcher service..."
+    export PYTHONPATH="$(pwd):$PYTHONPATH"
+    export DATA_INGESTION_PATH="$DATA_INGESTION_PATH"
+    nohup python -m data_processors.src.taifa_etl.services.file_ingestion.cli.file_ingestion_cli watch > logs/file_watcher.log 2>&1 &
+    WATCHER_PID=$!
+    echo "File watcher started with PID: $WATCHER_PID"
+fi
 
-# Function to start a service
-start_service() {
-    local service_name=$1
-    local command=$2
-    local pid_file=$3
-    local log_file=$4
-    
-    echo -e "${YELLOW}Starting $service_name...${NC}"
-    
-    # Create logs directory if it doesn't exist
-    mkdir -p "$(dirname "$log_file")"
-    
-    # Start the service
-    nohup $command > "$log_file" 2>&1 &
-    local pid=$!
-    echo "$pid" > "$pid_file"
-    
-    sleep 3
-    
-    if kill -0 "$pid" 2>/dev/null; then
-        echo -e "${GREEN}✓ $service_name started (PID: $pid)${NC}"
-        return 0
-    else
-        echo -e "${RED}✗ $service_name failed to start${NC}"
-        rm -f "$pid_file"
-        return 1
-    fi
-}
+# Wait for services to initialize
+info "Waiting for services to initialize..."
+sleep 10
 
-# Parse command line arguments
-ACTION=${1:-status}
+# Show running processes
+info "Current service processes:"
+ps aux | grep -E '(uvicorn|streamlit|node.*next|file_ingestion)' | grep -v grep || echo "No matching processes found"
 
-case "$ACTION" in
-    "status")
-        echo -e "${BLUE}Checking service status...${NC}"
-        check_service "Data Ingestion" ".data_ingestion.pid"
-        check_service "Dashboard" ".dashboard.pid"
-        ;;
-    
-    "start")
-        echo -e "${BLUE}Starting services...${NC}"
-        
-        # Check if virtual environment exists
-        if [ ! -d "$VENV_PATH" ]; then
-            echo -e "${RED}Error: Virtual environment not found at $VENV_PATH${NC}"
-            exit 1
-        fi
-        
-        # Start data ingestion service
-        start_service "Data Ingestion" \
-            "$VENV_PATH/bin/python tools/ingestion/start_data_ingestion.py" \
-            ".data_ingestion.pid" \
-            "logs/data_ingestion.log"
-        
-        # Start dashboard service
-        start_service "Dashboard" \
-            "$VENV_PATH/bin/streamlit run tools/dashboard/system_dashboard.py --server.port 8501 --server.address 0.0.0.0" \
-            ".dashboard.pid" \
-            "logs/dashboard.log"
-        ;;
-    
-    "stop")
-        echo -e "${BLUE}Stopping services...${NC}"
-        stop_service "Data Ingestion" ".data_ingestion.pid"
-        stop_service "Dashboard" ".dashboard.pid"
-        
-        # Kill any remaining processes
-        pkill -f 'streamlit.*system_dashboard' 2>/dev/null || true
-        pkill -f 'python.*start_data_ingestion' 2>/dev/null || true
-        ;;
-    
-    "restart")
-        echo -e "${BLUE}Restarting services...${NC}"
-        
-        # Stop services
-        stop_service "Data Ingestion" ".data_ingestion.pid"
-        stop_service "Dashboard" ".dashboard.pid"
-        
-        # Kill any remaining processes
-        pkill -f 'streamlit.*system_dashboard' 2>/dev/null || true
-        pkill -f 'python.*start_data_ingestion' 2>/dev/null || true
-        
-        sleep 3
-        
-        # Start services
-        echo -e "${BLUE}Starting services...${NC}"
-        
-        # Check if virtual environment exists
-        if [ ! -d "$VENV_PATH" ]; then
-            echo -e "${RED}Error: Virtual environment not found at $VENV_PATH${NC}"
-            exit 1
-        fi
-        
-        # Start data ingestion service
-        start_service "Data Ingestion" \
-            "$VENV_PATH/bin/python tools/ingestion/start_data_ingestion.py" \
-            ".data_ingestion.pid" \
-            "logs/data_ingestion.log"
-        
-        # Start dashboard service
-        start_service "Dashboard" \
-            "$VENV_PATH/bin/streamlit run tools/dashboard/system_dashboard.py --server.port 8501 --server.address 0.0.0.0" \
-            ".dashboard.pid" \
-            "logs/dashboard.log"
-        ;;
-    
-    "logs")
-        echo -e "${BLUE}Recent logs:${NC}"
-        echo -e "${YELLOW}--- Data Ingestion ---${NC}"
-        tail -20 logs/data_ingestion.log 2>/dev/null || echo "No logs found"
-        echo
-        echo -e "${YELLOW}--- Dashboard ---${NC}"
-        tail -20 logs/dashboard.log 2>/dev/null || echo "No logs found"
-        ;;
-    
-    "tail")
-        echo -e "${BLUE}Following logs (Ctrl+C to exit)...${NC}"
-        tail -f logs/*.log 2>/dev/null || echo "No logs found"
-        ;;
-    
-    *)
-        echo -e "${YELLOW}Usage: $0 {status|start|stop|restart|logs|tail}${NC}"
-        echo
-        echo "Commands:"
-        echo -e "${BLUE}status${NC}   - Check service status"
-        echo -e "${BLUE}start${NC}    - Start all services"
-        echo -e "${BLUE}stop${NC}     - Stop all services"
-        echo -e "${BLUE}restart${NC}  - Restart all services"
-        echo -e "${BLUE}logs${NC}     - Show recent logs"
-        echo -e "${BLUE}tail${NC}     - Follow logs in real-time"
-        exit 1
-        ;;
-esac
+if [ "$DOCKER_AVAILABLE" = true ]; then
+    info "Docker containers:"
+    docker ps
+fi
+
+success "Services restarted successfully!"
+info "Check logs in the logs/ directory for any issues."

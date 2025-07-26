@@ -1,0 +1,49 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./backend:/app/backend
+      - ./data_connectors:/app/data_connectors
+    environment:
+      - PYTHONPATH=/app
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  frontend:
+    build:
+      context: ./frontend/nextjs
+      dockerfile: Dockerfile
+    ports:
+      - "3020:3000"
+    volumes:
+      - ./frontend/nextjs:/app
+      - /app/node_modules
+      - /app/.next
+
+  streamlit:
+    build:
+      context: ./frontend/streamlit_app
+      dockerfile: Dockerfile
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./frontend/streamlit_app:/app
+
+  # New file watcher service
+  file_watcher:
+    build:
+      context: ./data_processors
+      dockerfile: Dockerfile.watcher
+    volumes:
+      - ./data_processors:/app/data_processors
+      - ./data_ingestion:/data_ingestion
+    environment:
+      - PYTHONPATH=/app
+      - DATA_INGESTION_PATH=/data_ingestion
+    depends_on:
+      - backend
