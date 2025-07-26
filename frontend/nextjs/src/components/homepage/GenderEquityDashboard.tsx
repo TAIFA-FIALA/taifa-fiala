@@ -11,17 +11,18 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
-  Legend,
   ResponsiveContainer,
-  Tooltip as RechartsTooltip,
-  ComposedChart
+  Tooltip,
+  LineChart
 } from 'recharts';
+
 
 // Icons
 import { 
   AlertCircle, 
   DollarSign, 
-  TrendingDown
+  TrendingDown,
+  TrendingUp,
 } from 'lucide-react';
 
 // TAIFA color scheme for charts - using Tailwind config values
@@ -212,172 +213,144 @@ const GenderEquityDashboard = () => {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Animated Metric Cards with Color Accents */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div className="bg-gradient-to-br from-white to-taifa-red/5 p-6 rounded-lg border-l-4 border-taifa-red shadow-sm hover:shadow-lg hover:scale-105 transition-all duration-300 text-center group">
-          <div className="w-12 h-12 rounded-full bg-taifa-red/10 flex items-center justify-center mx-auto mb-3 group-hover:bg-taifa-red/20 transition-colors">
-            <DollarSign className="w-6 h-6 text-taifa-red" />
+    <div className="space-y-4">
+      {/* Compact Metric Cards with Better Proportions */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+        <div className="bg-white p-4 rounded-lg border-l-3 border-taifa-red shadow-sm hover:shadow-md transition-all duration-200 text-center">
+          <div className="flex items-center justify-center mb-2">
+            <div className="w-8 h-8 rounded-full bg-taifa-red/10 flex items-center justify-center mr-2">
+              <DollarSign className="w-4 h-4 text-taifa-red" />
+            </div>
+            <div className="text-right">
+              <div className="text-xl font-bold text-taifa-red">
+                {Math.round((totalFundingWomen / (totalFundingWomen + totalFundingMen)) * 100)}%
+              </div>
+              <div className="text-xs text-taifa-muted">Female Funding Share</div>
+            </div>
           </div>
-          <div className="text-2xl font-semibold text-taifa-red mb-2">
-            {Math.round((totalFundingWomen / (totalFundingWomen + totalFundingMen)) * 100)}%
-          </div>
-          <div className="text-sm text-taifa-muted">Female Funding Share</div>
-          <div className="text-xs text-taifa-red mt-1">across {genderTimelineData.length} years</div>
+          <div className="text-xs text-taifa-red">across {genderTimelineData.length} years</div>
         </div>
 
-        <div className="bg-gradient-to-br from-white to-taifa-red/5 p-6 rounded-lg border-l-4 border-taifa-red shadow-sm hover:shadow-lg hover:scale-105 transition-all duration-300 text-center group">
-          <div className="w-12 h-12 rounded-full bg-taifa-red/10 flex items-center justify-center mx-auto mb-3 group-hover:bg-taifa-red/20 transition-colors">
-            <DollarSign className="w-6 h-6 text-taifa-red" />
+        <div className="bg-white p-4 rounded-lg border-l-3 border-taifa-red shadow-sm hover:shadow-md transition-all duration-200 text-center">
+          <div className="flex items-center justify-center mb-2">
+            <div className="w-8 h-8 rounded-full bg-taifa-red/10 flex items-center justify-center mr-2">
+              <DollarSign className="w-4 h-4 text-taifa-red" />
+            </div>
+            <div className="text-right">
+              <div className="text-xl font-bold text-taifa-red">
+                ${Math.round(totalFundingWomen / 1000000)}M
+              </div>
+              <div className="text-xs text-taifa-muted">Female founder funding</div>
+            </div>
           </div>
-          <div className="text-2xl font-semibold text-taifa-red mb-2">$48M</div>
-          <div className="text-sm text-taifa-muted mb-1">Female founder funding</div>
           <div className="text-xs text-taifa-red">Only 12% of total funding</div>
         </div>
-        
-        <div className="bg-gradient-to-br from-white to-taifa-red/5 p-6 rounded-lg border-l-4 border-taifa-red shadow-sm hover:shadow-lg hover:scale-105 transition-all duration-300 text-center group">
-          <div className="w-12 h-12 rounded-full bg-taifa-red/10 flex items-center justify-center mx-auto mb-3 group-hover:bg-taifa-red/20 transition-colors">
-            <TrendingDown className="w-6 h-6 text-taifa-red" />
+
+        <div className="bg-white p-4 rounded-lg border-l-3 border-taifa-red shadow-sm hover:shadow-md transition-all duration-200 text-center">
+          <div className="flex items-center justify-center mb-2">
+            <div className="w-8 h-8 rounded-full bg-taifa-red/10 flex items-center justify-center mr-2">
+              <TrendingDown className="w-4 h-4 text-taifa-red" />
+            </div>
+            <div className="text-right">
+              <div className="text-xl font-bold text-taifa-red">6 years</div>
+              <div className="text-xs text-taifa-muted">Declining trend</div>
+            </div>
           </div>
-          <div className="text-2xl font-semibold text-taifa-red mb-2">6 years</div>
-          <div className="text-sm text-taifa-muted mb-1">Declining trend</div>
           <div className="text-xs text-taifa-red">Since 2019 peak of 22.3%</div>
         </div>
-        
-        <div className="bg-gradient-to-br from-white to-taifa-red/5 p-6 rounded-lg border-l-4 border-taifa-red shadow-sm hover:shadow-lg hover:scale-105 transition-all duration-300 text-center group">
-          <div className="w-12 h-12 rounded-full bg-taifa-red/10 flex items-center justify-center mx-auto mb-3 group-hover:bg-taifa-red/20 transition-colors">
-            <svg className="w-6 h-6 text-taifa-red" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-            </svg>
+
+        <div className="bg-white p-4 rounded-lg border-l-3 border-taifa-red shadow-sm hover:shadow-md transition-all duration-200 text-center">
+          <div className="flex items-center justify-center mb-2">
+            <div className="w-8 h-8 rounded-full bg-taifa-red/10 flex items-center justify-center mr-2">
+              <TrendingUp className="w-4 h-4 text-taifa-red" />
+            </div>
+            <div className="text-right">
+              <div className="text-xl font-bold text-taifa-red">4.2x</div>
+              <div className="text-xs text-taifa-muted">Funding gap</div>
+            </div>
           </div>
-          <div className="text-2xl font-semibold text-taifa-red mb-2">4.2x</div>
-          <div className="text-sm text-taifa-muted mb-1">Funding gap</div>
           <div className="text-xs text-taifa-red">Less than male-led startups</div>
         </div>
       </div>
 
-      {/* Main Visualizations Grid - Only showing working charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Timeline Chart */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Female Representation in AI Funding (2018-2024)
-          </h3>
-          <div className="w-full h-80">
+      {/* Compact Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Gender Timeline Chart */}
+        <div className="bg-white p-4 rounded-lg shadow-sm">
+          <h4 className="text-lg font-semibold text-taifa-primary mb-3">Gender Funding Timeline</h4>
+          <div className="h-48">
             <ResponsiveContainer width="100%" height="100%">
-              <ComposedChart
-                data={genderTimelineData}
-                margin={chartPadding}
-                barGap={barGap}
-                barSize={barSize}
-              >
-
-                
-                <CartesianGrid 
-                  vertical={false} 
-                  stroke={CHART_COLORS.gridLine} 
-                  strokeDasharray="3 3" 
-                />
-                
+              <LineChart data={genderTimelineData} margin={chartPadding}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                 <XAxis 
                   dataKey="year" 
-                  tickLine={false}
-                  axisLine={{ stroke: CHART_COLORS.gridLine }}
-                  tick={{ fill: CHART_COLORS.text, fontSize: 12 }}
+                  stroke="#6B7280"
+                  fontSize={dimensions.isMobile ? 10 : 12}
                 />
-                
                 <YAxis 
-                  yAxisId="left" 
-                  orientation="left"
-                  tickLine={false}
-                  axisLine={false}
-                  tick={{ fill: CHART_COLORS.text, fontSize: 12 }}
+                  stroke="#6B7280"
+                  fontSize={dimensions.isMobile ? 10 : 12}
                 />
-                
-                <YAxis 
-                  yAxisId="right" 
-                  orientation="right" 
-                  domain={[0, 100]}
-                  tickFormatter={(value) => `${value}%`}
-                  tickLine={false}
-                  axisLine={false}
-                  tick={{ 
-                    fill: CHART_COLORS.text,
-                    fontSize: dimensions.isMobile ? 10 : 12,
-                    dx: 10
+                <Tooltip 
+                  contentStyle={{
+                    backgroundColor: 'white',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '8px',
+                    fontSize: '12px'
                   }}
-                />
-                <RechartsTooltip 
-                  content={<CustomTooltip 
-                    formatter={(value, name) => {
-                      if (name === 'femalePercentage') {
-                        return [`${value}%`, 'Female %'];
-                      }
-                      return [String(value), name];
-                    }}
-                  />} 
-                />
-                <Legend 
-                  formatter={(value) => {
-                    if (value === 'femalePercentage') return 'Female %';
-                    if (value === 'female') return 'Female Founders';
-                    if (value === 'male') return 'Male Founders';
-                    return value;
-                  }}
-                />
-                <Bar 
-                  yAxisId="left" 
-                  dataKey="female" 
-                  name="Female Founders" 
-                  fill={CHART_COLORS.female}
-                  radius={[4, 4, 0, 0]}
-                />
-                <Bar 
-                  yAxisId="left" 
-                  dataKey="male" 
-                  name="Male Founders" 
-                  fill={CHART_COLORS.male}
-                  radius={[4, 4, 0, 0]}
+                  formatter={(value: any, name: string) => [
+                    name === 'femalePercentage' ? `${value}%` : value,
+                    name === 'femalePercentage' ? 'Female %' : 
+                    name === 'female' ? 'Female Funding' : 'Male Funding'
+                  ]}
                 />
                 <Line 
-                  yAxisId="right" 
                   type="monotone" 
                   dataKey="femalePercentage" 
-                  name="Female %" 
-                  stroke={CHART_COLORS.female}
+                  stroke="var(--taifa-red)" 
                   strokeWidth={3}
-                  dot={{ 
-                    r: 5, 
-                    fill: CHART_COLORS.female,
-                    stroke: '#ffffff',
-                    strokeWidth: 2,
-                    fillOpacity: 1
-                  }}
+                  dot={{ fill: 'var(--taifa-red)', strokeWidth: 2, r: 4 }}
+                  activeDot={{ r: 6, stroke: 'var(--taifa-red)', strokeWidth: 2 }}
                 />
-              </ComposedChart>
+              </LineChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        {/* Regional Analysis */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Regional Gender Disparities
-          </h3>
-          <div className="w-full h-80">
+        {/* Regional Distribution Chart */}
+        <div className="bg-white p-4 rounded-lg shadow-sm">
+          <h4 className="text-lg font-semibold text-taifa-primary mb-3">Regional Gender Distribution</h4>
+          <div className="h-48">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={regionalGenderData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.gridLine} />
-                <XAxis dataKey="region" stroke={CHART_COLORS.text} />
-                <YAxis stroke={CHART_COLORS.text} />
-                <RechartsTooltip 
-                  formatter={(value: number) => [
-                    `${value}%`,
-                    'Female Leadership'
-                  ]}
-                  content={<CustomTooltip />}
+              <BarChart data={regionalGenderData} margin={chartPadding}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                <XAxis 
+                  dataKey="region" 
+                  stroke="#6B7280"
+                  fontSize={dimensions.isMobile ? 8 : 10}
+                  angle={dimensions.isMobile ? -45 : 0}
+                  textAnchor={dimensions.isMobile ? 'end' : 'middle'}
+                  height={dimensions.isMobile ? 60 : 40}
                 />
-                <Bar dataKey="femalePercent" fill={CHART_COLORS.female} name="Female Leadership %" radius={[4, 4, 0, 0]} />
+                <YAxis 
+                  stroke="#6B7280"
+                  fontSize={dimensions.isMobile ? 10 : 12}
+                />
+                <Tooltip 
+                  contentStyle={{
+                    backgroundColor: 'white',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '8px',
+                    fontSize: '12px'
+                  }}
+                  formatter={(value: any) => [`${value}%`, 'Female Representation']}
+                />
+                <Bar 
+                  dataKey="femalePercent" 
+                  fill="var(--taifa-red)"
+                  radius={[4, 4, 0, 0]}
+                  maxBarSize={barSize}
+                />
               </BarChart>
             </ResponsiveContainer>
           </div>

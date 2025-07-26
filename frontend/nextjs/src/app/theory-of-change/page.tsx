@@ -31,7 +31,7 @@ export default function TheoryOfChangePage() {
         "Public access to funding patterns and trends",
         "Standardized reporting frameworks for funding organizations"
       ],
-      icon: <BarChart3 className="h-8 w-8" />,
+      icon: <BarChart3 className="h-12 w-12" />,
       colorClass: "text-taifa-primary",
       bgClass: "bg-taifa-primary/10"
     },
@@ -45,9 +45,9 @@ export default function TheoryOfChangePage() {
         "Sector-specific funding gap identification",
         "Evidence-based policy recommendations"
       ],
-      icon: <Lightbulb className="h-8 w-8" />,
-      colorClass: "text-taifa-secondary",
-      bgClass: "bg-taifa-secondary/10"
+      icon: <Lightbulb className="h-12 w-12" />,
+      colorClass: "text-taifa-orange",
+      bgClass: "bg-taifa-orange/10"
     },
     {
       number: "3",
@@ -59,7 +59,7 @@ export default function TheoryOfChangePage() {
         "Research partnerships with academic institutions",
         "Civil society advocacy network development"
       ],
-      icon: <Users className="h-8 w-8" />,
+      icon: <Users className="h-12 w-12" />,
       colorClass: "text-taifa-accent",
       bgClass: "bg-taifa-accent/10"
     },
@@ -73,9 +73,9 @@ export default function TheoryOfChangePage() {
         "Institutional partnerships with African organizations",
         "Open-source tools and methodologies"
       ],
-      icon: <TrendingUp className="h-8 w-8" />,
-      colorClass: "text-taifa-olive",
-      bgClass: "bg-taifa-olive/10"
+      icon: <TrendingUp className="h-12 w-12" />,
+      colorClass: "text-taifa-red",
+      bgClass: "bg-taifa-red/10"
     },
     {
       number: "5",
@@ -87,7 +87,7 @@ export default function TheoryOfChangePage() {
         "Geographic diversity mandates in AI investment",
         "Gender equity improvements in funding allocation"
       ],
-      icon: <Shield className="h-8 w-8" />,
+      icon: <Shield className="h-12 w-12" />,
       colorClass: "text-taifa-primary",
       bgClass: "bg-taifa-primary/10"
     },
@@ -101,84 +101,84 @@ export default function TheoryOfChangePage() {
         "Strengthened local AI research and development capacity",
         "Sustainable funding ecosystem that reflects continental priorities"
       ],
-      icon: <Globe className="h-8 w-8" />,
+      icon: <Globe className="h-12 w-12" />,
       colorClass: "text-taifa-secondary",
       bgClass: "bg-taifa-secondary/10"
     }
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-taifa-yellow/5 via-white to-taifa-secondary/5">
+    <div className="min-h-screen bg-gradient-to-br from-taifa-yellow/5 via-taifa-white to-taifa-secondary/5">
       {/* Hero Section */}
-      <header className="bg-taifa-yellow relative overflow-hidden">
-        <div className="absolute inset-0 bg-black/10"></div>
-        <div className="relative max-w-7xl mx-auto py-20 px-4 sm:px-6 lg:px-8">
+      <section className="relative bg-gradient-to-br from-taifa-primary via-taifa-secondary/20 to-taifa-accent/10 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-taifa-primary/90 to-taifa-primary/70"></div>
+        <div className="relative max-w-7xl mx-auto py-24 px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             {/* Logo */}
-            <div className="mb-8 animate-fadeInUp">
+            <div className="mb-2 animate-fadeInUp">
               <Image 
-                src="/taifa-logo.png" 
+                src="/TAIFA-FIALA-Logo_transparent.png" 
                 alt="TAIFA-FIALA Logo" 
-                width={120} 
-                height={120} 
+                width={220} 
+                height={220} 
                 className="mx-auto" 
               />
             </div>
             
-            <div className="inline-flex items-center px-4 py-2 bg-white/20 border border-taifa-primary/30 rounded-full text-sm font-medium text-white mb-6 animate-fadeInUp" style={{ animationDelay: '0.075s' }}>
+            <div className="inline-flex items-center px-6 py-3 bg-taifa-white/20 border border-taifa-white/30 rounded-full text-sm font-medium text-taifa-white mb-8 animate-fadeInUp backdrop-blur-sm">
               <Target className="h-4 w-4 mr-2" />
-              Strategic Framework
+              Systematic Change Framework
             </div>
-            <h1 className="text-5xl md:text-6xl font-bold text-taifa-primary mb-6 animate-fadeInUp" style={{ animationDelay: '0.1s' }}>
+            <h1 className="text-5xl md:text-7xl font-bold text-taifa-primary mb-8 animate-fadeInUp leading-tight" style={{ animationDelay: '0.1s' }}>
               Theory of
-              <span className="block text-taifa-yellow">Change</span>
+              <span className="block text-taifa-primary">Change</span>
             </h1>
-            <p className="text-xl text-taifa-yellow mb-8 max-w-4xl mx-auto animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
-              Our comprehensive framework for transforming AI funding transparency and equity across Africa through systematic intervention and capacity building
+            <p className="text-xl md:text-2xl text-taifa-accent/90 mb-12 max-w-4xl mx-auto animate-fadeInUp leading-relaxed" style={{ animationDelay: '0.2s' }}>
+              Our comprehensive framework for transforming AI funding transparency and equity across Africa through systematic intervention, evidence-based advocacy, and sustainable capacity building.
             </p>
             
             {/* Key Principles */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto animate-fadeInUp" style={{ animationDelay: '0.3s' }}>
-              <div className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl border border-white/20">
-                <Shield className="h-8 w-8 text-taifa-yellow mx-auto mb-3" />
-                <div className="text-lg font-bold text-white mb-2">Transparency</div>
-                <div className="text-taifa-yellow text-sm">Open data and accountable processes</div>
+              <div className="bg-taifa-white/10 backdrop-blur-sm p-6 rounded-2xl border border-taifa-white/20">
+                <Shield className="h-12 w-12 text-taifa-orange mx-auto mb-3" />
+                <div className="text-lg font-bold text-taifa-white mb-2">Transparency</div>
+                <div className="text-taifa-muted text-lg">Open data and accountable processes</div>
               </div>
-              <div className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl border border-white/20">
-                <Users className="h-8 w-8 text-taifa-yellow mx-auto mb-3" />
-                <div className="text-lg font-bold text-white mb-2">Equity</div>
-                <div className="text-taifa-yellow text-sm">Fair distribution and inclusive access</div>
+              <div className="bg-taifa-white/10 backdrop-blur-sm p-6 rounded-2xl border border-taifa-white/20">
+                <Users className="h-12 w-12 text-taifa-accent mx-auto mb-3" />
+                <div className="text-lg font-bold text-taifa-white mb-2">Equity</div>
+                <div className="text-taifa-muted text-lg">Fair distribution and inclusive access</div>
               </div>
-              <div className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl border border-white/20">
-                <Globe className="h-8 w-8 text-taifa-yellow mx-auto mb-3" />
-                <div className="text-lg font-bold text-white mb-2">Sustainability</div>
-                <div className="text-taifa-yellow text-sm">Long-term systemic transformation</div>
+              <div className="bg-taifa-white/10 backdrop-blur-sm p-6 rounded-2xl border border-taifa-white/20">
+                <Globe className="h-12 w-12 text-taifa-red mx-auto mb-3" />
+                <div className="text-lg font-bold text-taifa-white mb-2">Sustainability</div>
+                <div className="text-taifa-muted text-lg">Long-term systemic transformation</div>
               </div>
             </div>
           </div>
         </div>
-      </header>
+      </section>
 
       {/* Theory of Change Flow */}
-      <section className="py-20">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-20 bg-gradient-to-b from-taifa-light/30 to-taifa-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <div className="inline-flex items-center px-4 py-2 bg-taifa-secondary/10 border border-taifa-secondary/20 rounded-full text-sm font-medium text-taifa-secondary mb-6 animate-fadeInUp">
               <ArrowDown className="h-4 w-4 mr-2" />
               Strategic Pathway
             </div>
-            <h2 className="text-4xl font-bold text-taifa-primary mb-4 animate-fadeInUp" style={{ animationDelay: '0.1s' }}>
-              Our Theory of Change
+            <h2 className="text-4xl md:text-5xl font-bold text-taifa-primary mb-6 leading-tight">
+              Six-Stage Transformation Framework
             </h2>
-            <p className="text-lg text-taifa-muted max-w-3xl mx-auto animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
-              A systematic approach to creating lasting change in African AI funding through evidence-based intervention
+            <p className="text-xl text-taifa-muted max-w-4xl mx-auto leading-relaxed">
+              Our theory of change outlines a systematic approach to achieving sustainable transformation in African AI funding patterns through evidence-based intervention and stakeholder engagement.
             </p>
           </div>
 
           {/* Stages Flow */}
           <div className="relative">
             {/* Connecting Line */}
-            <div className="absolute left-8 top-16 bottom-16 w-1 bg-gradient-to-b from-taifa-primary via-taifa-secondary to-taifa-olive rounded-full hidden md:block"></div>
+            <div className="absolute left-8 top-10 bottom-10 w-1 bg-gradient-to-b from-taifa-primary via-taifa-secondary to-taifa-olive rounded-full hidden md:block"></div>
             
             <div className="space-y-12">
               {stages.map((stage, index) => (
@@ -187,16 +187,16 @@ export default function TheoryOfChangePage() {
                   className="relative animate-fadeInUp" 
                   style={{ animationDelay: `${0.3 + index * 0.1}s` }}
                 >
-                  <div className="flex items-start gap-8">
+                  <div className="flex items-start gap-6">
                     {/* Stage Number */}
                     <div className="flex-shrink-0 relative z-10">
-                      <div className={`w-16 h-16 ${stage.bgClass} rounded-full flex items-center justify-center border-4 border-white shadow-xl`}>
+                      <div className={`w-16 h-16 ${stage.bgClass} rounded-full flex items-center justify-center border-4 border-taifa-white shadow-xl`}>
                         <span className={`text-2xl font-bold ${stage.colorClass}`}>{stage.number}</span>
                       </div>
                     </div>
                     
                     {/* Stage Content */}
-                    <div className="flex-1 bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-taifa-secondary/10 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
+                    <div className="flex-1 bg-taifa-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-taifa-secondary/10 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
                       <div className="flex items-start gap-6">
                         <div className={`w-16 h-16 ${stage.bgClass} rounded-2xl flex items-center justify-center border border-taifa-secondary/20`}>
                           <div className={stage.colorClass}>
@@ -210,7 +210,7 @@ export default function TheoryOfChangePage() {
                           
                           {/* Outcomes */}
                           <div className="space-y-3">
-                            <h4 className="text-sm font-semibold text-taifa-secondary uppercase tracking-wide">Key Outcomes</h4>
+                            <h4 className="text-sm font-semibold text-taifa-primary uppercase tracking-wide">Key Outcomes</h4>
                             <div className="grid md:grid-cols-2 gap-3">
                               {stage.outcomes.map((outcome, outcomeIndex) => (
                                 <div key={outcomeIndex} className="flex items-start gap-3">
@@ -231,9 +231,9 @@ export default function TheoryOfChangePage() {
 
           {/* Impact Statement */}
           <div className="mt-20 text-center animate-fadeInUp" style={{ animationDelay: '0.9s' }}>
-            <div className="bg-gradient-to-br from-taifa-primary to-taifa-olive p-12 rounded-3xl text-white shadow-2xl">
-              <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-6 border border-white/30">
-                <Heart className="h-10 w-10 text-white" />
+            <div className="bg-gradient-to-br from-taifa-primary to-taifa-olive p-12 rounded-3xl text-taifa-white shadow-2xl">
+              <div className="w-20 h-20 bg-taifa-white/20 rounded-full flex items-center justify-center mx-auto mb-6 border border-taifa-white/30">
+                <Heart className="h-10 w-10 text-taifa-white" />
               </div>
               <h3 className="text-3xl font-bold mb-6">Ultimate Vision</h3>
               <p className="text-xl text-taifa-yellow leading-relaxed max-w-4xl mx-auto">

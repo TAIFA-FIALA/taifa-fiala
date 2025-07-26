@@ -1,29 +1,130 @@
 @import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Source+Sans+Pro:wght@300;400;500;600;700&display=swap');
 
+@layer theme {
+  :root {
+    --color-taifa-primary: #3E4B59;
+    --color-taifa-secondary: #F0A621;
+    --color-taifa-accent: #007A56;
+    --color-taifa-light: #F9FAFB;
+    --color-taifa-dark: #3E4B59;
+    --color-taifa-muted: #6B7280;
+    --color-taifa-border: #F2F2F2;
+    --color-taifa-olive: #5F763B;
+    --color-taifa-orange: #BA4D00;
+    --color-taifa-yellow: #F0E68C;
+    --color-taifa-red: #A62E2E;
+    --color-taifa-white: #FFFFFF;
+  }
+}
+
+/* Explicit TAIFA Color Utility Classes for Tailwind v4 */
+@layer utilities {
+  /* Text Colors */
+  .text-taifa-primary { color: var(--color-taifa-primary); }
+  .text-taifa-secondary { color: var(--color-taifa-secondary); }
+  .text-taifa-accent { color: var(--color-taifa-accent); }
+  .text-taifa-light { color: var(--color-taifa-light); }
+  .text-taifa-dark { color: var(--color-taifa-dark); }
+  .text-taifa-muted { color: var(--color-taifa-muted); }
+  .text-taifa-border { color: var(--color-taifa-border); }
+  .text-taifa-olive { color: var(--color-taifa-olive); }
+  .text-taifa-orange { color: var(--color-taifa-orange); }
+  .text-taifa-yellow { color: var(--color-taifa-yellow); }
+  .text-taifa-red { color: var(--color-taifa-red); }
+  .text-taifa-white { color: var(--color-taifa-white); }
+
+  /* Background Colors */
+  .bg-taifa-primary { background-color: var(--color-taifa-primary); }
+  .bg-taifa-secondary { background-color: var(--color-taifa-secondary); }
+  .bg-taifa-accent { background-color: var(--color-taifa-accent); }
+  .bg-taifa-light { background-color: var(--color-taifa-light); }
+  .bg-taifa-dark { background-color: var(--color-taifa-dark); }
+  .bg-taifa-muted { background-color: var(--color-taifa-muted); }
+  .bg-taifa-border { background-color: var(--color-taifa-border); }
+  .bg-taifa-olive { background-color: var(--color-taifa-olive); }
+  .bg-taifa-orange { background-color: var(--color-taifa-orange); }
+  .bg-taifa-yellow { background-color: var(--color-taifa-yellow); }
+  .bg-taifa-red { background-color: var(--color-taifa-red); }
+  .bg-taifa-white { background-color: var(--color-taifa-white); }
+
+  /* Border Colors */
+  .border-taifa-primary { border-color: var(--color-taifa-primary); }
+  .border-taifa-secondary { border-color: var(--color-taifa-secondary); }
+  .border-taifa-accent { border-color: var(--color-taifa-accent); }
+  .border-taifa-light { border-color: var(--color-taifa-light); }
+  .border-taifa-dark { border-color: var(--color-taifa-dark); }
+  .border-taifa-muted { border-color: var(--color-taifa-muted); }
+  .border-taifa-border { border-color: var(--color-taifa-border); }
+  .border-taifa-olive { border-color: var(--color-taifa-olive); }
+  .border-taifa-orange { border-color: var(--color-taifa-orange); }
+  .border-taifa-yellow { border-color: var(--color-taifa-yellow); }
+  .border-taifa-red { border-color: var(--color-taifa-red); }
+  .border-taifa-white { border-color: var(--color-taifa-white); }
+
+  /* Opacity Support for Backgrounds */
+  .bg-taifa-primary\/5 { background-color: color-mix(in srgb, var(--color-taifa-primary) 5%, transparent); }
+  .bg-taifa-primary\/10 { background-color: color-mix(in srgb, var(--color-taifa-primary) 10%, transparent); }
+  .bg-taifa-primary\/20 { background-color: color-mix(in srgb, var(--color-taifa-primary) 20%, transparent); }
+  .bg-taifa-primary\/80 { background-color: color-mix(in srgb, var(--color-taifa-primary) 80%, transparent); }
+  .bg-taifa-primary\/90 { background-color: color-mix(in srgb, var(--color-taifa-primary) 90%, transparent); }
+  
+  .bg-taifa-secondary\/5 { background-color: color-mix(in srgb, var(--color-taifa-secondary) 5%, transparent); }
+  .bg-taifa-secondary\/10 { background-color: color-mix(in srgb, var(--color-taifa-secondary) 10%, transparent); }
+  .bg-taifa-secondary\/20 { background-color: color-mix(in srgb, var(--color-taifa-secondary) 20%, transparent); }
+  
+  .bg-taifa-accent\/10 { background-color: color-mix(in srgb, var(--color-taifa-accent) 10%, transparent); }
+  
+  .bg-taifa-light\/80 { background-color: color-mix(in srgb, var(--color-taifa-light) 80%, transparent); }
+  
+  .bg-taifa-white\/5 { background-color: color-mix(in srgb, var(--color-taifa-white) 5%, transparent); }
+  .bg-taifa-white\/10 { background-color: color-mix(in srgb, var(--color-taifa-white) 10%, transparent); }
+  .bg-taifa-white\/20 { background-color: color-mix(in srgb, var(--color-taifa-white) 20%, transparent); }
+  .bg-taifa-white\/80 { background-color: color-mix(in srgb, var(--color-taifa-white) 80%, transparent); }
+
+  .bg-taifa-yellow\/5 { background-color: color-mix(in srgb, var(--color-taifa-yellow) 5%, transparent); }
+
+  /* Opacity Support for Borders */
+  .border-taifa-border\/50 { border-color: color-mix(in srgb, var(--color-taifa-border) 50%, transparent); }
+  .border-taifa-border\/80 { border-color: color-mix(in srgb, var(--color-taifa-border) 80%, transparent); }
+  .border-taifa-white\/20 { border-color: color-mix(in srgb, var(--color-taifa-white) 20%, transparent); }
+  .border-taifa-white\/30 { border-color: color-mix(in srgb, var(--color-taifa-white) 30%, transparent); }
+  
+  /* Opacity Support for Text */
+  .text-taifa-border\/50 { color: color-mix(in srgb, var(--color-taifa-border) 50%, transparent); }
+  .text-taifa-yellow\/80 { color: color-mix(in srgb, var(--color-taifa-yellow) 80%, transparent); }
+}
+
 :root {
-  /* TAIFA-FIALA Official Color Palette */
-  --scholarly-primary: #3E4B59;    /* Dark blue-gray */
-  --scholarly-secondary: #F0A621;  /* Orange/yellow */
-  --scholarly-accent: #007A56;     /* Teal green */
-  --scholarly-light: #F9FAFB;      /* Very light gray */
-  --scholarly-dark: #3E4B59;       /* Dark blue-gray */
+  /* Legacy CSS Variables for existing styles */
+  --taifa-primary: #3E4B59;
+  --taifa-secondary: #F0A621;
+  --taifa-accent: #007A56;
+  --taifa-light: #F9FAFB;
+  --taifa-dark: #3E4B59;
+  --taifa-muted: #6B7280;
+  --taifa-border: #F2F2F2;
+  --taifa-olive: #5F763B;
+  --taifa-orange: #BA4D00;
+  --taifa-yellow: #F0E68C;
+  --taifa-red: #A62E2E;
+  --taifa-white: #FFFFFF;
   
   /* Typography Variables */
   --font-display: 'Inter', system-ui, sans-serif;
   --font-body: 'Source Sans Pro', system-ui, sans-serif;
   
   /* Professional Chart Colors */
-  --chart-primary: #3E4B59;        /* Dark blue-gray */
-  --chart-secondary: #F0A621;      /* Orange/yellow */
-  --chart-accent: #007A56;         /* Teal green */
-  --chart-neutral: #6B7280;        /* Gray */
-  --chart-light: #F9FAFB;          /* Very light gray */
-  --chart-success: #007A56;        /* Teal green */
-  --chart-olive: #5F763B;          /* Olive green */
-  --chart-orange: #BA4D00;         /* Dark orange */
-  --chart-yellow: #F0E68C;         /* Light yellow */
-  --chart-red: #A62E2E;            /* Dark red */
+  --chart-primary: #3E4B59;
+  --chart-secondary: #F0A621;
+  --chart-accent: #007A56;
+  --chart-neutral: #6B7280;
+  --chart-light: #F9FAFB;
+  --chart-success: #007A56;
+  --chart-olive: #5F763B;
+  --chart-orange: #BA4D00;
+  --chart-yellow: #F0E68C;
+  --chart-red: #A62E2E;
   
   /* System Colors */
   --background: #FFFFFF;
@@ -36,11 +137,11 @@
   :root {
     --background: #1a1a1a;
     --foreground: #E5E7EB;
-    --scholarly-primary: #4A90E2;
-    --scholarly-secondary: #E57373;
-    --scholarly-accent: #B39DDB;
-    --scholarly-light: #2C3E50;
-    --scholarly-dark: #ECF0F1;
+    --taifa-primary: #4A90E2;
+    --taifa-secondary: #E57373;
+    --taifa-accent: #B39DDB;
+    --taifa-light: #2C3E50;
+    --taifa-dark: #ECF0F1;
     --border-color: #4A5568;
     --text-muted: #A0AEC0;
   }
@@ -51,9 +152,7 @@ body {
   background-color: var(--background);
   color: var(--foreground);
   font-family: var(--font-body);
-  line-height: 1.75;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5;
 }
 
 /* Modern Typography */
@@ -62,11 +161,11 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  color: var(--scholarly-primary);
+  color: var(--taifa-primary);
   margin-top: 2em;
-  margin-bottom: 1em;
+  margin-bottom: 0.5em;
   font-weight: 600;
-  line-height: 1.3;
+  line-height: 1.2;
   letter-spacing: -0.02em;
 }
 
@@ -87,20 +186,20 @@ h6 { font-size: 1rem; font-weight: 500; }
 
 /* Academic Links */
 a {
-  color: var(--scholarly-primary);
+  color: var(--taifa-primary);
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
 a:hover {
-  color: var(--scholarly-secondary);
+  color: var(--taifa-secondary);
   text-decoration: underline;
 }
 
 /* Academic Paragraphs */
 p {
-  margin-bottom: 1.5em;
-  line-height: 1.8;
+  margin-bottom: 1em;
+  line-height: 1.5;
 }
 
 /* Academic Figures */
@@ -127,7 +226,7 @@ figcaption {
 }
 
 .research-table th {
-  background-color: var(--scholarly-light);
+  background-color: var(--taifa-light);
   font-weight: 600;
   text-align: left;
   padding: 1rem;
@@ -140,14 +239,14 @@ figcaption {
 }
 
 .research-table tr:hover {
-  background-color: var(--scholarly-light);
+  background-color: var(--taifa-light);
 }
 
 /* Academic Citations */
 .citation {
   font-size: 0.8rem;
   vertical-align: super;
-  color: var(--scholarly-secondary);
+  color: var(--taifa-secondary);
   text-decoration: none;
 }
 
@@ -156,17 +255,17 @@ figcaption {
   color: var(--text-muted);
   margin: 2em 0;
   padding-left: 2em;
-  border-left: 3px solid var(--scholarly-light);
+  border-left: 3px solid var(--taifa-light);
 }
 
 /* Academic Blockquotes */
 blockquote {
   margin: 2em 0;
   padding: 1em 2em;
-  border-left: 4px solid var(--scholarly-primary);
-  background-color: var(--scholarly-light);
+  border-left: 4px solid var(--taifa-primary);
+  background-color: var(--taifa-light);
   font-style: italic;
-  color: var(--scholarly-dark);
+  color: var(--taifa-dark);
 }
 
 blockquote cite {
@@ -188,7 +287,7 @@ blockquote cite {
 .chart-title {
   font-family: var(--font-display);
   font-size: 1.2rem;
-  color: var(--scholarly-primary);
+  color: var(--taifa-primary);
   margin-bottom: 1em;
   font-weight: 600;
 }
@@ -202,8 +301,8 @@ blockquote cite {
 }
 
 /* Academic Buttons */
-.btn-scholarly {
-  background-color: var(--scholarly-primary);
+.btn-taifa {
+  background-color: var(--taifa-primary);
   color: white;
   padding: 0.75em 1.5em;
   border: none;
@@ -214,8 +313,8 @@ blockquote cite {
   transition: background-color 0.2s ease;
 }
 
-.btn-scholarly:hover {
-  background-color: var(--scholarly-secondary);
+.btn-taifa:hover {
+  background-color: var(--taifa-secondary);
   text-decoration: none;
 }
 
@@ -223,14 +322,14 @@ blockquote cite {
 .abstract {
   margin: 2em 0;
   padding: 1.5em;
-  background-color: var(--scholarly-light);
+  background-color: var(--taifa-light);
   border-radius: 4px;
 }
 
 .abstract-title {
   font-family: var(--font-display);
   font-size: 1.2rem;
-  color: var(--scholarly-primary);
+  color: var(--taifa-primary);
   margin-bottom: 1em;
   font-weight: 600;
 }
@@ -243,7 +342,7 @@ blockquote cite {
 
 .keywords-title {
   font-weight: 600;
-  color: var(--scholarly-primary);
+  color: var(--taifa-primary);
 }
 
 /* Remove flashy elements */
@@ -256,23 +355,27 @@ blockquote cite {
 /* Navigation Pills */
 .nav-pill {
   padding: 0.5em 1em;
-  color: var(--scholarly-primary);
+  min-width: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--taifa-primary);
   background: none;
-  border: 1px solid var(--scholarly-primary);
+  border: 1px solid var(--taifa-primary);
   border-radius: 4px;
   transition: all 0.2s ease;
 }
 
 .nav-pill:hover,
 .nav-pill.active {
-  background-color: var(--scholarly-primary);
+  background-color: var(--taifa-primary);
   color: white;
 }
 
 /* Footer Styling */
 footer {
-  background-color: var(--scholarly-light);
-  color: var(--scholarly-dark);
+  background-color: var(--taifa-light);
+  color: var(--taifa-dark);
   border-top: 1px solid var(--border-color);
 }
 
@@ -301,7 +404,7 @@ footer {
   from {
     opacity: 0;
     transform: translateY(20px);
-  }
+  } 
   to {
     opacity: 1;
     transform: translateY(0);
@@ -310,4 +413,76 @@ footer {
 
 .animate-fadeInUp {
   animation: fadeInUp 0.5s ease-out forwards;
+}
+
+/* Custom Tailwind Utilities for TAIFA Colors */
+.text-taifa-yellow { color: var(--taifa-yellow); }
+.text-taifa-orange { color: var(--taifa-orange); }
+.text-taifa-red { color: var(--taifa-red); }
+.text-taifa-accent { color: var(--taifa-accent); }
+.text-taifa-secondary { color: var(--taifa-secondary); }
+.text-taifa-primary { color: var(--taifa-primary); }
+  
+.border-taifa-yellow { border-color: var(--taifa-yellow); }
+.border-taifa-orange { border-color: var(--taifa-orange); }
+.border-taifa-red { border-color: var(--taifa-red); }
+.border-taifa-accent { border-color: var(--taifa-accent); }
+.border-taifa-secondary { border-color: var(--taifa-secondary); }
+.border-taifa-primary { border-color: var(--taifa-primary); }
+  
+.bg-taifa-yellow { background-color: var(--taifa-yellow); }
+.bg-taifa-orange { background-color: var(--taifa-orange); }
+.bg-taifa-red { background-color: var(--taifa-red); }
+.bg-taifa-accent { background-color: var(--taifa-accent); }
+.bg-taifa-secondary { background-color: var(--taifa-secondary); }
+.bg-taifa-primary { background-color: var(--taifa-primary); }
+  
+.bg-taifa-accent\/20 { background-color: rgb(from var(--taifa-accent) r g b / 0.2); }
+.bg-taifa-secondary\/20 { background-color: rgb(from var(--taifa-secondary) r g b / 0.2); }
+.bg-taifa-red\/20 { background-color: rgb(from var(--taifa-red) r g b / 0.2); }
+  
+.border-taifa-accent\/30 { border-color: rgb(from var(--taifa-accent) r g b / 0.3); }
+.border-taifa-secondary\/30 { border-color: rgb(from var(--taifa-secondary) r g b / 0.3); }
+.border-taifa-red\/30 { border-color: rgb(from var(--taifa-red) r g b / 0.3); }
+
+/* Base Typography with Proper Line Heights */
+.text-lg {
+  line-height: 1.4 !important;
+}
+
+.text-xl {
+  line-height: 1.3 !important;
+}
+
+.text-2xl {
+  line-height: 1.25 !important;
+}
+
+.text-3xl {
+  line-height: 1.2 !important;
+}
+
+.text-4xl {
+  line-height: 1.1 !important;
+}
+
+.text-sm {
+  line-height: 1.4 !important;
+}
+
+.text-xs {
+  line-height: 1.3 !important;
+}
+
+/* Compact spacing for metric cards and similar components */
+.leading-tight {
+  line-height: 1.25 !important;
+}
+
+.leading-snug {
+  line-height: 1.375 !important;
+}
+
+.leading-normal {
+  line-height: 1.5 !important;
 }

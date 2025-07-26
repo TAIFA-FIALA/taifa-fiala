@@ -32,7 +32,7 @@ export default function SearchBar() {
         />
         <button 
           type="submit" 
-          className="bg-taifa-secondary hover:bg-yellow-400 text-taifa-primary px-6 py-4 font-medium text-lg transition-colors duration-200 flex items-center"
+          className="bg-taifa-yellow/80 hover:bg-taifa-secondary text-taifa-primary px-6 py-4 font-medium text-lg transition-colors duration-200 flex items-center"
         >
           Search
           <ChevronRight className="ml-2 h-5 w-5" />

@@ -1,454 +1,471 @@
-import { TrendingUp, AlertTriangle, DollarSign, Briefcase, Target, BarChart3, PieChart, MapPin, Globe, Users, Shield, Heart, Calendar } from 'lucide-react';
+import { TrendingUp, AlertTriangle, DollarSign, Briefcase, Target, BarChart3, PieChart, MapPin, Globe, Users, Shield, Heart, Calendar, Zap, ArrowUp, ArrowDown, Activity } from 'lucide-react';
 import React from 'react';
 import { Metadata } from 'next';
 import FundingCharts from './components/FundingCharts';
 
 export const metadata: Metadata = {
-  title: 'African AI Funding Landscape | TAIFA-FIALA',
-  description: 'Comprehensive analysis of AI funding across Africa (2019-2024). Discover funding patterns, geographic concentration, and sector distribution in African AI development.',
-  keywords: 'African AI funding, venture capital Africa, AI investment landscape, African startups, technology funding Africa',
+  title: 'African AI Funding Landscape: The Two-Track Surge | TAIFA-FIALA',
+  description: 'Explore Africa\'s AI funding ecosystem experiencing volatile VC investment alongside steady grants. Discover the twin engines financing Africa\'s transition from AI adoption to AI creation.',
+  keywords: 'African AI funding, venture capital Africa, AI4D grants, African AI startups, technology funding Africa, responsible AI',
 };
 
-// Data structures for the report
+// Data structures based on the actual report
 interface FundingMetric {
   value: string;
   label: string;
   icon: React.ReactNode;
   trend?: 'up' | 'down' | 'neutral';
+  trendValue?: string;
   color: string;
+  description?: string;
 }
 
-interface CountryFunding {
-  country: string;
+interface StoryCard {
+  title: string;
+  subtitle: string;
+  value: string;
+  description: string;
+  icon: React.ReactNode;
+  color: string;
+  trend?: string;
+}
+
+interface FundingStream {
+  name: string;
   amount: string;
-  deals?: number;
-  avgPerStartup?: string;
-}
-
-interface SectorData {
-  sector: string;
-  percentage: number;
+  trend: string;
+  implication: string;
+  strategy: string;
   color: string;
-  funding?: string;
+  icon: React.ReactNode;
 }
 
-
-// Components for visual storytelling
-
-// Chart data for visualizations
+// Real data from the report
 const fundingByCountryData = [
-  { country: 'Tunisia', funding: 244.4, deals: 9, color: '#3E4B59' },
-  { country: 'Kenya', funding: 242.3, deals: 30, color: '#F0A621' },
-  { country: 'South Africa', funding: 150.4, deals: 29, color: '#007A56' },
-  { country: 'Egypt', funding: 83.4, deals: 17, color: '#BA4D00' },
-  { country: 'Nigeria', funding: 45.2, deals: 32, color: '#5F763B' },
-  { country: 'Ghana', funding: 28.1, deals: 12, color: '#A62E2E' },
+  { country: 'Tunisia', funding: 244, deals: 9, color: 'var(--taifa-primary)', share: '30.4%' },
+  { country: 'Kenya', funding: 242, deals: 30, color: 'var(--taifa-secondary)', share: '30.2%' },
+  { country: 'South Africa', funding: 150, deals: 29, color: 'var(--taifa-accent)', share: '18.7%' },
+  { country: 'Egypt', funding: 83, deals: 44, color: 'var(--taifa-orange)', share: '10.4%' },
+  { country: 'Nigeria', funding: 45, deals: 32, color: 'var(--taifa-olive)', share: '5.6%' },
+  { country: 'Others', funding: 39, deals: 15, color: 'var(--taifa-red)', share: '4.7%' },
 ];
 
 const sectorDistributionData = [
-  { name: 'Financial Services', value: 20.9, funding: 134, color: '#3E4B59' },
-  { name: 'Healthcare', value: 5.8, funding: 46, color: '#A62E2E' },
-  { name: 'Agriculture', value: 3.9, funding: 31, color: '#007A56' },
-  { name: 'Education', value: 8.2, funding: 66, color: '#F0A621' },
-  { name: 'Climate AI', value: 1.3, funding: 10, color: '#5F763B' },
-  { name: 'Other', value: 59.9, funding: 513, color: '#F0E68C' },
+  { name: 'Fintech & AI-as-a-Service', value: 45, funding: 361, color: 'var(--taifa-primary)' },
+  { name: 'Language-tech', value: 15, funding: 120, color: 'var(--taifa-secondary)' },
+  { name: 'Climate-agri AI', value: 12, funding: 96, color: 'var(--taifa-accent)' },
+  { name: 'Healthcare', value: 8, funding: 64, color: 'var(--taifa-red)' },
+  { name: 'Other sectors', value: 20, funding: 162, color: 'var(--taifa-olive)' },
+];
+
+// Chart-compatible data for the FundingCharts component
+const chartSectorData = [
+  { name: 'Fintech & AI-as-a-Service', value: 45, funding: 361 },
+  { name: 'Language-tech', value: 15, funding: 120 },
+  { name: 'Climate-agri AI', value: 12, funding: 96 },
+  { name: 'Healthcare', value: 8, funding: 64 },
+  { name: 'Other sectors', value: 20, funding: 162 },
 ];
 
 const fundingTimelineData = [
-  { year: '2019', total: 87, private: 45, development: 42 },
-  { year: '2020', total: 124, private: 78, development: 46 },
-  { year: '2021', total: 189, private: 134, development: 55 },
-  { year: '2022', total: 267, private: 195, development: 72 },
-  { year: '2023', total: 334, private: 246, development: 88 },
-  { year: '2024', total: 387, private: 289, development: 98 },
+  { year: '2020', amount: 34.9, type: 'VC Peak Year' },
+  { year: '2022', amount: 167.7, type: 'Record High' },
+  { year: '2023', amount: 17.9, type: 'Market Trough' },
+  { year: '2024', amount: 108.0, type: 'Strong Recovery' },
 ];
 
-const regionalGapsData = [
-  { region: 'East Africa', funding: 285.7, countries: 12, population: 445 },
-  { region: 'West Africa', funding: 89.3, countries: 16, population: 381 },
-  { region: 'North Africa', funding: 327.8, countries: 6, population: 246 },
-  { region: 'Southern Africa', funding: 178.9, countries: 10, population: 174 },
-  { region: 'Central Africa', funding: 18.3, countries: 9, population: 185 },
-];
-
-
-// Components for visual storytelling
-
-const MetricCard: React.FC<{ metric: FundingMetric }> = ({ metric }) => (
-  <div className={`bg-white/80 backdrop-blur-sm p-8 rounded-2xl border-l-4 ${metric.color} shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 animate-fadeInUp`}>
-    <div className="flex items-center justify-between">
-      <div>
-        <div className="text-4xl font-bold text-taifa-primary mb-2">{metric.value}</div>
-        <div className="text-sm text-taifa-muted font-medium">{metric.label}</div>
-        {metric.trend && (
-          <div className={`inline-flex items-center mt-2 px-2 py-1 rounded-full text-xs font-medium ${
-            metric.trend === 'up' ? 'bg-green-100 text-green-800' : 
-            metric.trend === 'down' ? 'bg-red-100 text-red-800' : 
-            'bg-taifa-muted/10 text-taifa-muted'
-          }`}>
-            <TrendingUp className={`h-3 w-3 mr-1 ${
-              metric.trend === 'down' ? 'rotate-180' : ''
-            }`} />
-            {metric.trend}
+const Components = {
+  // Hero section with key narrative
+  HeroSection: () => (
+    <header className="bg-gradient-to-br from-taifa-primary via-taifa-secondary/20 to-taifa-accent/10 relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-r from-taifa-primary/90 to-taifa-primary/70"></div>
+      <div className="relative max-w-7xl mx-auto py-24 px-4 sm:px-6 lg:px-8">
+        <div className="text-center">
+          <div className="inline-flex items-center px-6 py-3 bg-taifa-white/20 border border-taifa-white/30 rounded-full text-sm font-medium text-taifa-white mb-8 animate-fadeInUp backdrop-blur-sm">
+            <Activity className="h-4 w-4 mr-2" />
+            Data-Driven Rapid Assessment • 2020-2025
           </div>
-        )}
-      </div>
-      <div className="text-4xl text-taifa-secondary/60">{metric.icon}</div>
-    </div>
-  </div>
-);
-
-const CountryCard: React.FC<{ country: CountryFunding; rank: number }> = ({ country, rank }) => (
-  <div className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl border border-taifa-secondary/20 hover:border-taifa-primary hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-    <div className="flex items-center justify-between mb-3">
-      <div className="flex items-center">
-        <div className="w-8 h-8 bg-taifa-primary/10 rounded-full flex items-center justify-center mr-3 border border-taifa-primary/20">
-          <span className="text-sm font-bold text-taifa-primary">#{rank}</span>
-        </div>
-        <span className="text-lg font-semibold text-taifa-primary">{country.country}</span>
-      </div>
-      <MapPin className="h-6 w-6 text-taifa-secondary" />
-    </div>
-    <div className="text-3xl font-bold text-taifa-accent mb-2">{country.amount}</div>
-    {country.avgPerStartup && (
-      <div className="text-sm text-taifa-muted font-medium bg-taifa-yellow/10 px-3 py-1 rounded-full inline-block">
-        Avg: {country.avgPerStartup}/startup
-      </div>
-    )}
-  </div>
-);
-
-const SectorBar: React.FC<{ sector: SectorData }> = ({ sector }) => (
-  <div className="mb-4">
-    <div className="flex justify-between items-center mb-2">
-      <span className="text-sm font-medium text-taifa-primary">{sector.sector}</span>
-      <span className="text-sm text-taifa-muted">{sector.percentage}%</span>
-    </div>
-    <div className="w-full bg-gray-200 rounded-full h-3">
-      <div 
-        className={`h-3 rounded-full ${sector.color}`}
-        style={{ width: `${sector.percentage * 4}%` }}
-      ></div>
-    </div>
-  </div>
-);
-
-const AlertCard: React.FC<{ title: string; metric: string; description: string; severity: 'high' | 'medium' | 'low' }> = ({ title, metric, description, severity }) => {
-  const severityConfig = {
-    high: {
-      borderColor: 'border-red-500',
-      bgColor: 'bg-gradient-to-br from-red-50 to-red-100',
-      textColor: 'text-red-800',
-      iconBg: 'bg-red-100',
-      iconBorder: 'border-red-200',
-      icon: <AlertTriangle className="h-5 w-5 text-red-600" />
-    },
-    medium: {
-      borderColor: 'border-yellow-500',
-      bgColor: 'bg-gradient-to-br from-yellow-50 to-yellow-100',
-      textColor: 'text-yellow-800',
-      iconBg: 'bg-yellow-100',
-      iconBorder: 'border-yellow-200',
-      icon: <AlertTriangle className="h-5 w-5 text-yellow-600" />
-    },
-    low: {
-      borderColor: 'border-green-500',
-      bgColor: 'bg-gradient-to-br from-green-50 to-green-100',
-      textColor: 'text-green-800',
-      iconBg: 'bg-green-100',
-      iconBorder: 'border-green-200',
-      icon: <Shield className="h-5 w-5 text-green-600" />
-    }
-  };
-
-  const config = severityConfig[severity];
-
-  return (
-    <div className={`p-6 rounded-2xl border-l-4 ${config.borderColor} ${config.bgColor} shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1`}>
-      <div className="flex justify-between items-start mb-4">
-        <div className="flex items-center">
-          <div className={`w-10 h-10 ${config.iconBg} rounded-full flex items-center justify-center mr-3 border ${config.iconBorder}`}>
-            {config.icon}
-          </div>
-          <h4 className={`font-bold text-lg ${config.textColor}`}>{title}</h4>
-        </div>
-        <span className={`text-3xl font-bold ${config.textColor}`}>{metric}</span>
-      </div>
-      <p className={`text-sm leading-relaxed ${config.textColor}/80 ml-13`}>{description}</p>
-    </div>
-  );
-};
-
-export default function FundingLandscapePage() {
-  // Colors for charts
-  const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#06B6D4', '#84CC16', '#F97316'];
-
-  // Data from the report
-  const keyMetrics: FundingMetric[] = [
-    {
-      value: "$800M+",
-      label: "Total AI Funding 2019-2024",
-      icon: <DollarSign />,
-      color: "border-taifa-accent",
-      trend: 'up'
-    },
-    {
-      value: "103",
-      label: "Private Sector Deals",
-      icon: <Briefcase />,
-      color: "border-taifa-primary"
-    },
-    {
-      value: "83%",
-      label: "Funding to 4 Countries Only",
-      icon: <AlertTriangle />,
-      color: "border-taifa-red",
-      trend: 'up'
-    },
-    {
-      value: "16",
-      label: "Countries with AI Strategies",
-      icon: <Target />,
-      color: "border-taifa-secondary"
-    }
-  ];
-
-  const topCountries: CountryFunding[] = [
-    { country: "Tunisia", amount: "$244.4M", avgPerStartup: "$27.2M" },
-    { country: "Kenya", amount: "$242.3M", avgPerStartup: "$8.1M" },
-    { country: "South Africa", amount: "$150.4M", avgPerStartup: "$5.2M" },
-    { country: "Egypt", amount: "$83.4M", avgPerStartup: "$4.9M" },
-  ];
-
-  const sectorData: SectorData[] = [
-    { sector: "Financial Services", percentage: 20.9, color: "bg-blue-500", funding: "$134M" },
-    { sector: "Healthcare", percentage: 5.8, color: "bg-red-500", funding: "$46M" },
-    { sector: "Agriculture", percentage: 3.9, color: "bg-green-500", funding: "$31M" },
-    { sector: "Climate AI", percentage: 1.3, color: "bg-yellow-500", funding: "$10M" },
-  ];
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-taifa-yellow/5 via-white to-taifa-secondary/5">
-      {/* Hero Section */}
-      <header className="bg-gradient-to-br from-taifa-primary via-taifa-secondary to-taifa-olive relative overflow-hidden">
-        <div className="absolute inset-0 bg-black/10"></div>
-        <div className="relative max-w-7xl mx-auto py-20 px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="inline-flex items-center px-4 py-2 bg-white/20 border border-white/30 rounded-full text-sm font-medium text-white mb-6 animate-fadeInUp">
-              <BarChart3 className="h-4 w-4 mr-2" />
-              Comprehensive Analysis
+          <h1 className="text-5xl md:text-7xl font-bold text-taifa-white mb-8 animate-fadeInUp leading-tight" style={{ animationDelay: '0.1s' }}>
+            Funding the African
+            <span className="block text-taifa-yellow">AI Surge</span>
+          </h1>
+          <p className="text-xl md:text-2xl text-taifa-yellow/90 mb-12 max-w-4xl mx-auto animate-fadeInUp leading-relaxed" style={{ animationDelay: '0.2s' }}>
+            Africa's AI ecosystem experiences a <strong>two-track funding dynamic</strong>: volatile VC investment rebounds after 2023 trough, while research grants rise steadily—together forming the twin engines financing Africa's transition from AI adoption to AI creation.
+          </p>
+          
+          {/* Key insights preview */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto animate-fadeInUp" style={{ animationDelay: '0.3s' }}>
+            <div className="bg-taifa-white/15 backdrop-blur-sm p-8 rounded-2xl border border-taifa-white/20 hover:bg-taifa-white/20 transition-all duration-300">
+              <div className="text-4xl font-bold text-taifa-white mb-3">$803M</div>
+              <div className="text-taifa-yellow/90 text-sm font-medium mb-2">Cumulative AI Funding</div>
+              <div className="text-taifa-white/80 text-xs">159 startups by mid-2025</div>
             </div>
-            <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 animate-fadeInUp" style={{ animationDelay: '0.1s' }}>
-              African AI Funding
-              <span className="block text-taifa-yellow">Landscape</span>
-            </h1>
-            <p className="text-xl text-taifa-yellow mb-8 max-w-3xl mx-auto animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
-              Comprehensive analysis revealing funding patterns, geographic concentration, and sector distribution across Africa (2019-2024)
-            </p>
-            
-            {/* Key Statistics */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto animate-fadeInUp" style={{ animationDelay: '0.3s' }}>
-              <div className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl border border-white/20">
-                <div className="text-3xl font-bold text-white mb-2">$800M+</div>
-                <div className="text-taifa-yellow text-sm">Total AI Funding</div>
-              </div>
-              <div className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl border border-white/20">
-                <div className="text-3xl font-bold text-white mb-2">54</div>
-                <div className="text-taifa-yellow text-sm">African Countries</div>
-              </div>
-              <div className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl border border-white/20">
-                <div className="text-3xl font-bold text-white mb-2">83%</div>
-                <div className="text-taifa-yellow text-sm">Concentrated in 4 Countries</div>
-              </div>
+            <div className="bg-taifa-white/15 backdrop-blur-sm p-8 rounded-2xl border border-taifa-white/20 hover:bg-taifa-white/20 transition-all duration-300">
+              <div className="text-4xl font-bold text-taifa-white mb-3">67%</div>
+              <div className="text-taifa-yellow/90 text-sm font-medium mb-2">Big Four Concentration</div>
+              <div className="text-taifa-white/80 text-xs">Nigeria, South Africa, Kenya, Egypt</div>
+            </div>
+            <div className="bg-taifa-white/15 backdrop-blur-sm p-8 rounded-2xl border border-taifa-white/20 hover:bg-taifa-white/20 transition-all duration-300">
+              <div className="text-4xl font-bold text-taifa-white mb-3">$755M</div>
+              <div className="text-taifa-yellow/90 text-sm font-medium mb-2">Venture Debt 2024</div>
+              <div className="text-taifa-white/80 text-xs">3× higher than 2022 levels</div>
             </div>
           </div>
         </div>
-      </header>
+      </div>
+    </header>
+  ),
 
-      {/* Key Metrics Dashboard */}
-      <section className="py-20">
+  // The two-track story
+  TwoTrackNarrative: () => {
+    const tracks = [
+      {
+        title: "Venture Capital Track",
+        subtitle: "Volatile but Rebounding",
+        description: "Private investment peaked at $167.7M in 2022, crashed to $17.9M in 2023, then rallied to ≈$108M in 2024 as global capital tightened.",
+        metrics: [
+          { label: "2022 Peak", value: "$167.7M", trend: "peak" },
+          { label: "2023 Trough", value: "$17.9M", trend: "down" },
+          { label: "2024 Rally", value: "≈$108M", trend: "up" },
+        ],
+        icon: <TrendingUp className="h-8 w-8" />,
+        color: "border-taifa-secondary bg-taifa-secondary/5"
+      },
+      {
+        title: "Grants & Development Track", 
+        subtitle: "Steady Upward Trajectory",
+        description: "Led by multilateral donors and Big Tech philanthropy, research grants climb steadily with major program expansions from AI4D and corporate commitments.",
+        metrics: [
+          { label: "AI4D Phase 2", value: "$70M", trend: "up" },
+          { label: "Google Package", value: "$37M", trend: "up" },
+          { label: "Microsoft SA", value: "$298M", trend: "up" },
+        ],
+        icon: <Heart className="h-8 w-8" />,
+        color: "border-taifa-accent bg-taifa-accent/5"
+      }
+    ];
+
+    return (
+      <section className="py-20 bg-gradient-to-br from-taifa-light/50 to-taifa-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center px-4 py-2 bg-taifa-secondary/10 border border-taifa-secondary/20 rounded-full text-sm font-medium text-taifa-secondary mb-6 animate-fadeInUp">
-              <DollarSign className="h-4 w-4 mr-2" />
-              Key Insights
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center px-4 py-2 bg-taifa-primary/10 border border-taifa-primary/20 rounded-full text-sm font-medium text-taifa-primary mb-6">
+              <BarChart3 className="h-4 w-4 mr-2" />
+              Twin Engines Analysis
             </div>
-            <h2 className="text-4xl font-bold text-taifa-primary mb-4 animate-fadeInUp" style={{ animationDelay: '0.1s' }}>Funding Overview</h2>
-            <p className="text-lg text-taifa-muted max-w-3xl mx-auto animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
-              Critical metrics revealing the current state of AI investment across the African continent
+            <h2 className="text-4xl md:text-5xl font-bold text-taifa-primary mb-6 leading-tight">
+              The Two-Track Funding Dynamic
+            </h2>
+            <p className="text-xl text-taifa-muted max-w-4xl mx-auto leading-relaxed">
+              Africa's AI funding operates on parallel tracks with distinct patterns, risks, and opportunities that together shape the continent's AI trajectory.
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
-            {keyMetrics.map((metric, index) => (
-              <div key={index} style={{ animationDelay: `${0.3 + index * 0.1}s` }}>
-                <MetricCard metric={metric} />
+
+          <div className="grid md:grid-cols-2 gap-12">
+            {tracks.map((track, index) => (
+              <div key={index} className={`p-10 rounded-3xl border-2 ${track.color} hover:shadow-2xl transition-all duration-500 hover:-translate-y-1`}>
+                <div className="flex items-start justify-between mb-8">
+                  <div>
+                    <div className="flex items-center mb-4">
+                      <div className="p-3 bg-taifa-white rounded-xl shadow-md mr-4">
+                        {track.icon}
+                      </div>
+                      <div>
+                        <h3 className="text-2xl font-bold text-taifa-primary">{track.title}</h3>
+                        <p className="text-taifa-secondary font-medium">{track.subtitle}</p>
+                      </div>
+                    </div>
+                    <p className="text-taifa-muted leading-relaxed mb-8">{track.description}</p>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-3 gap-4">
+                  {track.metrics.map((metric, idx) => (
+                    <div key={idx} className="text-center p-4 bg-taifa-white/80 rounded-xl border border-taifa-border">
+                      <div className="text-2xl font-bold text-taifa-primary mb-1">{metric.value}</div>
+                      <div className="text-xs text-taifa-muted font-medium">{metric.label}</div>
+                      <div className="flex justify-center mt-2">
+                        {metric.trend === 'up' && <ArrowUp className="h-4 w-4 text-taifa-accent" />}
+                        {metric.trend === 'down' && <ArrowDown className="h-4 w-4 text-taifa-red" />}
+                        {metric.trend === 'peak' && <Zap className="h-4 w-4 text-taifa-secondary" />}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             ))}
           </div>
         </div>
       </section>
+    );
+  },
 
-      {/* Geographic Concentration Story */}
-      <section className="py-20 bg-gradient-to-br from-taifa-accent/5 to-taifa-olive/5">
+  // Geographic concentration crisis
+  GeographicCrisis: () => {
+    const alertCards = [
+      {
+        title: "Big Four Dominance",
+        value: "67%",
+        description: "Nigeria, South Africa, Kenya & Egypt absorb 67% of equity AI funding, though their share is declining as North-African deal value surges 61% YoY.",
+        severity: "high" as const,
+        color: "border-taifa-red bg-taifa-red/5"
+      },
+      {
+        title: "Infrastructure Gap",
+        value: "<0.1%",
+        description: "Africa hosts <0.1% of global GPU capacity yet will need 30× today's compute by 2030 to train home-grown LLMs.",
+        severity: "high" as const,
+        color: "border-taifa-orange bg-taifa-orange/5"
+      },
+      {
+        title: "Gender Disparity",
+        value: "≈2%",
+        description: "Female-led AI start-ups captured only ≈2% of VC dollars in 2024 despite targeted schemes such as AI4D scholarships.",
+        severity: "high" as const,
+        color: "border-taifa-red bg-taifa-red/5"
+      }
+    ];
+
+    return (
+      <section className="py-20 bg-gradient-to-br from-taifa-red/5 to-taifa-orange/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-12 shadow-2xl mb-16 border border-taifa-secondary/10">
-            <div className="text-center mb-12">
-              <div className="inline-flex items-center px-4 py-2 bg-red-100 border border-red-200 rounded-full text-sm font-medium text-red-800 mb-6 animate-fadeInUp">
-                <AlertTriangle className="h-4 w-4 mr-2" />
-                Critical Issue
-              </div>
-              <h2 className="text-4xl font-bold text-taifa-primary mb-4 animate-fadeInUp" style={{ animationDelay: '0.1s' }}>Geographic Concentration Crisis</h2>
-              <p className="text-xl text-taifa-muted max-w-3xl mx-auto animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
-                The "Big Four" countries dominate AI funding while entire regions are systematically left behind
-              </p>
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center px-4 py-2 bg-taifa-red/10 border border-taifa-red/20 rounded-full text-sm font-medium text-taifa-red mb-6">
+              <AlertTriangle className="h-4 w-4 mr-2" />
+              Equity & Infrastructure Concerns
             </div>
-            
-            <div className="grid md:grid-cols-2 gap-12">
-              <div className="animate-fadeInUp" style={{ animationDelay: '0.3s' }}>
-                <div className="flex items-center mb-8">
-                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mr-4 border border-green-200">
-                    <TrendingUp className="h-6 w-6 text-green-600" />
+            <h2 className="text-4xl md:text-5xl font-bold text-taifa-primary mb-6 leading-tight">
+              Critical Gaps Persist
+            </h2>
+            <p className="text-xl text-taifa-muted max-w-4xl mx-auto leading-relaxed">
+              Despite overall growth, structural inequalities threaten Africa's AI potential, requiring targeted interventions to ensure inclusive development.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 mb-16">
+            {alertCards.map((card, index) => (
+              <div key={index} className={`p-8 rounded-2xl border-2 ${card.color} hover:shadow-xl transition-all duration-300 hover:-translate-y-1`}>
+                <div className="flex items-start justify-between mb-6">
+                  <div>
+                    <h4 className="text-xl font-bold text-taifa-primary mb-2">{card.title}</h4>
+                    <div className="text-4xl font-bold text-taifa-red mb-4">{card.value}</div>
                   </div>
-                  <h3 className="text-2xl font-bold text-taifa-primary">Top Funded Countries</h3>
+                  <AlertTriangle className="h-8 w-8 text-taifa-red/60" />
                 </div>
-                <div className="space-y-6">
-                  {topCountries.map((country, index) => (
-                    <div key={country.country} style={{ animationDelay: `${0.4 + index * 0.1}s` }} className="animate-fadeInUp">
-                      <CountryCard country={country} rank={index + 1} />
+                <p className="text-taifa-muted leading-relaxed">{card.description}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Country leadership board */}
+          <div className="bg-taifa-white/80 backdrop-blur-sm rounded-3xl p-12 shadow-xl border border-taifa-border">
+            <h3 className="text-3xl font-bold text-taifa-primary mb-8 text-center">Funding Leaders & Concentration</h3>
+            <div className="grid md:grid-cols-2 gap-12">
+              <div>
+                <h4 className="text-xl font-semibold text-taifa-primary mb-6">Top Countries by Total Funding</h4>
+                <div className="space-y-4">
+                  {fundingByCountryData.slice(0, 4).map((country, index) => (
+                    <div key={index} className="flex items-center justify-between p-4 bg-taifa-light/50 rounded-xl border border-taifa-border hover:bg-taifa-light transition-colors">
+                      <div className="flex items-center">
+                        <div className="w-8 h-8 bg-taifa-primary/10 rounded-full flex items-center justify-center mr-4 border border-taifa-primary/20">
+                          <span className="text-sm font-bold text-taifa-primary">#{index + 1}</span>
+                        </div>
+                        <div>
+                          <span className="font-semibold text-taifa-primary">{country.country}</span>
+                          <div className="text-sm text-taifa-muted">{country.deals} startups</div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-xl font-bold text-taifa-accent">${country.funding}M</div>
+                        <div className="text-sm text-taifa-muted">{country.share}</div>
+                      </div>
                     </div>
                   ))}
                 </div>
               </div>
               
-              <div className="animate-fadeInUp" style={{ animationDelay: '0.3s' }}>
-                <div className="flex items-center mb-8">
-                  <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mr-4 border border-red-200">
-                    <AlertTriangle className="h-6 w-6 text-red-600" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-taifa-primary">Critical Gaps</h3>
-                </div>
-                <div className="space-y-6">
-                  <div className="animate-fadeInUp" style={{ animationDelay: '0.4s' }}>
-                    <AlertCard 
-                      title="Central Africa"
-                      metric="<$20M"
-                      description="Entire region with 180M+ people severely underfunded"
-                      severity="high"
-                    />
-                  </div>
-                  <div className="animate-fadeInUp" style={{ animationDelay: '0.5s' }}>
-                    <AlertCard 
-                      title="Gender Disparity"
-                      metric="$48M"
-                      description="Female founders received lowest funding since 2019"
-                      severity="high"
-                    />
-                  </div>
-                  <div className="animate-fadeInUp" style={{ animationDelay: '0.6s' }}>
-                    <AlertCard 
-                      title="Strategy Gap"
-                      metric="39 Countries"
-                      description="Still lack national AI strategies"
-                      severity="medium"
-                    />
-                  </div>
+              <div>
+                <h4 className="text-xl font-semibold text-taifa-primary mb-6">Sectoral Patterns</h4>
+                <div className="space-y-4">
+                  {sectorDistributionData.slice(0, 4).map((sector, index) => (
+                    <div key={index} className="flex justify-between items-center p-4 bg-taifa-light/50 rounded-xl border border-taifa-border">
+                      <div>
+                        <span className="font-medium text-taifa-primary">{sector.name}</span>
+                        <div className="text-sm text-taifa-muted">${sector.funding}M funding</div>
+                      </div>
+                      <span className="text-xl font-bold text-taifa-secondary">{sector.value}%</span>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
           </div>
         </div>
       </section>
+    );
+  },
 
-      {/* Sectoral Misalignment */}
-      <section className="py-8">
+  // Future outlook section
+  OutlookSection: () => {
+    const outlookItems = [
+      {
+        title: "Compute Consortiums",
+        description: "Pooled GPU clusters backed by AI4D and Smart Africa to cut inference costs 40-60% for local SMEs",
+        timeline: "2025-2027",
+        icon: <Shield className="h-6 w-6" />,
+        color: "bg-taifa-accent/10 border-taifa-accent/30 text-taifa-accent"
+      },
+      {
+        title: "Debt-Equity Hybrids", 
+        description: "Venture-debt funds expand beyond fintech into model-hosting start-ups as revenue visibility improves",
+        timeline: "2025-2026",
+        icon: <Briefcase className="h-6 w-6" />,
+        color: "bg-taifa-secondary/10 border-taifa-secondary/30 text-taifa-secondary"
+      },
+      {
+        title: "Regulatory Premium",
+        description: "Jurisdictions implementing Responsible-AI Index findings attract higher-quality capital at lower risk premiums",
+        timeline: "2025-2027",
+        icon: <Target className="h-6 w-6" />,
+        color: "bg-taifa-primary/10 border-taifa-primary/30 text-taifa-primary"
+      },
+      {
+        title: "LLM Localization",
+        description: "African-language LLM checkpoints reach <2B parameters—small enough for on-device ag-extension and health chatbots",
+        timeline: "2025-2027",
+        icon: <Globe className="h-6 w-6" />,
+        color: "bg-taifa-olive/10 border-taifa-olive/30 text-taifa-olive"
+      }
+    ];
+
+    return (
+      <section className="py-20 bg-gradient-to-br from-taifa-primary/5 to-taifa-accent/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 gap-8">
-            <div className="bg-white rounded-xl p-8 shadow-lg">
-              <h2 className="text-2xl font-bold text-taifa-primary mb-6 flex items-center">
-                <PieChart className="mr-3 h-7 w-7 text-blue-600" />
-                Sector Distribution
-              </h2>
-              <div className="space-y-4">
-                {sectorData.map((sector, index) => (
-                  <SectorBar key={index} sector={sector} />
-                ))}
-              </div>
-              <div className="mt-6 p-4 bg-red-50 rounded-lg border-l-4 border-red-500">
-                <p className="text-sm text-red-800">
-                  <strong>Healthcare AI severely underfunded</strong> despite 25% global disease burden
-                </p>
-              </div>
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center px-4 py-2 bg-taifa-primary/10 border border-taifa-primary/20 rounded-full text-sm font-medium text-taifa-primary mb-6">
+              <Calendar className="h-4 w-4 mr-2" />
+              Strategic Outlook
             </div>
+            <h2 className="text-4xl md:text-5xl font-bold text-taifa-primary mb-6 leading-tight">
+              Outlook 2025-2027
+            </h2>
+            <p className="text-xl text-taifa-muted max-w-4xl mx-auto leading-relaxed">
+              Four key trends will shape Africa's AI funding ecosystem, bridging the compute-capacity gap and determining whether the continent becomes a creator—not just consumer—of frontier AI technologies.
+            </p>
+          </div>
 
-            <div className="bg-white rounded-xl p-8 shadow-lg">
-              <h2 className="text-2xl font-bold text-taifa-primary mb-6 flex items-center">
-                <BarChart3 className="mr-3 h-7 w-7 text-purple-600" />
-                Major Initiatives
-              </h2>
-              <div className="space-y-6">
-                <div className="border-l-4 border-blue-500 pl-4">
-                  <div className="text-2xl font-bold text-blue-600">CAD $100M+</div>
-                  <div className="text-sm text-taifa-primary">AI4D Africa Program Expansion</div>
-                  <div className="text-xs text-taifa-muted mt-1">Scaled from CAD $20M base</div>
+          <div className="grid md:grid-cols-2 gap-8">
+            {outlookItems.map((item, index) => (
+              <div key={index} className="bg-taifa-white/80 backdrop-blur-sm p-8 rounded-2xl border border-taifa-border hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                <div className="flex items-start justify-between mb-6">
+                  <div className={`p-3 rounded-xl border ${item.color}`}>
+                    {item.icon}
+                  </div>
+                  <span className="text-sm font-medium text-taifa-muted bg-taifa-light/50 px-3 py-1 rounded-full">{item.timeline}</span>
                 </div>
-                
-                <div className="border-l-4 border-green-500 pl-4">
-                  <div className="text-2xl font-bold text-green-600">CAD $130M</div>
-                  <div className="text-sm text-taifa-primary">AI4D Funders Collaborative</div>
-                  <div className="text-xs text-taifa-muted mt-1">Coordinated development funding</div>
-                </div>
-                
-                <div className="border-l-4 border-purple-500 pl-4">
-                  <div className="text-2xl font-bold text-purple-600">$641M</div>
-                  <div className="text-sm text-taifa-primary">Private Sector Investment</div>
-                  <div className="text-xs text-taifa-muted mt-1">2022-2023 period alone</div>
-                </div>
+                <h4 className="text-xl font-bold text-taifa-primary mb-4">{item.title}</h4>
+                <p className="text-taifa-muted leading-relaxed">{item.description}</p>
               </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
+    );
+  },
 
+  // Key takeaways and conclusion
+  ConclusionSection: () => (
+    <section className="py-20 bg-gradient-to-br from-taifa-primary via-taifa-secondary/10 to-taifa-accent/10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="bg-taifa-white/95 backdrop-blur-sm rounded-3xl p-12 shadow-2xl border border-taifa-border">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl md:text-5xl font-bold text-taifa-primary mb-6 leading-tight">
+              Key Takeaways
+            </h2>
+            <p className="text-xl text-taifa-muted max-w-3xl mx-auto leading-relaxed">
+              Funding for African AI is no longer confined to cyclical VC pulses—it is buttressed by long-horizon grants and strategic infrastructure investments.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 mb-12">
+            <div className="text-center p-8 bg-taifa-accent/5 rounded-2xl border border-taifa-accent/20">
+              <div className="w-16 h-16 bg-taifa-accent/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-taifa-accent/30">
+                <DollarSign className="h-8 w-8 text-taifa-accent" />
+              </div>
+              <h4 className="text-xl font-bold text-taifa-primary mb-4">Twin-Engine Growth</h4>
+              <p className="text-taifa-muted leading-relaxed">VC volatility balanced by steady grant funding creates resilient ecosystem foundation.</p>
+            </div>
+
+            <div className="text-center p-8 bg-taifa-red/5 rounded-2xl border border-taifa-red/20">
+              <div className="w-16 h-16 bg-taifa-red/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-taifa-red/30">
+                <AlertTriangle className="h-8 w-8 text-taifa-red" />
+              </div>
+              <h4 className="text-xl font-bold text-taifa-primary mb-4">Critical Gaps</h4>
+              <p className="text-taifa-muted leading-relaxed">Geographic concentration and infrastructure deficits require urgent policy intervention.</p>
+            </div>
+
+            <div className="text-center p-8 bg-taifa-secondary/5 rounded-2xl border border-taifa-secondary/20">
+              <div className="w-16 h-16 bg-taifa-secondary/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-taifa-secondary/30">
+                <Target className="h-8 w-8 text-taifa-secondary" />
+              </div>
+              <h4 className="text-xl font-bold text-taifa-primary mb-4">Strategic Window</h4>
+              <p className="text-taifa-muted leading-relaxed">2025-2027 represents crucial period for Africa's AI creator versus consumer trajectory.</p>
+            </div>
+          </div>
+
+          <div className="text-center">
+            <p className="text-lg text-taifa-primary font-medium italic">
+              "Bridging the compute-capacity gap and embedding gender-inclusive policies will decide whether the continent remains a consumer—or becomes a creator—of frontier AI technologies."
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+};
+
+export default function FundingLandscapePage() {
+  // Chart colors using TAIFA theme
+  const COLORS = [
+    'var(--taifa-primary)', 
+    'var(--taifa-secondary)', 
+    'var(--taifa-accent)', 
+    'var(--taifa-orange)', 
+    'var(--taifa-olive)', 
+    'var(--taifa-red)'
+  ];
+
+  return (
+    <div className="min-h-screen bg-taifa-white">
+      <Components.HeroSection />
+      <Components.TwoTrackNarrative />
+      <Components.GeographicCrisis />
+      
       {/* Interactive Data Visualizations */}
-      <section className="py-12">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-taifa-primary mb-4">Funding Landscape Deep Dive</h2>
-            <p className="text-taifa-muted">Interactive analysis of Africa&apos;s AI funding patterns</p>
+            <div className="inline-flex items-center px-4 py-2 bg-taifa-primary/10 border border-taifa-primary/20 rounded-full text-sm font-medium text-taifa-primary mb-6">
+              <BarChart3 className="h-4 w-4 mr-2" />
+              Data Deep Dive
+            </div>
+            <h2 className="text-4xl font-bold text-taifa-primary mb-4">Funding Patterns Analysis</h2>
+            <p className="text-xl text-taifa-muted max-w-3xl mx-auto">
+              Interactive visualizations revealing the complex dynamics shaping Africa's AI investment landscape
+            </p>
           </div>
 
           <FundingCharts 
             fundingByCountryData={fundingByCountryData}
-            sectorDistributionData={sectorDistributionData}
+            sectorDistributionData={chartSectorData}
             fundingTimelineData={fundingTimelineData}
             COLORS={COLORS}
           />
-
-          {/* Regional Gaps Analysis - keeping this separate for now */}
-          <div className="bg-white rounded-xl p-8 shadow-lg">
-            <h3 className="text-2xl font-bold text-taifa-primary mb-6">Regional Funding Gaps</h3>
-            <div className="space-y-4">
-              {regionalGapsData.map((region, index) => (
-                <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                  <div>
-                    <h4 className="font-semibold text-taifa-primary">{region.region}</h4>
-                    <p className="text-sm text-taifa-muted">{region.population}M people</p>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-2xl font-bold text-blue-600">${region.funding}M</div>
-                    <div className="text-xs text-taifa-muted">Total Funding</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="mt-6 p-4 bg-red-50 rounded-lg border-l-4 border-red-500">
-              <p className="text-sm text-red-800">
-                <strong>Critical Gap:</strong> Central Africa receives only $18.3M despite 185M population - less than $0.10 per person
-              </p>
-            </div>
-          </div>
         </div>
       </section>
+
+      <Components.OutlookSection />
+      <Components.ConclusionSection />
     </div>
   );
 }

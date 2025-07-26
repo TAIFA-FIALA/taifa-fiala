@@ -110,9 +110,9 @@ export default function MethodologyPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-taifa-light via-white to-taifa-light">
+    <div className="min-h-screen bg-gradient-to-b from-taifa-light via-taifa-light/50 to-taifa-light">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-white via-taifa-light/30 to-white border-b border-gray-200/50 overflow-hidden">
+      <section className="relative bg-gradient-to-br from-taifa-white via-taifa-light/30 to-taifa-white border-b border-taifa-border/50 overflow-hidden">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-5">
           <div className="absolute top-20 left-20 w-32 h-32 bg-taifa-accent rounded-full blur-3xl"></div>
@@ -175,7 +175,7 @@ export default function MethodologyPage() {
           <div className="grid md:grid-cols-3 gap-10 mb-16">
             {stages.map((stage, index) => (
               <div key={index} className="relative group animate-fadeInUp" style={{ animationDelay: `${0.3 + index * 0.1}s` }}>
-                <div className={`bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border-l-4 ${stage.borderClass}`}>
+                <div className={`bg-taifa-white p-8 rounded-xl shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border-l-4 ${stage.borderClass}`}>
                   <div className="flex items-center mb-6">
                     <div className={`w-16 h-16 rounded-full flex items-center justify-center mr-5 border-2 ${stage.bgClass} ${stage.textClass} border-current`}>
                       {React.cloneElement(stage.icon, { className: "h-8 w-8" })}
@@ -201,7 +201,7 @@ export default function MethodologyPage() {
                 
                 {index < stages.length - 1 && (
                   <div className="hidden md:block absolute top-1/2 -right-5 transform -translate-y-1/2 group-hover:scale-125 transition-transform">
-                    <ArrowRight className="h-10 w-10 text-gray-300/50" />
+                    <ArrowRight className="h-10 w-10 text-taifa-border/50" />
                   </div>
                 )}
               </div>
@@ -209,7 +209,7 @@ export default function MethodologyPage() {
           </div>
 
           {/* Pipeline Flow Diagram */}
-          <div className="bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-xl border border-gray-200/50 animate-fadeInUp" style={{ animationDelay: '0.7s' }}>
+          <div className="bg-taifa-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-xl border border-taifa-border/50 animate-fadeInUp" style={{ animationDelay: '0.7s' }}>
             <h3 className="text-2xl font-semibold text-taifa-primary mb-8 text-center">Complete Pipeline Flow</h3>
             <div className="flex flex-col md:flex-row items-center justify-between space-y-6 md:space-y-0 md:space-x-6">
               {[
@@ -226,7 +226,7 @@ export default function MethodologyPage() {
                     <div className="text-md font-medium text-taifa-primary">{item.title}</div>
                     <div className="text-sm text-taifa-muted">{item.subtitle}</div>
                   </div>
-                  {index < arr.length - 1 && <ArrowRight className="text-gray-300/60 hidden md:block" />}
+                  {index < arr.length - 1 && <ArrowRight className="text-taifa-border/60 hidden md:block" />}
                 </React.Fragment>
               ))}
             </div>
@@ -235,7 +235,7 @@ export default function MethodologyPage() {
       </section>
 
       {/* Technology Stack */}
-      <section className="py-20 bg-white/80 backdrop-blur-sm">
+      <section className="py-20 bg-taifa-white/80 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-taifa-primary mb-4">Technology Stack</h2>
@@ -252,7 +252,7 @@ export default function MethodologyPage() {
                 <ul className="space-y-3">
                   {stack.technologies.map((tech, idx) => (
                     <li key={idx} className="text-md text-taifa-muted flex items-center">
-                      <div className={`w-2.5 h-2.5 bg-white rounded-full mr-3 border ${stack.borderClass}`}></div>
+                      <div className={`w-2.5 h-2.5 bg-taifa-white rounded-full mr-3 border ${stack.borderClass}`}></div>
                       {tech}
                     </li>
                   ))}
@@ -273,7 +273,7 @@ export default function MethodologyPage() {
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {qualityMetrics.map((metric, index) => (
-              <div key={index} className={`bg-white p-6 rounded-2xl shadow-lg text-center hover:scale-105 transition-transform duration-300 animate-fadeInUp border ${metric.borderClass}`} style={{ animationDelay: `${0.3 + index * 0.1}s` }}>
+              <div key={index} className={`bg-taifa-white p-6 rounded-2xl shadow-lg text-center hover:scale-105 transition-transform duration-300 animate-fadeInUp border ${metric.borderClass}`} style={{ animationDelay: `${0.3 + index * 0.1}s` }}>
                 <div className={`text-5xl font-bold mb-2 ${metric.textClass}`}>
                   {metric.current}
                 </div>
@@ -286,7 +286,7 @@ export default function MethodologyPage() {
       </section>
 
       {/* Future Roadmap */}
-      <section className="py-20 bg-white/80 backdrop-blur-sm">
+      <section className="py-20 bg-taifa-white/80 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-taifa-primary mb-4">Development Roadmap</h2>
@@ -295,12 +295,12 @@ export default function MethodologyPage() {
 
           <div className="space-y-10">
             {futurePhases.map((phase, index) => (
-              <div key={index} className="bg-gray-50/80 p-8 rounded-2xl border border-gray-200/50 shadow-md hover:shadow-xl transition-shadow duration-300 animate-fadeInUp" style={{ animationDelay: `${0.3 + index * 0.1}s` }}>
+              <div key={index} className="bg-taifa-light/80 p-8 rounded-2xl border border-taifa-border/50 shadow-md hover:shadow-xl transition-shadow duration-300 animate-fadeInUp" style={{ animationDelay: `${0.3 + index * 0.1}s` }}>
                 <div className="flex flex-col md:flex-row items-start">
                   <div className="md:w-1/3 mb-6 md:mb-0">
                     <div className="text-md font-bold text-taifa-accent mb-2">{phase.phase}</div>
                     <h3 className="text-2xl font-semibold text-taifa-primary mb-3">{phase.title}</h3>
-                    <div className="inline-block bg-white text-taifa-primary text-sm px-3 py-1 rounded-full border border-gray-200/80 shadow-sm">
+                    <div className="inline-block bg-taifa-white text-taifa-primary text-sm px-3 py-1 rounded-full border border-taifa-border/80 shadow-sm">
                       {phase.timeline}
                     </div>
                   </div>
@@ -326,7 +326,7 @@ export default function MethodologyPage() {
       {/* Vision Statement */}
       <section className="py-24 bg-gradient-to-br from-taifa-primary to-taifa-olive">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl font-bold mb-6 text-white animate-fadeInUp" style={{ animationDelay: '0.1s' }}>Vision: AI by Africans, for Africans</h2>
+          <h2 className="text-4xl font-bold mb-6 text-taifa-white animate-fadeInUp" style={{ animationDelay: '0.1s' }}>Vision: AI by Africans, for Africans</h2>
           <p className="text-xl max-w-4xl mx-auto leading-relaxed text-taifa-yellow animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
             TAIFA-FIALA's ultimate goal extends beyond data collection to become the central platform 
             enabling African-led AI development. Through transparent funding intelligence, project amplification, 
@@ -344,7 +344,7 @@ export default function MethodologyPage() {
                 <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-5 border-2 bg-taifa-secondary/20 text-taifa-secondary border-taifa-secondary/50">
                   {React.cloneElement(item.icon, { className: "h-10 w-10" })}
                 </div>
-                <h3 className="text-xl font-semibold mb-2 text-white">{item.title}</h3>
+                <h3 className="text-xl font-semibold mb-2 text-taifa-white">{item.title}</h3>
                 <p className="text-md text-taifa-yellow opacity-80">{item.description}</p>
               </div>
             ))}
