@@ -129,10 +129,7 @@ export default function MethodologyPage() {
             </div>
             
             <h1 className="text-6xl md:text-7xl font-bold text-taifa-primary mb-6 animate-fadeInUp leading-tight" style={{ animationDelay: '0.1s' }}>
-              Methodology &
-              <span className="block bg-gradient-to-r from-taifa-accent to-taifa-secondary bg-clip-text text-transparent">
-                Architecture
-              </span>
+              Methodology, Architecture & Evaluation Metrics
             </h1>
             
             <p className="text-xl md:text-2xl text-taifa-muted max-w-4xl mx-auto leading-relaxed animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
@@ -144,21 +141,21 @@ export default function MethodologyPage() {
             {/* Key Stats */}
             <div className="flex flex-wrap justify-center gap-8 mt-12 animate-fadeInUp" style={{ animationDelay: '0.3s' }}>
               <div className="text-center">
-                <div className="text-3xl font-bold text-taifa-accent">200+</div>
-                <div className="text-sm text-taifa-muted font-medium">RSS Sources</div>
+                <div className="text-4xl font-bold text-taifa-accent">200+</div>
+                <div className="text-md text-taifa-muted font-medium">RSS Sources</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-taifa-secondary">90%+</div>
-                <div className="text-sm text-taifa-muted font-medium">Field Completion</div>
+                <div className="text-4xl font-bold text-taifa-secondary">90%+</div>
+                <div className="text-md text-taifa-muted font-medium">Field Completion</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-taifa-olive">54</div>
-                <div className="text-sm text-taifa-muted font-medium">African Countries</div>
+                <div className="text-4xl font-bold text-taifa-red">54</div>
+                <div className="text-md text-taifa-muted font-medium">African Countries</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-taifa-primary">24h</div>
-                <div className="text-sm text-taifa-muted font-medium">Max Latency</div>
-              </div>
+                <div className="text-4xl font-bold text-taifa-primary">24h</div>
+                <div className="text-md text-taifa-muted font-medium">Max Latency</div>
+              </div>1
             </div>
           </div>
         </div>
@@ -345,7 +342,7 @@ export default function MethodologyPage() {
                   {React.cloneElement(item.icon, { className: "h-10 w-10" })}
                 </div>
                 <h3 className="text-xl font-semibold mb-2 text-taifa-white">{item.title}</h3>
-                <p className="text-md text-taifa-orange opacity-80">{item.description}</p>
+                <p className="text-md tex qt-taifa-accent opacity-80">{item.description}</p>
               </div>
             ))}
           </div>

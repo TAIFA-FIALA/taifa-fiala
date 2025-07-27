@@ -108,50 +108,47 @@ export default function TheoryOfChangePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-taifa-orange/5 via-taifa-white to-taifa-secondary/5">
+    <div className="min-h-screen bg-light">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-taifa-primary via-taifa-secondary/20 to-taifa-accent/10 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-taifa-primary/90 to-taifa-primary/70"></div>
-        <div className="relative max-w-7xl mx-auto py-24 px-4 sm:px-6 lg:px-8">
+      <section className="relative bg-light">
+        <div className="relative max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             {/* Logo */}
-            <div className="mb-2 animate-fadeInUp">
+            <div className="mb-1 animate-fadeInUp">
               <Image 
                 src="/TAIFA-FIALA-Logo_transparent.png" 
                 alt="TAIFA-FIALA Logo" 
-                width={220} 
-                height={220} 
+                width={180} 
+                height={180} 
                 className="mx-auto" 
               />
             </div>
             
-            <div className="inline-flex items-center px-6 py-3 bg-taifa-white/20 border border-taifa-white/30 rounded-full text-sm font-medium text-taifa-white mb-8 animate-fadeInUp backdrop-blur-sm">
-              <Target className="h-4 w-4 mr-2" />
-              Systematic Change Framework
+            <div className="inline-flex items-center px-2 py-2 bg-taifa-secondary/10 border border-taifa-secondary/20 rounded-full text-sm font-medium text-taifa-secondary mb-6 animate-fadeInUp">
+            <Target className="h-4 w-4 mr-2" /> Systematic Change Framework
             </div>
-            <h1 className="text-5xl md:text-7xl font-bold text-taifa-primary mb-8 animate-fadeInUp leading-tight" style={{ animationDelay: '0.1s' }}>
-              Theory of
-              <span className="block text-taifa-primary">Change</span>
+            <h1 className="text-5xl md:text-7xl font-bold text-taifa-primary mb-4 animate-fadeInUp leading-tight" style={{ animationDelay: '0.1s' }}>
+              Theory of Change
             </h1>
-            <p className="text-xl md:text-2xl text-taifa-accent/90 mb-12 max-w-4xl mx-auto animate-fadeInUp leading-relaxed" style={{ animationDelay: '0.2s' }}>
+            <p className="text-lg md:text-lg text-taifa-muted/90 mb-5 max-w-4xl mx-auto animate-fadeInUp leading-relaxed" style={{ animationDelay: '0.2s' }}>
               Our comprehensive framework for transforming AI funding transparency and equity across Africa through systematic intervention, evidence-based advocacy, and sustainable capacity building.
             </p>
             
             {/* Key Principles */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto animate-fadeInUp" style={{ animationDelay: '0.3s' }}>
-              <div className="bg-taifa-white/10 backdrop-blur-sm p-6 rounded-2xl border border-taifa-white/20">
-                <Shield className="h-12 w-12 text-taifa-orange mx-auto mb-3" />
-                <div className="text-lg font-bold text-taifa-white mb-2">Transparency</div>
+              <div className="bg-taifa-white/10 backdrop-blur-sm p-6 rounded-2xl">
+                <Shield className="h-12 w-12 text-taifa-orange mx-auto mb-1" />
+                <div className="text-lg font-bold text-taifa-white mb-1">Transparency</div>
                 <div className="text-taifa-muted text-lg">Open data and accountable processes</div>
               </div>
-              <div className="bg-taifa-white/10 backdrop-blur-sm p-6 rounded-2xl border border-taifa-white/20">
-                <Users className="h-12 w-12 text-taifa-accent mx-auto mb-3" />
-                <div className="text-lg font-bold text-taifa-white mb-2">Equity</div>
+              <div className="bg-taifa-white/10 backdrop-blur-sm p-6 rounded-2xl">
+                <Users className="h-12 w-12 text-taifa-accent mx-auto mb-1" />
+                <div className="text-lg font-bold text-taifa-white mb-1">Equity</div>
                 <div className="text-taifa-muted text-lg">Fair distribution and inclusive access</div>
               </div>
-              <div className="bg-taifa-white/10 backdrop-blur-sm p-6 rounded-2xl border border-taifa-white/20">
-                <Globe className="h-12 w-12 text-taifa-red mx-auto mb-3" />
-                <div className="text-lg font-bold text-taifa-white mb-2">Sustainability</div>
+              <div className="bg-taifa-red/10 backdrop-blur-sm p-6 rounded-2xl">
+                <Globe className="h-12 w-12 text-taifa-red mx-auto mb-1" />
+                <div className="text-lg font-bold text-taifa-white mb-1">Sustainability</div>
                 <div className="text-taifa-muted text-lg">Long-term systemic transformation</div>
               </div>
             </div>
@@ -232,10 +229,10 @@ export default function TheoryOfChangePage() {
           {/* Impact Statement */}
           <div className="mt-20 text-center animate-fadeInUp" style={{ animationDelay: '0.9s' }}>
             <div className="bg-gradient-to-br from-taifa-primary to-taifa-olive p-12 rounded-3xl text-taifa-white shadow-2xl">
-              <div className="w-20 h-20 bg-taifa-white/20 rounded-full flex items-center justify-center mx-auto mb-6 border border-taifa-white/30">
-                <Heart className="h-10 w-10 text-taifa-white" />
+              <div className="w-20 h-20 bg-taifa-primary/20 rounded-full flex items-center justify-center mx-auto mb-6 border border-taifa-white/30">
+                <Heart className="h-10 w-10 text-taifa-primary" />
               </div>
-              <h3 className="text-3xl font-bold mb-6">Ultimate Vision</h3>
+              <h3 className="text-3xl font-bold mb-6 text-taifa-primary">Ultimate Vision</h3>
               <p className="text-xl text-taifa-primary leading-relaxed max-w-4xl mx-auto">
                 A transformed African AI ecosystem where funding flows transparently and equitably, 
                 empowering local innovators and ensuring AI development serves all Africans, 

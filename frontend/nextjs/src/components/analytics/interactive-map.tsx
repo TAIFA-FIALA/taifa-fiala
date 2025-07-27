@@ -3,6 +3,16 @@
 import React, { useState } from 'react';
 import { MapPin, TrendingUp, Zap, Users, Brain, DollarSign, Shield, Globe, Activity, Target, X } from 'lucide-react';
 
+// Feature flag to enable/disable interactive map
+// Set to false to disable interactive map functionality
+const INTERACTIVE_MAP_ENABLED = process.env.NEXT_PUBLIC_INTERACTIVE_MAP_ENABLED === 'true';
+
+if (INTERACTIVE_MAP_ENABLED) {
+  console.log('✅ Interactive Africa AI Map is ENABLED');
+} else {
+  console.log('⚠️  Interactive Africa AI Map is DISABLED (feature flag)');
+}
+
 interface CountryData {
   id: string;
   name: string;
@@ -347,7 +357,58 @@ const FactoidCard: React.FC<FactoidCardProps> = ({ country, onClose }) => {
   );
 };
 
-// Main component
+// Fallback component when interactive map is disabled
+const InteractiveMapFallback: React.FC = () => {
+  return (
+    <div className="relative">
+      <div className="bg-taifa-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-taifa-border">
+        <div className="text-center mb-8">
+          <h3 className="text-3xl font-bold text-taifa-primary mb-4">AI Across Africa</h3>
+          <p className="text-lg text-taifa-muted max-w-3xl mx-auto leading-relaxed">
+            Interactive map functionality is currently under development. Check back soon for an engaging exploration of AI innovations across the continent.
+          </p>
+        </div>
+
+        {/* Static placeholder */}
+        <div className="relative w-full max-w-2xl mx-auto">
+          <div className="relative w-full h-96 bg-taifa-light/20 rounded-lg overflow-hidden flex items-center justify-center">
+            <div className="text-center">
+              <Globe className="h-16 w-16 text-taifa-muted mx-auto mb-4" />
+              <p className="text-taifa-muted font-medium">Interactive Map Coming Soon</p>
+              <p className="text-sm text-taifa-muted/70 mt-2">Feature currently disabled</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Static legend */}
+        <div className="mt-8 grid grid-cols-2 md:grid-cols-5 gap-4 text-center opacity-50">
+          <div className="flex flex-col items-center">
+            <div className="w-4 h-4 bg-taifa-accent rounded mb-2"></div>
+            <span className="text-xs text-taifa-muted">Market Growth</span>
+          </div>
+          <div className="flex flex-col items-center">
+            <div className="w-4 h-4 bg-taifa-primary rounded mb-2"></div>
+            <span className="text-xs text-taifa-muted">Innovation</span>
+          </div>
+          <div className="flex flex-col items-center">
+            <div className="w-4 h-4 bg-taifa-secondary rounded mb-2"></div>
+            <span className="text-xs text-taifa-muted">AI Adoption</span>
+          </div>
+          <div className="flex flex-col items-center">
+            <div className="w-4 h-4 bg-taifa-orange rounded mb-2"></div>
+            <span className="text-xs text-taifa-muted">Infrastructure</span>
+          </div>
+          <div className="flex flex-col items-center">
+            <div className="w-4 h-4 bg-taifa-olive rounded mb-2"></div>
+            <span className="text-xs text-taifa-muted">Policy & Governance</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Main component with feature flag logic
 const InteractiveAfricaAIMap: React.FC = () => {
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
   const [selectedCountryData, setSelectedCountryData] = useState<CountryData | null>(null);
@@ -364,6 +425,11 @@ const InteractiveAfricaAIMap: React.FC = () => {
     setSelectedCountry(null);
     setSelectedCountryData(null);
   };
+
+  // Return fallback component if feature is disabled
+  if (!INTERACTIVE_MAP_ENABLED) {
+    return <InteractiveMapFallback />;
+  }
 
   return (
     <div className="relative">

@@ -20,7 +20,7 @@ export default function AboutPage() {
           <div className="absolute bottom-20 left-1/3 w-28 h-28 bg-taifa-olive rounded-full blur-3xl"></div>
         </div>
         
-        <div className="relative max-w-7xl mx-auto py-24 px-4 sm:px-6 lg:px-8">
+        <div className="relative max-w-7xl mx-auto py-18 px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             {/* Enhanced Title with Badge */}
             <div className="inline-flex items-center px-4 py-2 bg-taifa-accent/10 border border-taifa-accent/20 rounded-full text-sm font-medium text-taifa-accent mb-6 animate-fadeInUp">
@@ -28,27 +28,18 @@ export default function AboutPage() {
               Our Story & Mission
             </div>
             
-            <h1 className="text-6xl md:text-7xl font-bold text-taifa-primary mb-6 animate-fadeInUp leading-tight" style={{ animationDelay: '0.1s' }}>
-              About
-              <span className="block bg-gradient-to-r from-taifa-accent to-taifa-secondary bg-clip-text text-transparent">
-                TAIFA-FIALA
-              </span>
+            <h1 className="text-6xl md:text-7xl font-bold text-taifa-primary mb-12 animate-fadeInUp leading-tight" style={{ animationDelay: '0.1s' }}>
+              About TAIFA-FIALA
             </h1>
             
-            <p className="text-xl md:text-2xl text-taifa-muted max-w-4xl mx-auto leading-relaxed animate-fadeInUp mb-8" style={{ animationDelay: '0.2s' }}>
-              An <span className="font-semibold text-taifa-primary">independent initiative</span> promoting transparency, equity, and accountability in 
-              <span className="font-semibold text-taifa-accent">AI funding across Africa</span>. We apply advanced data analytics and research expertise 
-              to facilitate a vision where AI development serves all Africans, not just a privileged few.
-            </p>
-            
             {/* Mission Statement */}
-            <div className="bg-gradient-to-r from-taifa-accent/10 to-taifa-secondary/10 p-8 rounded-2xl border border-taifa-accent/20 max-w-5xl mx-auto animate-fadeInUp" style={{ animationDelay: '0.3s' }}>
+            <div className="bg-taifa-accent/10 p-8 rounded-2xl border border-taifa-accent/20 max-w-5xl mx-auto animate-fadeInUp" style={{ animationDelay: '0.3s' }}>
               <div className="flex items-center justify-center mb-4">
                 <Target className="h-6 w-6 text-taifa-accent mr-3" />
-                <span className="text-lg font-semibold text-taifa-primary">Our Mission</span>
+                <span className="text-xl font-semibold text-taifa-primary">Our Mission</span>
               </div>
               <p className="text-lg text-taifa-muted leading-relaxed">
-                Preventing AI development from perpetuating the same disparities as previous innovations 
+                We develop tools and resources that aim to democratize AI funding by promoting transparency, equity, and accountability that may prevent AI development from perpetuating the same disparities as previous innovations 
                 that promised much for Africans but failed to deliver equitably.
               </p>
             </div>
@@ -56,28 +47,22 @@ export default function AboutPage() {
             {/* Core Values */}
             <div className="flex flex-wrap justify-center gap-8 mt-12 animate-fadeInUp" style={{ animationDelay: '0.4s' }}>
               <div className="text-center">
-                <div className="w-16 h-16 bg-taifa-accent/10 rounded-full flex items-center justify-center mx-auto mb-3 border border-taifa-accent/20">
-                  <Shield className="h-8 w-8 text-taifa-accent" />
+                <div className="w-16 h-16 bg-taifa-orange/40 rounded-full flex items-center justify-center mx-auto mb-3 border border-taifa-orange">
+                  <Lightbulb className="h-8 w-8 text-taifa-orange" />
                 </div>
-                <div className="text-sm font-semibold text-taifa-primary">Transparency</div>
+                <div className="text-md font-semibold text-taifa-primary">Transparency</div>
               </div>
               <div className="text-center">
-                <div className="w-16 h-16 bg-taifa-secondary/10 rounded-full flex items-center justify-center mx-auto mb-3 border border-taifa-secondary/20">
-                  <Users className="h-8 w-8 text-taifa-secondary" />
+                <div className="w-16 h-16 bg-taifa-accent/40 rounded-full flex items-center justify-center mx-auto mb-3 border border-taifa-accent">
+                  <Users className="h-8 w-8 text-taifa-accent" />
                 </div>
-                <div className="text-sm font-semibold text-taifa-primary">Equity</div>
+                <div className="text-md font-semibold text-taifa-primary">Equity</div>
               </div>
               <div className="text-center">
-                <div className="w-16 h-16 bg-taifa-olive/10 rounded-full flex items-center justify-center mx-auto mb-3 border border-taifa-olive/20">
-                  <Award className="h-8 w-8 text-taifa-olive" />
+                <div className="w-16 h-16 bg-taifa-red/40 rounded-full flex items-center justify-center mx-auto mb-3 border border-taifa-red">
+                  <Award className="h-8 w-8 text-taifa-red" />
                 </div>
-                <div className="text-sm font-semibold text-taifa-primary">Accountability</div>
-              </div>
-              <div className="text-center">
-                <div className="w-16 h-16 bg-taifa-primary/10 rounded-full flex items-center justify-center mx-auto mb-3 border border-taifa-primary/20">
-                  <Lightbulb className="h-8 w-8 text-taifa-primary" />
-                </div>
-                <div className="text-sm font-semibold text-taifa-primary">Innovation</div>
+                <div className="text-md font-semibold text-taifa-primary">Accountability</div>
               </div>
             </div>
           </div>

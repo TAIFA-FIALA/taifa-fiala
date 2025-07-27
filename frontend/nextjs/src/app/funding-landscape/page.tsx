@@ -82,11 +82,11 @@ const Components = {
       <div className="absolute inset-0 bg-gradient-to-r from-taifa-primary/90 to-taifa-primary/70"></div>
       <div className="relative max-w-7xl mx-auto py-24 px-4 sm:px-6 lg:px-8">
         <div className="text-center">
-          <div className="inline-flex items-center px-6 py-3 bg-taifa-white/20 border border-taifa-white/30 rounded-full text-sm font-medium text-taifa-white mb-8 animate-fadeInUp backdrop-blur-sm">
+          <div className="inline-flex items-center px-6 py-3 bg-taifa-red/20 border border-taifa-red/30 rounded-full text-sm font-medium text-taifa-red mb-6 animate-fadeInUp backdrop-blur-sm">
             <Activity className="h-4 w-4 mr-2" />
             Data-Driven Rapid Assessment • 2020-2025
           </div>
-          <h1 className="text-5xl md:text-7xl font-bold text-taifa-white mb-8 animate-fadeInUp leading-tight" style={{ animationDelay: '0.1s' }}>
+          <h1 className="text-5xl md:text-7xl font-bold text-taifa-white mb-6 animate-fadeInUp leading-tight" style={{ animationDelay: '0.1s' }}>
             Funding the African
             <span className="block text-taifa-orange">AI Surge</span>
           </h1>
@@ -96,20 +96,20 @@ const Components = {
           
           {/* Key insights preview */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto animate-fadeInUp" style={{ animationDelay: '0.3s' }}>
-            <div className="bg-taifa-white/15 backdrop-blur-sm p-8 rounded-2xl border border-taifa-white/20 hover:bg-taifa-white/20 transition-all duration-300">
-              <div className="text-4xl font-bold text-taifa-white mb-3">$803M</div>
+            <div className="bg-taifa-orange/15 backdrop-blur-sm p-8 rounded-2xl border border-taifa-white/20 hover:bg-taifa-white/20 transition-all duration-300">
+              <div className="text-4xl font-bold text-taifa-orange mb-3">$803M</div>
               <div className="text-taifa-orange/90 text-sm font-medium mb-2">Cumulative AI Funding</div>
-              <div className="text-taifa-white/80 text-xs">159 startups by mid-2025</div>
+              <div className="text-taifa-muted/80 text-xs">159 startups by mid-2025</div>
             </div>
-            <div className="bg-taifa-white/15 backdrop-blur-sm p-8 rounded-2xl border border-taifa-white/20 hover:bg-taifa-white/20 transition-all duration-300">
-              <div className="text-4xl font-bold text-taifa-white mb-3">67%</div>
-              <div className="text-taifa-orange/90 text-sm font-medium mb-2">Big Four Concentration</div>
-              <div className="text-taifa-white/80 text-xs">Nigeria, South Africa, Kenya, Egypt</div>
+            <div className="bg-taifa-orange/15 backdrop-blur-sm p-8 rounded-2xl border border-taifa-white/20 hover:bg-taifa-white/20 transition-all duration-300">
+              <div className="text-4xl font-bold text-taifa-accent mb-3">67%</div>
+              <div className="text-taifa-accent/90 text-sm font-medium mb-2">Big Four Concentration</div>
+              <div className="text-taifa-muted/80 text-xs">Nigeria, South Africa, Kenya, Egypt</div>
             </div>
-            <div className="bg-taifa-white/15 backdrop-blur-sm p-8 rounded-2xl border border-taifa-white/20 hover:bg-taifa-white/20 transition-all duration-300">
-              <div className="text-4xl font-bold text-taifa-white mb-3">$755M</div>
-              <div className="text-taifa-orange/90 text-sm font-medium mb-2">Venture Debt 2024</div>
-              <div className="text-taifa-white/80 text-xs">3× higher than 2022 levels</div>
+            <div className="bg-taifa-red/15 backdrop-blur-sm p-8 rounded-2xl border border-taifa-white/20 hover:bg-taifa-white/20 transition-all duration-300">
+              <div className="text-4xl font-bold text-taifa-red mb-3">$755M</div>
+              <div className="text-taifa-red/90 text-sm font-medium mb-2">Venture Debt 2024</div>
+              <div className="text-taifa-muted/80 text-sm">3× higher than 2022 levels</div>
             </div>
           </div>
         </div>
