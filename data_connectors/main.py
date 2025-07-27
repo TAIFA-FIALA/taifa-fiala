@@ -34,6 +34,30 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
+def setup_error_logging():
+    """Set up detailed error logging"""
+    # Create logs directory if it doesn't exist
+    os.makedirs('logs', exist_ok=True)
+    
+    # Add file handler for errors
+    error_handler = logging.FileHandler('logs/data_collection_errors.log')
+    error_handler.setLevel(logging.ERROR)
+    error_formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    error_handler.setFormatter(error_formatter)
+    logger.addHandler(error_handler)
+    
+    # Also log to console
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(logging.INFO)
+    console_formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    console_handler.setFormatter(console_formatter)
+    logger.addHandler(console_handler)
+    
+    logger.info("✅ Enhanced error logging configured")
+
+# Set up error logging
+setup_error_logging()
+
 class DataCollector:
     """Main data collection orchestrator with RSS, Serper search, and database integration"""
     
@@ -48,6 +72,22 @@ class DataCollector:
         """Initialize all data collectors and database"""
         logger.info("Initializing AI Africa Funding Tracker data collectors...")
         
+        # Initialize database connector
+        from backend.app.core.supabase_client import get_supabase_client
+        supabase_client = get_supabase_client()
+        if supabase_client:
+            self.db_connector = DatabaseConnector(supabase_client, settings)
+            await self.db_connector.initialize()
+            
+            # Try to connect with retry logic
+            connection_success = await self.db_connector.connect_with_retry(max_retries=3, retry_delay=5)
+            if connection_success:
+                logger.info("✅ Database connector initialized and connected")
+            else:
+                logger.error("❌ Failed to connect to database after retries")
+        else:
+            logger.error("❌ Failed to initialize database connector - Supabase client not available")
+        
         # Initialize RSS monitors for known sources
         await self._setup_rss_monitors()
         
@@ -60,8 +100,9 @@ class DataCollector:
         rss_count = len(self.rss_monitors)
         serper_status = "✅" if self.serper_collector else "❌"
         scraper_status = "✅" if self.web_scraper else "❌"
+        db_status = "✅" if self.db_connector else "❌"
         
-        logger.info(f"✅ Initialized {rss_count} RSS monitors, Serper search {serper_status}, Web scraper {scraper_status}, and database")
+        logger.info(f"✅ Initialized {rss_count} RSS monitors, Serper search {serper_status}, Web scraper {scraper_status}, and database {db_status}")
     
     async def _setup_rss_monitors(self):
         """Setup RSS monitors for verified high-quality sources"""
@@ -94,11 +135,11 @@ class DataCollector:
     
     async def _setup_serper_collector(self):
         """Setup Serper search collector"""
-        if settings.SERPER_DEV_API_KEY:
-            self.serper_collector = SerperSearchCollector(settings.SERPER_DEV_API_KEY)
+        if settings.SERPER_API_KEY:
+            self.serper_collector = SerperSearchCollector(settings.SERPER_API_KEY)
             logger.info("✅ Serper search collector initialized")
         else:
-            logger.warning("⚠️  SERPER_DEV_API_KEY not found - Serper search disabled")
+            logger.warning("⚠️  SERPER_API_KEY not found - Serper search disabled")
     
     async def _setup_web_scraper(self):
         """Setup web scraper for sources without RSS feeds"""
@@ -284,7 +325,39 @@ class DataCollector:
                 for i, opp in enumerate(opportunities[:5], 1):
                     logger.info(f"  {i}. {opp['title'][:80]}... from {opp['source_name']}")
         
+        # Monitor data quality after collection
+        await self.monitor_data_quality()
+        
         return results
+        
+    async def monitor_data_quality(self):
+        """Monitor data quality metrics"""
+        if not self.db_connector:
+            logger.error("Cannot monitor data quality - database connector not initialized")
+            return
+            
+        try:
+            stats = await self.db_connector.get_statistics()
+            logger.info(f"📊 Data Quality Metrics:")
+            logger.info(f"  Total records: {stats.get('total_opportunities', 0)}")
+            logger.info(f"  RSS records: {stats.get('rss_opportunities', 0)}")
+            logger.info(f"  Serper records: {stats.get('serper_opportunities', 0)}")
+            logger.info(f"  AI-parsed records: {stats.get('ai_parsed_opportunities', 0)}")
+            logger.info(f"  Average relevance score: {stats.get('avg_relevance_score', 0):.2f}")
+            logger.info(f"  Records added today: {stats.get('today_opportunities', 0)}")
+            logger.info(f"  Records added this week: {stats.get('week_opportunities', 0)}")
+            
+            # Alert if duplicate rate is too high
+            total = stats.get('total_opportunities', 0)
+            duplicates = getattr(self.db_connector, 'duplicates_count', 0)
+            if total > 0 and duplicates > 0:
+                duplicate_rate = duplicates / (total + duplicates)
+                logger.info(f"  Duplicate rate: {duplicate_rate:.1%}")
+                if duplicate_rate > 0.3:
+                    logger.warning(f"⚠️ High duplicate rate detected: {duplicate_rate:.1%}")
+                
+        except Exception as e:
+            logger.error(f"Error monitoring data quality: {e}")
 
 async def main():
     """Main entry point"""

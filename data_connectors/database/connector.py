@@ -19,6 +19,9 @@ class DatabaseConnector:
         self.settings = settings
         self.deepseek_api_key = settings.DEEPSEEK_API_KEY
         self.deepseek_session = None
+        
+        # Add tracking for duplicates
+        self.duplicates_count = 0
 
     async def initialize(self):
         """Initialize DeepSeek session"""
@@ -35,9 +38,43 @@ class DatabaseConnector:
                 logger.info("✅ DeepSeek AI session initialized")
             else:
                 logger.warning("⚠️  DeepSeek API key not found - AI parsing disabled")
+                
+            # Test Supabase connection
+            if self.supabase:
+                try:
+                    response = self.supabase.table('africa_intelligence_feed').select('id').limit(1).execute()
+                    logger.info("✅ Database connection successful")
+                except Exception as e:
+                    logger.error(f"❌ Database connection test failed: {e}")
+                    # Don't raise here, we'll handle it with retry logic
+            else:
+                logger.error("❌ Supabase client not provided")
+                
         except Exception as e:
             logger.error(f"❌ Failed to initialize database connector: {e}")
             raise
+            
+    async def connect_with_retry(self, max_retries=3, retry_delay=5):
+        """Connect to database with retry logic"""
+        for attempt in range(max_retries):
+            try:
+                # Test connection
+                if self.supabase:
+                    response = self.supabase.table('africa_intelligence_feed').select('id').limit(1).execute()
+                    logger.info(f"✅ Database connection successful on attempt {attempt+1}/{max_retries}")
+                    return True
+                else:
+                    logger.error("❌ Supabase client not provided")
+                    return False
+            except Exception as e:
+                logger.error(f"Database connection attempt {attempt+1}/{max_retries} failed: {e}")
+                if attempt < max_retries - 1:
+                    logger.info(f"Retrying in {retry_delay} seconds...")
+                    await asyncio.sleep(retry_delay)
+                else:
+                    logger.error("All database connection attempts failed")
+                    return False
+        return False
 
     async def close(self):
         """Close DeepSeek session"""
@@ -60,6 +97,8 @@ class DatabaseConnector:
                 response = self.supabase.table('africa_intelligence_feed').select('id').eq('content_hash', opp.get("content_hash")).execute()
                 if response.data:
                     results["duplicates"] += 1
+                    self.duplicates_count += 1
+                    logger.info(f"Duplicate detected: {opp.get('title', 'Unknown')[:50]}...")
                     continue
 
                 # Try deterministic parsing first

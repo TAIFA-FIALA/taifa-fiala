@@ -48,7 +48,7 @@ async def root():
         "service": "TAIFA Data Collection Service",
         "status": collection_status,
         "last_collection": last_collection_time.isoformat() if last_collection_time else None,
-        "next_collection": "06:00 daily",
+        "next_collection": "06:00 and 18:00 daily (2x daily)",
         "version": "1.0.0"
     }
 
@@ -86,7 +86,7 @@ async def detailed_status():
         "last_collection": last_collection_time.isoformat() if last_collection_time else None,
         "database_url": "configured" if os.getenv("DATABASE_URL") else "missing",
         "serper_api": "configured" if os.getenv("SERPER_DEV_API_KEY") else "missing",
-        "collection_schedule": "06:00 daily UTC"
+        "collection_schedule": "06:00 and 18:00 daily UTC (2x daily)"
     }
 
 def run_scheduled_collection():
@@ -119,16 +119,17 @@ def start_scheduler():
     # Initialize scheduler
     scheduler_instance = DailyCollectionScheduler()
     
-    # Schedule daily collection at 6 AM UTC
+    # Schedule twice daily collection at 6 AM and 6 PM UTC
     schedule.every().day.at("06:00").do(run_scheduled_collection)
+    schedule.every().day.at("18:00").do(run_scheduled_collection)
     
-    # Schedule weekly cleanup on Sundays at 2 AM UTC  
+    # Schedule weekly cleanup on Sundays at 2 AM UTC
     schedule.every().sunday.at("02:00").do(
         lambda: asyncio.run(scheduler_instance.cleanup_expired_opportunities())
     )
     
     collection_status = "scheduled"
-    logger.info("✅ Scheduler configured: 06:00 daily, cleanup Sundays 02:00")
+    logger.info("✅ Scheduler configured: 06:00 and 18:00 daily (2x daily), cleanup Sundays 02:00")
     
     # Run scheduler loop
     try:

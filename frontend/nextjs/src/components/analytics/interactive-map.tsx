@@ -123,137 +123,139 @@ const countryData: CountryData[] = [
   }
 ];
 
-// Simplified Africa SVG map
+// Interactive Africa SVG map using real Africa outline
 const AfricaMapSVG: React.FC<{ onCountryClick: (countryId: string) => void, selectedCountry: string | null }> = ({ onCountryClick, selectedCountry }) => {
   return (
     <div className="relative w-full max-w-2xl mx-auto">
-      <svg  
-        viewBox="0 0 800660" 
-        className="w-full h-full"
-        style={{ maxHeight: '500px' }}
-      >
-        {/* Morocco */}
-        <path
-          id="morocco"
-          d="M180 120 L280 110 L290 130 L285 150 L270 160 L250 155 L230 165 L210 155 L190 140 Z"
-          fill={selectedCountry === 'morocco' ? 'var(--taifa-olive)' : 'var(--taifa-light)'}
-          stroke="var(--taifa-border)" 
-          strokeWidth="2"
-          className="cursor-pointer hover:fill-taifa-secondary/30 transition-colors duration-200"
-          onClick={() => onCountryClick('morocco')}
+      {/* Background Africa SVG */}
+      <div className="relative w-full h-96 bg-taifa-light/20 rounded-lg overflow-hidden">
+        <img 
+          src="/np_africa_3354_1A365D.svg" 
+          alt="Map of Africa"
+          className="w-full h-full object-contain opacity-30"
+          style={{ filter: 'brightness(0) saturate(100%) invert(27%) sepia(51%) saturate(2878%) hue-rotate(346deg) brightness(104%) contrast(97%)' }}
         />
         
-        {/* Egypt */}
-        <path
-          id="egypt"
-          d="M420 180 L480 175 L485 200 L490 220 L485 240 L470 250 L450 245 L430 235 L420 210 Z"
-          fill={selectedCountry === 'egypt' ? 'var(--taifa-red)' : 'var(--taifa-light)'}
-          stroke="var(--taifa-border)" 
-          strokeWidth="2"
-          className="cursor-pointer hover:fill-taifa-secondary/30 transition-colors duration-200"
-          onClick={() => onCountryClick('egypt')}
-        />
-        
-        {/* Nigeria */}
-        <path
-          id="nigeria"
-          d="M250 350 L320 345 L330 360 L335 380 L325 400 L310 410 L290 415 L270 410 L255 395 L245 375 L248 360 Z"
-          fill={selectedCountry === 'nigeria' ? 'var(--taifa-accent)' : 'var(--taifa-light)'}
-          stroke="var(--taifa-border)" 
-          strokeWidth="2"
-          className="cursor-pointer hover:fill-taifa-secondary/30 transition-colors duration-200"
-          onClick={() => onCountryClick('nigeria')}
-        />
-        
-        {/* Ghana */}
-        <path
-          id="ghana"
-          d="M210 400 L240 395 L245 410 L240 425 L225 430 L210 425 L205 410 Z"
-          fill={selectedCountry === 'ghana' ? 'var(--taifa-orange)' : 'var(--taifa-light)'}
-          stroke="var(--taifa-border)" 
-          strokeWidth="2"
-          className="cursor-pointer hover:fill-taifa-secondary/30 transition-colors duration-200"
-          onClick={() => onCountryClick('ghana')}
-        />
-        
-        {/* Togo */}
-        <path
-          id="togo"
-          d="M225 430 L240 425 L242 440 L238 450 L230 452 L225 445 Z"
-          fill={selectedCountry === 'togo' ? 'var(--taifa-red)' : 'var(--taifa-light)'}
-          stroke="var(--taifa-border)" 
-          strokeWidth="2"
-          className="cursor-pointer hover:fill-taifa-secondary/30 transition-colors duration-200"
-          onClick={() => onCountryClick('togo')}
-        />
-        
-        {/* Kenya */}
-        <path
-          id="kenya"
-          d="M480 400 L520 395 L525 415 L530 435 L525 450 L515 460 L500 465 L485 460 L475 445 L478 425 L480 405 Z"
-          fill={selectedCountry === 'kenya' ? 'var(--taifa-secondary)' : 'var(--taifa-light)'}
-          stroke="var(--taifa-border)" 
-          strokeWidth="2"
-          className="cursor-pointer hover:fill-taifa-secondary/30 transition-colors duration-200"
-          onClick={() => onCountryClick('kenya')}
-        />
-        
-        {/* Rwanda */}
-        <path
-          id="rwanda"
-          d="M470 450 L485 445 L490 460 L485 470 L475 472 L470 465 Z"
-          fill={selectedCountry === 'rwanda' ? 'var(--taifa-red)' : 'var(--taifa-light)'}
-          stroke="var(--taifa-border)" 
-          strokeWidth="2"
-          className="cursor-pointer hover:fill-taifa-secondary/30 transition-colors duration-200"
-          onClick={() => onCountryClick('rwanda')}
-        />
-        
-        {/* South Africa */}
-        <path
-          id="south-africa"
-          d="M350 620 L450 615 L480 625 L490 650 L485 680 L470 700 L450 710 L420 715 L390 710 L365 700 L350 685 L345 665 L348 645 Z"
-          fill={selectedCountry === 'south-africa' ? 'var(--taifa-primary)' : 'var(--taifa-light)'}
-          stroke="var(--taifa-border)" 
-          strokeWidth="2"
-          className="cursor-pointer hover:fill-taifa-secondary/30 transition-colors duration-200"
-          onClick={() => onCountryClick('south-africa')}
-        />
-        
-        {/* Mauritius (small island) */}
-        <circle
-          id="mauritius"
-          cx="550"
-          cy="680"
-          r="8"
-          fill={selectedCountry === 'mauritius' ? 'var(--taifa-accent)' : 'var(--taifa-light)'}
-          stroke="var(--taifa-border)"
-          strokeWidth="2"
-          className="cursor-pointer hover:fill-taifa-secondary/30 transition-colors duration-200"
-          onClick={() => onCountryClick('mauritius')}
-        />
-        
-        {/* Africa continent outline */}
-        <path
-          d="20 Q150 continent 140 140 180 Q135 220 145 260 Q150 300 160 340 Q170 380 185 420 Q200 460 220 500 Q240 540 270 580 Q300 620 340 650 Q380 680 420 700 Q460 720 500 715 Q540 710 570 690 Q590 670 600 640 Q610 600 605 560 Q600 520 590 480 Q580 440 570 400 Q560 360 545 320 Q530 280 510 240 Q490 200 470 170 Q450 140 420 120 Q390 105 360 110 Q330 115 300 115 Q270 115 240 118 Q210 120 180 120 Z"
-          fill="none"
-          stroke="var(--taifa-muted)"
-          strokeWidth="2"
-          strokeDasharray="3,3"
-          opacity="0.4"
-        />
-        
-        {/* Country labels */}
-        <text x="235" y="140" fontSize="11" fill="var(--taifa-muted)" textAnchor="middle" className="pointer-events-none font-medium">Morocco</text>
-        <text x="450" y="210" fontSize="11" fill="var(--taifa-muted)" textAnchor="middle" className="pointer-events-none font-medium">Egypt</text>
-        <text x="285" y="340" fontSize="11" fill="var(--taifa-muted)" textAnchor="middle" className="pointer-events-none font-medium font-medium">Nigeria</text>
-        <text x="252" y="418" fontSize="11" fill="var(--taifa-muted)" textAnchor="middle" className="pointer-events-none font-medium font-medium">Ghana</text>
-        <text x="232" y="385" fontSize="11" fill="var(--taifa-muted)" textAnchor="middle" className="pointer-events-none font-medium font-medium">Togo</text>
-        <text x="505" y="418" fontSize="11" fill="var(--taifa-muted)" textAnchor="middle" className="pointer-events-none font-medium font-medium">Kenya</text>
-        <text x="482" y="465" fontSize="10" fill="var(--taifa-muted)" textAnchor="middle" className="pointer-eventsnone font-medium font-medium">Rwanda</text>
-        <text x="420" y="670" fontSize="11" fill="var(--taifa-muted)" textAnchor="middle" className="pointer-events-none font-medium font-medium">South Africa</text>
-        <text x="565" y="690" fontSize="9" fill="var(--taifa-muted)" textAnchor="middle" className="pointer-events-none font-medium font-medium">Mauritius</text>
-      </svg>    
+        {/* Interactive overlay with positioned country markers */}
+        <div className="absolute inset-0">
+          <svg viewBox="0 0 400 400" className="w-full h-full">
+            {/* Morocco - Northwest Africa */}
+            <circle
+              id="morocco"
+              cx="195"
+              cy="90"
+              r="8"
+              fill={selectedCountry === 'morocco' ? 'var(--taifa-secondary)' : 'var(--taifa-accent)'}
+              stroke="var(--taifa-white)" 
+              strokeWidth="2"
+              className="cursor-pointer hover:fill-taifa-secondary transition-colors duration-200 drop-shadow-lg"
+              onClick={() => onCountryClick('morocco')}
+            />
+            
+            {/* Egypt - Northeast Africa */}
+            <circle
+              id="egypt"
+              cx="295"
+              cy="95"
+              r="8"
+              fill={selectedCountry === 'egypt' ? 'var(--taifa-orange)' : 'var(--taifa-accent)'}
+              stroke="var(--taifa-white)" 
+              strokeWidth="2"
+              className="cursor-pointer hover:fill-taifa-secondary transition-colors duration-200 drop-shadow-lg"
+              onClick={() => onCountryClick('egypt')}
+            />
+            
+            {/* Nigeria - West Africa */}
+            <circle
+              id="nigeria"
+              cx="190"
+              cy="175"
+              r="8"
+              fill={selectedCountry === 'nigeria' ? 'var(--taifa-accent)' : 'var(--taifa-accent)'}
+              stroke="var(--taifa-white)" 
+              strokeWidth="2"
+              className="cursor-pointer hover:fill-taifa-secondary transition-colors duration-200 drop-shadow-lg"
+              onClick={() => onCountryClick('nigeria')}
+            />
+            
+            {/* Ghana - West Africa */}
+            <circle
+              id="ghana"
+              cx="180"
+              cy="185"
+              r="6"
+              fill={selectedCountry === 'ghana' ? 'var(--taifa-olive)' : 'var(--taifa-accent)'}
+              stroke="var(--taifa-white)" 
+              strokeWidth="2"
+              className="cursor-pointer hover:fill-taifa-secondary transition-colors duration-200 drop-shadow-lg"
+              onClick={() => onCountryClick('ghana')}
+            />
+            
+            {/* Kenya - East Africa */}
+            <circle
+              id="kenya"
+              cx="300"
+              cy="195"
+              r="8"
+              fill={selectedCountry === 'kenya' ? 'var(--taifa-secondary)' : 'var(--taifa-accent)'}
+              stroke="var(--taifa-white)" 
+              strokeWidth="2"
+              className="cursor-pointer hover:fill-taifa-secondary transition-colors duration-200 drop-shadow-lg"
+              onClick={() => onCountryClick('kenya')}
+            />
+            
+            {/* Rwanda - East Africa */}
+            <circle
+              id="rwanda"
+              cx="285"
+              cy="205"
+              r="5"
+              fill={selectedCountry === 'rwanda' ? 'var(--taifa-red)' : 'var(--taifa-accent)'}
+              stroke="var(--taifa-white)" 
+              strokeWidth="2"
+              className="cursor-pointer hover:fill-taifa-secondary transition-colors duration-200 drop-shadow-lg"
+              onClick={() => onCountryClick('rwanda')}
+            />
+            
+            {/* South Africa - Southern Africa */}
+            <circle
+              id="south-africa"
+              cx="270"
+              cy="320"
+              r="10"
+              fill={selectedCountry === 'south-africa' ? 'var(--taifa-primary)' : 'var(--taifa-accent)'}
+              stroke="var(--taifa-white)" 
+              strokeWidth="2"
+              className="cursor-pointer hover:fill-taifa-secondary transition-colors duration-200 drop-shadow-lg"
+              onClick={() => onCountryClick('south-africa')}
+            />
+            
+            {/* Mauritius - Island off East Coast */}
+            <circle
+              id="mauritius"
+              cx="325"
+              cy="280"
+              r="4"
+              fill={selectedCountry === 'mauritius' ? 'var(--taifa-accent)' : 'var(--taifa-accent)'}
+              stroke="var(--taifa-white)"
+              strokeWidth="2"
+              className="cursor-pointer hover:fill-taifa-secondary transition-colors duration-200 drop-shadow-lg"
+              onClick={() => onCountryClick('mauritius')}
+            />
+            
+            {/* Country labels */}
+            <text x="195" y="80" fontSize="12" fill="var(--taifa-primary)" textAnchor="middle" className="pointer-events-none font-semibold drop-shadow-sm">Morocco</text>
+            <text x="295" y="85" fontSize="12" fill="var(--taifa-primary)" textAnchor="middle" className="pointer-events-none font-semibold drop-shadow-sm">Egypt</text>
+            <text x="190" y="165" fontSize="12" fill="var(--taifa-primary)" textAnchor="middle" className="pointer-events-none font-semibold drop-shadow-sm">Nigeria</text>
+            <text x="180" y="175" fontSize="10" fill="var(--taifa-primary)" textAnchor="middle" className="pointer-events-none font-semibold drop-shadow-sm">Ghana</text>
+            <text x="300" y="185" fontSize="12" fill="var(--taifa-primary)" textAnchor="middle" className="pointer-events-none font-semibold drop-shadow-sm">Kenya</text>
+            <text x="285" y="195" fontSize="9" fill="var(--taifa-primary)" textAnchor="middle" className="pointer-events-none font-semibold drop-shadow-sm">Rwanda</text>
+            <text x="270" y="310" fontSize="12" fill="var(--taifa-primary)" textAnchor="middle" className="pointer-events-none font-semibold drop-shadow-sm">South Africa</text>
+            <text x="325" y="270" fontSize="8" fill="var(--taifa-primary)" textAnchor="middle" className="pointer-events-none font-semibold drop-shadow-sm">Mauritius</text>
+          </svg>
+        </div>
+      </div>
+      
       <div className="absolute bottom-4 left-4 bg-taifa-white/90 backdrop-blur-sm px-4 py-2 rounded-lg border border-taifa-border shadow-lg">
         <p className="text-sm text-taifa-muted flex items-center">
           <MapPin className="h-4 w-4 mr-2 text-taifa-secondary" />
@@ -408,4 +410,3 @@ const InteractiveAfricaAIMap: React.FC = () => {
 };
 
 export default InteractiveAfricaAIMap;
-

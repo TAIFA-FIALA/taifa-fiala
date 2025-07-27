@@ -36,7 +36,7 @@ class FundingDeduplicator:
         
         # Default configuration
         self.config = config or {
-            'similarity_threshold': 85,  # Fuzzy matching threshold
+            'similarity_threshold': 75,  # Reduced from 85 to 75 to reduce false positives
             'check_window_days': 90,     # Check for duplicates within this window
             'dedup_fields': [            # Fields to use for deduplication
                 'organization_name',
