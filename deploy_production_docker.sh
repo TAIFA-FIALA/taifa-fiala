@@ -68,8 +68,19 @@ success "✓ SSH connection verified."
 
 # Check for Docker on remote server
 info "Checking for Docker on remote server..."
-if ! ssh $PROD_USER@$PROD_SERVER 'command -v docker >/dev/null 2>&1 && command -v docker-compose >/dev/null 2>&1'; then
-    warning "Docker or Docker Compose not found on remote server."
+# Check for Docker in common macOS and Linux locations
+if ssh $PROD_USER@$PROD_SERVER 'test -f /usr/local/bin/docker || test -f /usr/bin/docker || command -v docker >/dev/null 2>&1'; then
+    # Check for docker-compose
+    if ssh $PROD_USER@$PROD_SERVER 'test -f /usr/local/bin/docker-compose || test -f /usr/bin/docker-compose || command -v docker-compose >/dev/null 2>&1'; then
+        success "✓ Docker and Docker Compose are available on remote server."
+        DOCKER_AVAILABLE=true
+    else
+        warning "Docker found but Docker Compose not found on remote server."
+        warning "Continuing with deployment, but Docker-based services will not start."
+        DOCKER_AVAILABLE=false
+    fi
+else
+    warning "Docker not found on remote server."
     warning "You will need to install Docker and Docker Compose on the remote server."
     warning "Run the following commands on the remote server:"
     warning "  curl -fsSL https://get.docker.com -o get-docker.sh"
@@ -77,9 +88,6 @@ if ! ssh $PROD_USER@$PROD_SERVER 'command -v docker >/dev/null 2>&1 && command -
     warning "  sudo apt-get install -y docker-compose"
     warning "Continuing with deployment, but Docker-based services will not start."
     DOCKER_AVAILABLE=false
-else
-    success "✓ Docker and Docker Compose are available on remote server."
-    DOCKER_AVAILABLE=true
 fi
 
 # Git safety checks
