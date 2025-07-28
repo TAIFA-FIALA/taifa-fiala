@@ -249,20 +249,19 @@ scp .env ${PROD_USER}@${PROD_SERVER}:${PROD_DIR}/
 step "Step 7: Starting Services on Production Server"
 
 if [ "$DOCKER_AVAILABLE" = true ]; then
-    # Prompt for keychain password to unlock Docker authentication
-    echo "Docker requires keychain access for image pulling."
-    read -s -p "Enter your macOS keychain password: " KEYCHAIN_PASSWORD
-    echo  # New line after password input
+    echo "Preparing Docker environment for deployment..."
     
     ssh ${PROD_USER}@${PROD_SERVER} << EOF
         cd ${PROD_DIR}
         
         # Set Docker paths for macOS compatibility
         export PATH=/usr/local/bin:\$PATH
+        DOCKER_CMD=/usr/local/bin/docker
         DOCKER_COMPOSE_CMD=/usr/local/bin/docker-compose
         
-        # Unlock keychain for Docker authentication
-        echo "${KEYCHAIN_PASSWORD}" | security unlock-keychain -p - ~/Library/Keychains/login.keychain-db
+        # Logout from Docker Hub to avoid authentication issues with public images
+        echo "Logging out of Docker Hub to avoid keychain authentication issues..."
+        \$DOCKER_CMD logout || true
         
         # Stop any running containers
         \$DOCKER_COMPOSE_CMD down || true
@@ -293,9 +292,6 @@ if [ "$DOCKER_AVAILABLE" = true ]; then
         export PATH=/usr/local/bin:\$PATH
         DOCKER_CMD=/usr/local/bin/docker
         DOCKER_COMPOSE_CMD=/usr/local/bin/docker-compose
-        
-        # Ensure keychain is unlocked for health check
-        echo '${KEYCHAIN_PASSWORD}' | security unlock-keychain -p - ~/Library/Keychains/login.keychain-db
         
         # Check if Docker containers are running
         echo 'Docker container status:'
