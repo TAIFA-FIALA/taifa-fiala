@@ -37,8 +37,8 @@ services:
   # New file watcher service
   file_watcher:
     build:
-      context: ./data_processors
-      dockerfile: Dockerfile.watcher
+      context: .
+      dockerfile: data_processors/Dockerfile.watcher
     volumes:
       - ./data_processors:/app/data_processors
       - ./data_ingestion:/data_ingestion
