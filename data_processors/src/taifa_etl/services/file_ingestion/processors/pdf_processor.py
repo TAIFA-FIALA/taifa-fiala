@@ -146,19 +146,54 @@ class PDFProcessor:
         
         # Regex patterns for funding amounts
         amount_patterns = [
+            # Standard patterns with million/billion abbreviations
             r'(?P<organization>[\w\s]+?)\s+(?:raised|received|secured)\s+(?P<amount>\$[\d,]+\.?\d*\s*(?:million|M|billion|B))',
             r'(?P<amount>\$[\d,]+\.?\d*\s*(?:million|M|billion|B))\s+(?:funding|investment)\s+(?:in|for)\s+(?P<organization>[\w\s]+)',
             r'(?P<organization>[\w\s]+?)\s+(?:grant|award|funding)\s+of\s+(?P<amount>\$[\d,]+\.?\d*\s*(?:million|M|billion|B)?)',
+            
+            # US$ patterns with full numbers (common in reports)
+            r'(?P<count>\d+)\s+(?P<organization_type>African tech startups?|startups?|companies)\s+raised\s+.*?(?P<amount>US\$[\d,]+(?:,\d{3})*)',
+            r'(?P<organization>[\w\s]+?)\s+(?:raised|received|secured)\s+(?P<amount>US\$[\d,]+(?:,\d{3})*)',
+            r'(?:raised|received|secured)\s+(?P<amount>US\$[\d,]+(?:,\d{3})*)',
+            
+            # General US$ amounts
+            r'(?P<amount>US\$[\d,]+(?:,\d{3})*(?:\.\d+)?(?:\s*(?:million|billion|M|B))?)',
+            
+            # Funding context patterns
+            r'total.*?funding.*?(?P<amount>US\$[\d,]+(?:,\d{3})*)',
+            r'secured.*?funding.*?(?P<amount>US\$[\d,]+(?:,\d{3})*)',
         ]
         
         for pattern in amount_patterns:
             matches = re.finditer(pattern, text, re.IGNORECASE)
             for match in matches:
+                groups = match.groupdict()
+                
+                # Extract organization name with fallbacks
+                org_name = groups.get('organization', '').strip()
+                if not org_name:
+                    org_name = groups.get('organization_type', '').strip()
+                if not org_name:
+                    org_name = groups.get('count', '') + ' ' + groups.get('organization_type', 'startups')
+                if not org_name or org_name.strip() == '':
+                    org_name = 'African Tech Startups'  # Default fallback
+                
+                # Parse amount
+                amount_text = groups.get('amount', '')
+                amount_usd = self._parse_amount(amount_text)
+                
+                # Skip very small or very large amounts (likely parsing errors)
+                if amount_usd < 1000 or amount_usd > 100_000_000_000:
+                    continue
+                
                 record = {
-                    'organization_name': match.group('organization').strip(),
-                    'amount_text': match.group('amount'),
-                    'amount_usd': self._parse_amount(match.group('amount')),
-                    'context': text[max(0, match.start()-100):match.end()+100],
+                    'organization_name': org_name.strip(),
+                    'amount_text': amount_text,
+                    'amount_usd': amount_usd,
+                    'round_type': groups.get('round_type', ''),
+                    'investor': groups.get('investor', ''),
+                    'count': groups.get('count', ''),
+                    'context': text[max(0, match.start()-150):match.end()+150],
                     'source_type': 'pdf',
                     'extraction_method': 'regex'
                 }
@@ -176,30 +211,46 @@ class PDFProcessor:
     
     def _parse_amount(self, amount_text: str) -> float:
         """
-        Parse amount text to a float value.
+        Parse amount text to a float value, handling multiple formats.
         
         Args:
             amount_text: Text containing an amount
             
         Returns:
-            Parsed amount as float
+            Parsed amount as float in USD
         """
-        amount_text = amount_text.replace('$', '').replace(',', '')
+        if not amount_text:
+            return 0.0
         
+        # Clean the text
+        clean_text = amount_text.replace('US$', '').replace('USD', '').replace('$', '').replace(',', '').strip()
+        
+        # Handle multipliers
         multipliers = {
+            'billion': 1_000_000_000, 'B': 1_000_000_000, 'b': 1_000_000_000,
             'million': 1_000_000, 'M': 1_000_000, 'm': 1_000_000,
-            'billion': 1_000_000_000, 'B': 1_000_000_000, 'b': 1_000_000_000
+            'thousand': 1_000, 'K': 1_000, 'k': 1_000,
         }
         
-        for key, multiplier in multipliers.items():
-            if key in amount_text:
-                number = float(re.search(r'[\d.]+', amount_text).group())
-                return number * multiplier
+        multiplier = 1
+        for key, mult in multipliers.items():
+            if key in clean_text:
+                multiplier = mult
+                clean_text = clean_text.replace(key, '').strip()
+                break
         
+        # Extract the numeric value
         try:
-            return float(re.search(r'[\d.]+', amount_text).group())
-        except (AttributeError, ValueError):
-            return 0.0
+            # Find the main number
+            number_match = re.search(r'[\d,]+\.?\d*', clean_text)
+            if number_match:
+                number_str = number_match.group().replace(',', '')
+                number = float(number_str)
+                return number * multiplier
+        except (ValueError, AttributeError):
+            pass
+        
+        return 0.0
     
     def _parse_date(self, date_text: str) -> Optional[str]:
         """

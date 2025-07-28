@@ -38,7 +38,10 @@ class FileIngestionCLI:
     
     def __init__(self):
         """Initialize the CLI."""
-        self.service = FileIngestionService()
+        # Look for config file in project root
+        project_root = os.path.abspath(os.path.join(parent_dir, '..'))  # Go one level up from data_processors
+        config_path = os.path.join(project_root, 'config', 'file_ingestion_config.json')
+        self.service = FileIngestionService(config_path=config_path)
         self.logger = logging.getLogger(__name__)
         
     def run(self):
