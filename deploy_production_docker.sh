@@ -252,14 +252,18 @@ if [ "$DOCKER_AVAILABLE" = true ]; then
     ssh ${PROD_USER}@${PROD_SERVER} << EOF
         cd ${PROD_DIR}
         
+        # Set Docker paths for macOS compatibility
+        export PATH=/usr/local/bin:\$PATH
+        DOCKER_COMPOSE_CMD=/usr/local/bin/docker-compose
+        
         # Stop any running containers
-        docker-compose down || true
+        \$DOCKER_COMPOSE_CMD down || true
         
         # Start the services with the watcher
-        docker-compose -f docker-compose.watcher.yml up -d
+        \$DOCKER_COMPOSE_CMD -f docker-compose.watcher.yml up -d
         
         # Check if services are running
-        docker-compose ps
+        \$DOCKER_COMPOSE_CMD ps
 EOF
 else
     warning "Skipping Docker container startup as Docker is not available on the remote server."
@@ -277,19 +281,24 @@ if [ "$DOCKER_AVAILABLE" = true ]; then
     ssh $PROD_USER@$PROD_SERVER "
         cd ${PROD_DIR}
         
+        # Set Docker paths for macOS compatibility
+        export PATH=/usr/local/bin:\$PATH
+        DOCKER_CMD=/usr/local/bin/docker
+        DOCKER_COMPOSE_CMD=/usr/local/bin/docker-compose
+        
         # Check if Docker containers are running
         echo 'Docker container status:'
-        docker-compose -f docker-compose.watcher.yml ps
+        \$DOCKER_COMPOSE_CMD -f docker-compose.watcher.yml ps
         
         # Check if all expected containers are running
-        RUNNING_CONTAINERS=\$(docker ps --format '{{.Names}}' | wc -l)
+        RUNNING_CONTAINERS=\$(\$DOCKER_CMD ps --format '{{.Names}}' | wc -l)
         if [ \$RUNNING_CONTAINERS -lt 4 ]; then
             echo '⚠ Warning: Not all containers are running!'
-            docker ps
+            \$DOCKER_CMD ps
             echo 'Container logs:'
-            for container in \$(docker-compose -f docker-compose.watcher.yml ps -q); do
-                echo \"Logs for \$(docker inspect --format='{{.Name}}' \$container | sed 's/^\///')\"
-                docker logs \$container --tail 20
+            for container in \$(\$DOCKER_COMPOSE_CMD -f docker-compose.watcher.yml ps -q); do
+                echo \"Logs for \$(\$DOCKER_CMD inspect --format='{{.Name}}' \$container | sed 's/^\///')\"
+                \$DOCKER_CMD logs \$container --tail 20
             done
         else
             echo '✓ All containers are running'
