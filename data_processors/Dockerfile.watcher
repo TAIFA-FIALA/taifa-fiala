@@ -12,7 +12,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
 # Copy the data_processors directory
-COPY . /app/data_processors
+COPY data_processors /app/data_processors
 
 # Create the necessary directories for file ingestion
 RUN mkdir -p /data_ingestion/inbox/pdfs \
