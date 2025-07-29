@@ -242,8 +242,21 @@ else:
             exit 1
         fi
         
-        echo "Starting FastAPI backend..."
-        nohup uvicorn app.main:app --host 0.0.0.0 --port 8030 --reload > ../logs/backend.log 2>&1 &
+        echo "Starting FastAPI backend with detailed logging..."
+        # Create detailed uvicorn log with access logs, error details, and timestamps
+        # Main log: application logs, errors, startup info
+        # Access log: HTTP requests and responses
+        nohup uvicorn app.main:app \
+            --host 0.0.0.0 \
+            --port 8030 \
+            --reload \
+            --log-level debug \
+            --access-log \
+            --access-logfile ../logs/backend_access.log \
+            --use-colors \
+            --date-header \
+            --server-header \
+            > ../logs/backend.log 2>&1 &
         BACKEND_PID=$!
         echo $BACKEND_PID > ../pids/backend.pid
         echo "✓ Backend started (PID: $BACKEND_PID)"
@@ -272,6 +285,13 @@ STREAMLIT_REQ
     
     if install_requirements_safely "streamlit" "venv" "requirements.txt"; then
         source venv/bin/activate
+        
+        # Check and free port 8501 before starting Streamlit
+        if ! check_and_free_port 8501 "Streamlit"; then
+            error "❌ Cannot free port 8501 for Streamlit"
+            exit 1
+        fi
+        
         echo "Starting Streamlit dashboard..."
         nohup streamlit run app.py --server.port 8501 --server.address 0.0.0.0 > ../../logs/streamlit.log 2>&1 &
         STREAMLIT_PID=$!
@@ -295,6 +315,12 @@ STREAMLIT_REQ
         npm install --legacy-peer-deps
         npm run build
         
+        # Check and free port 3030 before starting frontend
+        if ! check_and_free_port 3030 "Frontend"; then
+            error "❌ Cannot free port 3030 for frontend"
+            exit 1
+        fi
+        
         echo "Starting Next.js frontend..."
         nohup bash -c "export PATH=/usr/local/bin:$PATH && PORT=3030 npm start" > ../../logs/frontend.log 2>&1 &
         FRONTEND_PID=$!
@@ -315,8 +341,21 @@ STREAMLIT_REQ
         # Check if the actual watcher exists at the correct path
         WATCHER_PATH="src/taifa_etl/services/file_ingestion/watcher.py"
         if [ -f "$WATCHER_PATH" ]; then
-            echo "Starting file watcher from: $WATCHER_PATH"
-            nohup python "$WATCHER_PATH" > ../logs/file_watcher.log 2>&1 &
+            echo "Starting file watcher with detailed logging from: $WATCHER_PATH"
+            
+            # Create detailed log with environment info and debug output
+            {
+                echo "=== File Watcher Startup $(date) ==="
+                echo "Python Path: $PYTHONPATH"
+                echo "Data Ingestion Path: $DATA_INGESTION_PATH"
+                echo "Working Directory: $(pwd)"
+                echo "Python Version: $(python --version)"
+                echo "Virtual Environment: $VIRTUAL_ENV"
+                echo "========================================"
+            } > ../logs/file_watcher.log
+            
+            # Start file watcher with verbose logging
+            nohup python -u "$WATCHER_PATH" >> ../logs/file_watcher.log 2>&1 &
             WATCHER_PID=$!
             echo $WATCHER_PID > ../pids/file_watcher.pid
             echo "✓ File watcher started (PID: $WATCHER_PID)"
