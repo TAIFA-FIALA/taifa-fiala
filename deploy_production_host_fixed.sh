@@ -28,6 +28,46 @@ warning() { printf "${YELLOW}%s${NC}\n" "$1"; }
 error() { printf "${RED}%s${NC}\n" "$1"; }
 step() { printf "\n${YELLOW}--- %s ---${NC}\n" "$1"; }
 
+# Port checking function
+check_and_free_port() {
+    local port=$1
+    local service_name=$2
+    
+    info "Checking if port $port is available for $service_name..."
+    
+    # Check if port is in use
+    local processes=$(lsof -ti :$port 2>/dev/null)
+    
+    if [ -n "$processes" ]; then
+        warning "⚠ Port $port is in use by processes: $processes"
+        
+        # Show what's using the port
+        lsof -i :$port
+        
+        # Kill the processes
+        for pid in $processes; do
+            info "Killing process $pid using port $port..."
+            kill -9 $pid 2>/dev/null || true
+        done
+        
+        # Wait a moment for cleanup
+        sleep 2
+        
+        # Verify port is now free
+        local remaining=$(lsof -ti :$port 2>/dev/null)
+        if [ -n "$remaining" ]; then
+            error "❌ Failed to free port $port. Remaining processes: $remaining"
+            return 1
+        else
+            success "✅ Port $port is now free for $service_name"
+        fi
+    else
+        success "✅ Port $port is available for $service_name"
+    fi
+    
+    return 0
+}
+
 echo -e "${GREEN}=== AI Africa Funding Tracker Host-Based Deployment (Fixed) ===${NC}"
 echo -e "${YELLOW}Deploying services with dependency conflict resolution${NC}"
 
