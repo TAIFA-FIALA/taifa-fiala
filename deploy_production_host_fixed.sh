@@ -139,19 +139,18 @@ ssh ${PROD_USER}@${PROD_SERVER} << 'EOF'
             pip install --only-binary=pandas,numpy -r $requirements_file
         fi
         
-        # Verify critical imports
+        # Verify critical imports based on component
         python -c "
 import sys
+component = '$component'
 critical_packages = {
-    'fastapi': 'fastapi',
-    'uvicorn': 'uvicorn',
-    'streamlit': 'streamlit',
-    'pandas': 'pandas',
-    'numpy': 'numpy',
-    'beautifulsoup4': 'bs4'
+    'backend': {'fastapi': 'fastapi', 'uvicorn': 'uvicorn', 'pandas': 'pandas', 'numpy': 'numpy', 'beautifulsoup4': 'bs4'},
+    'streamlit': {'streamlit': 'streamlit', 'pandas': 'pandas', 'numpy': 'numpy', 'plotly': 'plotly'},
+    'data_processors': {'pandas': 'pandas', 'numpy': 'numpy', 'aiohttp': 'aiohttp', 'beautifulsoup4': 'bs4'}
 }
+packages_to_test = critical_packages.get(component, critical_packages['backend'])
 failed = []
-for pkg_name, import_name in critical_packages.items():
+for pkg_name, import_name in packages_to_test.items():
     try:
         __import__(import_name)
         print(f'✓ {pkg_name} imported successfully')
