@@ -13,9 +13,13 @@ echo -n "Enter your macOS login password: "
 read -s PASSWORD
 echo ""
 
+# First unlock the keychain with the provided password
+echo "Unlocking keychain first..."
+security unlock-keychain -p "$PASSWORD" "$HOME/Library/Keychains/login.keychain-db"
+
 # Store the password in keychain
 echo "Storing password in keychain..."
-security add-generic-password -s 'keychain-unlock' -a "$USER" -w "$PASSWORD" -T "/usr/bin/security"
+security add-generic-password -s 'keychain-unlock' -a "$USER" -w "$PASSWORD" -T "/usr/bin/security" -T "/usr/local/bin/security" -T "" "$HOME/Library/Keychains/login.keychain-db"
 
 if [ $? -eq 0 ]; then
     echo "✓ Password stored successfully in keychain"
