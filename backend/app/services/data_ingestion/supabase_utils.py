@@ -17,9 +17,14 @@ class SupabaseUtils:
     
     def __init__(self):
         """Initialize the Supabase client."""
-        self.supabase: Client = get_supabase_client()
-        if not self.supabase:
-            raise RuntimeError("Failed to initialize Supabase client")
+        try:
+            self.supabase: Client = get_supabase_client()
+            self.is_available = bool(self.supabase)
+        except Exception as e:
+            print(f"⚠️ Supabase client initialization failed: {e}")
+            print("⚠️ SupabaseUtils will operate in offline mode")
+            self.supabase = None
+            self.is_available = False
     
     async def get_sparse_rss_items(self, hours: int = 24, limit: int = 50) -> List[Dict[str, Any]]:
         """
@@ -32,6 +37,10 @@ class SupabaseUtils:
         Returns:
             List of RSS items that need enrichment
         """
+        if not self.is_available:
+            print("⚠️ Supabase not available, returning empty list")
+            return []
+            
         try:
             # Calculate the timestamp for the cutoff
             cutoff_time = (datetime.utcnow() - timedelta(hours=hours)).isoformat()
@@ -140,5 +149,19 @@ class SupabaseUtils:
         
         return {'success': success, 'failed': failed}
 
-# Create a singleton instance
-supabase_utils = SupabaseUtils()
+# Create a singleton instance with lazy initialization
+_supabase_utils_instance = None
+
+def get_supabase_utils() -> SupabaseUtils:
+    """Get the singleton SupabaseUtils instance with lazy initialization."""
+    global _supabase_utils_instance
+    if _supabase_utils_instance is None:
+        _supabase_utils_instance = SupabaseUtils()
+    return _supabase_utils_instance
+
+# For backward compatibility, create a property that initializes on first access
+class LazySupabaseUtils:
+    def __getattr__(self, name):
+        return getattr(get_supabase_utils(), name)
+
+supabase_utils = LazySupabaseUtils()
