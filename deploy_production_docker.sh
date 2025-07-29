@@ -252,14 +252,22 @@ if [ "$DOCKER_AVAILABLE" = true ]; then
     ssh ${PROD_USER}@${PROD_SERVER} << EOF
         cd ${PROD_DIR}
         
+        # Set Docker paths for macOS compatibility
+        export PATH=/usr/local/bin:$PATH
+        DOCKER_CMD=/usr/local/bin/docker
+        DOCKER_COMPOSE_CMD=/usr/local/bin/docker-compose
+        
+        # Disable BuildKit to avoid build context issues
+        export DOCKER_BUILDKIT=0
+        
         # Stop any running containers
-        docker-compose down || true
+        \$DOCKER_COMPOSE_CMD down || true
         
         # Start the services with the watcher
-        docker-compose -f docker-compose.watcher.yml up -d
+        \$DOCKER_COMPOSE_CMD -f docker-compose.watcher.yml up -d
         
         # Check if services are running
-        docker-compose ps
+        \$DOCKER_COMPOSE_CMD ps
 EOF
 else
     warning "Skipping Docker container startup as Docker is not available on the remote server."
