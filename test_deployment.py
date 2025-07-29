@@ -6,12 +6,10 @@ Tests the deployment process and validates all components
 
 import subprocess
 import sys
-import time
-import requests
 from pathlib import Path
 import tempfile
 import shutil
-from typing import Dict, List, Tuple
+from typing import Dict
 
 class DeploymentTester:
     def __init__(self):
@@ -62,10 +60,10 @@ class DeploymentTester:
             
             # Test critical imports
             critical_packages = {
-                'backend': ['fastapi', 'uvicorn', 'sqlalchemy', 'pydantic'],
+                'backend': ['fastapi', 'uvicorn', 'pandas', 'numpy', 'beautifulsoup4'],
                 'streamlit_app': ['streamlit', 'pandas', 'numpy', 'plotly'],
                 'data_processors': ['pandas', 'numpy', 'aiohttp', 'beautifulsoup4'],
-                'unified': ['fastapi', 'streamlit', 'pandas', 'numpy']
+                'unified': ['pandas', 'numpy', 'requests', 'aiohttp']
             }
             
             packages_to_test = critical_packages.get(component, [])

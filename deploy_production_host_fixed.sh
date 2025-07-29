@@ -128,15 +128,15 @@ ssh ${PROD_USER}@${PROD_SERVER} << 'EOF'
         # Try unified requirements first
         if [ -f "../requirements-unified.txt" ]; then
             echo "Using unified requirements for $component..."
-            pip install -r ../requirements-unified.txt --no-deps
+            pip install --only-binary=pandas,numpy -r ../requirements-unified.txt --no-deps
             # Then install component-specific requirements to fill gaps
             if [ -f "$requirements_file" ]; then
-                pip install -r $requirements_file --upgrade
+                pip install --only-binary=pandas,numpy -r $requirements_file --upgrade
             fi
         else
             # Fallback to component requirements
             echo "Using component-specific requirements for $component..."
-            pip install -r $requirements_file
+            pip install --only-binary=pandas,numpy -r $requirements_file
         fi
         
         # Verify critical imports

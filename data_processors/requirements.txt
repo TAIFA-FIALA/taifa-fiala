@@ -1,5 +1,5 @@
 # Core data processing dependencies - Compatible with unified requirements
-pandas>=2.2.0,<2.4.0
+pandas>=2.2.3,<2.4.0
 numpy>=1.26.4,<2.0.0
 beautifulsoup4==4.12.3
 aiohttp==3.12.14
