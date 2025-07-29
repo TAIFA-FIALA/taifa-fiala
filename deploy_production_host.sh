@@ -81,7 +81,7 @@ ssh ${PROD_USER}@${PROD_SERVER} << 'EOF'
     
     # Start backend service
     echo "Starting FastAPI backend..."
-    nohup uvicorn app.main:app --host 0.0.0.0 --port 8030 --reload > ../logs/backend.log 2>&1 &
+    nohup bash -c "source venv/bin/activate && uvicorn app.main:app --host 0.0.0.0 --port 8030 --reload" > ../logs/backend.log 2>&1 &
     BACKEND_PID=$!
     echo $BACKEND_PID > ../pids/backend.pid
     echo "✓ Backend started (PID: $BACKEND_PID)"
@@ -113,7 +113,7 @@ ssh ${PROD_USER}@${PROD_SERVER} << 'EOF'
     
     # Start Next.js service
     echo "Starting Next.js frontend..."
-    PORT=3030 nohup npm start > ../../logs/frontend.log 2>&1 &
+    nohup bash -c "export PATH=/usr/local/bin:$PATH && PORT=3030 npm start" > ../../logs/frontend.log 2>&1 &
     FRONTEND_PID=$!
     echo $FRONTEND_PID > ../../pids/frontend.pid
     echo "✓ Frontend started (PID: $FRONTEND_PID)"
