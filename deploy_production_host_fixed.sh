@@ -235,6 +235,13 @@ else:
     cd backend
     if install_requirements_safely "backend" "venv" "requirements.txt"; then
         source venv/bin/activate
+        
+        # Check and free port 8030 before starting backend
+        if ! check_and_free_port 8030 "Backend"; then
+            error "❌ Cannot free port 8030 for backend"
+            exit 1
+        fi
+        
         echo "Starting FastAPI backend..."
         nohup uvicorn app.main:app --host 0.0.0.0 --port 8030 --reload > ../logs/backend.log 2>&1 &
         BACKEND_PID=$!
