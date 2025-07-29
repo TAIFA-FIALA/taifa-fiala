@@ -48,6 +48,10 @@ venv.bak/
 
 # pytest
 .pytest_cache/
+
+# Deployment scripts with embedded credentials
+deploy_production_docker.sh
+setup_keychain_password.sh
 .coverage
 htmlcov/
 
