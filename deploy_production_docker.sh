@@ -249,67 +249,17 @@ scp .env ${PROD_USER}@${PROD_SERVER}:${PROD_DIR}/
 step "Step 7: Starting Services on Production Server"
 
 if [ "$DOCKER_AVAILABLE" = true ]; then
-    echo "Preparing Docker environment for deployment..."
-    
     ssh ${PROD_USER}@${PROD_SERVER} << EOF
         cd ${PROD_DIR}
         
-        # Set Docker paths for macOS compatibility
-        export PATH=/usr/local/bin:\$PATH
-        export DOCKER_BUILDKIT=0
-        DOCKER_CMD=/usr/local/bin/docker
-        DOCKER_COMPOSE_CMD=/usr/local/bin/docker-compose
-        
-        # Unlock keychain using stored password for SSH sessions
-        echo "Unlocking keychain for Docker operations..."
-        
-        # First, try to get the stored password
-        KEYCHAIN_PASSWORD=\$(security find-generic-password -w -s 'keychain-unlock' -a \$USER 2>/dev/null)
-        
-        if [ -n "\$KEYCHAIN_PASSWORD" ]; then
-            # Unlock the keychain with the stored password
-            if security unlock-keychain -p "\$KEYCHAIN_PASSWORD" "\$HOME/Library/Keychains/login.keychain-db" 2>/dev/null; then
-                echo "✓ Keychain unlocked successfully"
-                
-                # Set keychain timeout to prevent re-locking during deployment
-                security set-keychain-settings -t 3600 "\$HOME/Library/Keychains/login.keychain-db" 2>/dev/null || true
-                
-                # Add keychain to search list to ensure Docker can access it
-                security list-keychains -d user -s "\$HOME/Library/Keychains/login.keychain-db" 2>/dev/null || true
-                
-            else
-                echo "⚠ Failed to unlock keychain with stored password"
-                echo "⚠ Attempting manual unlock for SSH session..."
-                
-                # Try alternative unlock method for SSH sessions
-                security -v unlock-keychain "\$HOME/Library/Keychains/login.keychain-db" 2>/dev/null || {
-                    echo "⚠ Manual keychain unlock also failed"
-                    echo "⚠ Continuing with credential-free Docker operations..."
-                }
-            fi
-        else
-            echo "⚠ No stored keychain password found"
-            echo "⚠ You need to run './setup_keychain_password.sh' on the production server first"
-            echo "⚠ For now, attempting to unlock keychain manually..."
-            
-            # Try to unlock without stored password (will prompt if interactive)
-            security -v unlock-keychain "\$HOME/Library/Keychains/login.keychain-db" 2>/dev/null || {
-                echo "⚠ Could not unlock keychain automatically"
-                echo "⚠ Continuing with credential-free Docker operations..."
-            }
-        fi
-        
-        # Configure Docker for operation (with or without keychain)
-        echo "Configuring Docker environment..."
-        
         # Stop any running containers
-        \$DOCKER_COMPOSE_CMD down || true
+        docker-compose down || true
         
         # Start the services with the watcher
-        \$DOCKER_COMPOSE_CMD -f docker-compose.watcher.yml up -d
+        docker-compose -f docker-compose.watcher.yml up -d
         
         # Check if services are running
-        \$DOCKER_COMPOSE_CMD ps
+        docker-compose ps
 EOF
 else
     warning "Skipping Docker container startup as Docker is not available on the remote server."

@@ -1,0 +1,37 @@
+# Core data processing dependencies
+pandas
+numpy
+beautifulsoup4
+aiohttp
+watchdog
+fuzzywuzzy
+chardet
+anthropic
+PyPDF2
+
+# Database and async support
+asyncpg
+aiofiles
+asyncio-throttle
+
+# HTTP and web scraping
+requests
+httpx
+crawl4ai
+
+# RSS and feed processing
+feedparser
+lxml
+
+# Text processing
+python-Levenshtein
+nltk
+
+# Configuration and utilities
+python-dotenv
+pydantic
+tenacity
+backoff
+
+# Logging
+structlog

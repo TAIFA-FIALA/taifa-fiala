@@ -4,24 +4,16 @@ FROM python:3.12-slim
 # Set the working directory in the container
 WORKDIR /app
 
-# Install build dependencies for packages that need compilation
-RUN apt-get update && apt-get install -y \
-    gcc \
-    g++ \
-    build-essential \
-    && rm -rf /var/lib/apt/lists/*
-
-# Copy unified requirements file from root
+# Copy requirements file
 COPY requirements.txt ./
 
-# Install uv for fast dependency resolution
-RUN pip install --no-cache-dir uv
-
-# Install all dependencies from unified requirements using uv
-RUN /usr/local/bin/uv pip install --system -r requirements.txt
+# Install Python dependencies
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt && \
+    pip install --no-cache-dir PyPDF2 pandas beautifulsoup4 aiohttp watchdog fuzzywuzzy chardet anthropic
 
 # Copy the data_processors directory
-COPY data_processors /app/data_processors
+COPY . /app/data_processors
 
 # Create the necessary directories for file ingestion
 RUN mkdir -p /data_ingestion/inbox/pdfs \
