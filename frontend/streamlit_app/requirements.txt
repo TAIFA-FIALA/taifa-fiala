@@ -5,4 +5,5 @@ pandas>=2.2.3,<2.4.0
 plotly==5.17.0
 numpy>=1.26.4,<2.0.0
 aiohttp==3.12.14
-packaging>=24.2
+packaging>=20,<25
+rich>=10.14.0,<14

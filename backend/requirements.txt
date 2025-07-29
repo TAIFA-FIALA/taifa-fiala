@@ -40,6 +40,8 @@ aioredis==2.0.1
 # Background Tasks
 celery==5.4.0
 kombu==5.4.2
+amqp>=5.1.1,<6.0.0
+vine==5.1.0
 
 # Logging and Monitoring
 structlog==23.2.0
