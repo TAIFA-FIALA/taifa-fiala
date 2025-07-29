@@ -251,7 +251,7 @@ step "Step 7: Starting Services on Production Server"
 if [ "$DOCKER_AVAILABLE" = true ]; then
     echo "Preparing Docker environment for deployment..."
     
-    ssh ${PROD_USER}@${PROD_SERVER} << EOF
+    ssh ${PROD_USER}@${PROD_SERVER} env KEYCHAIN_PASSWORD="${KEYCHAIN_PASSWORD}" bash << EOF
         cd ${PROD_DIR}
         
         # Set Docker paths for macOS compatibility
@@ -262,7 +262,11 @@ if [ "$DOCKER_AVAILABLE" = true ]; then
         
         # Unlock keychain for Docker operations on macOS
         echo "Unlocking keychain for Docker operations..."
-        security unlock-keychain ~/Library/Keychains/login.keychain-db || true
+        if [ -n "\$KEYCHAIN_PASSWORD" ]; then
+            security unlock-keychain -p "\$KEYCHAIN_PASSWORD" "/Users/jforrest/Library/Keychains/login.keychain-db" || true
+        else
+            security unlock-keychain "/Users/jforrest/Library/Keychains/login.keychain-db" || true
+        fi
         
         # Logout from Docker Hub to avoid authentication issues with public images
         echo "Logging out of Docker Hub to avoid keychain authentication issues..."
