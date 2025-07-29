@@ -265,14 +265,16 @@ STREAMLIT_REQ
         export PYTHONPATH=/Users/jforrest/production/TAIFA-FIALA
         export DATA_INGESTION_PATH=/Users/jforrest/production/TAIFA-FIALA/data_ingestion
         
-        # Check if file_watcher.py exists
-        if [ -f "file_watcher.py" ]; then
-            nohup python file_watcher.py > ../logs/file_watcher.log 2>&1 &
+        # Check if the actual watcher exists at the correct path
+        WATCHER_PATH="src/taifa_etl/services/file_ingestion/watcher.py"
+        if [ -f "$WATCHER_PATH" ]; then
+            echo "Starting file watcher from: $WATCHER_PATH"
+            nohup python "$WATCHER_PATH" > ../logs/file_watcher.log 2>&1 &
             WATCHER_PID=$!
             echo $WATCHER_PID > ../pids/file_watcher.pid
             echo "✓ File watcher started (PID: $WATCHER_PID)"
         else
-            echo "⚠ file_watcher.py not found, skipping file watcher"
+            echo "⚠ File watcher not found at $WATCHER_PATH, skipping file watcher"
         fi
     else
         echo "❌ Failed to setup data processors environment"
