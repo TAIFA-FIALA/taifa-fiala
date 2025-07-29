@@ -262,9 +262,20 @@ if [ "$DOCKER_AVAILABLE" = true ]; then
         
         # Unlock keychain for Docker operations on macOS
         echo "Unlocking keychain for Docker operations..."
-        if [ -n "\$KEYCHAIN_PASSWORD" ]; then
+        
+        # Try to unlock keychain using stored password
+        STORED_PASSWORD=\$(security find-generic-password -w -s 'keychain-unlock' -a \$USER 2>/dev/null || echo '')
+        if [ -n "\$STORED_PASSWORD" ]; then
+            echo "Using stored keychain password..."
+            security unlock-keychain -p "\$STORED_PASSWORD" "/Users/jforrest/Library/Keychains/login.keychain-db" || true
+            # Set keychain to stay unlocked for 6 hours
+            security set-keychain-settings -t 21600 -l "/Users/jforrest/Library/Keychains/login.keychain-db" || true
+        elif [ -n "\$KEYCHAIN_PASSWORD" ]; then
+            echo "Using environment variable keychain password..."
             security unlock-keychain -p "\$KEYCHAIN_PASSWORD" "/Users/jforrest/Library/Keychains/login.keychain-db" || true
+            security set-keychain-settings -t 21600 -l "/Users/jforrest/Library/Keychains/login.keychain-db" || true
         else
+            echo "No keychain password available, trying interactive unlock..."
             security unlock-keychain "/Users/jforrest/Library/Keychains/login.keychain-db" || true
         fi
         
