@@ -259,6 +259,10 @@ if [ "$DOCKER_AVAILABLE" = true ]; then
         DOCKER_CMD=/usr/local/bin/docker
         DOCKER_COMPOSE_CMD=/usr/local/bin/docker-compose
         
+        # Unlock keychain for Docker operations on macOS
+        echo "Unlocking keychain for Docker operations..."
+        security unlock-keychain ~/Library/Keychains/login.keychain-db || true
+        
         # Logout from Docker Hub to avoid authentication issues with public images
         echo "Logging out of Docker Hub to avoid keychain authentication issues..."
         \$DOCKER_CMD logout || true
