@@ -317,7 +317,7 @@ if [ "$DOCKER_AVAILABLE" = true ]; then
         else
             echo '⚠ Backend health check failed'
             echo 'Backend container logs:'
-            docker logs \$(docker ps -q -f name=backend) --tail 20
+            \$DOCKER_CMD logs \$(\$DOCKER_CMD ps -q -f name=backend) --tail 20
         fi
         
         # Test Streamlit dashboard
@@ -326,7 +326,7 @@ if [ "$DOCKER_AVAILABLE" = true ]; then
         else
             echo '⚠ Streamlit dashboard health check failed'
             echo 'Streamlit container logs:'
-            docker logs \$(docker ps -q -f name=streamlit) --tail 20
+            \$DOCKER_CMD logs \$(\$DOCKER_CMD ps -q -f name=streamlit) --tail 20
         fi
         
         # Test Next.js frontend
@@ -335,12 +335,12 @@ if [ "$DOCKER_AVAILABLE" = true ]; then
         else
             echo '⚠ Frontend health check failed'
             echo 'Frontend container logs:'
-            docker logs \$(docker ps -q -f name=frontend) --tail 20
+            \$DOCKER_CMD logs \$(\$DOCKER_CMD ps -q -f name=frontend) --tail 20
         fi
         
         # Check file watcher service
         echo 'Checking file watcher service...'
-        if docker ps | grep -q file_watcher; then
+        if \$DOCKER_CMD ps | grep -q file_watcher; then
             echo '✓ File watcher service is running'
             
             # Check if watch directory exists
@@ -353,7 +353,7 @@ if [ "$DOCKER_AVAILABLE" = true ]; then
         else
             echo '⚠ File watcher service is not running'
             echo 'File watcher container logs:'
-            docker logs \$(docker ps -q -f name=file_watcher) --tail 20 || echo 'No file watcher container found'
+            \$DOCKER_CMD logs \$(\$DOCKER_CMD ps -q -f name=file_watcher) --tail 20 || echo 'No file watcher container found'
         fi
     "
 else
