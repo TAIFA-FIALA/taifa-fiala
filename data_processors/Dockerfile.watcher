@@ -14,9 +14,11 @@ RUN apt-get update && apt-get install -y \
 # Copy unified requirements file from root
 COPY requirements.txt ./
 
-# Install all dependencies from unified requirements
-RUN pip install --no-cache-dir --upgrade pip setuptools && \
-    pip install --no-cache-dir -r requirements.txt
+# Install uv for fast dependency resolution
+RUN pip install --no-cache-dir uv
+
+# Install all dependencies from unified requirements using uv
+RUN /usr/local/bin/uv pip install --system -r requirements.txt
 
 # Copy the data_processors directory
 COPY data_processors /app/data_processors
