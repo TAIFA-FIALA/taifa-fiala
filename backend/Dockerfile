@@ -5,8 +5,8 @@ FROM python:3.12-slim
 # Set the working directory in the container
 WORKDIR /app/backend
 
-# Copy requirements file from project root
-COPY ../requirements.txt ./
+# Copy requirements file
+COPY requirements.txt ./
 
 # Install Python dependencies
 RUN pip install --no-cache-dir --upgrade pip && \
