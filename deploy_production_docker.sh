@@ -251,7 +251,7 @@ step "Step 7: Starting Services on Production Server"
 if [ "$DOCKER_AVAILABLE" = true ]; then
     echo "Preparing Docker environment for deployment..."
     
-    ssh ${PROD_USER}@${PROD_SERVER} env KEYCHAIN_PASSWORD="${KEYCHAIN_PASSWORD}" bash << EOF
+    ssh ${PROD_USER}@${PROD_SERVER} << EOF
         cd ${PROD_DIR}
         
         # Set Docker paths for macOS compatibility
@@ -260,24 +260,47 @@ if [ "$DOCKER_AVAILABLE" = true ]; then
         DOCKER_CMD=/usr/local/bin/docker
         DOCKER_COMPOSE_CMD=/usr/local/bin/docker-compose
         
-        # Unlock keychain for Docker operations on macOS
+        # Unlock keychain using stored password for SSH sessions
         echo "Unlocking keychain for Docker operations..."
         
-        # Use environment variable password directly (most reliable for SSH sessions)
+        # First, try to get the stored password
+        KEYCHAIN_PASSWORD=\$(security find-generic-password -w -s 'keychain-unlock' -a \$USER 2>/dev/null)
+        
         if [ -n "\$KEYCHAIN_PASSWORD" ]; then
-            echo "Using environment variable keychain password..."
-            security unlock-keychain -p "\$KEYCHAIN_PASSWORD" "/Users/jforrest/Library/Keychains/login.keychain-db"
-            # Set keychain to stay unlocked for 6 hours
-            security set-keychain-settings -t 21600 -l "/Users/jforrest/Library/Keychains/login.keychain-db"
-            echo "✓ Keychain unlocked successfully"
+            # Unlock the keychain with the stored password
+            if security unlock-keychain -p "\$KEYCHAIN_PASSWORD" "\$HOME/Library/Keychains/login.keychain-db" 2>/dev/null; then
+                echo "✓ Keychain unlocked successfully"
+                
+                # Set keychain timeout to prevent re-locking during deployment
+                security set-keychain-settings -t 3600 "\$HOME/Library/Keychains/login.keychain-db" 2>/dev/null || true
+                
+                # Add keychain to search list to ensure Docker can access it
+                security list-keychains -d user -s "\$HOME/Library/Keychains/login.keychain-db" 2>/dev/null || true
+                
+            else
+                echo "⚠ Failed to unlock keychain with stored password"
+                echo "⚠ Attempting manual unlock for SSH session..."
+                
+                # Try alternative unlock method for SSH sessions
+                security -v unlock-keychain "\$HOME/Library/Keychains/login.keychain-db" 2>/dev/null || {
+                    echo "⚠ Manual keychain unlock also failed"
+                    echo "⚠ Continuing with credential-free Docker operations..."
+                }
+            fi
         else
-            echo "⚠ KEYCHAIN_PASSWORD not set - Docker authentication may fail"
-            echo "Please set KEYCHAIN_PASSWORD environment variable with your macOS login password"
+            echo "⚠ No stored keychain password found"
+            echo "⚠ You need to run './setup_keychain_password.sh' on the production server first"
+            echo "⚠ For now, attempting to unlock keychain manually..."
+            
+            # Try to unlock without stored password (will prompt if interactive)
+            security -v unlock-keychain "\$HOME/Library/Keychains/login.keychain-db" 2>/dev/null || {
+                echo "⚠ Could not unlock keychain automatically"
+                echo "⚠ Continuing with credential-free Docker operations..."
+            }
         fi
         
-        # Logout from Docker Hub to avoid authentication issues with public images
-        echo "Logging out of Docker Hub to avoid keychain authentication issues..."
-        \$DOCKER_CMD logout || true
+        # Configure Docker for operation (with or without keychain)
+        echo "Configuring Docker environment..."
         
         # Stop any running containers
         \$DOCKER_COMPOSE_CMD down || true
