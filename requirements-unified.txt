@@ -1,6 +1,11 @@
-# FastAPI and ASGI server - Compatible with unified requirements
+# Unified Requirements for AI Africa Funding Tracker
+# This file resolves all dependency conflicts across components
+# Python 3.12 compatible versions
+
+# Core Framework Dependencies
 fastapi==0.116.1
 uvicorn[standard]==0.35.0
+streamlit>=1.30.0,<1.40.0
 
 # Database
 sqlalchemy>=2.0.0,<2.1.0
@@ -29,9 +34,10 @@ crawl4ai==0.6.0
 feedparser==6.0.10
 lxml==5.3.0
 
-# Data Processing
+# Data Processing - Unified versions (Python 3.13 compatible)
 pandas>=2.2.0,<2.4.0
 numpy>=1.26.4,<2.0.0
+plotly==5.17.0
 
 # Caching
 redis==5.2.1
@@ -66,7 +72,7 @@ fuzzywuzzy==0.18.0
 python-Levenshtein==0.27.1
 sentence-transformers==3.3.1
 
-# OpenAI (for classification)
+# OpenAI
 openai==1.59.2
 
 # Rate Limiting
@@ -91,4 +97,13 @@ pymongo==4.6.0
 pinecone==5.0.0
 supabase==2.17.0
 
-# CORS - handled by FastAPI
+# File Processing
+watchdog>=3.0.0
+PyPDF2>=3.0.0
+chardet==5.2.0
+
+# AI/ML
+anthropic>=0.25.0
+
+# Additional utilities
+packaging>=24.2
