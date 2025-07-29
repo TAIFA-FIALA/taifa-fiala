@@ -260,6 +260,10 @@ if [ "$DOCKER_AVAILABLE" = true ]; then
         # Disable BuildKit to avoid build context issues
         export DOCKER_BUILDKIT=0
         
+        # Bypass Docker credential issues by logging out
+        echo "Logging out of Docker to avoid credential issues..."
+        \$DOCKER_CMD logout 2>/dev/null || true
+        
         # Stop any running containers
         \$DOCKER_COMPOSE_CMD down || true
         
