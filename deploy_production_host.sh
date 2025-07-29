@@ -160,7 +160,7 @@ sleep 15
 info "Testing HTTP endpoints..."
 
 # Test FastAPI backend
-if curl --silent --fail --max-time 10 http://100.75.201.24:8000/health > /dev/null; then
+if curl --silent --fail --max-time 10 http://100.75.201.24:8030/health > /dev/null; then
     success "✓ Backend is healthy and responding"
 else
     warning "⚠ Backend health check failed"
@@ -174,7 +174,7 @@ else
 fi
 
 # Test Next.js frontend
-if curl --silent --fail --max-time 10 http://100.75.201.24:3000 > /dev/null; then
+if curl --silent --fail --max-time 10 http://100.75.201.24:3030 > /dev/null; then
     success "✓ Frontend is responding"
 else
     warning "⚠ Frontend health check failed"
@@ -262,10 +262,10 @@ success "=== Host-Based Deployment Complete ==="
 info "Deployment completed at: $(date)"
 echo
 warning "Services running on:"
-warning "Backend FastAPI: http://100.75.201.24:8000"
+warning "Backend FastAPI: http://100.75.201.24:8030"
 warning "Streamlit Dashboard: http://100.75.201.24:8501"
-warning "API Documentation: http://100.75.201.24:8000/docs"
-warning "Next.js Frontend: http://100.75.201.24:3000"
+warning "API Documentation: http://100.75.201.24:8030/docs"
+warning "Next.js Frontend: http://100.75.201.24:3030"
 echo
 info "Management commands:"
 echo "Restart services: ssh ${PROD_USER}@${PROD_SERVER} 'cd ${PROD_DIR} && ./restart_services_host.sh'"
