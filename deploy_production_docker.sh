@@ -256,6 +256,7 @@ if [ "$DOCKER_AVAILABLE" = true ]; then
         
         # Set Docker paths for macOS compatibility
         export PATH=/usr/local/bin:\$PATH
+        export DOCKER_BUILDKIT=0
         DOCKER_CMD=/usr/local/bin/docker
         DOCKER_COMPOSE_CMD=/usr/local/bin/docker-compose
         
