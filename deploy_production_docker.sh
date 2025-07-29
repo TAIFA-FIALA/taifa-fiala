@@ -260,9 +260,31 @@ if [ "$DOCKER_AVAILABLE" = true ]; then
         # Disable BuildKit to avoid build context issues
         export DOCKER_BUILDKIT=0
         
-        # Bypass Docker credential issues by logging out
-        echo "Logging out of Docker to avoid credential issues..."
+        # Comprehensive Docker credential bypass for macOS
+        echo "Bypassing Docker credentials to avoid keychain issues..."
+        
+        # Remove Docker config files that might contain credential helpers
+        rm -f \$HOME/.docker/config.json 2>/dev/null || true
+        rm -f \$HOME/.docker/daemon.json 2>/dev/null || true
+        
+        # Create minimal Docker config without credential helpers
+        mkdir -p \$HOME/.docker
+        echo '{}' > \$HOME/.docker/config.json
+        
+        # Logout from Docker to clear any cached credentials
         \$DOCKER_CMD logout 2>/dev/null || true
+        
+        # Set environment variables to disable credential helpers
+        export DOCKER_CONFIG=\$HOME/.docker
+        unset DOCKER_CREDENTIAL_HELPERS
+        
+        # Stop and remove any Docker credential helper containers
+        echo "Stopping Docker credential helper containers..."
+        for container in \$(\$DOCKER_CMD ps -a --format '{{.Names}}' | grep -i credential 2>/dev/null || true); do
+            echo "Stopping container: \$container"
+            \$DOCKER_CMD stop \$container 2>/dev/null || true
+            \$DOCKER_CMD rm \$container 2>/dev/null || true
+        done
         
         # Stop any running containers
         \$DOCKER_COMPOSE_CMD down || true

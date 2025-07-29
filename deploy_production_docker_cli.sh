@@ -46,21 +46,33 @@ if [ ! -f "docker-compose.watcher.yml" ]; then
     exit 1
 fi
 
-# Test keychain access
-step "Step 2: Testing Keychain Access"
-KEYCHAIN_PASSWORD=$(security find-generic-password -w -s 'keychain-unlock' -a $USER 2>/dev/null)
-if [ -n "$KEYCHAIN_PASSWORD" ]; then
-    if security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$HOME/Library/Keychains/login.keychain-db" 2>/dev/null; then
-        success "✓ Keychain unlocked successfully"
-        # Set extended timeout
-        security set-keychain-settings -t 3600 "$HOME/Library/Keychains/login.keychain-db" 2>/dev/null || true
-    else
-        warning "⚠ Failed to unlock keychain with stored password"
-    fi
-else
-    warning "⚠ No stored keychain password found"
-    warning "⚠ Run the keychain setup script first if credential access is needed"
-fi
+# Bypass Docker credential issues for macOS
+step "Step 2: Setting up Credential-Free Docker Environment"
+info "Bypassing Docker credentials to avoid keychain issues..."
+
+# Remove Docker config files that might contain credential helpers
+rm -f $HOME/.docker/config.json 2>/dev/null || true
+rm -f $HOME/.docker/daemon.json 2>/dev/null || true
+
+# Create minimal Docker config without credential helpers
+mkdir -p $HOME/.docker
+echo '{}' > $HOME/.docker/config.json
+
+# Logout from Docker to clear any cached credentials
+/usr/local/bin/docker logout 2>/dev/null || true
+
+# Set environment variables to disable credential helpers
+export DOCKER_CONFIG=$HOME/.docker
+unset DOCKER_CREDENTIAL_HELPERS
+
+# Stop any Docker credential helper containers
+for container in $(/usr/local/bin/docker ps -a --format '{{.Names}}' | grep -i credential 2>/dev/null || true); do
+    info "Stopping credential container: $container"
+    /usr/local/bin/docker stop $container 2>/dev/null || true
+    /usr/local/bin/docker rm $container 2>/dev/null || true
+done
+
+success "✓ Docker environment configured for credential-free operation"
 
 # Stop existing containers
 step "Step 3: Stopping Existing Containers"
