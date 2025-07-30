@@ -130,132 +130,177 @@ TAIFA-FIALA Platform Architecture
 
 ### **Project Structure**
 ```
-taifa/
-├── backend/                 # FastAPI application
-├── frontend/               
-│   ├── streamlit_app/      # Primary bilingual interface
-│   └── nextjs_dashboard/   # Enhanced features (planned)
-├── data_collectors/        # Automated data collection
-├── translation_service.py  # AI translation engine
-├── translation_queue_processor.py  # Batch translation
-├── database_multilingual_schema.sql  # DB schema
-├── tests/                  # Test suite
-└── scripts/               # Deployment and utilities
+FastAPI + Python 3.12 + PostgreSQL
+├── Hybrid search engine
+├── Automated data pipeline
+├── RESTful API with OpenAPI docs
+└── Real-time analytics endpoints
 ```
 
-### **API Endpoints**
+### Infrastructure
+```
+Production Deployment
+├── GitHub Actions CI/CD
+├── Cloudflare CDN
+├── Health monitoring
+└── Automated backups
+```
 
-#### **Core Data**
-- `GET /api/v1/funding-opportunities/` - List intelligence feed
-- `GET /api/v1/funding-opportunities/{id}` - Detailed opportunity view
-- `GET /api/v1/organizations/` - Funding organizations directory
+## 🚀 Quick Start
 
-#### **Translation Features**
-- `GET /api/v1/translated-content/{lang}` - Get content in specified language
-- `POST /api/v1/translation-queue/` - Queue content for translation
-- `GET /api/v1/translation-status/` - Translation system status
+### Prerequisites
+- Python 3.12+
+- Node.js 18+
+- PostgreSQL 14+
 
-#### **Analytics**
-- `GET /api/v1/analytics/summary` - Platform statistics
-- `GET /api/v1/analytics/trends` - Funding trend analysis
-- `GET /api/v1/search` - Multilingual search with filters
+### Development Setup
 
-### **Running Tests**
 ```bash
-# Test data collection
-python test_enhanced_collection.py
+# Clone repository
+git clone https://github.com/TAIFA-FIALA/taifa-fiala.git
+cd taifa-fiala
 
-# Test translation pipeline
-python translation_queue_processor.py --mode test
+# Backend setup
+pip install -r requirements.txt
 
-# Test API endpoints
-pytest tests/
+# Frontend setup
+cd frontend/nextjs
+npm install
+cd ../..
 
-# Test database schema
-python apply_multilingual_schema.py
+# Environment configuration
+cp .env.sample .env
+# Edit .env with your configuration
+
+# Start development servers
+./start-dev.sh
 ```
 
-## 🌍 **Deployment**
+### One-Command Deployment
 
-### **Development Environment**
 ```bash
-# Start all services
-docker-compose up -d
-
-# View logs
-docker-compose logs -f
-
-# Stop services
-docker-compose down
+# Deploy to production
+./deploy-latest.sh
 ```
 
-### **Production Deployment**
+## 📊 Data & Analytics
+
+### Current Metrics
+- **50+ RSS Sources**: Major funding organizations
+- **Real-Time Processing**: 50 records every 12 hours
+- **Quality Filtering**: 60%+ relevance threshold
+- **Geographic Focus**: Africa-prioritized scoring
+
+### Gender Equity Insights
+- Live disparity analysis
+- Sector-by-sector breakdowns
+- Historical trend tracking
+- Actionable recommendations
+
+### Search Intelligence
+- **Traditional Search**: Fast PostgreSQL full-text
+- **Vector Enhancement**: Semantic similarity matching
+- **Composite Ranking**: Multi-factor algorithm
+- **Quality Assurance**: Automated relevance scoring
+
+## 🛠️ Development
+
+### Project Structure
+```
+taifa-fiala/
+├── frontend/nextjs/          # Next.js application
+├── backend/                  # FastAPI backend
+├── data_processors/          # Pipeline components
+├── database/                 # Schema and migrations
+├── scripts/                  # Utility scripts
+│   ├── deployment/          # Deployment automation
+│   ├── monitoring/          # Health checks
+│   └── testing/             # Test utilities
+└── docs/                    # Documentation
+```
+
+### Key Commands
+
 ```bash
-# Deploy to production server
-./scripts/deploy_production.sh
+# Development
+npm run dev                   # Start frontend dev server
+python -m uvicorn app.main:app --reload  # Start backend
 
-# Configure domain routing
-# Point DNS: taifa-africa.com, fiala-afrique.com, taifa-fiala.net
+# Production
+./scripts/deployment/deploy_production_host.sh
+./scripts/monitoring/check_services_status.sh
 
-# Start production services
-docker-compose -f docker-compose.prod.yml up -d
+# Testing
+npm run lint                  # Frontend linting
+pytest                        # Backend tests
 ```
 
-## 📈 **Performance Metrics**
+## 🌐 Live Platform
 
-### **Data Collection**
-- **Sources**: 44 active data sources
-- **Update Frequency**: Real-time to 12-hour intervals
-- **Success Rate**: 90%+ across all collection methods
-- **Data Quality**: 95%+ relevance accuracy
+**🔗 [Visit TAIFA-FIALA](https://taifa-fiala.net)**
 
-### **Translation System**
-- **Language Pairs**: English ↔ French (fully operational)
-- **Translation Quality**: 0.89-0.97 confidence scores
-- **Processing Speed**: Real-time for urgent, <2 hours for batch
-- **Content Coverage**: 100% of platform content
+### Key Pages
+- **🏠 Homepage**: Search and platform overview
+- **💰 Funding Landscape**: Comprehensive opportunity browser
+- **🎯 Theory of Change**: Mission and impact framework
+- **📋 Methodology**: Data collection and analysis approach
+- **ℹ️ About**: Team, vision, and contact information
 
-### **Platform Performance**
-- **API Response Time**: <500ms average
-- **Database Queries**: Optimized with indexes and views
-- **Uptime Target**: 99.9% availability
-- **Concurrent Users**: Designed for 1000+ simultaneous users
+## 🤝 Contributing
 
-## 🤝 **Contributing**
+We welcome contributions! Here's how to get involved:
 
-We welcome contributions from the African AI and development communities!
+1. **🍴 Fork** the repository
+2. **🌿 Create** a feature branch (`git checkout -b feature/amazing-feature`)
+3. **💻 Make** your changes
+4. **✅ Test** your changes
+5. **📤 Submit** a pull request
 
-### **How to Contribute**
-1. **Fork the repository**
-2. **Create feature branch**: `git checkout -b feature/your-feature`
-3. **Make changes and test thoroughly**
-4. **Submit pull request** with detailed description
+### Code Standards
+- TypeScript for all frontend components
+- Python type hints for backend code
+- ESLint + Prettier for formatting
+- Comprehensive error handling
+- Clear documentation
 
-### **Contribution Areas**
-- **Data Sources**: Add new funding organization feeds
-- **Translation Quality**: Improve French translations and add new languages
-- **Documentation**: Enhance user guides and API documentation
-- **Testing**: Expand test coverage and edge case handling
-- **UI/UX**: Improve user interface and accessibility
+## 📈 Impact & Metrics
 
-## 📄 **License**
+### Platform Analytics
+- **Search Queries**: Real-time funding discovery
+- **Data Quality**: 60%+ relevance threshold maintained
+- **Geographic Coverage**: Africa-focused with global context
+- **Update Frequency**: 12-hour automated cycles
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+### Research Insights
+- **Gender Disparity**: Quantified funding gaps
+- **Sector Analysis**: AI/ML funding distribution
+- **Trend Identification**: Emerging funding patterns
+- **Policy Recommendations**: Evidence-based advocacy
 
-## 🙏 **Acknowledgments**
+## 📚 Documentation
 
-- **African AI Research Community** for inspiration and requirements
-- **Open Source Contributors** who made this platform possible
-- **Funding Organizations** who provide the data that powers this platform
-- **Translation Service Providers** enabling multilingual accessibility
+- 📖 [API Documentation](./docs/api/) - Complete API reference
+- 🚀 [Deployment Guide](./DEPLOYMENT_GUIDE.md) - Production setup
+- ⚙️ [CI/CD Setup](./CICD_SETUP.md) - Automation configuration
+- 🗄️ [Database Schema](./SCHEMA.md) - Data structure reference
 
-## 📞 **Contact & Support**
+## 📄 License
 
-- **Website**: [taifa-fiala.net](https://taifa-fiala.net)
-- **English**: [taifa-africa.com](https://taifa-africa.com)  
-- **Français**: [fiala-afrique.com](https://fiala-afrique.com)
-- **GitHub Issues**: [Report bugs and feature requests](https://github.com/drjforrest/taifa/issues)
-- **API Documentation**: [docs.taifa-fiala.net](https://docs.taifa-fiala.net)
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+
+## 👥 Team
+
+**H Ruton & J Forrest** - *TAIFA-FIALA Founders*
+
+Building transparency, equity, and accountability in African AI funding through open data and evidence-based analysis.
+
+## 🙏 Acknowledgments
+
+- 🌍 African AI research community
+- 💻 Open source contributors
+- 🏛️ Funding organizations providing transparent data
+- 👥 Users providing feedback and insights
+- 🤝 Partners supporting our mission
 
 ---
 
