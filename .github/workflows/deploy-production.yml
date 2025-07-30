@@ -43,9 +43,9 @@ jobs:
     - name: Deploy to production server
       uses: appleboy/ssh-action@v1.0.3
       with:
-        host: ${{ secrets.PROD_HOST }}
-        username: ${{ secrets.PROD_USER }}
-        key: ${{ secrets.PROD_SSH_KEY }}
+        host: ${{ secrets.PRODUCTION_HOST }}
+        username: ${{ secrets.PRODUCTION_USER }}
+        key: ${{ secrets.PRODUCTION_SSH_KEY }}
         script: |
           # Navigate to production directory
           cd /Users/jforrest/production/TAIFA-FIALA
@@ -53,14 +53,14 @@ jobs:
           # Pull latest changes
           git pull origin main
           
-          # Stop services
-          ./stop_services_host.sh || true
+          # Stop existing services
+          pkill -f "uvicorn.*main:app" || true
+          pkill -f "npm.*start" || true
+          pkill -f "next.*start" || true
+          sleep 5
           
-          # Install/update backend dependencies
-          cd backend
-          source venv/bin/activate || python3 -m venv venv && source venv/bin/activate
-          pip install -r requirements.txt
-          cd ..
+          # Install/update Python dependencies
+          /usr/local/bin/python3.12 -m pip install -r requirements.txt
           
           # Install/update frontend dependencies and build
           cd frontend/nextjs
@@ -68,11 +68,20 @@ jobs:
           npm run build
           cd ../..
           
-          # Restart all services
-          ./restart_services_host.sh
+          # Start backend service
+          cd backend
+          nohup /usr/local/bin/python3.12 -m uvicorn app.main:app --host 0.0.0.0 --port 8030 > ../logs/backend.log 2>&1 &
+          cd ..
+          
+          # Start frontend service
+          cd frontend/nextjs
+          nohup npm start > ../../logs/frontend.log 2>&1 &
+          cd ../..
+          
+          # Wait for services to start
+          sleep 15
           
           # Verify deployment
-          sleep 10
           curl -f http://localhost:8030/health || exit 1
           curl -f http://localhost:3030 || exit 1
           
