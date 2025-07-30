@@ -1,0 +1,89 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:  # Allow manual triggering
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: frontend/nextjs/package-lock.json
+        
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'
+        
+    - name: Install frontend dependencies
+      run: |
+        cd frontend/nextjs
+        npm ci
+        
+    - name: Build frontend
+      run: |
+        cd frontend/nextjs
+        npm run build
+        
+    - name: Run tests (if any)
+      run: |
+        cd frontend/nextjs
+        npm run lint
+        
+    - name: Deploy to production server
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.PROD_HOST }}
+        username: ${{ secrets.PROD_USER }}
+        key: ${{ secrets.PROD_SSH_KEY }}
+        script: |
+          # Navigate to production directory
+          cd /Users/jforrest/production/TAIFA-FIALA
+          
+          # Pull latest changes
+          git pull origin main
+          
+          # Stop services
+          ./stop_services_host.sh || true
+          
+          # Install/update backend dependencies
+          cd backend
+          source venv/bin/activate || python3 -m venv venv && source venv/bin/activate
+          pip install -r requirements.txt
+          cd ..
+          
+          # Install/update frontend dependencies and build
+          cd frontend/nextjs
+          npm install
+          npm run build
+          cd ../..
+          
+          # Restart all services
+          ./restart_services_host.sh
+          
+          # Verify deployment
+          sleep 10
+          curl -f http://localhost:8030/health || exit 1
+          curl -f http://localhost:3030 || exit 1
+          
+          echo "✅ Deployment successful!"
+          
+    - name: Notify deployment status
+      if: always()
+      run: |
+        if [ "${{ job.status }}" == "success" ]; then
+          echo "🎉 Production deployment successful!"
+          echo "Site: https://taifa-fiala.net"
+        else
+          echo "❌ Production deployment failed!"
+        fi
