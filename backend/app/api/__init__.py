@@ -5,6 +5,7 @@ from app.api.endpoints import (
     user_submissions, admin_scraping, automated_discovery, equity_analyses, stakeholder_reports, data_ingestion,
     etl_monitoring, notifications, balance_monitoring, intelligent_search
 )
+from api import events
 from app.core.database import get_db 
 
 # Create main API router
@@ -127,4 +128,10 @@ api_router.include_router(
 api_router.include_router(
     balance_monitoring.router,
     tags=["balance-monitoring"]
+)
+
+# Server-Sent Events for real-time updates
+api_router.include_router(
+    events.router,
+    tags=["events"]
 )
