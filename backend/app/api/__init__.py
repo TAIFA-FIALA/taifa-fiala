@@ -5,6 +5,7 @@ from app.api.endpoints import (
     user_submissions, admin_scraping, automated_discovery, equity_analyses, stakeholder_reports, data_ingestion,
     etl_monitoring, notifications, balance_monitoring, intelligent_search
 )
+# Import events router
 from api import events
 from app.core.database import get_db 
 

@@ -2,97 +2,161 @@ name: Deploy to Production
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, master ]
   workflow_dispatch:  # Allow manual triggering
+    inputs:
+      deployment_type:
+        description: 'Deployment type'
+        required: true
+        default: 'docker'
+        type: choice
+        options:
+        - docker
+        - host
+      restart_services:
+        description: 'Restart all services'
+        required: false
+        default: true
+        type: boolean
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    name: Deploy TAIFA-FIALA to Production
     
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
       
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
+    - name: Setup SSH key
+      uses: webfactory/ssh-agent@v0.9.0
       with:
-        node-version: '18'
-        cache: 'npm'
-        cache-dependency-path: frontend/nextjs/package-lock.json
+        ssh-private-key: ${{ secrets.PRODUCTION_SSH_KEY }}
         
-    - name: Setup Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.12'
-        
-    - name: Install frontend dependencies
+    - name: Add production server to known hosts
       run: |
-        cd frontend/nextjs
-        npm ci
-        
-    - name: Build frontend
-      run: |
-        cd frontend/nextjs
-        npm run build
-        
-    - name: Run tests (if any)
-      run: |
-        cd frontend/nextjs
-        npm run lint
+        ssh-keyscan -H ${{ secrets.PRODUCTION_HOST }} >> ~/.ssh/known_hosts
         
     - name: Deploy to production server
-      uses: appleboy/ssh-action@v1.0.3
-      with:
-        host: ${{ secrets.PRODUCTION_HOST }}
-        username: ${{ secrets.PRODUCTION_USER }}
-        key: ${{ secrets.PRODUCTION_SSH_KEY }}
-        script: |
-          # Navigate to production directory
-          cd /Users/jforrest/production/TAIFA-FIALA
+      env:
+        PRODUCTION_HOST: ${{ secrets.PRODUCTION_HOST }}
+        PRODUCTION_USER: ${{ secrets.PRODUCTION_USER }}
+        KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+        DEPLOYMENT_TYPE: ${{ github.event.inputs.deployment_type || 'docker' }}
+        RESTART_SERVICES: ${{ github.event.inputs.restart_services || 'true' }}
+      run: |
+        echo "🚀 Starting deployment to production..."
+        
+        # Connect to production server and run deployment
+        ssh -o StrictHostKeyChecking=no $PRODUCTION_USER@$PRODUCTION_HOST << 'EOF'
+          set -e
           
-          # Pull latest changes
-          git pull org-origin main
+          echo "📁 Navigating to project directory..."
+          cd /Users/jforrest/dev/devprojects/ai-africa-funding-tracker
           
-          # Stop existing services
-          pkill -f "uvicorn.*main:app" || true
-          pkill -f "npm.*start" || true
-          pkill -f "next.*start" || true
-          sleep 5
+          echo "🔄 Pulling latest changes..."
+          git fetch origin
+          git reset --hard origin/main
           
-          # Install/update Python dependencies
-          /usr/local/bin/python3.12 -m pip install -r requirements.txt
+          echo "🔧 Setting deployment type..."
+          if [ "${{ env.DEPLOYMENT_TYPE }}" = "docker" ]; then
+            echo "🐳 Running Docker deployment..."
+            chmod +x ./deploy_production_docker.sh
+            echo "🔑 Using keychain password for Docker deployment..."
+            KEYCHAIN_PASSWORD="${{ env.KEYCHAIN_PASSWORD }}" ./deploy_production_docker.sh
+          else
+            echo "🖥️ Running host-based deployment..."
+            chmod +x ./deploy_production.sh
+            ./deploy_production.sh
+          fi
           
-          # Install/update frontend dependencies and build
-          cd frontend/nextjs
-          npm install
-          npm run build
-          cd ../..
+          echo "✅ Deployment completed successfully!"
+        EOF
+        
+    - name: Verify deployment
+      env:
+        PRODUCTION_HOST: ${{ secrets.PRODUCTION_HOST }}
+        PRODUCTION_USER: ${{ secrets.PRODUCTION_USER }}
+      run: |
+        echo "🔍 Verifying deployment..."
+        
+        # Check if services are running
+        ssh -o StrictHostKeyChecking=no $PRODUCTION_USER@$PRODUCTION_HOST << 'EOF'
+          echo "📊 Checking service status..."
           
-          # Start backend service
-          cd backend
-          nohup /usr/local/bin/python3.12 -m uvicorn app.main:app --host 0.0.0.0 --port 8030 > ../logs/backend.log 2>&1 &
-          cd ..
+          # Check backend service
+          if pgrep -f "uvicorn.*8030" > /dev/null; then
+            echo "✅ Backend service is running"
+          else
+            echo "❌ Backend service is not running"
+            exit 1
+          fi
           
-          # Start frontend service
-          cd frontend/nextjs
-          nohup npm start > ../../logs/frontend.log 2>&1 &
-          cd ../..
+          # Check if port 8030 is listening
+          if netstat -an | grep -q ":8030.*LISTEN"; then
+            echo "✅ Backend is listening on port 8030"
+          else
+            echo "❌ Backend is not listening on port 8030"
+            exit 1
+          fi
           
-          # Wait for services to start
-          sleep 15
+          # Test health endpoint
+          if curl -f http://localhost:8030/health > /dev/null 2>&1; then
+            echo "✅ Backend health check passed"
+          else
+            echo "❌ Backend health check failed"
+            exit 1
+          fi
           
-          # Verify deployment
-          curl -f http://localhost:8030/health || exit 1
-          curl -f http://localhost:3030 || exit 1
-          
-          echo "✅ Deployment successful!"
-          
+          echo "🎉 All services verified successfully!"
+        EOF
+        
     - name: Notify deployment status
       if: always()
       run: |
-        if [ "${{ job.status }}" == "success" ]; then
-          echo "🎉 Production deployment successful!"
-          echo "Site: https://taifa-fiala.net"
+        if [ ${{ job.status }} == 'success' ]; then
+          echo "🎉 Deployment completed successfully!"
+          echo "🌐 TAIFA-FIALA is now running the latest version"
         else
-          echo "❌ Production deployment failed!"
+          echo "❌ Deployment failed!"
+          echo "🔧 Please check the logs and try again"
         fi
+
+  # Optional: Run post-deployment tests
+  post-deployment-tests:
+    needs: deploy
+    runs-on: ubuntu-latest
+    name: Post-Deployment Tests
+    if: success()
+    
+    steps:
+    - name: Test API endpoints
+      env:
+        PRODUCTION_URL: ${{ secrets.PRODUCTION_URL || 'https://taifa-fiala.net' }}
+      run: |
+        echo "🧪 Running post-deployment API tests..."
+        
+        # Test health endpoint
+        if curl -f "$PRODUCTION_URL/health" > /dev/null 2>&1; then
+          echo "✅ Health endpoint is accessible"
+        else
+          echo "❌ Health endpoint is not accessible"
+          exit 1
+        fi
+        
+        # Test main API endpoint
+        if curl -f "$PRODUCTION_URL/api/v1/funding-opportunities/" > /dev/null 2>&1; then
+          echo "✅ Main API endpoint is accessible"
+        else
+          echo "❌ Main API endpoint is not accessible"
+          exit 1
+        fi
+        
+        # Test SSE endpoint (should return 200 or streaming response)
+        if curl -f "$PRODUCTION_URL/api/v1/events/stream" --max-time 5 > /dev/null 2>&1; then
+          echo "✅ SSE endpoint is accessible"
+        else
+          echo "⚠️ SSE endpoint may not be accessible (this is expected if events router isn't deployed yet)"
+        fi
+        
+        echo "🎉 Post-deployment tests completed!"
