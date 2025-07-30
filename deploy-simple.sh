@@ -15,6 +15,15 @@ cd /Users/jforrest/production/TAIFA-FIALA
 # Set up pyenv environment
 export PATH="$HOME/.pyenv/shims:$PATH"
 
+# Set up Node.js/nvm environment
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+# Use specific Node.js version or fallback to available version
+nvm use v20.19.0 2>/dev/null || nvm use node || echo "⚠️ nvm not available, using system node"
+# Add npm to PATH explicitly
+export PATH="$HOME/.nvm/versions/node/v20.19.0/bin:$PATH"
+
 # Stop existing services
 pkill -f "uvicorn\|npm.*start\|next.*start" || true
 sleep 5
