@@ -1,185 +1,119 @@
-# TAIFA-FIALA: AI Funding Tracker for Africa
-*Financement pour l'Intelligence Artificielle en Afrique*
+# TAIFA-FIALA: Tracking AI Funding in Africa
+# TAIFA-FIALA : Suivi des Financements IA en Afrique
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-13+-blue.svg)](https://www.postgresql.org/)
+<div align="center">
+
+![TAIFA-FIALA Logo](https://taifa-fiala.net/logo.png)
+
+**Promoting transparency, equity, and accountability in African AI funding**  
+**Promouvoir la transparence, l'équité et la responsabilité dans le financement de l'IA africaine**
+
+[![Live Site](https://img.shields.io/badge/Live%20Site-taifa--fiala.net-blue)](https://taifa-fiala.net)
+[![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-green)](https://github.com/TAIFA-FIALA/taifa-fiala/actions)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+[🇬🇧 English](#english) | [🇫🇷 Français](#français)
+
+</div>
 
 ## 🌍 **Mission**
 
+**English:**  
 TAIFA-FIALA is the comprehensive bilingual platform for tracking funds for artificial intelligence across Africa. We aim to democratize access to funding information by breaking down language barriers and centralizing data and communications on funding announcements and their projects from hundreds of sources into one reliable, searchable platform.
 
-**English**: Tracking AI Funding for Africa  
-**Français**: Financement pour l'Intelligence Artificielle en Afrique
+**Français:**  
+TAIFA-FIALA est la plateforme bilingue complète pour suivre les fonds pour l'intelligence artificielle à travers l'Afrique. Nous visons à démocratiser l'accès à l'information sur le financement en brisant les barrières linguistiques et en centralisant les données et les communications sur les annonces de financement et leurs projets de centaines de sources dans une plateforme fiable et recherchable.
 
 ## ✨ **Key Features**
 
-### 🔍 **Comprehensive Data Collection**
-- **44 Active Sources**: RSS feeds, web scraping, search APIs
-- **Real-time Updates**: Automated monitoring with intelligent scheduling
-- **Quality Assurance**: Deduplication, relevance scoring, content validation
-- **Geographic Coverage**: All African countries + international sources
+### 🔎 Intelligent Search | Recherche Intelligente
+- Hybrid traditional + vector search architecture | Architecture de recherche hybride traditionnelle + vectorielle
+- Real-time funding opportunity discovery | Découverte d'opportunités de financement en temps réel
+- Quality-filtered results (relevance score ≥0.6) | Résultats filtrés par qualité (score de pertinence ≥0.6)
+- Semantic search for complex queries | Recherche sémantique pour requêtes complexes
 
-### 🌐 **Bilingual Platform**
-- **English ↔ French**: Full interface and content translation
-- **Intelligent Translation**: Multi-provider AI translation with quality scoring
-- **Cultural Adaptation**: Localized formatting for dates, currencies, terminology
-- **Domain Strategy**: taifa-africa.com (EN) | fiala-afrique.com (FR) | taifa-fiala.net (bilingual)
+### 📈 Real-Time Analytics | Analyses en Temps Réel
+- **Gender Equity Analysis | Analyse de l'Équité de Genre**: Live disparity metrics and trends | Métriques et tendances des disparités en direct
+- **Geographic Distribution | Distribution Géographique**: African-focused opportunity mapping | Cartographie des opportunités axée sur l'Afrique
+- **Funding Intelligence | Intelligence de Financement**: Active vs. allocated funding distinction | Distinction entre financement actif et alloué
+- **Sector Insights | Aperçus Sectoriels**: AI/ML, FinTech, HealthTech, AgriTech breakdowns | Répartitions IA/ML, FinTech, HealthTech, AgriTech
 
-### 📊 **Advanced Search & Analytics**
-- **Multilingual Search**: Query in English or French across all content
-- **Smart Filtering**: By amount, deadline, sector, organization, geography
-- **Trend Analysis**: Funding patterns, geographic distribution, sector insights
-- **Export Capabilities**: CSV/JSON for research and reporting
+### 🤖 Automated Data Pipeline | Pipeline de Données Automatisé
+- **Stage 1 | Étape 1**: RSS collection from 50+ funding sources | Collecte RSS de 50+ sources de financement
+- **Stage 2 | Étape 2**: Crawl4AI enrichment for precise details | Enrichissement Crawl4AI pour détails précis
+- **Stage 3 | Étape 3**: Serper search enhancement and validation | Amélioration et validation de recherche Serper
+- **Quality Scoring | Notation Qualité**: Objective 4-dimension relevance assessment | Évaluation objective de pertinence à 4 dimensions
 
-### 🛡️ **Enterprise-Grade Infrastructure**
-- **PostgreSQL Database**: Robust data storage with translation infrastructure
-- **FastAPI Backend**: High-performance REST API with comprehensive endpoints
-- **Docker Deployment**: Containerized services for development and production
-- **Health Monitoring**: Real-time status tracking and error recovery
+### 🎯 Actionable Insights | Informations Exploitables
+- Application deadline tracking | Suivi des dates limites de candidature
+- Funding stage analysis | Analyse des étapes de financement
+- Eligibility criteria extraction | Extraction des critères d'éligibilité
+- Contact information and application URLs | Informations de contact et URLs de candidature
 
-## 🚀 **Quick Start**
+## 🏗️ Technical Architecture | Architecture Technique
 
-### **Prerequisites**
+### Frontend Stack | Pile Frontend
+```
+Next.js 15 + TypeScript + Tailwind CSS v4
+├── Real-time search modal | Modal de recherche en temps réel
+├── Custom TAIFA theme system | Système de thème TAIFA personnalisé
+├── Responsive analytics dashboards | Tableaux de bord analytiques adaptatifs
+└── Progressive enhancement | Amélioration progressive
+```
+
+### Backend Stack | Pile Backend
+```
+FastAPI + Python 3.12 + PostgreSQL
+├── Hybrid search engine | Moteur de recherche hybride
+├── Automated data pipeline | Pipeline de données automatisé
+├── RESTful API with OpenAPI docs | API RESTful avec docs OpenAPI
+└── Real-time analytics endpoints | Points de terminaison analytiques temps réel
+```
+
+### Infrastructure | Infrastructure
+```
+Production Deployment | Déploiement Production
+├── GitHub Actions CI/CD | CI/CD GitHub Actions
+├── Cloudflare CDN | CDN Cloudflare
+├── Health monitoring | Surveillance de santé
+└── Automated backups | Sauvegardes automatisées
+```
+
+## 🚀 Quick Start | Démarrage Rapide
+
+### Prerequisites | Prérequis
 - Docker & Docker Compose
-- Python 3.11+
+- Python 3.12+
 - Access to PostgreSQL database
 - (Optional) Translation API keys for enhanced features
 
-### **Installation**
+### Development Setup | Configuration de Développement
 
 ```bash
-# Clone the repository
-git clone https://github.com/drjforrest/taifa.git
-cd taifa
-
-# Copy environment template
-cp .env.example .env
-# Edit .env with your database credentials
-
-# Initialize database schema
-python apply_multilingual_schema.py
-
-# Test data collection system
-python test_enhanced_collection.py
-
-# Start the platform
-docker-compose up -d
-```
-
-### **Access Points**
-- **Streamlit Dashboard**: http://localhost:8501
-- **API Documentation**: http://localhost:8000/docs
-- **Health Check**: http://localhost:8000/health
-
-## 🏗️ **Architecture Overview**
-
-```
-TAIFA-FIALA Platform Architecture
-├── Data Collection Layer
-│   ├── RSS Monitors (16 sources)
-│   ├── Web Scrapers (6 major orgs)
-│   └── Search APIs (22 query patterns)
-├── Processing Layer
-│   ├── Content Classification
-│   ├── Translation Pipeline
-│   └── Quality Validation
-├── Storage Layer
-│   ├── PostgreSQL Database
-│   ├── Translation Tables
-│   └── Queue Management
-├── API Layer
-│   ├── FastAPI Backend
-│   ├── REST Endpoints
-│   └── Webhook Support
-└── Frontend Layer
-    ├── Streamlit Dashboard (Bilingual)
-    ├── Next.js Enhancement (Planned)
-    └── Mobile PWA (Roadmap)
-```
-
-## 📊 **Data Sources**
-
-### **Multilateral Organizations**
-- World Bank Digital Development
-- African Development Bank
-- United Nations Development Programme
-- European Commission Horizon Europe
-
-### **Research Institutions**
-- International Development Research Centre (IDRC)
-- Science for Africa Foundation
-- MIT Technology Review
-- Nature Technology
-
-### **Government Sources**
-- USAID Opportunities
-- National Science Foundation
-- European Research Council
-- African Union Development Agency
-
-### **Private Sector**
-- Google AI for Good
-- Microsoft AI for Good
-- Gates Foundation
-- TechCrunch Startup News
-
-*Full list of 44 sources available in system documentation*
-
-## 🛠️ **Development**
-
-### **Project Structure**
-```
-FastAPI + Python 3.12 + PostgreSQL
-├── Hybrid search engine
-├── Automated data pipeline
-├── RESTful API with OpenAPI docs
-└── Real-time analytics endpoints
-```
-
-### Infrastructure
-```
-Production Deployment
-├── GitHub Actions CI/CD
-├── Cloudflare CDN
-├── Health monitoring
-└── Automated backups
-```
-
-## 🚀 Quick Start
-
-### Prerequisites
-- Python 3.12+
-- Node.js 18+
-- PostgreSQL 14+
-
-### Development Setup
-
-```bash
-# Clone repository
+# Clone repository | Cloner le dépôt
 git clone https://github.com/TAIFA-FIALA/taifa-fiala.git
 cd taifa-fiala
 
-# Backend setup
+# Backend setup | Configuration backend
 pip install -r requirements.txt
 
-# Frontend setup
+# Frontend setup | Configuration frontend
 cd frontend/nextjs
 npm install
 cd ../..
 
-# Environment configuration
+# Environment configuration | Configuration environnement
 cp .env.sample .env
-# Edit .env with your configuration
+# Edit .env with your configuration | Modifier .env avec votre configuration
 
-# Start development servers
+# Start development servers | Démarrer les serveurs de développement
 ./start-dev.sh
 ```
 
-### One-Command Deployment
+### One-Command Deployment | Déploiement en Une Commande
 
 ```bash
-# Deploy to production
+# Deploy to production | Déployer en production
 ./deploy-latest.sh
 ```
 
@@ -235,33 +169,34 @@ npm run lint                  # Frontend linting
 pytest                        # Backend tests
 ```
 
-## 🌐 Live Platform
+## 🌐 Live Platform | Plateforme En Direct
 
-**🔗 [Visit TAIFA-FIALA](https://taifa-fiala.net)**
+**🔗 [Visit TAIFA-FIALA | Visitez TAIFA-FIALA](https://taifa-fiala.net)**
 
-### Key Pages
-- **🏠 Homepage**: Search and platform overview
-- **💰 Funding Landscape**: Comprehensive opportunity browser
-- **🎯 Theory of Change**: Mission and impact framework
-- **📋 Methodology**: Data collection and analysis approach
-- **ℹ️ About**: Team, vision, and contact information
+### Key Pages | Pages Principales
+- **🏠 Homepage | Accueil**: Search and platform overview | Recherche et aperçu de la plateforme
+- **💰 Funding Landscape | Paysage de Financement**: Comprehensive opportunity browser | Navigateur d'opportunités complet
+- **🎯 Theory of Change | Théorie du Changement**: Mission and impact framework | Mission et cadre d'impact
+- **📋 Methodology | Méthodologie**: Data collection and analysis approach | Approche de collecte et d'analyse des données
+- **ℹ️ About | À Propos**: Team, vision, and contact information | Équipe, vision et informations de contact
 
-## 🤝 Contributing
+## 🤝 Contributing | Contribuer
 
-We welcome contributions! Here's how to get involved:
+**English:** We welcome contributions! Here's how to get involved:  
+**Français:** Nous accueillons les contributions ! Voici comment vous impliquer :
 
-1. **🍴 Fork** the repository
-2. **🌿 Create** a feature branch (`git checkout -b feature/amazing-feature`)
-3. **💻 Make** your changes
-4. **✅ Test** your changes
-5. **📤 Submit** a pull request
+1. **🍴 Fork | Bifurquer** the repository | le dépôt
+2. **🌿 Create | Créer** a feature branch | une branche de fonctionnalité (`git checkout -b feature/amazing-feature`)
+3. **💻 Make | Effectuer** your changes | vos modifications
+4. **✅ Test | Tester** your changes | vos modifications
+5. **📤 Submit | Soumettre** a pull request | une demande de tirage
 
-### Code Standards
-- TypeScript for all frontend components
-- Python type hints for backend code
-- ESLint + Prettier for formatting
-- Comprehensive error handling
-- Clear documentation
+### Code Standards | Normes de Code
+- TypeScript for all frontend components | TypeScript pour tous les composants frontend
+- Python type hints for backend code | Annotations de type Python pour le code backend
+- ESLint + Prettier for formatting | ESLint + Prettier pour le formatage
+- Comprehensive error handling | Gestion d'erreurs complète
+- Clear documentation | Documentation claire
 
 ## 📈 Impact & Metrics
 
@@ -288,22 +223,8 @@ We welcome contributions! Here's how to get involved:
 
 This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
 
-## 👥 Team
+## 👥 Team | Équipe
 
-**H Ruton & J Forrest** - *TAIFA-FIALA Founders*
-
-Building transparency, equity, and accountability in African AI funding through open data and evidence-based analysis.
-
-## 🙏 Acknowledgments
-
-- 🌍 African AI research community
-- 💻 Open source contributors
-- 🏛️ Funding organizations providing transparent data
-- 👥 Users providing feedback and insights
-- 🤝 Partners supporting our mission
-
----
-
-**Supporting AI development across Africa through better funding access** 🌟
+**H Ruton & J Forrest** - *TAIFA-FIALA Founders | Fondateurs TAIFA-FIALA*
 
 *Building bridges between Anglophone and Francophone African AI communities*
