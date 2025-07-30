@@ -1,0 +1,84 @@
+name: Blog Post Automation
+
+on:
+  push:
+    branches: [ main, master ]
+    paths:
+      - 'frontend/nextjs/src/content/blog/**'
+  pull_request:
+    branches: [ main, master ]
+    paths:
+      - 'frontend/nextjs/src/content/blog/**'
+
+jobs:
+  validate-blog-posts:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: 'frontend/nextjs/package-lock.json'
+        
+    - name: Install dependencies
+      run: |
+        cd frontend/nextjs
+        npm ci
+        
+    - name: Validate MDX files
+      run: |
+        cd frontend/nextjs
+        npm run validate-blog
+        
+    - name: Build application
+      run: |
+        cd frontend/nextjs
+        npm run build
+        
+    - name: Generate blog post summary
+      run: |
+        cd frontend/nextjs
+        npm run blog-summary
+        
+  deploy-blog-updates:
+    needs: validate-blog-posts
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: 'frontend/nextjs/package-lock.json'
+        
+    - name: Install dependencies
+      run: |
+        cd frontend/nextjs
+        npm ci
+        
+    - name: Build application
+      run: |
+        cd frontend/nextjs
+        npm run build
+        
+    - name: Deploy to production
+      run: |
+        echo "Deploy step - integrate with your deployment pipeline"
+        # Add your deployment commands here
+        # Example: npm run deploy or docker build/push commands
+        
+    - name: Notify team of new blog post
+      if: contains(github.event.head_commit.message, 'Add blog post:')
+      run: |
+        echo "New blog post detected in commit: ${{ github.event.head_commit.message }}"
+        # Add notification logic here (Slack, email, etc.)

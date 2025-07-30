@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Search, Filter, MapPin, Globe, Users, TrendingUp } from 'lucide-react';
 import { getApiUrl, API_ENDPOINTS } from '@/lib/api-config';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Scrollbar, A11y } from 'swiper/modules';

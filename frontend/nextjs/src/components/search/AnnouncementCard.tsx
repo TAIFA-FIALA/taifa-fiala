@@ -152,9 +152,9 @@ export default function AnnouncementCard({ announcement, searchMode }: Announcem
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           {/* Funding Amount */}
           <div className="flex items-center space-x-2">
-            <DollarSign className="w-5 h-5 text-green-600" />
+            <DollarSign className="w-5 h-5 text-slate-600" />
             <div>
-              <div className="text-lg font-semibold text-green-600">
+              <div className="text-lg font-semibold text-slate-700">
                 {getFundingAmountDisplay()}
               </div>
               {announcement.funding_type?.requires_equity && (
@@ -170,7 +170,7 @@ export default function AnnouncementCard({ announcement, searchMode }: Announcem
           {/* Deadline */}
           {announcement.deadline && (
             <div className="flex items-center space-x-2">
-              <Calendar className="w-5 h-5 text-blue-600" />
+              <Calendar className="w-5 h-5 text-slate-600" />
               <div>
                 <div className="text-sm font-medium text-gray-900">
                   {formatDate(announcement.deadline)}
@@ -184,7 +184,7 @@ export default function AnnouncementCard({ announcement, searchMode }: Announcem
         {/* Organization */}
         {announcement.provider_organization && (
           <div className="flex items-center space-x-2 mb-4">
-            <Building className="w-5 h-5 text-purple-600" />
+            <Building className="w-5 h-5 text-slate-600" />
             <div>
               <div className="text-sm font-medium text-gray-900">
                 {announcement.provider_organization.name}
@@ -208,14 +208,14 @@ export default function AnnouncementCard({ announcement, searchMode }: Announcem
         <div className="flex flex-wrap gap-2 mb-4">
           {/* AI Domains */}
           {announcement.ai_domains?.slice(0, 3).map((domain) => (
-            <span key={domain.id} className="px-2 py-1 bg-indigo-100 text-indigo-800 rounded-full text-xs">
+            <span key={domain.id} className="px-2 py-1 bg-slate-200 text-slate-800 rounded-full text-xs">
               {domain.name}
             </span>
           ))}
           
           {/* Geographic Scope */}
           {announcement.geographic_scope_names?.slice(0, 2).map((scope) => (
-            <span key={scope} className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs flex items-center space-x-1">
+            <span key={scope} className="px-2 py-1 bg-slate-100 text-slate-700 rounded-full text-xs flex items-center space-x-1">
               <Globe className="w-3 h-3" />
               <span>{scope}</span>
             </span>
@@ -223,7 +223,7 @@ export default function AnnouncementCard({ announcement, searchMode }: Announcem
           
           {/* Inclusion Indicators */}
           {announcement.inclusion_indicators?.slice(0, 2).map((indicator) => (
-            <span key={indicator} className="px-2 py-1 bg-pink-100 text-pink-800 rounded-full text-xs flex items-center space-x-1">
+            <span key={indicator} className="px-2 py-1 bg-slate-100 text-slate-800 rounded-full text-xs flex items-center space-x-1">
               <Users className="w-3 h-3" />
               <span>{indicator}</span>
             </span>
@@ -233,28 +233,28 @@ export default function AnnouncementCard({ announcement, searchMode }: Announcem
         {/* Equity Focus Indicators */}
         {(announcement.underserved_focus || announcement.women_focus || announcement.youth_focus || announcement.rural_focus) && (
           <div className="flex items-center space-x-3 mb-4">
-            <Shield className="w-4 h-4 text-blue-600" />
+            <Shield className="w-4 h-4 text-slate-600" />
             <div className="flex space-x-2">
               {announcement.underserved_focus && (
-                <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded flex items-center space-x-1">
+                <span className="text-xs bg-slate-200 text-slate-800 px-2 py-1 rounded flex items-center space-x-1">
                   <Globe className="w-3 h-3" />
                   <span>Underserved Focus</span>
                 </span>
               )}
               {announcement.women_focus && (
-                <span className="text-xs bg-pink-100 text-pink-800 px-2 py-1 rounded flex items-center space-x-1">
+                <span className="text-xs bg-slate-200 text-slate-800 px-2 py-1 rounded flex items-center space-x-1">
                   <UserCheck className="w-3 h-3" />
                   <span>Women-Led</span>
                 </span>
               )}
               {announcement.youth_focus && (
-                <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded flex items-center space-x-1">
+                <span className="text-xs bg-slate-100 text-slate-700 px-2 py-1 rounded flex items-center space-x-1">
                   <GraduationCap className="w-3 h-3" />
                   <span>Youth-Focused</span>
                 </span>
               )}
               { announcement.rural_focus && (
-                <span className="text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded flex items-center space-x-1">
+                <span className="text-xs bg-amber-100 text-amber-800 px-2 py-1 rounded flex items-center space-x-1">
                   <Home className="w-3 h-3" />
                   <span>Rural</span>
                 </span>
@@ -370,7 +370,7 @@ export default function AnnouncementCard({ announcement, searchMode }: Announcem
                   </h4>
                   <div className="flex flex-wrap gap-2">
                     {announcement.ai_domains.map((domain) => (
-                      <span key={domain.id} className="px-2 py-1 bg-indigo-100 text-indigo-800 rounded-full text-xs">
+                      <span key={domain.id} className="px-2 py-1 bg-slate-200 text-slate-800 rounded-full text-xs">
                         {domain.name}
                       </span>
                     ))}
@@ -387,7 +387,7 @@ export default function AnnouncementCard({ announcement, searchMode }: Announcem
                   </h4>
                   <div className="flex flex-wrap gap-2">
                     {announcement.geographic_scope_names.map((scope) => (
-                      <span key={scope} className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
+                      <span key={scope} className="px-2 py-1 bg-slate-100 text-slate-700 rounded-full text-xs">
                         {scope}
                       </span>
                     ))}
@@ -399,12 +399,12 @@ export default function AnnouncementCard({ announcement, searchMode }: Announcem
               {announcement.bias_flags && announcement.bias_flags.length > 0 && (
                 <div>
                   <h4 className="font-semibold text-gray-900 mb-2 flex items-center space-x-2">
-                    <AlertCircle className="w-4 h-4 text-yellow-600" />
+                    <AlertCircle className="w-4 h-4 text-amber-600" />
                     <span>Bias Analysis</span>
                   </h4>
                   <div className="space-y-1">
                     {announcement.bias_flags.map((flag: string, index: number) => (
-                      <div key={index} className="text-xs text-yellow-700 bg-yellow-50 px-2 py-1 rounded">
+                      <div key={index} className="text-xs text-amber-700 bg-amber-50 px-2 py-1 rounded">
                         {flag}
                       </div>
                     ))}
@@ -440,7 +440,7 @@ export default function AnnouncementCard({ announcement, searchMode }: Announcem
           <div className="flex items-center space-x-4">
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className="flex items-center space-x-2 text-blue-600 hover:text-blue-800 text-sm font-medium"
+              className="flex items-center space-x-2 text-slate-600 hover:text-slate-800 text-sm font-medium"
             >
               {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
               <span>{isExpanded ? 'Less Details' : 'More Details'}</span>
@@ -449,7 +449,7 @@ export default function AnnouncementCard({ announcement, searchMode }: Announcem
             {equityScore && (
               <button
                 onClick={() => setShowEquityDetails(!showEquityDetails)}
-                className="flex items-center space-x-2 text-purple-600 hover:text-purple-800 text-sm font-medium"
+                className="flex items-center space-x-2 text-slate-600 hover:text-slate-800 text-sm font-medium"
               >
                 <Shield className="w-4 h-4" />
                 <span>Equity Analysis</span>
@@ -466,8 +466,8 @@ export default function AnnouncementCard({ announcement, searchMode }: Announcem
                 rel="noopener noreferrer"
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center space-x-2 ${
                   announcement.requires_registration
-                    ? 'bg-orange-600 hover:bg-orange-700 text-white'
-                    : 'bg-blue-600 hover:bg-blue-700 text-white'
+                    ? 'bg-amber-700 hover:bg-amber-800 text-white'
+                    : 'bg-slate-700 hover:bg-slate-800 text-white'
                 }`}
               >
                 <span>
@@ -483,7 +483,7 @@ export default function AnnouncementCard({ announcement, searchMode }: Announcem
                 href={announcement.registration_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center space-x-2"
+                className="bg-slate-700 hover:bg-slate-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center space-x-2"
               >
                 <UserCheck className="w-4 h-4" />
                 <span>Register First</span>

@@ -3,7 +3,6 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { format } from 'date-fns';
 import { useRouter, useSearchParams } from 'next/navigation';
-import Link from 'next/link';
 import { getApiUrl, API_ENDPOINTS } from '@/lib/api-config';
 
 interface FundingAnnouncement {

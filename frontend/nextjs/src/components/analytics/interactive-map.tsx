@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { MapPin, TrendingUp, Zap, Users, Brain, DollarSign, Shield, Globe, Activity, Target, X } from 'lucide-react';
+import Image from 'next/image';
 
 // Feature flag to enable/disable interactive map
 // Set to false to disable interactive map functionality
@@ -40,7 +41,7 @@ const countryData: CountryData[] = [
     description: 'South Africa hosts over 600 AI companies, the most in Africa, reflecting its status as the continent\'s most developed tech ecosystem.',
     insight: 'Leading with strong research institutions, corporate R&D, and government AI policy framework. Home to DataProphet, which cuts manufacturing defects by 40% using AI.',
     icon: <Brain className="h-6 w-6" />,
-    color: 'var(--taifa-primary)',
+    color: 'var(--color-site-slate)',
     category: 'innovation'
   },
   {
@@ -51,7 +52,7 @@ const countryData: CountryData[] = [
     description: 'Kenya shows world-leading engagement with AI tools - 27% of Kenyans use OpenAI services like ChatGPT daily.',
     insight: 'Highest AI tool adoption globally, driven by mobile internet penetration, young population, and strong English proficiency. Known as "Silicon Savannah".',
     icon: <Activity className="h-6 w-6" />,
-    color: 'var(--taifa-secondary)',
+    color: 'var(--color-site-gold)',
     category: 'adoption'
   },
   {
@@ -62,7 +63,7 @@ const countryData: CountryData[] = [
     description: 'Nigeria hosts 400+ AI companies, with fintechs like Periculum using AI to speed up loan processing by 60%.',
     insight: 'Major fintech hub using AI for credit scoring and financial inclusion. Part of the "Big Four" capturing 83% of Africa\'s AI funding.',
     icon: <DollarSign className="h-6 w-6" />,
-    color: 'var(--taifa-accent)',
+    color: 'var(--color-site-sage)',
     category: 'market'
   },
   {
@@ -73,7 +74,7 @@ const countryData: CountryData[] = [
     description: 'Egypt\'s e-commerce market, fueled by AI recommendation engines, is projected to reach $50 billion by 2025.',
     insight: 'Rapid digital commerce growth driven by AI algorithms for personalization, dynamic pricing, and logistics optimization in a 100M+ population market.',
     icon: <TrendingUp className="h-6 w-6" />,
-    color: 'var(--taifa-orange)',
+    color: 'var(--color-site-brown)',
     category: 'market'
   },
   {
@@ -84,7 +85,7 @@ const countryData: CountryData[] = [
     description: 'Rwanda\'s Babyl telemedicine platform uses AI triage to serve 62% of adults with 5M+ consultations and 91% satisfaction.',
     insight: 'Revolutionary AI-driven healthcare reducing unnecessary clinic visits by 54%. First African country with national AI policy (2020).',
     icon: <Shield className="h-6 w-6" />,
-    color: 'var(--taifa-red)',
+    color: 'var(--color-site-brown)',
     category: 'innovation'
   },
   {
@@ -95,7 +96,7 @@ const countryData: CountryData[] = [
     description: 'Ghana\'s mPharma uses AI predictive analytics to reduce drug stockouts by 45% and cut patient costs by 37%.',
     insight: 'AI-driven pharmaceutical supply chain optimization removing thousands of counterfeit drugs while improving availability and affordability.',
     icon: <Target className="h-6 w-6" />,
-    color: 'var(--taifa-olive)',
+    color: 'var(--color-site-purple)',
     category: 'innovation'
   },
   {
@@ -106,7 +107,7 @@ const countryData: CountryData[] = [
     description: 'Morocco unveiled "Toubkal" in 2023, Africa\'s most powerful supercomputer to support AI research.',
     insight: 'Strategic investment in high-performance computing infrastructure, surpassing South Africa\'s previous top system to advance regional AI capabilities.',
     icon: <Zap className="h-6 w-6" />,
-    color: 'var(--taifa-primary)',
+    color: 'var(--color-site-slate)',
     category: 'infrastructure'
   },
   {
@@ -117,7 +118,7 @@ const countryData: CountryData[] = [
     description: 'Togo used AI analytics to identify 57,000 new beneficiaries for its Novissi cash transfer program without physical surveys.',
     insight: 'Pioneering AI for social good, using satellite imagery and mobile data to improve social aid targeting and ensure relief reaches overlooked communities.',
     icon: <Users className="h-6 w-6" />,
-    color: 'var(--taifa-secondary)',
+    color: 'var(--color-site-gold)',
     category: 'policy'
   },
   {
@@ -128,7 +129,7 @@ const countryData: CountryData[] = [
     description: 'Mauritius leads Africa on the Government AI Readiness Index with a score of 53.3, excelling in government commitment and vision.',
     insight: 'Top-ranked for AI preparedness in governance, showing that smaller economies can advance AI policy and digital infrastructure effectively.',
     icon: <Globe className="h-6 w-6" />,
-    color: 'var(--taifa-accent)',
+    color: 'var(--color-site-sage)',
     category: 'policy'
   }
 ];
@@ -138,12 +139,13 @@ const AfricaMapSVG: React.FC<{ onCountryClick: (countryId: string) => void, sele
   return (
     <div className="relative w-full max-w-2xl mx-auto">
       {/* Background Africa SVG */}
-      <div className="relative w-full h-96 bg-taifa-light/20 rounded-lg overflow-hidden">
-        <img 
+      <div className="relative w-full h-96 bg-slate-50/20 rounded-lg overflow-hidden">
+        <Image 
           src="/np_africa_3354_1A365D.svg" 
           alt="Map of Africa"
-          className="w-full h-full object-contain opacity-30"
-          style={{ filter: 'brightness(0) saturate(100%) invert(27%) sepia(51%) saturate(2878%) hue-rotate(346deg) brightness(104%) contrast(97%)' }}
+          fill
+          className="object-contain opacity-30"
+          priority={false}
         />
         
         {/* Interactive overlay with positioned country markers */}
@@ -155,10 +157,10 @@ const AfricaMapSVG: React.FC<{ onCountryClick: (countryId: string) => void, sele
               cx="195"
               cy="90"
               r="8"
-              fill={selectedCountry === 'morocco' ? 'var(--taifa-secondary)' : 'var(--taifa-accent)'}
-              stroke="var(--taifa-white)" 
+              fill={selectedCountry === 'morocco' ? 'var(--color-site-gold)' : 'var(--color-site-slate)'}
+              stroke="white" 
               strokeWidth="2"
-              className="cursor-pointer hover:fill-taifa-secondary transition-colors duration-200 drop-shadow-lg"
+              className="cursor-pointer hover:opacity-80 transition-all duration-200 drop-shadow-lg"
               onClick={() => onCountryClick('morocco')}
             />
             
@@ -168,10 +170,10 @@ const AfricaMapSVG: React.FC<{ onCountryClick: (countryId: string) => void, sele
               cx="295"
               cy="95"
               r="8"
-              fill={selectedCountry === 'egypt' ? 'var(--taifa-orange)' : 'var(--taifa-accent)'}
-              stroke="var(--taifa-white)" 
+              fill={selectedCountry === 'egypt' ? 'var(--color-site-brown)' : 'var(--color-site-slate)'}
+              stroke="white" 
               strokeWidth="2"
-              className="cursor-pointer hover:fill-taifa-secondary transition-colors duration-200 drop-shadow-lg"
+              className="cursor-pointer hover:opacity-80 transition-all duration-200 drop-shadow-lg"
               onClick={() => onCountryClick('egypt')}
             />
             
@@ -181,10 +183,10 @@ const AfricaMapSVG: React.FC<{ onCountryClick: (countryId: string) => void, sele
               cx="190"
               cy="175"
               r="8"
-              fill={selectedCountry === 'nigeria' ? 'var(--taifa-accent)' : 'var(--taifa-accent)'}
-              stroke="var(--taifa-white)" 
+              fill={selectedCountry === 'nigeria' ? 'var(--color-taifa-secondary)' : 'var(--color-site-slate)'}
+              stroke="white" 
               strokeWidth="2"
-              className="cursor-pointer hover:fill-taifa-secondary transition-colors duration-200 drop-shadow-lg"
+              className="cursor-pointer hover:opacity-80 transition-all duration-200 drop-shadow-lg"
               onClick={() => onCountryClick('nigeria')}
             />
             
@@ -194,10 +196,10 @@ const AfricaMapSVG: React.FC<{ onCountryClick: (countryId: string) => void, sele
               cx="180"
               cy="185"
               r="6"
-              fill={selectedCountry === 'ghana' ? 'var(--taifa-olive)' : 'var(--taifa-accent)'}
-              stroke="var(--taifa-white)" 
+              fill={selectedCountry === 'ghana' ? 'var(--color-site-purple)' : 'var(--color-site-slate)'}
+              stroke="white" 
               strokeWidth="2"
-              className="cursor-pointer hover:fill-taifa-secondary transition-colors duration-200 drop-shadow-lg"
+              className="cursor-pointer hover:opacity-80 transition-all duration-200 drop-shadow-lg"
               onClick={() => onCountryClick('ghana')}
             />
             
@@ -207,10 +209,10 @@ const AfricaMapSVG: React.FC<{ onCountryClick: (countryId: string) => void, sele
               cx="300"
               cy="195"
               r="8"
-              fill={selectedCountry === 'kenya' ? 'var(--taifa-secondary)' : 'var(--taifa-accent)'}
-              stroke="var(--taifa-white)" 
+              fill={selectedCountry === 'kenya' ? 'var(--color-site-gold)' : 'var(--color-site-slate)'}
+              stroke="white" 
               strokeWidth="2"
-              className="cursor-pointer hover:fill-taifa-secondary transition-colors duration-200 drop-shadow-lg"
+              className="cursor-pointer hover:opacity-80 transition-all duration-200 drop-shadow-lg"
               onClick={() => onCountryClick('kenya')}
             />
             
@@ -220,10 +222,10 @@ const AfricaMapSVG: React.FC<{ onCountryClick: (countryId: string) => void, sele
               cx="285"
               cy="205"
               r="5"
-              fill={selectedCountry === 'rwanda' ? 'var(--taifa-red)' : 'var(--taifa-accent)'}
-              stroke="var(--taifa-white)" 
+              fill={selectedCountry === 'rwanda' ? 'var(--color-site-brown)' : 'var(--color-site-slate)'}
+              stroke="white" 
               strokeWidth="2"
-              className="cursor-pointer hover:fill-taifa-secondary transition-colors duration-200 drop-shadow-lg"
+              className="cursor-pointer hover:opacity-80 transition-all duration-200 drop-shadow-lg"
               onClick={() => onCountryClick('rwanda')}
             />
             
@@ -233,10 +235,10 @@ const AfricaMapSVG: React.FC<{ onCountryClick: (countryId: string) => void, sele
               cx="270"
               cy="320"
               r="10"
-              fill={selectedCountry === 'south-africa' ? 'var(--taifa-primary)' : 'var(--taifa-accent)'}
-              stroke="var(--taifa-white)" 
+              fill={selectedCountry === 'south-africa' ? 'var(--color-taifa-secondary)' : 'var(--color-site-slate)'}
+              stroke="white" 
               strokeWidth="2"
-              className="cursor-pointer hover:fill-taifa-secondary transition-colors duration-200 drop-shadow-lg"
+              className="cursor-pointer hover:opacity-80 transition-all duration-200 drop-shadow-lg"
               onClick={() => onCountryClick('south-africa')}
             />
             
@@ -246,29 +248,29 @@ const AfricaMapSVG: React.FC<{ onCountryClick: (countryId: string) => void, sele
               cx="325"
               cy="280"
               r="4"
-              fill={selectedCountry === 'mauritius' ? 'var(--taifa-accent)' : 'var(--taifa-accent)'}
-              stroke="var(--taifa-white)"
+              fill={selectedCountry === 'mauritius' ? 'var(--color-taifa-secondary)' : 'var(--color-site-slate)'}
+              stroke="white"
               strokeWidth="2"
-              className="cursor-pointer hover:fill-taifa-secondary transition-colors duration-200 drop-shadow-lg"
+              className="cursor-pointer hover:opacity-80 transition-all duration-200 drop-shadow-lg"
               onClick={() => onCountryClick('mauritius')}
             />
             
             {/* Country labels */}
-            <text x="195" y="80" fontSize="12" fill="var(--taifa-primary)" textAnchor="middle" className="pointer-events-none font-semibold drop-shadow-sm">Morocco</text>
-            <text x="295" y="85" fontSize="12" fill="var(--taifa-primary)" textAnchor="middle" className="pointer-events-none font-semibold drop-shadow-sm">Egypt</text>
-            <text x="190" y="165" fontSize="12" fill="var(--taifa-primary)" textAnchor="middle" className="pointer-events-none font-semibold drop-shadow-sm">Nigeria</text>
-            <text x="180" y="175" fontSize="10" fill="var(--taifa-primary)" textAnchor="middle" className="pointer-events-none font-semibold drop-shadow-sm">Ghana</text>
-            <text x="300" y="185" fontSize="12" fill="var(--taifa-primary)" textAnchor="middle" className="pointer-events-none font-semibold drop-shadow-sm">Kenya</text>
-            <text x="285" y="195" fontSize="9" fill="var(--taifa-primary)" textAnchor="middle" className="pointer-events-none font-semibold drop-shadow-sm">Rwanda</text>
-            <text x="270" y="310" fontSize="12" fill="var(--taifa-primary)" textAnchor="middle" className="pointer-events-none font-semibold drop-shadow-sm">South Africa</text>
-            <text x="325" y="270" fontSize="8" fill="var(--taifa-primary)" textAnchor="middle" className="pointer-events-none font-semibold drop-shadow-sm">Mauritius</text>
+            <text x="195" y="80" fontSize="12" fill="var(--color-site-slate)" textAnchor="middle" className="pointer-events-none font-semibold drop-shadow-sm">Morocco</text>
+            <text x="295" y="85" fontSize="12" fill="var(--color-site-slate)" textAnchor="middle" className="pointer-events-none font-semibold drop-shadow-sm">Egypt</text>
+            <text x="190" y="165" fontSize="12" fill="var(--color-site-slate)" textAnchor="middle" className="pointer-events-none font-semibold drop-shadow-sm">Nigeria</text>
+            <text x="180" y="175" fontSize="10" fill="var(--color-site-slate)" textAnchor="middle" className="pointer-events-none font-semibold drop-shadow-sm">Ghana</text>
+            <text x="300" y="185" fontSize="12" fill="var(--color-site-slate)" textAnchor="middle" className="pointer-events-none font-semibold drop-shadow-sm">Kenya</text>
+            <text x="285" y="195" fontSize="9" fill="var(--color-site-slate)" textAnchor="middle" className="pointer-events-none font-semibold drop-shadow-sm">Rwanda</text>
+            <text x="270" y="310" fontSize="12" fill="var(--color-site-slate)" textAnchor="middle" className="pointer-events-none font-semibold drop-shadow-sm">South Africa</text>
+            <text x="325" y="270" fontSize="8" fill="var(--color-site-slate)" textAnchor="middle" className="pointer-events-none font-semibold drop-shadow-sm">Mauritius</text>
           </svg>
         </div>
       </div>
       
-      <div className="absolute bottom-4 left-4 bg-taifa-white/90 backdrop-blur-sm px-4 py-2 rounded-lg border border-taifa-border shadow-lg">
-        <p className="text-sm text-taifa-muted flex items-center">
-          <MapPin className="h-4 w-4 mr-2 text-taifa-secondary" />
+      <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-lg border border-slate-200 shadow-lg">
+        <p className="text-sm text-slate-600 flex items-center">
+          <MapPin className="h-4 w-4 mr-2 text-site-gold" />
           Click on countries to explore AI insights
         </p>
       </div>
@@ -281,11 +283,11 @@ const FactoidCard: React.FC<FactoidCardProps> = ({ country, onClose }) => {
   if (!country) return null;
 
   const categoryColors = {
-    market: 'border-taifa-accent bg-taifa-accent/5',
-    innovation: 'border-taifa-primary bg-taifa-primary/5',
-    adoption: 'border-taifa-secondary bg-taifa-secondary/5',
-    infrastructure: 'border-taifa-orange bg-taifa-orange/5',
-    policy: 'border-taifa-olive bg-taifa-olive/5'
+    market: 'border-site-sage bg-site-sage/5',
+    innovation: 'border-site-slate bg-site-slate/5',
+    adoption: 'border-site-gold bg-site-gold/5',
+    infrastructure: 'border-site-brown bg-site-brown/5',
+    policy: 'border-site-purple bg-site-purple/5'
   };
 
   const categoryLabels = {
@@ -298,7 +300,7 @@ const FactoidCard: React.FC<FactoidCardProps> = ({ country, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fadeInUp">
-      <div className={`bg-taifa-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border-2 ${categoryColors[country.category]} shadow-2xl`}>
+      <div className={`bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border-2 ${categoryColors[country.category]} shadow-2xl`}>
         <div className="p-8">
           {/* Header */}
           <div className="flex items-start justify-between mb-6">
@@ -307,7 +309,7 @@ const FactoidCard: React.FC<FactoidCardProps> = ({ country, onClose }) => {
                 {country.icon}
               </div>
               <div>
-                <h3 className="text-2xl font-bold text-taifa-primary">{country.name}</h3>
+                <h3 className="text-2xl font-bold text-site-slate">{country.name}</h3>
                 <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${categoryColors[country.category]}`} style={{ color: country.color }}>
                   {categoryLabels[country.category]}
                 </span>
@@ -315,29 +317,29 @@ const FactoidCard: React.FC<FactoidCardProps> = ({ country, onClose }) => {
             </div>
             <button 
               onClick={onClose}
-              className="p-2 hover:bg-taifa-light rounded-lg transition-colors"
+              className="p-2 hover:bg-slate-50 rounded-lg transition-colors"
             >
-              <X className="h-5 w-5 text-taifa-muted" />
+              <X className="h-5 w-5 text-slate-600" />
             </button>
           </div>
 
           {/* Main statistic */}
-          <div className="mb-6 p-6 bg-gradient-to-r from-taifa-light/50 to-taifa-white rounded-xl border border-taifa-border">
+          <div className="mb-6 p-6 bg-gradient-to-r from-taifa-light/50 to-taifa-white rounded-xl border border-slate-200">
             <div className="text-4xl font-bold mb-2" style={{ color: country.color }}>
               {country.value}
             </div>
-            <div className="text-xl font-semibold text-taifa-primary mb-3">
+            <div className="text-xl font-semibold text-site-slate mb-3">
               {country.statistic}
             </div>
-            <p className="text-taifa-muted leading-relaxed">
+            <p className="text-slate-600 leading-relaxed">
               {country.description}
             </p>
           </div>
 
           {/* Deeper insight */}
-          <div className="p-6 bg-taifa-primary/5 rounded-xl border-l-4 border-taifa-primary">
-            <h4 className="text-lg font-semibold text-taifa-primary mb-3">Key Insight</h4>
-            <p className="text-taifa-muted leading-relaxed">
+          <div className="p-6 bg-site-slate/5 rounded-xl border-l-4 border-taifa-primary">
+            <h4 className="text-lg font-semibold text-site-slate mb-3">Key Insight</h4>
+            <p className="text-slate-600 leading-relaxed">
               {country.insight}
             </p>
           </div>
@@ -346,7 +348,7 @@ const FactoidCard: React.FC<FactoidCardProps> = ({ country, onClose }) => {
           <div className="mt-6 text-center">
             <button 
               onClick={onClose}
-              className="px-6 py-3 bg-taifa-primary text-taifa-white rounded-lg hover:bg-taifa-secondary transition-colors font-medium"
+              className="px-6 py-3 bg-site-slate text-white rounded-lg hover:bg-site-gold transition-colors font-medium"
             >
               Explore More Countries
             </button>
@@ -361,21 +363,21 @@ const FactoidCard: React.FC<FactoidCardProps> = ({ country, onClose }) => {
 const InteractiveMapFallback: React.FC = () => {
   return (
     <div className="relative">
-      <div className="bg-taifa-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-taifa-border">
+      <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-slate-200">
         <div className="text-center mb-8">
-          <h3 className="text-3xl font-bold text-taifa-primary mb-4">AI Across Africa</h3>
-          <p className="text-lg text-taifa-muted max-w-3xl mx-auto leading-relaxed">
+          <h3 className="text-3xl font-bold text-site-slate mb-4">AI Across Africa</h3>
+          <p className="text-lg text-slate-600 max-w-3xl mx-auto leading-relaxed">
             Interactive map functionality is currently under development. Check back soon for an engaging exploration of AI innovations across the continent.
           </p>
         </div>
 
         {/* Static placeholder */}
         <div className="relative w-full max-w-2xl mx-auto">
-          <div className="relative w-full h-96 bg-taifa-light/20 rounded-lg overflow-hidden flex items-center justify-center">
+          <div className="relative w-full h-96 bg-slate-50/20 rounded-lg overflow-hidden flex items-center justify-center">
             <div className="text-center">
-              <Globe className="h-16 w-16 text-taifa-muted mx-auto mb-4" />
-              <p className="text-taifa-muted font-medium">Interactive Map Coming Soon</p>
-              <p className="text-sm text-taifa-muted/70 mt-2">Feature currently disabled</p>
+              <Globe className="h-16 w-16 text-slate-600 mx-auto mb-4" />
+              <p className="text-slate-600 font-medium">Interactive Map Coming Soon</p>
+              <p className="text-sm text-slate-600/70 mt-2">Feature currently disabled</p>
             </div>
           </div>
         </div>
@@ -383,24 +385,24 @@ const InteractiveMapFallback: React.FC = () => {
         {/* Static legend */}
         <div className="mt-8 grid grid-cols-2 md:grid-cols-5 gap-4 text-center opacity-50">
           <div className="flex flex-col items-center">
-            <div className="w-4 h-4 bg-taifa-accent rounded mb-2"></div>
-            <span className="text-xs text-taifa-muted">Market Growth</span>
+            <div className="w-4 h-4 bg-site-sage rounded mb-2"></div>
+            <span className="text-xs text-slate-600">Market Growth</span>
           </div>
           <div className="flex flex-col items-center">
-            <div className="w-4 h-4 bg-taifa-primary rounded mb-2"></div>
-            <span className="text-xs text-taifa-muted">Innovation</span>
+            <div className="w-4 h-4 bg-site-slate rounded mb-2"></div>
+            <span className="text-xs text-slate-600">Innovation</span>
           </div>
           <div className="flex flex-col items-center">
-            <div className="w-4 h-4 bg-taifa-secondary rounded mb-2"></div>
-            <span className="text-xs text-taifa-muted">AI Adoption</span>
+            <div className="w-4 h-4 bg-site-gold rounded mb-2"></div>
+            <span className="text-xs text-slate-600">AI Adoption</span>
           </div>
           <div className="flex flex-col items-center">
-            <div className="w-4 h-4 bg-taifa-orange rounded mb-2"></div>
-            <span className="text-xs text-taifa-muted">Infrastructure</span>
+            <div className="w-4 h-4 bg-site-brown rounded mb-2"></div>
+            <span className="text-xs text-slate-600">Infrastructure</span>
           </div>
           <div className="flex flex-col items-center">
-            <div className="w-4 h-4 bg-taifa-olive rounded mb-2"></div>
-            <span className="text-xs text-taifa-muted">Policy & Governance</span>
+            <div className="w-4 h-4 bg-site-purple rounded mb-2"></div>
+            <span className="text-xs text-slate-600">Policy & Governance</span>
           </div>
         </div>
       </div>
@@ -434,10 +436,10 @@ const InteractiveAfricaAIMap: React.FC = () => {
   return (
     <div className="relative">
       {/* Map container */}
-      <div className="bg-taifa-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-taifa-border">
+      <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-slate-200">
         <div className="text-center mb-8">
-          <h3 className="text-3xl font-bold text-taifa-primary mb-4">AI Across Africa</h3>
-          <p className="text-lg text-taifa-muted max-w-3xl mx-auto leading-relaxed">
+          <h3 className="text-3xl font-bold text-site-slate mb-4">AI Across Africa</h3>
+          <p className="text-lg text-slate-600 max-w-3xl mx-auto leading-relaxed">
             Discover fascinating AI statistics and innovations happening across the continent. Click on any highlighted country to explore their unique AI story.
           </p>
         </div>
@@ -447,24 +449,24 @@ const InteractiveAfricaAIMap: React.FC = () => {
         {/* Legend */}
         <div className="mt-8 grid grid-cols-2 md:grid-cols-5 gap-4 text-center">
           <div className="flex flex-col items-center">
-            <div className="w-4 h-4 bg-taifa-accent rounded mb-2"></div>
-            <span className="text-xs text-taifa-muted">Market Growth</span>
+            <div className="w-4 h-4 bg-site-sage rounded mb-2"></div>
+            <span className="text-xs text-slate-600">Market Growth</span>
           </div>
           <div className="flex flex-col items-center">
-            <div className="w-4 h-4 bg-taifa-primary rounded mb-2"></div>
-            <span className="text-xs text-taifa-muted">Innovation</span>
+            <div className="w-4 h-4 bg-site-slate rounded mb-2"></div>
+            <span className="text-xs text-slate-600">Innovation</span>
           </div>
           <div className="flex flex-col items-center">
-            <div className="w-4 h-4 bg-taifa-secondary rounded mb-2"></div>
-            <span className="text-xs text-taifa-muted">AI Adoption</span>
+            <div className="w-4 h-4 bg-site-gold rounded mb-2"></div>
+            <span className="text-xs text-slate-600">AI Adoption</span>
           </div>
           <div className="flex flex-col items-center">
-            <div className="w-4 h-4 bg-taifa-orange rounded mb-2"></div>
-            <span className="text-xs text-taifa-muted">Infrastructure</span>
+            <div className="w-4 h-4 bg-site-brown rounded mb-2"></div>
+            <span className="text-xs text-slate-600">Infrastructure</span>
           </div>
           <div className="flex flex-col items-center">
-            <div className="w-4 h-4 bg-taifa-olive rounded mb-2"></div>
-            <span className="text-xs text-taifa-muted">Policy & Governance</span>
+            <div className="w-4 h-4 bg-site-purple rounded mb-2"></div>
+            <span className="text-xs text-slate-600">Policy & Governance</span>
           </div>
         </div>
       </div>

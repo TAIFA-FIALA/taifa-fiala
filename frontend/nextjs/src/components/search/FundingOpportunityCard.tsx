@@ -1,5 +1,5 @@
 import React from 'react';
-import { Clock, MapPin, Users, Award, DollarSign, Calendar, Building, Target, AlertCircle, CheckCircle } from 'lucide-react';
+import { DollarSign, Clock, MapPin, Users, Calendar, Building, Target, AlertCircle, CheckCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 
@@ -85,15 +85,11 @@ export function FundingAnnouncementCard(props: FundingAnnouncementCardProps) {
     requiresRegistration,
     tags = [],
     applicationProcess,
-    selectionCriteria = [],
     applicationDeadlineType,
-    announcementDate,
-    fundingStartDate,
     projectDuration,
     reportingRequirements = [],
     targetAudience = [],
     aiSubsectors = [],
-    developmentStage = [],
     collaborationRequired,
     genderFocused,
     youthFocused,

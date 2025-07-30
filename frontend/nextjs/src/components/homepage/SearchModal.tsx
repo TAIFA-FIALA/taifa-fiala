@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { X, Search, Loader2, AlertCircle, Database } from 'lucide-react';
 import AnnouncementCard from '@/components/search/AnnouncementCard';
 import { FundingAnnouncement } from '@/types/funding';
@@ -32,21 +32,7 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
   const [searchMetadata, setSearchMetadata] = useState<SearchResponse['metadata'] | null>(null);
   const [hasSearched, setHasSearched] = useState(false);
 
-  // Reset state when modal opens/closes
-  useEffect(() => {
-    if (isOpen && initialQuery) {
-      setQuery(initialQuery);
-      handleSearch();
-    } else if (!isOpen) {
-      setQuery('');
-      setResults([]);
-      setError(null);
-      setSearchMetadata(null);
-      setHasSearched(false);
-    }
-  }, [isOpen, initialQuery]);
-
-  const handleSearch = async (searchQuery: string = query) => {
+  const handleSearch = useCallback(async (searchQuery: string = query) => {
     if (!searchQuery.trim()) return;
 
     setLoading(true);
@@ -105,7 +91,21 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
     } finally {
       setLoading(false);
     }
-  };
+  }, [query]);
+
+  // Reset state when modal opens/closes
+  useEffect(() => {
+    if (isOpen && initialQuery) {
+      setQuery(initialQuery);
+      handleSearch(initialQuery);
+    } else if (!isOpen) {
+      setQuery('');
+      setResults([]);
+      setError(null);
+      setSearchMetadata(null);
+      setHasSearched(false);
+    }
+  }, [isOpen, initialQuery, handleSearch]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -166,7 +166,7 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
               <div>
                 <h3 className="font-semibold text-blue-900 mb-1">Early Access Preview</h3>
                 <p className="text-sm text-blue-700">
-                  We're actively building our comprehensive database. Current results showcase our search capabilities 
+                  We&apos;re actively building our comprehensive database. Current results showcase our search capabilities 
                   More funding announcements are being added daily.
                 </p>
               </div>
@@ -199,7 +199,7 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
               <Search className="w-12 h-12 text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-gray-900 mb-2">No results found</h3>
               <p className="text-gray-600">
-                Try adjusting your search terms or check back soon as we're continuously adding new announcements.
+                Try adjusting your search terms or check back soon as we&apos;re continuously adding new announcements.
               </p>
             </div>
           )}
@@ -240,10 +240,10 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
               {/* Footer Message */}
               <div className="mt-8 p-4 bg-taifa-yellow/10 border border-taifa-yellow/30 rounded-lg text-center">
                 <p className="text-taifa-primary font-medium mb-2">
-                  🚀 Building Africa's Most Comprehensive AI Funding Database
+                  🚀 Building Africa&apos;s Most Comprehensive AI Funding Database
                 </p>
                 <p className="text-sm text-taifa-primary/80">
-                  We're continuously expanding our database with new funding announcements. 
+                  We&apos;re continuously expanding our database with new funding announcements. 
                   Check back regularly for the latest additions.
                 </p>
               </div>

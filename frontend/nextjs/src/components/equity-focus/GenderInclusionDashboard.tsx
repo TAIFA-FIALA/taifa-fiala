@@ -31,7 +31,8 @@ const CustomPieTooltip = ({ active, payload }: { active?: boolean; payload?: Too
   return null;
 };
 
-const COLORS = ['#3E4B59', '#F0A621', '#BA4D00', '#5F763B', '#007A56'];
+// Using muted professional colors for categorical data (not performance indicators)
+const COLORS = ['#2D3748', '#553C9A', '#2D7D79', '#8B4513', '#4A5568']; // site-slate, site-purple, site-teal, site-brown, site-steel
 
 interface GenderData {
   gender: string;
@@ -155,7 +156,7 @@ export default function GenderInclusionDashboard({ className = '' }: GenderInclu
               <div className="text-2xl font-bold text-taifa-secondary mt-1">
                 {genderData.find(d => d.gender === 'Female-led')?.funding_percentage || 12}%
               </div>
-              <div className="text-xs text-red-500 mt-1">
+              <div className="text-xs text-dashboard-danger mt-1">
                 11% below global average
               </div>
             </div>
@@ -165,7 +166,7 @@ export default function GenderInclusionDashboard({ className = '' }: GenderInclu
               <div className="text-2xl font-bold text-taifa-primary mt-1">
                 {trendData[trendData.length - 1]?.youth_led_percentage || 12.4}%
               </div>
-              <div className="text-xs text-green-500 mt-1">
+              <div className="text-xs text-dashboard-success mt-1">
                 +2.3% from last year
               </div>
             </div>
@@ -175,7 +176,7 @@ export default function GenderInclusionDashboard({ className = '' }: GenderInclu
               <div className="text-2xl font-bold text-taifa-accent mt-1">
                 {trendData[trendData.length - 1]?.rural_percentage || 2.3}%
               </div>
-              <div className="text-xs text-red-500 mt-1">
+              <div className="text-xs text-dashboard-danger mt-1">
                 18% below target
               </div>
             </div>
@@ -236,20 +237,20 @@ export default function GenderInclusionDashboard({ className = '' }: GenderInclu
                 <Line 
                   type="monotone" 
                   dataKey="Female-led Projects" 
-                  stroke="#F0A621"
+                  stroke="#553C9A"
                   activeDot={{ r: 8 }} 
                   strokeWidth={2}
                 />
                 <Line 
                   type="monotone" 
                   dataKey="Youth-led Projects" 
-                  stroke="rgba(54, 162, 235, 1)" 
+                  stroke="#4C51BF" 
                   strokeWidth={2}
                 />
                 <Line 
                   type="monotone" 
                   dataKey="Rural Projects" 
-                  stroke="rgba(75, 192, 192, 1)" 
+                  stroke="#2D7D79" 
                   strokeWidth={2}
                 />
               </LineChart>
@@ -273,8 +274,8 @@ export default function GenderInclusionDashboard({ className = '' }: GenderInclu
                     <h4 className="font-medium text-gray-800">{founder.name}</h4>
                     <div className="text-sm text-gray-600">{founder.organization}</div>
                     <div className="flex items-center mt-1">
-                      <span className="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded">{founder.country}</span>
-                      <span className="text-xs bg-green-100 text-green-600 px-2 py-0.5 rounded ml-2">{founder.sector}</span>
+                      <span className="text-xs bg-site-indigo/20 text-site-indigo px-2 py-0.5 rounded">{founder.country}</span>
+                      <span className="text-xs bg-site-olive/20 text-site-olive px-2 py-0.5 rounded ml-2">{founder.sector}</span>
                     </div>
                     <div className="text-xs text-gray-500 mt-1">
                       Received ${(founder.funding_received / 1000000).toFixed(1)}M in funding

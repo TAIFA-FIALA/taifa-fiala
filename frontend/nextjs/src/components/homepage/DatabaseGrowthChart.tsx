@@ -197,8 +197,8 @@ export default function DatabaseGrowthChart({ className = '' }: DatabaseGrowthCh
             <AreaChart data={data}>
               <defs>
                 <linearGradient id="colorGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#F0A621" stopOpacity={0.3}/>
-                  <stop offset="95%" stopColor="#F0A621" stopOpacity={0}/>
+                  <stop offset="5%" stopColor="#2D3748" stopOpacity={0.3}/>
+                  <stop offset="95%" stopColor="#2D3748" stopOpacity={0}/>
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -219,7 +219,7 @@ export default function DatabaseGrowthChart({ className = '' }: DatabaseGrowthCh
               <Area
                 type="monotone"
                 dataKey="records"
-                stroke="#F0A621"
+                stroke="#2D3748"
                 strokeWidth={2}
                 fill="url(#colorGradient)"
               />
@@ -259,7 +259,7 @@ export default function DatabaseGrowthChart({ className = '' }: DatabaseGrowthCh
       <div className="px-6 py-4 bg-gray-50 border-t border-gray-100">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <div className="w-2 h-2 bg-slate-600 rounded-full animate-pulse"></div>
             <span className="text-sm text-gray-600">Live updates every 5 minutes</span>
           </div>
           <div className="flex items-center space-x-2 text-gray-500">

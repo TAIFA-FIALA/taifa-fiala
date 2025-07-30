@@ -3,24 +3,87 @@
 
 @layer theme {
   :root {
-    --color-taifa-primary: #3E4B59;
-    --color-taifa-secondary: #F0A621;
-    --color-taifa-accent: #007A56;
-    --color-taifa-light: #F9FAFB;
-    --color-taifa-dark: #3E4B59;
-    --color-taifa-muted: #6B7280;
+    /* Site Brand Colours - Professional, sophisticated for branding */
+    --color-site-slate: #2D3748;          /* Deep charcoal - primary text, headers */
+    --color-site-burgandy: #4b1212;     /* Warm red-orange - primary accent */
+    --color-site-terracotta: #CD5C5C;     /* Terracotta - warm orange-red from logo */
+    --color-site-gold: #D69E2E;           /* Rich gold - secondary accent */
+    --color-site-sage: #38A169;           /* Muted green - nature, growth */
+    --color-site-cream: #F7FAFC;          /* Off-white - backgrounds */
+    --color-site-navy: #2C5282;           /* Deep blue - professional accent */
+    
+    /* Site Data Visualization - Muted Professional Palette */
+    --color-site-purple: #553C9A;         /* Deep purple - dignified categorical */
+    --color-site-teal: #2D7D79;           /* Muted teal - serious secondary */
+    --color-site-indigo: #4C51BF;         /* Subdued indigo - professional tertiary */
+    --color-site-brown: #2F2458;          /* Deep purple - sophisticated categorical */
+    --color-site-steel: #4A5568;          /* Steel blue - industrial tone */
+    --color-site-olive: #68623C;          /* Olive green - natural muted */
+    
+    /* Dashboard Colors - Performance & Status Only */
+    --color-dashboard-success: #38A169;    /* Muted green - targets met, positive trends */
+    --color-dashboard-warning: #D69E2E;    /* Professional amber - moderate performance */
+    --color-dashboard-danger: #E53E3E;     /* Serious red - targets missed, issues */
+    --color-dashboard-neutral: #718096;    /* Neutral grey - no data, not applicable */
+    
+    /* Supporting Neutrals */
+    --color-neutral-50: #F9FAFB;
+    --color-neutral-100: #F3F4F6;
+    --color-neutral-200: #E5E7EB;
+    --color-neutral-300: #D1D5DB;
+    --color-neutral-400: #9CA3AF;
+    --color-neutral-500: #6B7280;
+    --color-neutral-600: #4B5563;
+    --color-neutral-700: #374151;
+    --color-neutral-800: #1F2937;
+    --color-neutral-900: #111827;
+    
+    /* TAIFA Brand Colors - Slate-Amber-Purple Theme */
+    --color-taifa-primary: var(--color-site-slate);     /* Slate - primary brand color */
+    --color-taifa-secondary: var(--color-site-gold);    /* Amber/Gold - secondary brand color */
+    --color-taifa-accent: var(--color-site-brown);      /* Deep Purple - accent color */
+    --color-taifa-light: var(--color-site-cream);
+    --color-taifa-dark: var(--color-site-slate);
+    --color-taifa-muted: var(--color-neutral-500);
     --color-taifa-border: #F2F2F2;
-    --color-taifa-olive: #5F763B;
-    --color-taifa-orange: #BA4D00;
-    --color-taifa-yellow: #F0E68C;
-    --color-taifa-red: #A62E2E;
+    --color-taifa-olive: var(--color-site-olive);
+    --color-taifa-orange: var(--color-site-burgandy);   /* Burgundy - rich deep red */
+    --color-taifa-yellow: var(--color-site-gold);
+    --color-taifa-red: var(--color-site-navy);          /* Navy - deep professional blue */
     --color-taifa-white: #FFFFFF;
+    
+    /* Section Background Colors - Step Function */
+    --bg-database: #E2E8F0;                            /* Light gray for database section (slate-200) */
+    --bg-equityOverview: #CBD5E1;                       /* Medium gray for equity overview section (slate-300) */
+    --bg-values: #F1F5F9;                              /* Lightest gray for values section (slate-100) */
   }
 }
 
-/* Explicit TAIFA Color Utility Classes for Tailwind v4 */
+/* Comprehensive Color Utility Classes */
 @layer utilities {
-  /* Text Colors */
+  /* Site Brand Colors - Text */
+  .text-site-slate { color: var(--color-site-slate); }
+  .text-site-terracotta { color: var(--color-site-terracotta); }
+  .text-site-gold { color: var(--color-site-gold); }
+  .text-site-sage { color: var(--color-site-sage); }
+  .text-site-cream { color: var(--color-site-cream); }
+  .text-site-navy { color: var(--color-site-navy); }
+  
+  /* Site Data Visualization Colors - Text */
+  .text-site-purple { color: var(--color-site-purple); }
+  .text-site-teal { color: var(--color-site-teal); }
+  .text-site-indigo { color: var(--color-site-indigo); }
+  .text-site-brown { color: var(--color-site-brown); }
+  .text-site-steel { color: var(--color-site-steel); }
+  .text-site-olive { color: var(--color-site-olive); }
+  
+  /* Dashboard Performance Colors - Text */
+  .text-dashboard-success { color: var(--color-dashboard-success); }
+  .text-dashboard-warning { color: var(--color-dashboard-warning); }
+  .text-dashboard-danger { color: var(--color-dashboard-danger); }
+  .text-dashboard-neutral { color: var(--color-dashboard-neutral); }
+  
+  /* Legacy Text Colors for backwards compatibility */
   .text-taifa-primary { color: var(--color-taifa-primary); }
   .text-taifa-secondary { color: var(--color-taifa-secondary); }
   .text-taifa-accent { color: var(--color-taifa-accent); }
@@ -34,7 +97,29 @@
   .text-taifa-red { color: var(--color-taifa-red); }
   .text-taifa-white { color: var(--color-taifa-white); }
 
-  /* Background Colors */
+  /* Site Brand Colors - Background */
+  .bg-site-slate { background-color: var(--color-site-slate); }
+  .bg-site-terracotta { background-color: var(--color-site-terracotta); }
+  .bg-site-gold { background-color: var(--color-site-gold); }
+  .bg-site-sage { background-color: var(--color-site-sage); }
+  .bg-site-cream { background-color: var(--color-site-cream); }
+  .bg-site-navy { background-color: var(--color-site-navy); }
+  
+  /* Site Data Visualization Colors - Background */
+  .bg-site-purple { background-color: var(--color-site-purple); }
+  .bg-site-teal { background-color: var(--color-site-teal); }
+  .bg-site-indigo { background-color: var(--color-site-indigo); }
+  .bg-site-brown { background-color: var(--color-site-brown); }
+  .bg-site-steel { background-color: var(--color-site-steel); }
+  .bg-site-olive { background-color: var(--color-site-olive); }
+  
+  /* Dashboard Performance Colors - Background */
+  .bg-dashboard-success { background-color: var(--color-dashboard-success); }
+  .bg-dashboard-warning { background-color: var(--color-dashboard-warning); }
+  .bg-dashboard-danger { background-color: var(--color-dashboard-danger); }
+  .bg-dashboard-neutral { background-color: var(--color-dashboard-neutral); }
+  
+  /* Legacy Background Colors for backwards compatibility */
   .bg-taifa-primary { background-color: var(--color-taifa-primary); }
   .bg-taifa-secondary { background-color: var(--color-taifa-secondary); }
   .bg-taifa-accent { background-color: var(--color-taifa-accent); }
@@ -48,7 +133,68 @@
   .bg-taifa-red { background-color: var(--color-taifa-red); }
   .bg-taifa-white { background-color: var(--color-taifa-white); }
 
-  /* Border Colors */
+  /* TAIFA Colors with Opacity Support for Tailwind v4 */
+  .from-taifa-primary { --tw-gradient-from: var(--color-taifa-primary) var(--tw-gradient-from-position); --tw-gradient-to: color-mix(in srgb, var(--color-taifa-primary) 0%, transparent) var(--tw-gradient-to-position); --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to); }
+  .to-taifa-primary\/80 { --tw-gradient-to: color-mix(in srgb, var(--color-taifa-primary) 80%, transparent) var(--tw-gradient-to-position); }
+  .from-taifa-secondary { --tw-gradient-from: var(--color-taifa-secondary) var(--tw-gradient-from-position); --tw-gradient-to: color-mix(in srgb, var(--color-taifa-secondary) 0%, transparent) var(--tw-gradient-to-position); --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to); }
+  .to-taifa-secondary\/80 { --tw-gradient-to: color-mix(in srgb, var(--color-taifa-secondary) 80%, transparent) var(--tw-gradient-to-position); }
+  .from-taifa-accent { --tw-gradient-from: var(--color-taifa-accent) var(--tw-gradient-from-position); --tw-gradient-to: color-mix(in srgb, var(--color-taifa-accent) 0%, transparent) var(--tw-gradient-to-position); --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to); }
+  .to-taifa-accent\/80 { --tw-gradient-to: color-mix(in srgb, var(--color-taifa-accent) 80%, transparent) var(--tw-gradient-to-position); }
+  .from-taifa-orange { --tw-gradient-from: var(--color-taifa-orange) var(--tw-gradient-from-position); --tw-gradient-to: color-mix(in srgb, var(--color-taifa-orange) 0%, transparent) var(--tw-gradient-to-position); --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to); }
+  .to-taifa-orange\/80 { --tw-gradient-to: color-mix(in srgb, var(--color-taifa-orange) 80%, transparent) var(--tw-gradient-to-position); }
+  .from-taifa-red { --tw-gradient-from: var(--color-taifa-red) var(--tw-gradient-from-position); --tw-gradient-to: color-mix(in srgb, var(--color-taifa-red) 0%, transparent) var(--tw-gradient-to-position); --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to); }
+  .to-taifa-red\/80 { --tw-gradient-to: color-mix(in srgb, var(--color-taifa-red) 80%, transparent) var(--tw-gradient-to-position); }
+  
+  /* Border opacity support */
+  .border-taifa-primary\/20 { border-color: color-mix(in srgb, var(--color-taifa-primary) 20%, transparent); }
+  .border-taifa-secondary\/20 { border-color: color-mix(in srgb, var(--color-taifa-secondary) 20%, transparent); }
+  .border-taifa-accent\/20 { border-color: color-mix(in srgb, var(--color-taifa-accent) 20%, transparent); }
+  .border-taifa-orange\/20 { border-color: color-mix(in srgb, var(--color-taifa-orange) 20%, transparent); }
+  .border-taifa-red\/20 { border-color: color-mix(in srgb, var(--color-taifa-red) 20%, transparent); }
+
+  /* Complete gradient utilities for Tailwind v4 */
+  .bg-gradient-to-br { background-image: linear-gradient(to bottom right, var(--tw-gradient-stops)); }
+  
+  /* Complete TAIFA gradient combinations */
+  .bg-gradient-to-br.from-taifa-primary.to-taifa-primary\/80 {
+    background-image: linear-gradient(to bottom right, var(--color-taifa-primary), color-mix(in srgb, var(--color-taifa-primary) 80%, transparent));
+  }
+  .bg-gradient-to-br.from-taifa-secondary.to-taifa-secondary\/80 {
+    background-image: linear-gradient(to bottom right, var(--color-taifa-secondary), color-mix(in srgb, var(--color-taifa-secondary) 80%, transparent));
+  }
+  .bg-gradient-to-br.from-taifa-accent.to-taifa-accent\/80 {
+    background-image: linear-gradient(to bottom right, var(--color-taifa-accent), color-mix(in srgb, var(--color-taifa-accent) 80%, transparent));
+  }
+  .bg-gradient-to-br.from-taifa-orange.to-taifa-orange\/80 {
+    background-image: linear-gradient(to bottom right, var(--color-taifa-orange), color-mix(in srgb, var(--color-taifa-orange) 80%, transparent));
+  }
+  .bg-gradient-to-br.from-taifa-red.to-taifa-red\/80 {
+    background-image: linear-gradient(to bottom right, var(--color-taifa-red), color-mix(in srgb, var(--color-taifa-red) 80%, transparent));
+  }
+
+  /* Site Brand Colors - Border */
+  .border-site-slate { border-color: var(--color-site-slate); }
+  .border-site-terracotta { border-color: var(--color-site-terracotta); }
+  .border-site-gold { border-color: var(--color-site-gold); }
+  .border-site-sage { border-color: var(--color-site-sage); }
+  .border-site-cream { border-color: var(--color-site-cream); }
+  .border-site-navy { border-color: var(--color-site-navy); }
+  
+  /* Site Data Visualization Colors - Border */
+  .border-site-purple { border-color: var(--color-site-purple); }
+  .border-site-teal { border-color: var(--color-site-teal); }
+  .border-site-indigo { border-color: var(--color-site-indigo); }
+  .border-site-brown { border-color: var(--color-site-brown); }
+  .border-site-steel { border-color: var(--color-site-steel); }
+  .border-site-olive { border-color: var(--color-site-olive); }
+  
+  /* Dashboard Performance Colors - Border */
+  .border-dashboard-success { border-color: var(--color-dashboard-success); }
+  .border-dashboard-warning { border-color: var(--color-dashboard-warning); }
+  .border-dashboard-danger { border-color: var(--color-dashboard-danger); }
+  .border-dashboard-neutral { border-color: var(--color-dashboard-neutral); }
+  
+  /* Legacy Border Colors for backwards compatibility */
   .border-taifa-primary { border-color: var(--color-taifa-primary); }
   .border-taifa-secondary { border-color: var(--color-taifa-secondary); }
   .border-taifa-accent { border-color: var(--color-taifa-accent); }
@@ -62,7 +208,28 @@
   .border-taifa-red { border-color: var(--color-taifa-red); }
   .border-taifa-white { border-color: var(--color-taifa-white); }
 
-  /* Opacity Support for Backgrounds */
+  /* Opacity Support for Site Colors */
+  .bg-site-slate\/5 { background-color: color-mix(in srgb, var(--color-site-slate) 5%, transparent); }
+  .bg-site-slate\/10 { background-color: color-mix(in srgb, var(--color-site-slate) 10%, transparent); }
+  .bg-site-slate\/20 { background-color: color-mix(in srgb, var(--color-site-slate) 20%, transparent); }
+  .bg-site-slate\/80 { background-color: color-mix(in srgb, var(--color-site-slate) 80%, transparent); }
+  
+  .bg-site-purple\/10 { background-color: color-mix(in srgb, var(--color-site-purple) 10%, transparent); }
+  .bg-site-purple\/20 { background-color: color-mix(in srgb, var(--color-site-purple) 20%, transparent); }
+  .bg-site-teal\/10 { background-color: color-mix(in srgb, var(--color-site-teal) 10%, transparent); }
+  .bg-site-brown\/10 { background-color: color-mix(in srgb, var(--color-site-brown) 10%, transparent); }
+  .bg-site-steel\/10 { background-color: color-mix(in srgb, var(--color-site-steel) 10%, transparent); }
+  .bg-site-olive\/10 { background-color: color-mix(in srgb, var(--color-site-olive) 10%, transparent); }
+  
+  /* Opacity Support for Dashboard Colors */
+  .bg-dashboard-success\/10 { background-color: color-mix(in srgb, var(--color-dashboard-success) 10%, transparent); }
+  .bg-dashboard-success\/20 { background-color: color-mix(in srgb, var(--color-dashboard-success) 20%, transparent); }
+  .bg-dashboard-warning\/10 { background-color: color-mix(in srgb, var(--color-dashboard-warning) 10%, transparent); }
+  .bg-dashboard-warning\/20 { background-color: color-mix(in srgb, var(--color-dashboard-warning) 20%, transparent); }
+  .bg-dashboard-danger\/10 { background-color: color-mix(in srgb, var(--color-dashboard-danger) 10%, transparent); }
+  .bg-dashboard-danger\/20 { background-color: color-mix(in srgb, var(--color-dashboard-danger) 20%, transparent); }
+  
+  /* Legacy Opacity Support for backwards compatibility */
   .bg-taifa-primary\/5 { background-color: color-mix(in srgb, var(--color-taifa-primary) 5%, transparent); }
   .bg-taifa-primary\/10 { background-color: color-mix(in srgb, var(--color-taifa-primary) 10%, transparent); }
   .bg-taifa-primary\/20 { background-color: color-mix(in srgb, var(--color-taifa-primary) 20%, transparent); }
@@ -99,7 +266,7 @@
   /* Legacy CSS Variables for existing styles */
   --taifa-primary: #3E4B59;
   --taifa-secondary: #F0A621;
-  --taifa-accent: #007A56;
+  --taifa-accent: #2F2458;
   --taifa-light: #F9FAFB;
   --taifa-dark: #3E4B59;
   --taifa-muted: #6B7280;
@@ -114,17 +281,26 @@
   --font-display: 'Inter', system-ui, sans-serif;
   --font-body: 'Source Sans Pro', system-ui, sans-serif;
   
-  /* Professional Chart Colors */
-  --chart-primary: #3E4B59;
-  --chart-secondary: #F0A621;
-  --chart-accent: #007A56;
-  --chart-neutral: #6B7280;
-  --chart-light: #F9FAFB;
-  --chart-success: #007A56;
-  --chart-olive: #5F763B;
-  --chart-orange: #BA4D00;
-  --chart-yellow: #F0E68C;
-  --chart-red: #A62E2E;
+  /* Professional Chart Colors - Updated for new system */
+  --chart-primary: var(--color-site-slate);
+  --chart-secondary: var(--color-site-gold);
+  --chart-accent: var(--color-site-sage);
+  --chart-neutral: var(--color-neutral-500);
+  --chart-light: var(--color-site-cream);
+  
+  /* Chart colors for categorical data (site colors only) */
+  --chart-purple: var(--color-site-purple);
+  --chart-teal: var(--color-site-teal);
+  --chart-indigo: var(--color-site-indigo);
+  --chart-brown: var(--color-site-brown);
+  --chart-steel: var(--color-site-steel);
+  --chart-olive: var(--color-site-olive);
+  
+  /* Dashboard performance indicators - reserved for KPIs only */
+  --chart-success: var(--color-dashboard-success);
+  --chart-warning: var(--color-dashboard-warning);
+  --chart-danger: var(--color-dashboard-danger);
+  --chart-neutral-dashboard: var(--color-dashboard-neutral);
   
   /* System Colors */
   --background: #FFFFFF;

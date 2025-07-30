@@ -132,6 +132,51 @@ ssh ${PROD_USER}@${PROD_SERVER} << 'EOF'
     # Create directories for logs and PIDs early
     mkdir -p logs pids
     
+    # Helper functions (available in SSH context)
+    error() { echo "❌ $1"; }
+    
+    # Port checking function (available in SSH context)
+    check_and_free_port() {
+        local port=$1
+        local service_name=$2
+        
+        echo "Checking if port $port is available for $service_name..."
+        
+        # Check if port is in use
+        local processes=$(lsof -ti :$port 2>/dev/null)
+        
+        if [ -n "$processes" ]; then
+            echo "⚠ Port $port is in use by processes: $processes"
+            
+            # Show what's using the port
+            lsof -i :$port 2>/dev/null || true
+            
+            # Kill the processes one by one
+            echo "$processes" | while read -r pid; do
+                if [ -n "$pid" ]; then
+                    echo "Killing process $pid using port $port..."
+                    kill -9 "$pid" 2>/dev/null || true
+                fi
+            done
+            
+            # Wait a moment for cleanup
+            sleep 3
+            
+            # Verify port is now free
+            local remaining=$(lsof -ti :$port 2>/dev/null)
+            if [ -n "$remaining" ]; then
+                echo "❌ Failed to free port $port. Remaining processes: $remaining"
+                return 1
+            else
+                echo "✅ Port $port is now free for $service_name"
+            fi
+        else
+            echo "✅ Port $port is available for $service_name"
+        fi
+        
+        return 0
+    }
+    
     # Function to safely install requirements with conflict resolution
     install_requirements_safely() {
         local component=$1
@@ -244,15 +289,13 @@ else:
         
         echo "Starting FastAPI backend with detailed logging..."
         # Create detailed uvicorn log with access logs, error details, and timestamps
-        # Main log: application logs, errors, startup info
-        # Access log: HTTP requests and responses
+        # Main log: application logs, errors, startup info, and access logs
         nohup uvicorn app.main:app \
             --host 0.0.0.0 \
             --port 8030 \
             --reload \
             --log-level debug \
             --access-log \
-            --access-logfile ../logs/backend_access.log \
             --use-colors \
             --date-header \
             --server-header \

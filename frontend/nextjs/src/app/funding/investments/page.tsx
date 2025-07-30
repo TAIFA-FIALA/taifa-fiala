@@ -166,7 +166,7 @@ function InvestmentContent() {
       <div className="container mx-auto p-4 py-8">
         {/* Header */}
         <div className="mb-8">
-          <Link href="/" className="text-green-600 hover:text-green-700 mb-4 inline-block font-medium">
+          <Link href="/" className="text-slate-600 hover:text-slate-700 mb-4 inline-block font-medium">
             ← Back to Pathway Selection
           </Link>
           <h1 className="text-4xl font-extrabold text-gray-900 mb-4">Investment Opportunities</h1>
@@ -186,7 +186,7 @@ function InvestmentContent() {
                 id="keyword"
                 value={keyword}
                 onChange={(e) => setKeyword(e.target.value)}
-                className="w-full rounded-md bg-white border border-gray-300 text-gray-900 placeholder-gray-500 focus:border-green-500 focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
+                className="w-full rounded-md bg-white border border-gray-300 text-gray-900 placeholder-gray-500 focus:border-slate-500 focus:ring-2 focus:ring-slate-500 focus:ring-opacity-50"
                 placeholder="Search title or description"
               />
             </div>
@@ -197,7 +197,7 @@ function InvestmentContent() {
                 id="minAmount"
                 value={minAmount}
                 onChange={(e) => setMinAmount(e.target.value)}
-                className="w-full rounded-md bg-white border border-gray-300 text-gray-900 placeholder-gray-500 focus:border-green-500 focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
+                className="w-full rounded-md bg-white border border-gray-300 text-gray-900 placeholder-gray-500 focus:border-slate-500 focus:ring-2 focus:ring-slate-500 focus:ring-opacity-50"
                 placeholder="e.g., 50000"
               />
             </div>
@@ -208,7 +208,7 @@ function InvestmentContent() {
                 id="maxAmount"
                 value={maxAmount}
                 onChange={(e) => setMaxAmount(e.target.value)}
-                className="w-full rounded-md bg-white border border-gray-300 text-gray-900 placeholder-gray-500 focus:border-green-500 focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
+                className="w-full rounded-md bg-white border border-gray-300 text-gray-900 placeholder-gray-500 focus:border-slate-500 focus:ring-2 focus:ring-slate-500 focus:ring-opacity-50"
                 placeholder="e.g., 1000000"
               />
             </div>
@@ -219,7 +219,7 @@ function InvestmentContent() {
                 id="maxEquity"
                 value={maxEquity}
                 onChange={(e) => setMaxEquity(e.target.value)}
-                className="w-full rounded-md bg-white border border-gray-300 text-gray-900 placeholder-gray-500 focus:border-green-500 focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
+                className="w-full rounded-md bg-white border border-gray-300 text-gray-900 placeholder-gray-500 focus:border-slate-500 focus:ring-2 focus:ring-slate-500 focus:ring-opacity-50"
                 placeholder="e.g., 20"
                 min="0"
                 max="100"
@@ -231,7 +231,7 @@ function InvestmentContent() {
                 id="stage"
                 value={selectedStage}
                 onChange={(e) => setSelectedStage(e.target.value)}
-                className="w-full rounded-md bg-white border border-gray-300 text-gray-900 focus:border-green-500 focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
+                className="w-full rounded-md bg-white border border-gray-300 text-gray-900 focus:border-slate-500 focus:ring-2 focus:ring-slate-500 focus:ring-opacity-50"
               >
                 <option value="">All Stages</option>
                 {fundingStages.map((stage) => (
@@ -246,7 +246,7 @@ function InvestmentContent() {
                 id="startDate"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="w-full rounded-md bg-white border border-gray-300 text-gray-900 focus:border-green-500 focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
+                className="w-full rounded-md bg-white border border-gray-300 text-gray-900 focus:border-slate-500 focus:ring-2 focus:ring-slate-500 focus:ring-opacity-50"
               />
             </div>
             <div>
@@ -256,7 +256,7 @@ function InvestmentContent() {
                 id="endDate"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="w-full rounded-md bg-white border border-gray-300 text-gray-900 focus:border-green-500 focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
+                className="w-full rounded-md bg-white border border-gray-300 text-gray-900 focus:border-slate-500 focus:ring-2 focus:ring-slate-500 focus:ring-opacity-50"
               />
             </div>
             <div>
@@ -265,7 +265,7 @@ function InvestmentContent() {
                 id="status"
                 value={selectedStatus}
                 onChange={(e) => setSelectedStatus(e.target.value)}
-                className="w-full rounded-md bg-white border border-gray-300 text-gray-900 focus:border-green-500 focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
+                className="w-full rounded-md bg-white border border-gray-300 text-gray-900 focus:border-slate-500 focus:ring-2 focus:ring-slate-500 focus:ring-opacity-50"
               >
                 <option value="">All</option>
                 {statuses.map((s) => (
@@ -279,7 +279,7 @@ function InvestmentContent() {
                 id="organization"
                 value={selectedOrganization}
                 onChange={(e) => setSelectedOrganization(e.target.value)}
-                className="w-full rounded-md bg-white border border-gray-300 text-gray-900 focus:border-green-500 focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
+                className="w-full rounded-md bg-white border border-gray-300 text-gray-900 focus:border-slate-500 focus:ring-2 focus:ring-slate-500 focus:ring-opacity-50"
               >
                 <option value="">All</option>
                 {organizations.map((org) => (
@@ -293,7 +293,7 @@ function InvestmentContent() {
                 id="country"
                 value={selectedCountry}
                 onChange={(e) => setSelectedCountry(e.target.value)}
-                className="w-full rounded-md bg-white border border-gray-300 text-gray-900 focus:border-green-500 focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
+                className="w-full rounded-md bg-white border border-gray-300 text-gray-900 focus:border-slate-500 focus:ring-2 focus:ring-slate-500 focus:ring-opacity-50"
               >
                 <option value="">All</option>
                 {countries.map((c) => (
@@ -320,7 +320,7 @@ function InvestmentContent() {
                         setSelectedCategories(selectedCategories.filter((c) => c !== cat));
                       }
                     }}
-                    className="h-4 w-4 text-green-600 bg-white border-gray-300 rounded focus:ring-green-500"
+                    className="h-4 w-4 text-slate-600 bg-white border-gray-300 rounded focus:ring-slate-500"
                   />
                   <label htmlFor={`category-${cat}`} className="text-sm text-gray-700">{cat}</label>
                 </div>
@@ -331,7 +331,7 @@ function InvestmentContent() {
           <div className="mt-6 flex justify-end">
             <button
               onClick={handleClearFilters}
-              className="px-6 py-2 bg-white border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
+              className="px-6 py-2 bg-white border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-opacity-50"
             >
               Clear Filters
             </button>
@@ -341,7 +341,7 @@ function InvestmentContent() {
         {/* Opportunities List */}
         {loading ? (
           <div className="text-center py-12">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-slate-600"></div>
             <p className="text-gray-600 mt-4">Loading investment opportunities...</p>
           </div>
         ) : error ? (
@@ -355,7 +355,7 @@ function InvestmentContent() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {opportunities.map((opportunity) => (
-              <div key={opportunity.id} className="bg-white border border-gray-200 rounded-xl p-6 hover:border-green-400 hover:shadow-md transition-all duration-200">
+              <div key={opportunity.id} className="bg-white border border-gray-200 rounded-xl p-6 hover:border-slate-400 hover:shadow-md transition-all duration-200">
                 <div className="mb-4">
                   <h3 className="text-xl font-bold text-gray-900 mb-2">{opportunity.title}</h3>
                   <p className="text-gray-600 text-sm mb-4 line-clamp-3">{opportunity.description}</p>
@@ -363,16 +363,16 @@ function InvestmentContent() {
                 
                 <div className="space-y-3 text-sm">
                   {opportunity.amount_usd && (
-                    <p className="text-green-600 font-semibold">
+                    <p className="text-slate-700 font-semibold">
                       <DollarSign className="w-4 h-4 inline mr-1" />
                       Investment: ${opportunity.amount_usd.toLocaleString()} {opportunity.currency}
                     </p>
                   )}
-                  <p className="text-orange-600">
+                  <p className="text-amber-700">
                     <Clock className="w-4 h-4 inline mr-1" />
                     Deadline: {format(new Date(opportunity.deadline), 'PPP')}
                   </p>
-                  <p className="text-emerald-600">
+                  <p className="text-slate-600">
                     <BarChart3 className="w-4 h-4 inline mr-1" />
                     Status: <span className="capitalize">{opportunity.status}</span>
                   </p>
@@ -385,19 +385,19 @@ function InvestmentContent() {
                     </p>
                   )}
                   {opportunity.valuation_cap && (
-                    <p className="text-blue-600">
+                    <p className="text-slate-600">
                       <Gem className="w-4 h-4 inline mr-1" />
                       Valuation Cap: ${opportunity.valuation_cap.toLocaleString()}
                     </p>
                   )}
                   {opportunity.expected_roi && (
-                    <p className="text-purple-600">
+                    <p className="text-slate-600">
                       <Target className="w-4 h-4 inline mr-1" />
                       Expected ROI: {opportunity.expected_roi}%
                     </p>
                   )}
                   {opportunity.interest_rate && (
-                    <p className="text-indigo-600">
+                    <p className="text-slate-600">
                       <BarChart3 className="w-4 h-4 inline mr-1" />
                       Interest Rate: {opportunity.interest_rate}%
                     </p>
@@ -411,7 +411,7 @@ function InvestmentContent() {
                   )}
                   
                   {opportunity.post_investment_support && (
-                    <p className="text-cyan-600 text-xs">
+                    <p className="text-slate-600 text-xs">
                       <Handshake className="w-4 h-4 inline mr-1" />
                       Support: {opportunity.post_investment_support}
                     </p>
@@ -431,7 +431,7 @@ function InvestmentContent() {
                       href={opportunity.link} 
                       target="_blank" 
                       rel="noopener noreferrer" 
-                      className="inline-block bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200"
+                      className="inline-block bg-slate-700 hover:bg-slate-800 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200"
                     >
                       View Investment Details →
                     </a>
@@ -466,7 +466,7 @@ function InvestmentContent() {
                 setItemsPerPage(Number(e.target.value));
                 setCurrentPage(1);
               }}
-              className="ml-4 rounded-md bg-white border border-gray-300 text-gray-900 focus:border-green-500 focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
+              className="ml-4 rounded-md bg-white border border-gray-300 text-gray-900 focus:border-slate-500 focus:ring-2 focus:ring-slate-500 focus:ring-opacity-50"
             >
               <option value={10}>10 per page</option>
               <option value={20}>20 per page</option>
@@ -482,7 +482,7 @@ function InvestmentContent() {
 export default function InvestmentsPage() {
   return (
     <Suspense fallback={<div className="flex justify-center items-center h-64">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-slate-500"></div>
     </div>}>
       <InvestmentContent />
     </Suspense>

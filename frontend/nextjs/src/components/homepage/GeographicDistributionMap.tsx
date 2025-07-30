@@ -1,12 +1,10 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { scaleLinear } from 'd3-scale';
 import { Map, Overlay } from 'pigeon-maps';
 import africanCountriesGeo from '@/data/african_countries_geo.json';
 import VisualizationErrorBoundary from '@/components/common/VisualizationErrorBoundary';
 import Image from 'next/image';
-import { ScaleIcon } from 'lucide-react';
 
 // Types for GeoJSON features
 interface GeoJSONProperties {
@@ -138,18 +136,6 @@ const GeographicDistributionMap = () => {
     setData(mockData);
   }, []);
 
-  const getFundingColor = (countryName: string) => {  
-    const countryData = data.find(d => d.country === countryName);
-    if (!countryData) return '#F5F5F5'; // Default color for countries with no data
-    
-    // Color scale
-    const colorScale = scaleLinear<string>()
-      .domain([0, 30])
-      .range(['#E5E7EB', '#1B365D']);
-      
-    return colorScale(countryData.percentageTotal);
-  };
-
   // Simple number formatter with thousands separator
   const formatNumber = (num: number): string => {
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -201,7 +187,6 @@ const GeographicDistributionMap = () => {
               {/* Render African countries with color-coding based on funding data */}
               {countryPolygons.map((country, index) => {
                 const countryName = country.name;
-                const fillColor = getFundingColor(countryName);
                 
                 // Display markers for countries with significant funding
                 const countryData = data.find(d => d.country === countryName);
@@ -221,7 +206,7 @@ const GeographicDistributionMap = () => {
                         <div
                           className="absolute rounded-full opacity-70 cursor-pointer"
                           style={{
-                            backgroundColor: '#F0A621', // taifa-secondary
+                            backgroundColor: countryData.percentageTotal > 15 ? '#1B365D' : '#64748B', // Dark slate for high funding, medium slate for others
                             width: `${Math.max(20, countryData.percentageTotal * 3)}px`,
                             height: `${Math.max(20, countryData.percentageTotal * 3)}px`,
                             top: '50%',

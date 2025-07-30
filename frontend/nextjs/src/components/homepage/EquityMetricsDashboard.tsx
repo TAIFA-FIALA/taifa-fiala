@@ -34,14 +34,19 @@ interface EquityMetrics {
 }
 
 const COLORS = {
-  primary: '#102F76',
-  gold: '#D4AF37',
-  blue: '#4F46E5',
-  green: '#059669',
-  red: '#DC2626',
-  orange: '#EA580C',
-  purple: '#7C3AED',
-  teal: '#0D9488'
+  primary: '#2D3748',        // site-slate
+  gold: '#D69E2E',          // site-gold  
+  blue: '#4C51BF',          // site-indigo
+  purple: '#553C9A',        // site-purple
+  teal: '#2D7D79',          // site-teal
+  brown: '#2F2458',         // site-brown
+  steel: '#4A5568',         // site-steel
+  olive: '#68623C',         // site-olive
+  // Dashboard performance colors (only for KPIs)
+  success: '#38A169',       // dashboard-success
+  warning: '#D69E2E',       // dashboard-warning
+  danger: '#E53E3E',        // dashboard-danger
+  neutral: '#718096'        // dashboard-neutral
 };
 
 export default function EquityMetricsDashboard() {
@@ -101,13 +106,13 @@ export default function EquityMetricsDashboard() {
   if (!metrics) return null;
 
   const geographicData = [
-    { name: 'Big 4 Countries', value: metrics.geographic.big_four_percentage, color: COLORS.red },
-    { name: 'Other Countries', value: 100 - metrics.geographic.big_four_percentage, color: COLORS.green },
+    { name: 'Big 4 Countries', value: metrics.geographic.big_four_percentage, color: COLORS.primary },
+    { name: 'Other Countries', value: 100 - metrics.geographic.big_four_percentage, color: COLORS.teal },
   ];
 
   const sectoralData = [
-    { name: 'Healthcare', value: metrics.sectoral.healthcare_percentage, color: COLORS.red },
-    { name: 'Agriculture', value: metrics.sectoral.agriculture_percentage, color: COLORS.green },
+    { name: 'Healthcare', value: metrics.sectoral.healthcare_percentage, color: COLORS.purple },
+    { name: 'Agriculture', value: metrics.sectoral.agriculture_percentage, color: COLORS.olive },
     { name: 'Climate', value: metrics.sectoral.climate_percentage, color: COLORS.blue },
     { name: 'Tech/Other', value: 100 - metrics.sectoral.healthcare_percentage - metrics.sectoral.agriculture_percentage - metrics.sectoral.climate_percentage, color: COLORS.primary },
   ];
@@ -121,8 +126,8 @@ export default function EquityMetricsDashboard() {
   const languageData = [
     { name: 'English', value: metrics.language.english_percentage, color: COLORS.primary },
     { name: 'French', value: metrics.language.french_percentage, color: COLORS.gold },
-    { name: 'Arabic', value: metrics.language.arabic_percentage, color: COLORS.green },
-    { name: 'Portuguese', value: metrics.language.portuguese_percentage, color: COLORS.orange },
+    { name: 'Arabic', value: metrics.language.arabic_percentage, color: COLORS.brown },
+    { name: 'Portuguese', value: metrics.language.portuguese_percentage, color: COLORS.steel },
   ];
 
   const equityOverviewData = [
@@ -238,33 +243,33 @@ export default function EquityMetricsDashboard() {
               <div>
                 <h4 className="text-lg font-semibold text-gray-900 mb-4">Key Insights</h4>
                 <div className="space-y-4">
-                  <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                  <div className="bg-dashboard-danger/10 border border-dashboard-danger/20 rounded-lg p-4">
                     <div className="flex items-center space-x-2 mb-2">
-                      <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                      <span className="font-medium text-red-800">Geographic Concentration</span>
+                      <div className="w-2 h-2 bg-dashboard-danger rounded-full"></div>
+                      <span className="font-medium text-dashboard-danger">Geographic Concentration Risk</span>
                     </div>
-                    <p className="text-sm text-red-700">
-                      {metrics.geographic.big_four_percentage}% of opportunities concentrated in Big 4 countries
+                    <p className="text-sm" style={{ color: 'var(--color-dashboard-danger)' }}>
+                      {metrics.geographic.big_four_percentage}% concentration exceeds 60% target threshold
                     </p>
                   </div>
                   
-                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                  <div className="bg-dashboard-warning/10 border border-dashboard-warning/20 rounded-lg p-4">
                     <div className="flex items-center space-x-2 mb-2">
-                      <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                      <span className="font-medium text-yellow-800">Sector Gaps</span>
+                      <div className="w-2 h-2 bg-dashboard-warning rounded-full"></div>
+                      <span className="font-medium text-dashboard-warning">Sector Performance Gap</span>
                     </div>
-                    <p className="text-sm text-yellow-700">
+                    <p className="text-sm" style={{ color: 'var(--color-dashboard-warning)' }}>
                       Healthcare ({metrics.sectoral.healthcare_percentage}%) and Agriculture ({metrics.sectoral.agriculture_percentage}%) below targets
                     </p>
                   </div>
                   
-                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <div className="bg-dashboard-success/10 border border-dashboard-success/20 rounded-lg p-4">
                     <div className="flex items-center space-x-2 mb-2">
-                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                      <span className="font-medium text-green-800">Inclusion Progress</span>
+                      <div className="w-2 h-2 bg-dashboard-success rounded-full"></div>
+                      <span className="font-medium text-dashboard-success">Target Achievement</span>
                     </div>
-                    <p className="text-sm text-green-700">
-                      Youth-focused opportunities ({metrics.inclusion.youth_focused_percentage}%) showing strong growth
+                    <p className="text-sm" style={{ color: 'var(--color-dashboard-success)' }}>
+                      Youth-focused opportunities ({metrics.inclusion.youth_focused_percentage}%) meeting 25% target threshold
                     </p>
                   </div>
                 </div>
@@ -301,28 +306,28 @@ export default function EquityMetricsDashboard() {
               <div>
                 <h4 className="text-lg font-semibold text-gray-900 mb-4">Regional Breakdown</h4>
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between p-3 bg-red-50 rounded-lg">
+                  <div className="flex items-center justify-between p-3 bg-site-slate/10 rounded-lg">
                     <div className="flex items-center space-x-3">
-                      <div className="w-4 h-4 bg-red-500 rounded-full"></div>
+                      <div className="w-4 h-4 bg-site-slate rounded-full"></div>
                       <span className="font-medium text-gray-900">Nigeria, Kenya, South Africa, Egypt</span>
                     </div>
-                    <span className="text-lg font-bold text-red-600">{metrics.geographic.big_four_percentage}%</span>
+                    <span className="text-lg font-bold text-site-slate">{metrics.geographic.big_four_percentage}%</span>
                   </div>
                   
-                  <div className="flex items-center justify-between p-3 bg-yellow-50 rounded-lg">
+                  <div className="flex items-center justify-between p-3 bg-site-gold/10 rounded-lg">
                     <div className="flex items-center space-x-3">
-                      <div className="w-4 h-4 bg-yellow-500 rounded-full"></div>
+                      <div className="w-4 h-4 bg-site-gold rounded-full"></div>
                       <span className="font-medium text-gray-900">Emerging Markets</span>
                     </div>
-                    <span className="text-lg font-bold text-yellow-600">15%</span>
+                    <span className="text-lg font-bold text-site-gold">15%</span>
                   </div>
                   
-                  <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                  <div className="flex items-center justify-between p-3 bg-site-teal/10 rounded-lg">
                     <div className="flex items-center space-x-3">
-                      <div className="w-4 h-4 bg-green-500 rounded-full"></div>
+                      <div className="w-4 h-4 bg-site-teal rounded-full"></div>
                       <span className="font-medium text-gray-900">Underserved Regions</span>
                     </div>
-                    <span className="text-lg font-bold text-green-600">{metrics.geographic.underserved_percentage}%</span>
+                    <span className="text-lg font-bold text-site-teal">{metrics.geographic.underserved_percentage}%</span>
                   </div>
                 </div>
                 
@@ -360,9 +365,9 @@ export default function EquityMetricsDashboard() {
                 <h4 className="text-lg font-semibold text-gray-900 mb-4">Development Priorities</h4>
                 <div className="space-y-4">
                   {[
-                    { name: 'Healthcare', current: metrics.sectoral.healthcare_percentage, target: 20, color: 'red' },
-                    { name: 'Agriculture', current: metrics.sectoral.agriculture_percentage, target: 18, color: 'green' },
-                    { name: 'Climate', current: metrics.sectoral.climate_percentage, target: 15, color: 'blue' },
+                    { name: 'Healthcare', current: metrics.sectoral.healthcare_percentage, target: 20, color: COLORS.purple },
+                    { name: 'Agriculture', current: metrics.sectoral.agriculture_percentage, target: 18, color: COLORS.olive },
+                    { name: 'Climate', current: metrics.sectoral.climate_percentage, target: 15, color: COLORS.blue },
                   ].map((sector) => (
                     <div key={sector.name} className="space-y-2">
                       <div className="flex justify-between items-center">
@@ -371,11 +376,11 @@ export default function EquityMetricsDashboard() {
                       </div>
                       <div className="w-full bg-gray-200 rounded-full h-2">
                         <div 
-                          className={`h-2 rounded-full transition-all duration-500 ${
-                            sector.color === 'red' ? 'bg-red-500' :
-                            sector.color === 'green' ? 'bg-green-500' : 'bg-blue-500'
-                          }`}
-                          style={{ width: `${(sector.current / sector.target) * 100}%` }}
+                          className="h-2 rounded-full transition-all duration-500"
+                          style={{ 
+                            width: `${(sector.current / sector.target) * 100}%`,
+                            backgroundColor: sector.color
+                          }}
                         ></div>
                       </div>
                     </div>
@@ -454,13 +459,13 @@ export default function EquityMetricsDashboard() {
                 <p className="text-sm text-blue-700">of opportunities target young innovators</p>
               </div>
               
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
                 <div className="flex items-center space-x-2 mb-2">
-                  <Home className="w-6 h-6 text-green-600" />
-                  <span className="font-medium text-green-800">Rural-Focused</span>
+                  <Home className="w-6 h-6 text-amber-700" />
+                  <span className="font-medium text-amber-800">Rural-Focused</span>
                 </div>
-                <div className="text-2xl font-bold text-green-600">{metrics.inclusion.rural_focused_percentage}%</div>
-                <p className="text-sm text-green-700">of opportunities target rural communities</p>
+                <div className="text-2xl font-bold text-amber-700">{metrics.inclusion.rural_focused_percentage}%</div>
+                <p className="text-sm text-amber-600">of opportunities target rural communities</p>
               </div>
             </div>
           </div>

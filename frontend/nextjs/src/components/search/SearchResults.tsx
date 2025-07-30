@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { 
   Grid, List, ChevronLeft, ChevronRight, RotateCcw, 
   SortAsc, SortDesc, Filter, Download, Share2,
@@ -35,8 +35,8 @@ export default function SearchResults({ searchMode, filters, loading, onLoadMore
     { value: 'organization', label: 'Organization', icon: Building2 }
   ];
 
-  // Mock data for demonstration
-  const mockAnnouncements: FundingAnnouncement[] = [
+  // Memoize mock data to prevent dependency array changes
+  const mockAnnouncements: FundingAnnouncement[] = useMemo(() => [
     {
       id: 1,
       title: "AI for Healthcare Innovation Grant",
@@ -131,7 +131,7 @@ export default function SearchResults({ searchMode, filters, loading, onLoadMore
       created_at: "2024-07-10",
       last_checked: "2024-07-16"
     }
-  ];
+  ], []);
 
   useEffect(() => {
     // Simulate API call

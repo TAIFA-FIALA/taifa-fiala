@@ -25,14 +25,14 @@ import {
   TrendingUp,
 } from 'lucide-react';
 
-// TAIFA color scheme for charts - using Tailwind config values
+// TAIFA color scheme for charts - using serious professional palette
 const CHART_COLORS = {
-  female: '#A62E2E',      // taifa-red - consistent with Tailwind config
-  male: '#3E4B59',        // taifa-primary - for contrast/differentiation
-  femaleLight: '#A62E2E', // taifa-red - consistent with Tailwind config
-  maleLight: '#6B7280',   // taifa-muted - for lighter male representation
-  gridLine: '#F2F2F2',    // taifa-border - consistent with Tailwind config
-  text: '#3E4B59'         // taifa-primary - consistent with Tailwind config
+  female: '#553C9A',      // site-purple - muted professional for gender category
+  male: '#2D3748',        // site-slate - deep professional primary
+  femaleLight: '#553C9A', // site-purple - consistent muted tone
+  maleLight: '#4A5568',   // site-steel - muted secondary
+  gridLine: '#F2F2F2',    // neutral grid
+  text: '#2D3748'         // site-slate - professional text
 } as const;
 
 // Data type definitions
@@ -179,13 +179,13 @@ const GenderEquityDashboard = () => {
 
   if (error) {
     return (
-      <div className="bg-red-50 border-l-4 border-red-400 p-4">
+      <div className="bg-site-brown/5 border-l-4 border-site-brown p-4">
         <div className="flex">
           <div className="flex-shrink-0">
-            <AlertCircle className="h-5 w-5 text-red-400" />
+            <AlertCircle className="h-5 w-5 text-site-brown" />
           </div>
           <div className="ml-3">
-            <p className="text-sm text-red-700">
+            <p className="text-sm text-site-brown">
               Failed to load gender equity data. Please try again later.
             </p>
           </div>
@@ -216,60 +216,60 @@ const GenderEquityDashboard = () => {
     <div className="space-y-4">
       {/* Compact Metric Cards with Better Proportions */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
-        <div className="bg-white p-4 rounded-lg border-l-3 border-taifa-red shadow-sm hover:shadow-md transition-all duration-200 text-center">
+        <div className="bg-white p-4 rounded-lg border-l-3 border-site-brown shadow-sm hover:shadow-md transition-all duration-200 text-center">
           <div className="flex items-center justify-center mb-2">
-            <div className="w-8 h-8 rounded-full bg-taifa-red/10 flex items-center justify-center mr-2">
-              <DollarSign className="w-4 h-4 text-taifa-red" />
+            <div className="w-8 h-8 rounded-full bg-site-brown/10 flex items-center justify-center mr-2">
+              <DollarSign className="w-4 h-4 text-site-brown" />
             </div>
             <div className="text-right">
-              <div className="text-xl font-bold text-taifa-red">
+              <div className="text-xl font-bold text-site-brown">
                 {Math.round((totalFundingWomen / (totalFundingWomen + totalFundingMen)) * 100)}%
               </div>
               <div className="text-xs text-taifa-muted">Female Funding Share</div>
             </div>
           </div>
-          <div className="text-xs text-taifa-red">across {genderTimelineData.length} years</div>
+          <div className="text-xs text-site-brown">across {genderTimelineData.length} years</div>
         </div>
 
-        <div className="bg-white p-4 rounded-lg border-l-3 border-taifa-red shadow-sm hover:shadow-md transition-all duration-200 text-center">
+        <div className="bg-white p-4 rounded-lg border-l-3 border-site-brown shadow-sm hover:shadow-md transition-all duration-200 text-center">
           <div className="flex items-center justify-center mb-2">
-            <div className="w-8 h-8 rounded-full bg-taifa-red/10 flex items-center justify-center mr-2">
-              <DollarSign className="w-4 h-4 text-taifa-red" />
+            <div className="w-8 h-8 rounded-full bg-site-brown/10 flex items-center justify-center mr-2">
+              <DollarSign className="w-4 h-4 text-site-brown" />
             </div>
             <div className="text-right">
-              <div className="text-xl font-bold text-taifa-red">
+              <div className="text-xl font-bold text-site-brown">
                 ${Math.round(totalFundingWomen / 1000000)}M
               </div>
               <div className="text-xs text-taifa-muted">Female founder funding</div>
             </div>
           </div>
-          <div className="text-xs text-taifa-red">Only 12% of total funding</div>
+          <div className="text-xs text-site-brown">Only 12% of total funding</div>
         </div>
 
-        <div className="bg-white p-4 rounded-lg border-l-3 border-taifa-red shadow-sm hover:shadow-md transition-all duration-200 text-center">
+        <div className="bg-white p-4 rounded-lg border-l-3 border-site-brown shadow-sm hover:shadow-md transition-all duration-200 text-center">
           <div className="flex items-center justify-center mb-2">
-            <div className="w-8 h-8 rounded-full bg-taifa-red/10 flex items-center justify-center mr-2">
-              <TrendingDown className="w-4 h-4 text-taifa-red" />
+            <div className="w-8 h-8 rounded-full bg-site-brown/10 flex items-center justify-center mr-2">
+              <TrendingDown className="w-4 h-4 text-site-brown" />
             </div>
             <div className="text-right">
-              <div className="text-xl font-bold text-taifa-red">6 years</div>
+              <div className="text-xl font-bold text-site-brown">6 years</div>
               <div className="text-xs text-taifa-muted">Declining trend</div>
             </div>
           </div>
-          <div className="text-xs text-taifa-red">Since 2019 peak of 22.3%</div>
+          <div className="text-xs text-site-brown">Since 2019 peak of 22.3%</div>
         </div>
 
-        <div className="bg-white p-4 rounded-lg border-l-3 border-taifa-red shadow-sm hover:shadow-md transition-all duration-200 text-center">
+        <div className="bg-white p-4 rounded-lg border-l-3 border-site-brown shadow-sm hover:shadow-md transition-all duration-200 text-center">
           <div className="flex items-center justify-center mb-2">
-            <div className="w-8 h-8 rounded-full bg-taifa-red/10 flex items-center justify-center mr-2">
-              <TrendingUp className="w-4 h-4 text-taifa-red" />
+            <div className="w-8 h-8 rounded-full bg-site-brown/10 flex items-center justify-center mr-2">
+              <TrendingUp className="w-4 h-4 text-site-brown" />
             </div>
             <div className="text-right">
-              <div className="text-xl font-bold text-taifa-red">4.2x</div>
+              <div className="text-xl font-bold text-site-brown">4.2x</div>
               <div className="text-xs text-taifa-muted">Funding gap</div>
             </div>
           </div>
-          <div className="text-xs text-taifa-red">Less than male-led startups</div>
+          <div className="text-xs text-site-brown">Less than male-led startups</div>
         </div>
       </div>
 
@@ -307,10 +307,10 @@ const GenderEquityDashboard = () => {
                 <Line 
                   type="monotone" 
                   dataKey="femalePercentage" 
-                  stroke="var(--taifa-red)" 
+                  stroke="var(--color-site-brown)" 
                   strokeWidth={3}
-                  dot={{ fill: 'var(--taifa-red)', strokeWidth: 2, r: 4 }}
-                  activeDot={{ r: 6, stroke: 'var(--taifa-red)', strokeWidth: 2 }}
+                  dot={{ fill: 'var(--color-site-brown)', strokeWidth: 2, r: 4 }}
+                  activeDot={{ r: 6, stroke: 'var(--color-site-brown)', strokeWidth: 2 }}
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -347,7 +347,7 @@ const GenderEquityDashboard = () => {
                 />
                 <Bar 
                   dataKey="femalePercent" 
-                  fill="var(--taifa-red)"
+                  fill="var(--color-site-brown)"
                   radius={[4, 4, 0, 0]}
                   maxBarSize={barSize}
                 />
@@ -358,25 +358,25 @@ const GenderEquityDashboard = () => {
       </div>
 
       {/* Critical Insights */}
-      <div className="bg-red-50 p-6 rounded-lg border-l-4 border-red-400">
-        <h4 className="text-lg font-semibold text-red-800 mb-3 flex items-center gap-2">
+      <div className="bg-site-brown/5 p-6 rounded-lg border-l-4 border-site-brown">
+        <h4 className="text-lg font-semibold text-site-brown mb-3 flex items-center gap-2">
           <AlertCircle className="h-5 w-5" />
           Critical Gender Equity Findings
         </h4>
         <div className="grid md:grid-cols-2 gap-4 text-sm">
           <div>
-            <p className="text-red-700 mb-2">
+            <p className="text-site-brown mb-2">
               <strong>Declining Trend:</strong> Female leadership dropped from 22.3% (2019) to 12.3% (2024)
             </p>
-            <p className="text-red-700">
+            <p className="text-site-brown">
               <strong>Funding Gap:</strong> Female founders receive 4x less funding per deal on average
             </p>
           </div>
           <div>
-            <p className="text-red-700 mb-2">
+            <p className="text-site-brown mb-2">
               <strong>Sector Gaps:</strong> Infrastructure and FinTech show severe underrepresentation
             </p>
-            <p className="text-red-700">
+            <p className="text-site-brown">
               <strong>Regional Variation:</strong> Central Africa has lowest female participation at 8.9%
             </p>
           </div>

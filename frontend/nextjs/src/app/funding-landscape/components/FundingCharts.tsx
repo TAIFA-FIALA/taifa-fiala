@@ -1,53 +1,72 @@
 'use client';
 
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart as RechartsPieChart, Pie, Cell, ComposedChart, Line } from 'recharts';
+import { XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart as RechartsPieChart, Pie, Cell, ComposedChart, Line, Bar } from 'recharts';
+
+interface CountryData {
+  country: string;
+  funding: number;
+  deals: number;
+  color: string;
+  share: string;
+}
+
+interface SectorData {
+  name: string;
+  value: number;
+  funding: number;
+}
+
+interface TimelineData {
+  year: string;
+  amount: number;
+  type: string;
+}
 
 interface FundingChartsProps {
-  fundingByCountryData: any[];
-  sectorDistributionData: any[];
-  fundingTimelineData: any[];
+  fundingByCountryData: CountryData[];
+  sectorDistributionData: SectorData[];
+  fundingTimelineData: TimelineData[];
   COLORS: string[];
 }
 
-export default function FundingCharts({ 
-  fundingByCountryData, 
-  sectorDistributionData, 
-  fundingTimelineData, 
-  COLORS 
+export default function FundingCharts({
+  fundingByCountryData,
+  sectorDistributionData,
+  COLORS
 }: FundingChartsProps) {
   return (
     <>
       {/* Funding by Country Chart */}
-      <div className="bg-taifa-white rounded-xl p-8 shadow-lg mb-8 border border-taifa-border">
-        <h3 className="text-2xl font-bold text-taifa-primary mb-6">Top Countries by Funding Volume</h3>
+      <div className="bg-white rounded-xl p-8 shadow-lg mb-8 border border-slate-200">
+        <h3 className="text-2xl font-bold text-site-slate mb-6">Top Countries by Funding Volume</h3>
         <ResponsiveContainer width="100%" height={400}>
           <ComposedChart data={fundingByCountryData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="var(--color-taifa-border)" />
-            <XAxis dataKey="country" tick={{ fill: 'var(--color-taifa-muted)' }} />
-            <YAxis yAxisId="left" orientation="left" tick={{ fill: 'var(--color-taifa-muted)' }} />
-            <YAxis yAxisId="right" orientation="right" tick={{ fill: 'var(--color-taifa-muted)' }} />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--color-neutral-200)" />
+            <XAxis dataKey="country" tick={{ fill: 'var(--color-slate-600)' }} />
+            <YAxis yAxisId="left" orientation="left" tick={{ fill: 'var(--color-slate-600)' }} />
+            <YAxis yAxisId="right" orientation="right" tick={{ fill: 'var(--color-slate-600)' }} />
             <Tooltip 
               formatter={(value, name) => [
                 name === 'funding' ? `$${value}M` : value,
                 name === 'funding' ? 'Total Funding' : 'Number of Deals'
               ]}
               contentStyle={{ 
-                backgroundColor: 'var(--color-taifa-white)', 
-                border: '1px solid var(--color-taifa-border)',
+                backgroundColor: 'white', 
+                border: '1px solid var(--color-slate-200)',
                 borderRadius: '8px',
-                color: 'var(--color-taifa-primary)'
+                color: 'var(--color-site-slate)'
               }}
             />
             <Legend />
-            <Bar yAxisId="left" dataKey="funding" fill="var(--color-taifa-primary)" name="Funding ($M)" />
-            <Line yAxisId="right" type="monotone" dataKey="deals" stroke="var(--color-taifa-red)" strokeWidth={3} name="Deals" />
+            <Bar yAxisId="left" dataKey="funding" fill="var(--color-site-slate)" name="Funding ($M)" />
+            <Line yAxisId="right" type="monotone" dataKey="deals" stroke="var(--color-site-brown)" strokeWidth={3} name="Deals" />
           </ComposedChart>
         </ResponsiveContainer>
       </div>
 
       {/* Sector Distribution Chart Only - Remove Empty Timeline */}
-      <div className="bg-taifa-white rounded-xl p-8 shadow-lg border border-taifa-border">
-        <h3 className="text-2xl font-bold text-taifa-primary mb-6">Sector Distribution</h3>
+      <div className="bg-white rounded-xl p-8 shadow-lg border border-slate-200">
+        <h3 className="text-2xl font-bold text-site-slate mb-6">Sector Distribution</h3>
         <ResponsiveContainer width="100%" height={400}>
           <RechartsPieChart>
             <Pie
@@ -67,10 +86,10 @@ export default function FundingCharts({
             <Tooltip 
               formatter={(value) => [`$${value}M`, 'Funding']}
               contentStyle={{ 
-                backgroundColor: 'var(--color-taifa-white)', 
-                border: '1px solid var(--color-taifa-border)',
+                backgroundColor: 'white', 
+                border: '1px solid var(--color-slate-200)',
                 borderRadius: '8px',
-                color: 'var(--color-taifa-primary)'
+                color: 'var(--color-site-slate)'
               }}
             />
           </RechartsPieChart>
