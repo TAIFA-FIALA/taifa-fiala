@@ -51,7 +51,7 @@ jobs:
           cd /Users/jforrest/production/TAIFA-FIALA
           
           # Pull latest changes
-          git pull origin main
+          git pull org-origin main
           
           # Stop existing services
           pkill -f "uvicorn.*main:app" || true
