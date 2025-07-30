@@ -40,17 +40,21 @@ class Settings(BaseSettings):
                 "https://taifa-fiala.net",
                 "https://www.taifa-africa.com",
                 "https://www.fiala-afrique.com",
-                "https://api.taifa-fiala.net"
+                "https://api.taifa-fiala.net",
+                "https://taifa-fiala.jforrest.dev",
+                "http://100.75.201.24:3000",
+                "http://localhost:3000"
             ])
         
-        else:
-            # Development origins
-            origins.extend([
-                "http://localhost:3000",
-                "http://localhost:8501", 
-                "http://127.0.0.1:3000",
-                "http://127.0.0.1:8501"
-            ])
+        # Always include development origins for flexibility
+        origins.extend([
+            "http://localhost:3000",
+            "http://localhost:8501", 
+            "http://127.0.0.1:3000",
+            "http://127.0.0.1:8501",
+            "http://localhost:8030",
+            "http://127.0.0.1:8030"
+        ])
         
         # Allow custom origins from environment
         custom_origins = os.getenv("BACKEND_CORS_ORIGINS")
