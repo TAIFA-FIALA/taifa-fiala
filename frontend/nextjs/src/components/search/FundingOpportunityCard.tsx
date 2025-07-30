@@ -236,7 +236,7 @@ export function FundingAnnouncementCard(props: FundingAnnouncementCardProps) {
           <div className="flex items-center text-sm text-taifa-muted">
             <Clock className="h-4 w-4 mr-1" />
             {deadline && deadline.trim() && deadline !== 'null' && deadline !== 'undefined' ? (
-              <span className={`${getDeadlineUrgency() === 'urgent' ? 'text-red-600 font-medium' : ''}`}>
+              <span className={`${getDeadlineUrgency()?.level === 'urgent' ? 'text-red-600 font-medium' : ''}`}>
                 Due: {(() => {
                   try {
                     return new Date(deadline).toLocaleDateString();
@@ -257,8 +257,6 @@ export function FundingAnnouncementCard(props: FundingAnnouncementCardProps) {
                 {country}
                 {region && `, ${region}`}
               </span>
-                )}
-              </div>
             </div>
           )}
 

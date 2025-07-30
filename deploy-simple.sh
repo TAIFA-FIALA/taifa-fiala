@@ -45,7 +45,10 @@ mkdir -p logs
 
 # Start backend with environment variables
 cd backend
-export $(cat ../.env | xargs)
+# Export environment variables safely
+set -a  # automatically export all variables
+source ../.env
+set +a  # stop automatically exporting
 nohup python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8030 > ../logs/backend.log 2>&1 &
 cd ..
 
