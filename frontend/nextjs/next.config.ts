@@ -11,15 +11,11 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: process.env.NODE_ENV === 'production' 
-          ? 'http://100.75.201.24:8030/api/:path*'  // Production backend
-          : 'http://localhost:8030/api/:path*'       // Development backend
+        destination: 'http://localhost:8030/api/:path*'  // Always use localhost
       },
       {
         source: '/health',
-        destination: process.env.NODE_ENV === 'production'
-          ? 'http://100.75.201.24:8030/health'      // Production health check
-          : 'http://localhost:8030/health'           // Development health check
+        destination: 'http://localhost:8030/health'       // Always use localhost
       }
     ];
   },
