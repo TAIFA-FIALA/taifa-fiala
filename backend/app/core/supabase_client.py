@@ -17,7 +17,7 @@ load_dotenv(env_path)
 logger = logging.getLogger(__name__)
 
 # Supabase configuration
-SUPABASE_URL = os.environ.get('SUPABASE_URL')
+SUPABASE_URL = os.environ.get('SUPABASE_URL') or os.environ.get('SUPABASE_PROJECT_URL')
 SUPABASE_KEY = os.environ.get('SUPABASE_API_KEY')  # Use the service key for backend operations
 SUPABASE_ANON_KEY = os.environ.get('SUPABASE_PUBLISHABLE_KEY')  # This is the anon key for client-side
 

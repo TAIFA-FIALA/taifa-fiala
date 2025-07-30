@@ -107,6 +107,9 @@ export function FundingAnnouncementCard(props: FundingAnnouncementCardProps) {
     switch (fundingType) {
       case 'total_pool':
         const { totalFundingPool, estimatedProjectCount, projectCountRange } = props as TotalFundingProps;
+        if (!totalFundingPool || totalFundingPool <= 0) {
+          return <span className="text-taifa-muted text-sm italic">Funding amount TBD</span>;
+        }
         return (
           <div className="space-y-1">
             <span className="font-medium">{formatCurrency(totalFundingPool)} total pool</span>
@@ -124,16 +127,22 @@ export function FundingAnnouncementCard(props: FundingAnnouncementCardProps) {
         );
       case 'per_project_exact':
         const { exactAmountPerProject } = props as ExactFundingProps;
+        if (!exactAmountPerProject || exactAmountPerProject <= 0) {
+          return <span className="text-taifa-muted text-sm italic">Amount varies</span>;
+        }
         return <span className="font-medium">{formatCurrency(exactAmountPerProject)} per project</span>;
       case 'per_project_range':
         const { minAmountPerProject, maxAmountPerProject } = props as RangeFundingProps;
+        if (!minAmountPerProject || !maxAmountPerProject || minAmountPerProject <= 0) {
+          return <span className="text-taifa-muted text-sm italic">Amount varies</span>;
+        }
         return (
           <span className="font-medium">
             {formatCurrency(minAmountPerProject)} - {formatCurrency(maxAmountPerProject)} per project
           </span>
         );
       default:
-        return <span className="text-taifa-muted">Amount not specified</span>;
+        return <span className="text-taifa-muted text-sm italic">Funding details available on application</span>;
     }
   };
 
@@ -199,11 +208,18 @@ export function FundingAnnouncementCard(props: FundingAnnouncementCardProps) {
           <Badge className="bg-taifa-olive text-white">
             {sector}
           </Badge>
-          {tags.map((tag, index) => (
-            <Badge key={index} variant="outline" className="bg-taifa-light">
-              {tag}
+          {tags && tags.length > 0 && tags.some(tag => tag && tag.trim().length > 0) && (
+            tags.filter(tag => tag && tag.trim().length > 0).slice(0, 4).map((tag, index) => (
+              <Badge key={index} variant="outline" className="text-xs bg-taifa-light">
+                {tag}
+              </Badge>
+            ))
+          )}
+          {tags && tags.length > 0 && tags.some(tag => tag && tag.trim().length > 0) && tags.filter(tag => tag && tag.trim().length > 0).length > 4 && (
+            <Badge variant="outline" className="text-xs text-taifa-muted">
+              +{tags.filter(tag => tag && tag.trim().length > 0).length - 4}
             </Badge>
-          ))}
+          )}
         </div>
 
         {/* Key details */}
@@ -217,22 +233,30 @@ export function FundingAnnouncementCard(props: FundingAnnouncementCardProps) {
             </div>
           </div>
           
-          <div className="flex items-center">
-            <MapPin className="h-4 w-4 mr-2 text-taifa-red flex-shrink-0" />
-            <span className="text-taifa-dark">
-              {country}
-              {region && `, ${region}`}
-            </span>
+          <div className="flex items-center text-sm text-taifa-muted">
+            <Clock className="h-4 w-4 mr-1" />
+            {deadline && deadline.trim() && deadline !== 'null' && deadline !== 'undefined' ? (
+              <span className={`${getDeadlineUrgency() === 'urgent' ? 'text-red-600 font-medium' : ''}`}>
+                Due: {(() => {
+                  try {
+                    return new Date(deadline).toLocaleDateString();
+                  } catch {
+                    return deadline; // Fallback to raw string if date parsing fails
+                  }
+                })()}
+              </span>
+            ) : (
+              <span className="italic">Rolling applications</span>
+            )}
           </div>
           
-          {deadline && (
+          {country && (
             <div className="flex items-center">
-              <Clock className="h-4 w-4 mr-2 text-taifa-orange flex-shrink-0" />
-              <div className="flex-1">
-                <span className="font-medium">Deadline: </span>
-                <span className="text-taifa-dark">{new Date(deadline).toLocaleDateString()}</span>
-                {applicationDeadlineType && (
-                  <span className="ml-2 text-xs text-taifa-muted">({applicationDeadlineType})</span>
+              <MapPin className="h-4 w-4 mr-2 text-taifa-red flex-shrink-0" />
+              <span className="text-taifa-dark">
+                {country}
+                {region && `, ${region}`}
+              </span>
                 )}
               </div>
             </div>
@@ -298,10 +322,11 @@ export function FundingAnnouncementCard(props: FundingAnnouncementCardProps) {
           </div>
         )}
 
-        {/* AI Subsectors */}
-        {aiSubsectors.length > 0 && (
+        {/* AI Subsectors - Only show if populated */}
+        {aiSubsectors && aiSubsectors.length > 0 && (
           <div className="mb-4">
-            <h4 className="text-sm font-medium text-taifa-primary mb-2">
+            <h4 className="text-sm font-medium text-taifa-primary mb-2 flex items-center">
+              <Target className="h-4 w-4 mr-1" />
               AI Focus Areas:
             </h4>
             <div className="flex flex-wrap gap-1">
@@ -319,30 +344,30 @@ export function FundingAnnouncementCard(props: FundingAnnouncementCardProps) {
           </div>
         )}
 
-        {/* Eligibility Criteria */}
-        {eligibilityCriteria.length > 0 && (
+        {/* Eligibility Criteria - Only show if populated and meaningful */}
+        {eligibilityCriteria && eligibilityCriteria.length > 0 && eligibilityCriteria.some(criteria => criteria && criteria.trim().length > 0) && (
           <div className="mb-4">
             <h4 className="text-sm font-medium text-taifa-primary mb-2 flex items-center">
               <CheckCircle className="h-4 w-4 mr-1" />
               Key Requirements:
             </h4>
             <ul className="list-disc list-inside text-sm space-y-1 text-taifa-muted">
-              {eligibilityCriteria.slice(0, 3).map((criteria, index) => (
+              {eligibilityCriteria.filter(criteria => criteria && criteria.trim().length > 0).slice(0, 3).map((criteria, index) => (
                 <li key={index} className="line-clamp-1">
                   {criteria}
                 </li>
               ))}
-              {eligibilityCriteria.length > 3 && (
+              {eligibilityCriteria.filter(criteria => criteria && criteria.trim().length > 0).length > 3 && (
                 <li className="text-taifa-accent cursor-pointer hover:underline">
-                  +{eligibilityCriteria.length - 3} more requirements...
+                  +{eligibilityCriteria.filter(criteria => criteria && criteria.trim().length > 0).length - 3} more requirements...
                 </li>
               )}
             </ul>
           </div>
         )}
 
-        {/* Application Process Preview */}
-        {applicationProcess && (
+        {/* Application Process Preview - Only show if meaningful content */}
+        {applicationProcess && applicationProcess.trim().length > 10 && (
           <div className="mb-4">
             <h4 className="text-sm font-medium text-taifa-primary mb-2">
               Application Process:
@@ -353,22 +378,22 @@ export function FundingAnnouncementCard(props: FundingAnnouncementCardProps) {
           </div>
         )}
 
-        {/* Reporting Requirements */}
-        {reportingRequirements.length > 0 && (
+        {/* Reporting Requirements - Only show if populated and meaningful */}
+        {reportingRequirements && reportingRequirements.length > 0 && reportingRequirements.some(req => req && req.trim().length > 0) && (
           <div className="mb-4">
             <h4 className="text-sm font-medium text-taifa-primary mb-2 flex items-center">
               <AlertCircle className="h-4 w-4 mr-1" />
               Reporting Required:
             </h4>
             <div className="flex flex-wrap gap-1">
-              {reportingRequirements.slice(0, 2).map((requirement, index) => (
+              {reportingRequirements.filter(req => req && req.trim().length > 0).slice(0, 2).map((requirement, index) => (
                 <Badge key={index} variant="outline" className="text-xs bg-yellow-50 border-yellow-200">
                   {requirement}
                 </Badge>
               ))}
-              {reportingRequirements.length > 2 && (
+              {reportingRequirements.filter(req => req && req.trim().length > 0).length > 2 && (
                 <Badge variant="outline" className="text-xs text-taifa-muted">
-                  +{reportingRequirements.length - 2} more
+                  +{reportingRequirements.filter(req => req && req.trim().length > 0).length - 2} more
                 </Badge>
               )}
             </div>

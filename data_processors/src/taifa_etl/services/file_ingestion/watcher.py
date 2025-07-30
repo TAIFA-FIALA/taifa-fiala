@@ -115,6 +115,10 @@ class FileIngestionService:
         # Initialize deduplicator
         self.deduplicator = FundingDeduplicator()
         
+        # Initialize vector database integration
+        from .vector_integration import vector_database_integration
+        self.vector_integration = vector_database_integration
+        
     def _load_config(self, config_path: Optional[str]) -> Dict[str, Any]:
         """
         Load configuration from a file or use default values.
@@ -247,6 +251,21 @@ class FileIngestionService:
             # Send to database
             if unique_records:
                 await self._send_to_database(unique_records)
+                
+                # Index in vector database for semantic search
+                try:
+                    self.logger.info(f"Indexing {len(unique_records)} records in vector database")
+                    vector_result = await self.vector_integration.index_records(unique_records)
+                    
+                    if vector_result.get('success'):
+                        indexed_count = vector_result.get('indexed_count', 0)
+                        self.logger.info(f"Successfully indexed {indexed_count} records in vector database")
+                    else:
+                        self.logger.warning(f"Vector indexing failed: {vector_result.get('error', 'Unknown error')}")
+                        
+                except Exception as e:
+                    self.logger.error(f"Error during vector indexing: {e}")
+                    # Don't fail the entire process if vector indexing fails
             
             # Move to completed
             completed_file = Path(self.config['paths']['completed']) / file_path.name
@@ -338,6 +357,21 @@ class FileIngestionService:
             # Send to database
             if unique_records:
                 await self._send_to_database(unique_records)
+                
+                # Index in vector database for semantic search
+                try:
+                    self.logger.info(f"Indexing {len(unique_records)} URL records in vector database")
+                    vector_result = await self.vector_integration.index_records(unique_records)
+                    
+                    if vector_result.get('success'):
+                        indexed_count = vector_result.get('indexed_count', 0)
+                        self.logger.info(f"Successfully indexed {indexed_count} URL records in vector database")
+                    else:
+                        self.logger.warning(f"Vector indexing failed for URLs: {vector_result.get('error', 'Unknown error')}")
+                        
+                except Exception as e:
+                    self.logger.error(f"Error during vector indexing for URLs: {e}")
+                    # Don't fail the entire process if vector indexing fails
                 
             self.logger.info(f"Completed processing URLs from {urls_file_path}")
             

@@ -37,7 +37,7 @@ from .monitoring_system import ComprehensiveMonitoringSystem, MetricType
 from .batch_processor import BatchTask, DataSource, BatchStatus
 
 # Crawl4AI imports
-from crawl4ai import AsyncWebCrawler, LLMExtractionStrategy, CrawlerRunConfig, CacheMode, LLMConfig
+from crawl4ai import AsyncWebCrawler, LLMExtractionStrategy, CrawlerRunConfig, CacheMode
 
 logger = logging.getLogger(__name__)
 

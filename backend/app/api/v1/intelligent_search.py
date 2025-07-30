@@ -13,6 +13,7 @@ from app.models.funding import AfricaIntelligenceItem
 from sqlalchemy.orm import Session
 from sqlalchemy import and_, or_, func
 from app.core.database import get_db
+from app.core.supabase_service import get_supabase_service
 
 logger = logging.getLogger(__name__)
 
@@ -23,6 +24,7 @@ class IntelligentSearchService:
     
     def __init__(self):
         self.vector_service = VectorSearchService()
+        self.supabase_service = get_supabase_service()
     
     async def search_opportunities(
         self,
@@ -112,70 +114,49 @@ class IntelligentSearchService:
     ) -> List[int]:
         """Apply database-level quality filters before vector search"""
         
-        query = db.query(AfricaIntelligenceItem.id)
-        
-        # Core quality filters
-        query = query.filter(
-            and_(
-                # Use our new relevance scoring system
-                AfricaIntelligenceItem.relevance_score >= min_relevance_score,
+        try:
+            # Build filters for Supabase service
+            supabase_filters = {
+                'min_relevance_score': min_relevance_score,
+                'validation_status': 'approved'
+            }
+            
+            # Add deadline filter (only active opportunities)
+            from datetime import datetime
+            supabase_filters['deadline_after'] = datetime.now()
+            
+            # Apply additional filters if provided
+            if filters:
+                if 'min_amount' in filters:
+                    supabase_filters['min_amount'] = filters['min_amount']
                 
-                # Only validated/approved content
-                AfricaIntelligenceItem.validation_status.in_(['approved', 'auto_approved']),
+                if 'max_amount' in filters:
+                    supabase_filters['max_amount'] = filters['max_amount']
                 
-                # Active opportunities (not expired)
-                or_(
-                    AfricaIntelligenceItem.application_deadline.is_(None),
-                    AfricaIntelligenceItem.application_deadline >= datetime.now()
-                ),
+                if 'deadline_after' in filters:
+                    supabase_filters['deadline_after'] = filters['deadline_after']
                 
-                # Must have essential fields
-                AfricaIntelligenceItem.title.isnot(None),
-                AfricaIntelligenceItem.description.isnot(None),
-                func.length(AfricaIntelligenceItem.title) >= 10,
-                func.length(AfricaIntelligenceItem.description) >= 50
+                if 'deadline_before' in filters:
+                    supabase_filters['deadline_before'] = filters['deadline_before']
+                
+                if 'geographic_focus' in filters:
+                    supabase_filters['geographic_focus'] = filters['geographic_focus']
+            
+            # Get filtered items using Supabase service
+            items = await self.supabase_service.get_intelligence_items(
+                filters=supabase_filters,
+                limit=1000  # Get more items for quality filtering
             )
-        )
-        
-        # Apply user filters if provided
-        if filters:
-            if filters.get('min_amount'):
-                query = query.filter(
-                    AfricaIntelligenceItem.funding_amount >= filters['min_amount']
-                )
             
-            if filters.get('max_amount'):
-                query = query.filter(
-                    AfricaIntelligenceItem.funding_amount <= filters['max_amount']
-                )
+            # Extract IDs
+            result_ids = [item['id'] for item in items if item.get('id')]
             
-            if filters.get('deadline_after'):
-                query = query.filter(
-                    AfricaIntelligenceItem.application_deadline >= filters['deadline_after']
-                )
+            logger.info(f"Quality filtering returned {len(result_ids)} eligible opportunity IDs")
+            return result_ids
             
-            if filters.get('deadline_before'):
-                query = query.filter(
-                    AfricaIntelligenceItem.application_deadline <= filters['deadline_before']
-                )
-            
-            if filters.get('funding_type'):
-                query = query.filter(
-                    AfricaIntelligenceItem.funding_type_id == filters['funding_type']
-                )
-            
-            if filters.get('geographic_focus'):
-                # Search in description or metadata for geographic terms
-                geo_term = f"%{filters['geographic_focus']}%"
-                query = query.filter(
-                    or_(
-                        AfricaIntelligenceItem.description.ilike(geo_term),
-                        AfricaIntelligenceItem.eligibility_criteria.ilike(geo_term)
-                    )
-                )
-        
-        # Return list of IDs that meet quality criteria
-        return [row.id for row in query.all()]
+        except Exception as e:
+            logger.error(f"Error in quality filtering: {e}")
+            return []
     
     async def _traditional_text_search(
         self, 
@@ -184,52 +165,29 @@ class IntelligentSearchService:
         db: Session, 
         max_results: int
     ) -> List[Dict[str, Any]]:
-        """Perform traditional PostgreSQL text search on quality-filtered opportunities"""
-        
-        # Use PostgreSQL's full-text search capabilities
-        search_query = db.query(AfricaIntelligenceItem).filter(
-            AfricaIntelligenceItem.id.in_(allowed_ids)
-        )
-        
-        # Apply text search on title and description
-        search_terms = query.lower().split()
-        for term in search_terms:
-            search_pattern = f"%{term}%"
-            search_query = search_query.filter(
-                or_(
-                    func.lower(AfricaIntelligenceItem.title).like(search_pattern),
-                    func.lower(AfricaIntelligenceItem.description).like(search_pattern),
-                    func.lower(AfricaIntelligenceItem.eligibility_criteria).like(search_pattern)
-                )
+        """Perform traditional text search on quality-filtered opportunities using Supabase"""
+        try:
+            if not allowed_ids:
+                return []
+            
+            # Use Supabase service for RLS-compatible text search
+            results = await self.supabase_service.search_intelligence_items_text(
+                query=query,
+                allowed_ids=allowed_ids,
+                limit=max_results
             )
-        
-        # Order by relevance score and limit results
-        search_query = search_query.order_by(
-            AfricaIntelligenceItem.relevance_score.desc(),
-            AfricaIntelligenceItem.created_at.desc()
-        ).limit(max_results)
-        
-        # Convert to dictionary format
-        results = []
-        for opportunity in search_query.all():
-            result = {
-                'id': opportunity.id,
-                'title': opportunity.title,
-                'description': opportunity.description,
-                'funding_amount': opportunity.funding_amount,
-                'currency': opportunity.currency,
-                'application_deadline': opportunity.application_deadline.isoformat() if opportunity.application_deadline else None,
-                'application_url': opportunity.application_url,
-                'contact_email': opportunity.contact_email,
-                'eligibility_criteria': opportunity.eligibility_criteria,
-                'source_url': opportunity.source_url,
-                'relevance_score': opportunity.relevance_score,
-                'validation_status': opportunity.validation_status,
-                'search_method': 'traditional_text',
-                'created_at': opportunity.created_at.isoformat() if opportunity.created_at else None,
-                'updated_at': opportunity.updated_at.isoformat() if opportunity.updated_at else None
-            }
-            results.append(result)
+            
+            # Add search method metadata
+            for result in results:
+                result['search_method'] = 'traditional_text'
+                result['composite_score'] = result.get('relevance_score', 0.5)  # Use relevance as base score
+            
+            logger.info(f"Traditional text search found {len(results)} results")
+            return results
+            
+        except Exception as e:
+            logger.error(f"Error in traditional text search: {e}")
+            return []
         
         return results
     
