@@ -58,7 +58,7 @@ const Components = {
           <Activity className="h-4 w-4 mr-2" />
           Data-Driven Rapid Assessment • 2020-2025
         </div>
-        <h1 className="text-5xl md:text-7xl font-bold text-white/80 mb-6 animate-fadeInUp leading-tight" style={{ animationDelay: '0.1s' }}>
+        <h1 className="text-5xl md:text-7xl font-bold mb-6 animate-fadeInUp leading-tight" style={{ animationDelay: '0.1s', color: '#ffffff' }}>
           Funding the African
           <span className="block" style={{ color: 'var(--color-site-gold)' }}>AI Surge</span>
         </h1>
