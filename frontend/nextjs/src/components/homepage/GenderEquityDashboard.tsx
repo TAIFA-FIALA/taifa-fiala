@@ -16,7 +16,6 @@ import {
   LineChart
 } from 'recharts';
 
-
 // Icons
 import { 
   AlertCircle, 
@@ -44,48 +43,34 @@ interface GenderTimelineData {
   femalePercentage: number;
 }
 
-interface SectorGenderData {
-  sector: string;
-  femalePercent: number;
-  malePercent: number;
-}
-
 interface RegionalGenderData {
   region: string;
   femalePercent: number;
   total: number;
 }
 
-interface FundingComparisonData {
-  category: string;
-  female: number;
-  male: number;
-  total: number;
-  femalePercentage: number;
-}
-
-interface TooltipPayload<T = Record<string, unknown>> {
+interface TooltipPayload {
   name: string;
   value: number;
   color: string;
   dataKey?: string;
-  payload: T;
+  payload: Record<string, unknown>;
 }
 
-interface TooltipProps<T = Record<string, unknown>> {
+interface TooltipProps {
   active?: boolean;
-  payload?: TooltipPayload<T>[];
+  payload?: TooltipPayload[];
   label?: string | number;
   formatter?: (value: number, name: string) => [string | number, string];
 }
 
-// Custom Tooltip Component with generic type for payload
-const CustomTooltip = <T extends Record<string, unknown>>({ 
+// Custom Tooltip Component
+const CustomTooltip = ({ 
   active, 
   payload, 
   label, 
   formatter 
-}: TooltipProps<T>) => {
+}: TooltipProps) => {
   if (active && payload && payload.length) {
     return (
       <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
@@ -106,7 +91,6 @@ const CustomTooltip = <T extends Record<string, unknown>>({
 
 const GenderEquityDashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
-  const [error] = useState<string | null>(null);
 
   // Responsive dimensions for charts
   const [dimensions, setDimensions] = useState({
@@ -176,23 +160,6 @@ const GenderEquityDashboard = () => {
     }, 1000);
     return () => clearTimeout(timer);
   }, []);
-
-  if (error) {
-    return (
-      <div className="bg-site-brown/5 border-l-4 border-site-brown p-4">
-        <div className="flex">
-          <div className="flex-shrink-0">
-            <AlertCircle className="h-5 w-5 text-site-brown" />
-          </div>
-          <div className="ml-3">
-            <p className="text-sm text-site-brown">
-              Failed to load gender equity data. Please try again later.
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   if (isLoading) {
     return (
@@ -298,7 +265,7 @@ const GenderEquityDashboard = () => {
                     borderRadius: '8px',
                     fontSize: '12px'
                   }}
-                  formatter={(value: any, name: string) => [
+                  formatter={(value: number, name: string) => [
                     name === 'femalePercentage' ? `${value}%` : value,
                     name === 'femalePercentage' ? 'Female %' : 
                     name === 'female' ? 'Female Funding' : 'Male Funding'
@@ -343,7 +310,7 @@ const GenderEquityDashboard = () => {
                     borderRadius: '8px',
                     fontSize: '12px'
                   }}
-                  formatter={(value: any) => [`${value}%`, 'Female Representation']}
+                  formatter={(value: number) => [`${value}%`, 'Female Representation']}
                 />
                 <Bar 
                   dataKey="femalePercent" 

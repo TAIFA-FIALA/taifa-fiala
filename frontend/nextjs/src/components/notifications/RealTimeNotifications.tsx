@@ -9,8 +9,16 @@ import React, { useState } from 'react';
 import { useFundingOpportunityEvents } from '@/hooks/useServerSentEvents';
 import { Bell, CheckCircle, AlertCircle, Wifi, WifiOff, X } from 'lucide-react';
 
+interface FundingOpportunity {
+  id: string;
+  title: string;
+  organization: string;
+  sector: string;
+  amount_exact?: number;
+}
+
 interface NotificationItemProps {
-  opportunity: any;
+  opportunity: FundingOpportunity;
   onDismiss: () => void;
 }
 

@@ -5,19 +5,39 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 
+interface FundingOpportunityData {
+  id: string;
+  title: string;
+  organization: string;
+  sector: string;
+  amount_exact?: number;
+}
+
+interface PipelineExecutionData {
+  status: string;
+  records_inserted?: number;
+  message?: string;
+}
+
+interface DatabaseUpdateData {
+  table: string;
+  operation: string;
+  count: number;
+}
+
 export interface SSEEvent {
   type: string;
-  data: any;
+  data: unknown;
   timestamp: string;
 }
 
 export interface SSEHookOptions {
   url: string;
   onEvent?: (event: SSEEvent) => void;
-  onNewFundingOpportunity?: (data: any) => void;
-  onPipelineExecution?: (data: any) => void;
+  onNewFundingOpportunity?: (data: FundingOpportunityData) => void;
+  onPipelineExecution?: (data: PipelineExecutionData) => void;
   onCacheRefresh?: () => void;
-  onDatabaseUpdate?: (data: any) => void;
+  onDatabaseUpdate?: (data: DatabaseUpdateData) => void;
   reconnectInterval?: number;
   maxReconnectAttempts?: number;
 }
@@ -54,16 +74,16 @@ export function useServerSentEvents(options: SSEHookOptions) {
       // Call specific event handlers based on type
       switch (eventData.type) {
         case 'new_funding_opportunity':
-          onNewFundingOpportunity?.(eventData.data);
+          onNewFundingOpportunity?.(eventData.data as FundingOpportunityData);
           break;
         case 'pipeline_execution':
-          onPipelineExecution?.(eventData.data);
+          onPipelineExecution?.(eventData.data as PipelineExecutionData);
           break;
         case 'cache_refresh':
           onCacheRefresh?.();
           break;
         case 'database_update':
-          onDatabaseUpdate?.(eventData.data);
+          onDatabaseUpdate?.(eventData.data as DatabaseUpdateData);
           break;
         case 'connected':
           console.log('SSE connection established');
@@ -162,7 +182,7 @@ export function useServerSentEvents(options: SSEHookOptions) {
 
 // Convenience hook specifically for funding opportunities
 export function useFundingOpportunityEvents() {
-  const [newOpportunities, setNewOpportunities] = useState<any[]>([]);
+  const [newOpportunities, setNewOpportunities] = useState<FundingOpportunityData[]>([]);
   const [pipelineStatus, setPipelineStatus] = useState<string>('idle');
 
   const { isConnected, error, reconnect } = useServerSentEvents({
@@ -181,7 +201,7 @@ export function useFundingOpportunityEvents() {
     onPipelineExecution: (data) => {
       setPipelineStatus(data.status);
       
-      if (data.status === 'success' && data.records_inserted > 0) {
+      if (data.status === 'success' && data.records_inserted && data.records_inserted > 0) {
         console.log(`Pipeline success: ${data.records_inserted} new opportunities added`);
       }
     },
