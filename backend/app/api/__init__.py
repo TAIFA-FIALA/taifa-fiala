@@ -6,6 +6,9 @@ from app.api.endpoints import (
     etl_monitoring, notifications, balance_monitoring, intelligent_search
 )
 # Import events router
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../'))
 from api import events
 from app.core.database import get_db 
 
