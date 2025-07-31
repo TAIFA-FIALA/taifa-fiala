@@ -4,6 +4,7 @@
  */
 
 import { useEffect, useRef, useState, useCallback } from 'react';
+import { getApiUrl } from '@/lib/api-config';
 
 interface FundingOpportunityData {
   id: string;
@@ -186,7 +187,7 @@ export function useFundingOpportunityEvents() {
   const [pipelineStatus, setPipelineStatus] = useState<string>('idle');
 
   const { isConnected, error, reconnect } = useServerSentEvents({
-    url: '/api/v1/events/stream',
+    url: getApiUrl('/api/v1/events/stream'),
     onNewFundingOpportunity: (data) => {
       setNewOpportunities(prev => [data, ...prev.slice(0, 9)]); // Keep last 10
       
