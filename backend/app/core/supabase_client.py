@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 # Supabase configuration
 SUPABASE_URL = os.environ.get('SUPABASE_URL') or os.environ.get('SUPABASE_PROJECT_URL')
-SUPABASE_KEY = os.environ.get('SUPABASE_API_KEY')  # Use the service key for backend operations
+SUPABASE_KEY = os.environ.get('SUPABASE_API_KEY') or os.environ.get('SUPABASE_SERVICE_API_KEY')  # Use the service key for backend operations
 SUPABASE_ANON_KEY = os.environ.get('SUPABASE_PUBLISHABLE_KEY')  # This is the anon key for client-side
 
 def create_supabase_client(use_service_key: bool = True) -> Optional[Client]:
@@ -49,11 +49,15 @@ def create_supabase_client(use_service_key: bool = True) -> Optional[Client]:
         return None
     
     try:
+        # Create minimal Supabase client without options to avoid proxy issues
+        logger.info(f"Creating Supabase client with URL: {SUPABASE_URL[:50]}... and {key_type} key")
         supabase_client = create_client(SUPABASE_URL, api_key)
         logger.info(f"✅ Supabase client created successfully with {key_type} key")
         return supabase_client
     except Exception as e:
         logger.error(f"❌ Failed to create Supabase client: {e}")
+        logger.error(f"URL: {SUPABASE_URL}")
+        logger.error(f"Key length: {len(api_key) if api_key else 'None'}")
         return None
 
 # Create a global client instance for backend operations
