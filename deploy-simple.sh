@@ -64,7 +64,7 @@ echo "🧹 Cleaning up old SSE connections..."
 
 # Sync latest changes from local to production
 echo "📤 Syncing local changes to production..."
-rsync -avz --exclude='.git' --exclude='node_modules' --exclude='venv' --exclude='.next' --exclude='logs' --exclude='*.log' /Users/drjforrest/dev/devprojects/ai-africa-funding-tracker/ /Users/jforrest/production/TAIFA-FIALA/
+rsync -avz --exclude='.git' --exclude='node_modules' --exclude='venv' --exclude='.next' --exclude='logs' --exclude='*.log' /Users/drjforrest/dev/devprojects/ai-africa-funding-tracker/ jforrest@100.75.201.24:/Users/jforrest/production/TAIFA-FIALA/
 
 # Install Python dependencies
 /usr/local/bin/uv run pip install -r requirements.txt
