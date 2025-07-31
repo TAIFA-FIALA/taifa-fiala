@@ -25,7 +25,7 @@ nvm use v20.19.0 2>/dev/null || nvm use node || echo "⚠️ nvm not available, 
 export PATH="$HOME/.nvm/versions/node/v20.19.0/bin:$PATH"
 
 # Check and kill processes on ports 8030 and 3000/3030
-echo "🔍 Checking for processes on ports 8030, 3000, and 3030..."
+echo "🔍 Checking for processes on ports 8030 and 3030..."
 
 # Function to kill process on a specific port
 kill_port() {
@@ -49,7 +49,6 @@ kill_port() {
 
 # Kill processes on required ports
 kill_port 8030
-kill_port 3000
 kill_port 3030
 
 # Stop existing services (fallback)
