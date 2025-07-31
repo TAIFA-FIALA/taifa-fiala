@@ -5,7 +5,9 @@ echo "🚀 Deploying TAIFA-FIALA to production..."
 
 # Copy .env file to production
 echo "📄 Copying .env file..."
-scp -o Ciphers=aes256-gcm@openssh.com .env jforrest@100.75.201.24:/Users/jforrest/production/TAIFA-FIALA/
+# Get the directory where this script is located
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+scp -o Ciphers=aes256-gcm@openssh.com "$SCRIPT_DIR/.env" jforrest@100.75.201.24:/Users/jforrest/production/TAIFA-FIALA/
 
 # Deploy and restart services on production
 echo "🔄 Restarting services on production..."
@@ -64,7 +66,9 @@ echo "🧹 Cleaning up old SSE connections..."
 
 # Sync latest changes from local to production
 echo "📤 Syncing local changes to production..."
-rsync -avz -e "ssh -o Ciphers=aes256-gcm@openssh.com" --exclude='.git' --exclude='node_modules' --exclude='venv' --exclude='.next' --exclude='logs' --exclude='*.log' /Users/drjforrest/dev/devprojects/ai-africa-funding-tracker/ jforrest@100.75.201.24:/Users/jforrest/production/TAIFA-FIALA/
+# Get the directory where this script is located
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+rsync -avz -e "ssh -o Ciphers=aes256-gcm@openssh.com" --exclude='.git' --exclude='node_modules' --exclude='venv' --exclude='.next' --exclude='logs' --exclude='*.log' "$SCRIPT_DIR/" jforrest@100.75.201.24:/Users/jforrest/production/TAIFA-FIALA/
 
 # Install Python dependencies
 /usr/local/bin/uv run pip install -r requirements.txt
