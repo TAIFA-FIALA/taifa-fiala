@@ -32,7 +32,7 @@ sleep 5
 git pull org-origin main
 
 # Install Python dependencies
-python3 -m pip install -r requirements.txt
+/usr/local/bin/uv run pip install -r requirements.txt
 
 # Install frontend dependencies and build
 cd frontend/nextjs
