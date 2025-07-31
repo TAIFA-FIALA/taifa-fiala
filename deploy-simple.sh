@@ -83,7 +83,19 @@ echo "🔍 Environment variables check:"
 echo "SUPABASE_URL: ${SUPABASE_URL:0:30}..." 
 echo "SUPABASE_PROJECT_URL: ${SUPABASE_PROJECT_URL:0:30}..." 
 echo "ENVIRONMENT: $ENVIRONMENT"
-nohup python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8030 --no-reload > ../logs/backend.log 2>&1 &
+
+# Create a wrapper script with environment variables
+cat > start_backend.sh << 'SCRIPT_EOF'
+#!/bin/bash
+export SUPABASE_URL="https://turcbnsgdlyelzmcqixd.supabase.co"
+export SUPABASE_PROJECT_URL="https://turcbnsgdlyelzmcqixd.supabase.co"
+export SUPABASE_API_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR1cmNibnNnZGx5ZWx6bWNxaXhkIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MjY1NzQ4OCwiZXhwIjoyMDY4MjMzNDg4fQ.Vdn2zHMhQ2V6rJf-MazNX1wxXJknnYighekkruEXMrA"
+export ENVIRONMENT="production"
+exec python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8030
+SCRIPT_EOF
+
+chmod +x start_backend.sh
+nohup ./start_backend.sh > ../logs/backend.log 2>&1 &
 cd ..
 
 # Start frontend on port 3030

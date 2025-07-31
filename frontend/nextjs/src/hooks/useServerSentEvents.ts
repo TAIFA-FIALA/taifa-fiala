@@ -124,24 +124,26 @@ export function useServerSentEvents(options: SSEHookOptions) {
         setError('SSE connection error');
         console.error('SSE connection error:', event);
 
-        // Attempt to reconnect if we haven't exceeded max attempts
-        if (connectionAttempts < maxReconnectAttempts) {
-          setConnectionAttempts(prev => prev + 1);
-          
-          reconnectTimeoutRef.current = setTimeout(() => {
-            console.log(`Attempting to reconnect SSE (attempt ${connectionAttempts + 1}/${maxReconnectAttempts})`);
-            connect();
-          }, reconnectInterval);
-        } else {
-          setError(`Failed to connect after ${maxReconnectAttempts} attempts`);
-        }
+        // Use functional update to avoid stale closure
+        setConnectionAttempts(currentAttempts => {
+          if (currentAttempts < maxReconnectAttempts) {
+            reconnectTimeoutRef.current = setTimeout(() => {
+              console.log(`Attempting to reconnect SSE (attempt ${currentAttempts + 1}/${maxReconnectAttempts})`);
+              connect();
+            }, reconnectInterval);
+            return currentAttempts + 1;
+          } else {
+            setError(`Failed to connect after ${maxReconnectAttempts} attempts`);
+            return currentAttempts;
+          }
+        });
       };
 
     } catch (err) {
       setError('Failed to create SSE connection');
       console.error('Error creating SSE connection:', err);
     }
-  }, [url, handleEvent, connectionAttempts, maxReconnectAttempts, reconnectInterval]);
+  }, [url, handleEvent, maxReconnectAttempts, reconnectInterval]);
 
   const disconnect = useCallback(() => {
     if (eventSourceRef.current) {
