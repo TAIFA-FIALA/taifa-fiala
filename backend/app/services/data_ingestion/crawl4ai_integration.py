@@ -142,10 +142,6 @@ class EnhancedCrawl4AIProcessor:
         """Initialize different extraction strategies for different content types"""
         self.extraction_strategies = {
             'intelligence_item': LLMExtractionStrategy(
-                llm_config=LLMConfig(
-                    provider=self.config.llm_provider,
-                    api_token=self.config.llm_api_key
-                ),
                 instruction="""
                 Extract comprehensive intelligence item information from this webpage.
                 
@@ -212,10 +208,6 @@ class EnhancedCrawl4AIProcessor:
             ),
             
             'news_article': LLMExtractionStrategy(
-                llm_config=LLMConfig(
-                    provider=self.config.llm_provider,
-                    api_token=self.config.llm_api_key
-                ),
                 instruction="""
                 Extract news article information related to AI funding in Africa.
                 
@@ -246,10 +238,6 @@ class EnhancedCrawl4AIProcessor:
             ),
             
             'organization_profile': LLMExtractionStrategy(
-                llm_config=LLMConfig(
-                    provider=self.config.llm_provider,
-                    api_token=self.config.llm_api_key
-                ),
                 instruction="""
                 Extract organization profile information for potential funding sources.
                 
