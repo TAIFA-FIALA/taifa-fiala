@@ -9,9 +9,10 @@ from .endpoints import (
     analytics,
     search,
     funding_opportunities,
-    equity_analyses,
-    events
+    equity_analyses
 )
+# Import events from the correct location
+from api import events
 # Events router already imported above
 from app.core.database import get_db 
 
