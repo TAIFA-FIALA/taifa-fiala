@@ -43,14 +43,18 @@ class Settings(BaseSettings):
                 "https://api.taifa-fiala.net",
                 "https://taifa-fiala.jforrest.dev",
                 "http://100.75.201.24:3000",
-                "http://localhost:3000"
+                "http://100.75.201.24:3030",
+                "http://localhost:3000",
+                "http://localhost:3030"
             ])
         
         # Always include development origins for flexibility
         origins.extend([
             "http://localhost:3000",
+            "http://localhost:3030",
             "http://localhost:8501", 
             "http://127.0.0.1:3000",
+            "http://127.0.0.1:3030",
             "http://127.0.0.1:8501",
             "http://localhost:8030",
             "http://127.0.0.1:8030"
