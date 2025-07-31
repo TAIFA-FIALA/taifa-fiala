@@ -2,7 +2,6 @@ import { Lora, Inter } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
 import Navbar from "@/components/layout/Navbar";
-import RealTimeNotifications from "@/components/notifications/RealTimeNotifications";
 
 const lora = Lora({
   variable: "--font-lora",
@@ -33,8 +32,6 @@ export default function RootLayout({
           {children}
         </main>
 
-        {/* Real-time notifications for funding opportunities */}
-        <RealTimeNotifications />
 
         {/* Footer */}
         <footer className="bg-slate-50 py-8">

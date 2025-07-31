@@ -11,8 +11,6 @@ from .endpoints import (
     funding_opportunities,
     equity_analyses
 )
-# Import events from the correct location
-from api import events
 # Events router already imported above
 from app.core.database import get_db 
 
@@ -146,9 +144,3 @@ api_router.include_router(
 #     tags=["balance-monitoring"]
 # )
 
-# Server-Sent Events for real-time updates
-api_router.include_router(
-    events.router,
-    prefix="/events",
-    tags=["events"]
-)

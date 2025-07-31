@@ -166,7 +166,10 @@ export function useServerSentEvents(options: SSEHookOptions) {
   }, [disconnect, connect]);
 
   useEffect(() => {
-    connect();
+    // Prevent multiple connections by checking if one already exists
+    if (!eventSourceRef.current || eventSourceRef.current.readyState === EventSource.CLOSED) {
+      connect();
+    }
 
     return () => {
       disconnect();
