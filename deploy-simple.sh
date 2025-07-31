@@ -62,8 +62,9 @@ sleep 5
 
 echo "🧹 Cleaning up old SSE connections..."
 
-# Pull latest changes
-git pull org-origin main
+# Sync latest changes from local to production
+echo "📤 Syncing local changes to production..."
+rsync -avz --exclude='.git' --exclude='node_modules' --exclude='venv' --exclude='.next' --exclude='logs' --exclude='*.log' /Users/drjforrest/dev/devprojects/ai-africa-funding-tracker/ /Users/jforrest/production/TAIFA-FIALA/
 
 # Install Python dependencies
 /usr/local/bin/uv run pip install -r requirements.txt
