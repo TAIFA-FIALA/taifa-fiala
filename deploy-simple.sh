@@ -51,9 +51,16 @@ kill_port() {
 kill_port 8030
 kill_port 3030
 
-# Stop existing services (fallback)
+# Stop existing services (fallback) 
 pkill -f "uvicorn\|npm.*start\|next.*start" || true
+
+# Clean up any remaining backend processes
+pkill -f "python.*uvicorn" || true
+pkill -f "start_backend.sh" || true
+
 sleep 5
+
+echo "🧹 Cleaning up old SSE connections..."
 
 # Pull latest changes
 git pull org-origin main
@@ -64,6 +71,8 @@ git pull org-origin main
 # Install frontend dependencies and build
 cd frontend/nextjs
 npm install
+# Clean build to ensure latest changes are included
+rm -rf .next
 npm run build
 cd ../..
 
