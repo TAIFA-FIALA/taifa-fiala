@@ -90,7 +90,23 @@ sleep 15
 
 # Check health
 echo "🔍 Checking service health..."
-curl -f http://localhost:8030/health && echo "✅ Backend OK" || echo "❌ Backend FAILED"
+echo "Backend process check:"
+ps aux | grep "uvicorn\|python.*main" | grep -v grep || echo "❌ No backend process found"
+
+echo "Port 8030 check:"
+netstat -tlnp | grep :8030 || echo "❌ Port 8030 not listening"
+
+echo "Testing backend endpoints:"
+curl -f http://localhost:8030/health && echo "✅ Backend health OK" || echo "❌ Backend health FAILED"
+curl -f http://localhost:8030/ && echo "✅ Backend root OK" || echo "❌ Backend root FAILED" 
+curl -f http://localhost:8030/api/v1/events/stream --max-time 5 && echo "✅ SSE endpoint OK" || echo "❌ SSE endpoint FAILED"
+
+echo "Frontend process check:"
+ps aux | grep "npm.*start\|next.*start" | grep -v grep || echo "❌ No frontend process found"
+
+echo "Port 3030 check:"
+netstat -tlnp | grep :3030 || echo "❌ Port 3030 not listening"
+
 curl -f http://localhost:3030 && echo "✅ Frontend OK" || echo "❌ Frontend FAILED"
 
 echo "✅ Deployment complete!"
