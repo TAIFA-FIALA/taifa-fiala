@@ -5,11 +5,11 @@ echo "🚀 Deploying TAIFA-FIALA to production..."
 
 # Copy .env file to production
 echo "📄 Copying .env file..."
-scp .env jforrest@100.75.201.24:/Users/jforrest/production/TAIFA-FIALA/
+scp -o Ciphers=aes256-gcm@openssh.com .env jforrest@100.75.201.24:/Users/jforrest/production/TAIFA-FIALA/
 
 # Deploy and restart services on production
 echo "🔄 Restarting services on production..."
-ssh -T jforrest@100.75.201.24 << 'EOF'
+ssh -T -o Ciphers=aes256-gcm@openssh.com jforrest@100.75.201.24 << 'EOF'
 cd /Users/jforrest/production/TAIFA-FIALA
 
 # Set up pyenv environment
@@ -64,7 +64,7 @@ echo "🧹 Cleaning up old SSE connections..."
 
 # Sync latest changes from local to production
 echo "📤 Syncing local changes to production..."
-rsync -avz --exclude='.git' --exclude='node_modules' --exclude='venv' --exclude='.next' --exclude='logs' --exclude='*.log' /Users/drjforrest/dev/devprojects/ai-africa-funding-tracker/ jforrest@100.75.201.24:/Users/jforrest/production/TAIFA-FIALA/
+rsync -avz -e "ssh -o Ciphers=aes256-gcm@openssh.com" --exclude='.git' --exclude='node_modules' --exclude='venv' --exclude='.next' --exclude='logs' --exclude='*.log' /Users/drjforrest/dev/devprojects/ai-africa-funding-tracker/ jforrest@100.75.201.24:/Users/jforrest/production/TAIFA-FIALA/
 
 # Install Python dependencies
 /usr/local/bin/uv run pip install -r requirements.txt
