@@ -3,16 +3,21 @@
 # Simple deployment script to fix production services
 echo "🚀 Deploying TAIFA-FIALA to production..."
 
-# Copy .env file to production
-echo "📄 Copying .env file..."
 # Get the directory where this script is located
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-scp -o Ciphers=aes256-gcm@openssh.com "$SCRIPT_DIR/.env" jforrest@100.75.201.24:/Users/jforrest/production/TAIFA-FIALA/
+
+# Sync latest changes from local to production
+echo "📤 Syncing local changes to production..."
+rsync -avz -e "ssh -o Ciphers=aes256-gcm@openssh.com" --exclude='.git' --exclude='node_modules' --exclude='venv' --exclude='.next' --exclude='logs' --exclude='*.log' "$SCRIPT_DIR/" jforrest@100.75.201.24:/production/TAIFA-FIALA/
+
+# Copy .env file to production
+echo "📄 Copying .env file..."
+scp -o Ciphers=aes256-gcm@openssh.com "$SCRIPT_DIR/.env" jforrest@100.75.201.24:/production/TAIFA-FIALA/
 
 # Deploy and restart services on production
 echo "🔄 Restarting services on production..."
 ssh -T -o Ciphers=aes256-gcm@openssh.com jforrest@100.75.201.24 << 'EOF'
-cd /Users/jforrest/production/TAIFA-FIALA
+cd /production/TAIFA-FIALA
 
 # Set up pyenv environment
 export PATH="$HOME/.pyenv/shims:$PATH"
@@ -64,11 +69,6 @@ sleep 5
 
 echo "🧹 Cleaning up old SSE connections..."
 
-# Sync latest changes from local to production
-echo "📤 Syncing local changes to production..."
-# Get the directory where this script is located
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-rsync -avz -e "ssh -o Ciphers=aes256-gcm@openssh.com" --exclude='.git' --exclude='node_modules' --exclude='venv' --exclude='.next' --exclude='logs' --exclude='*.log' "$SCRIPT_DIR/" jforrest@100.75.201.24:/Users/jforrest/production/TAIFA-FIALA/
 
 # Install Python dependencies
 /usr/local/bin/uv run pip install -r requirements.txt
