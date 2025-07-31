@@ -9,7 +9,7 @@ scp .env jforrest@100.75.201.24:/Users/jforrest/production/TAIFA-FIALA/
 
 # Deploy and restart services on production
 echo "🔄 Restarting services on production..."
-ssh jforrest@100.75.201.24 << 'EOF'
+ssh -T jforrest@100.75.201.24 << 'EOF'
 cd /Users/jforrest/production/TAIFA-FIALA
 
 # Set up pyenv environment
@@ -24,7 +24,35 @@ nvm use v20.19.0 2>/dev/null || nvm use node || echo "⚠️ nvm not available, 
 # Add npm to PATH explicitly
 export PATH="$HOME/.nvm/versions/node/v20.19.0/bin:$PATH"
 
-# Stop existing services
+# Check and kill processes on ports 8030 and 3000/3030
+echo "🔍 Checking for processes on ports 8030, 3000, and 3030..."
+
+# Function to kill process on a specific port
+kill_port() {
+    local port=$1
+    local pid=$(lsof -ti:$port)
+    if [ ! -z "$pid" ]; then
+        echo "⚠️ Found process on port $port (PID: $pid), killing it..."
+        kill -9 $pid || true
+        sleep 2
+        # Verify it's gone
+        local check_pid=$(lsof -ti:$port)
+        if [ ! -z "$check_pid" ]; then
+            echo "❌ Failed to kill process on port $port"
+        else
+            echo "✅ Successfully killed process on port $port"
+        fi
+    else
+        echo "✅ Port $port is free"
+    fi
+}
+
+# Kill processes on required ports
+kill_port 8030
+kill_port 3000
+kill_port 3030
+
+# Stop existing services (fallback)
 pkill -f "uvicorn\|npm.*start\|next.*start" || true
 sleep 5
 
@@ -52,9 +80,9 @@ set +a  # stop automatically exporting
 nohup python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8030 > ../logs/backend.log 2>&1 &
 cd ..
 
-# Start frontend
+# Start frontend on port 3030
 cd frontend/nextjs
-nohup npm start > ../../logs/frontend.log 2>&1 &
+nohup npm start -- -p 3030 > ../../logs/frontend.log 2>&1 &
 cd ../..
 
 # Wait for services to start
