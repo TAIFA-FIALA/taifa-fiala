@@ -13,7 +13,7 @@ from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/api/v1/events", tags=["events"])
+router = APIRouter(tags=["events"])
 
 # Global event queue for broadcasting to all connected clients
 event_queue: asyncio.Queue = asyncio.Queue()
