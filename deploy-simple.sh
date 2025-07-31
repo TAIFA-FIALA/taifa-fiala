@@ -77,7 +77,13 @@ set -a  # automatically export all variables
 source ../.env
 export ENVIRONMENT=production
 set +a  # stop automatically exporting
-nohup python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8030 > ../logs/backend.log 2>&1 &
+
+# Debug: verify key environment variables are loaded
+echo "🔍 Environment variables check:"
+echo "SUPABASE_URL: ${SUPABASE_URL:0:30}..." 
+echo "SUPABASE_PROJECT_URL: ${SUPABASE_PROJECT_URL:0:30}..." 
+echo "ENVIRONMENT: $ENVIRONMENT"
+nohup python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8030 --no-reload > ../logs/backend.log 2>&1 &
 cd ..
 
 # Start frontend on port 3030
